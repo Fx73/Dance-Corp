@@ -1,0 +1,28 @@
+ion-grid{
+  padding: 0px;
+}
+
+ion-col{
+  padding: 0px;
+  margin-bottom: 16px;
+}
+
+
+
+
+ion-modal {
+  --height:fit-content;
+  --border-radius: 16px;
+}
+
+.recoveryText{
+  text-align: right;
+  color: #888;
+  font-size: smaller;
+  font-style: italic;
+  cursor: pointer;
+}
+
+.base-card{
+  width: 100%;
+}

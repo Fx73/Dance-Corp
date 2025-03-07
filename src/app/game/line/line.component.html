@@ -1,0 +1,6 @@
+<div [style]="{'bottom': position + '%'}"
+	class="line">
+	<ng-container *ngFor="let arrow of arrows">
+		<app-arrow [direction]="arrow.direction"></app-arrow>
+	</ng-container>
+</div>

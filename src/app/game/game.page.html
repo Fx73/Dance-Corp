@@ -1,0 +1,11 @@
+<ion-header [translucent]="true">
+	<ion-toolbar>
+		<ion-title>Game</ion-title>
+	</ion-toolbar>
+</ion-header>
+<ion-content [fullscreen]="true">
+	<ng-container *ngFor="let line of lines">
+		<app-line [arrows]="line.arrows"
+			[position]="line.time"></app-line>
+	</ng-container>
+</ion-content>
