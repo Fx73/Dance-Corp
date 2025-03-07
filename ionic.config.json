@@ -1,5 +1,8 @@
 {
   "name": "DanceCorp",
-  "integrations": {},
-  "type": "angular-standalone"
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular",
+  "id": "7202c11e"
 }
