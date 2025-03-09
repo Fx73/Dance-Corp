@@ -1,13 +1,60 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>upload</ion-title>
-  </ion-toolbar>
-</ion-header>
+<app-header title="Upload"></app-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">upload</ion-title>
-    </ion-toolbar>
-  </ion-header>
+
+
+<ion-content>
+	<div class="container">
+		<h2>
+			Select a .sm or .ssc File
+		</h2>
+		<input (change)="onFileSelected($event)"
+			type="file"
+			accept=".sm,.ssc">
+
+
+
+		<div *ngIf="musicData">
+			<h3>File Information:</h3>
+			<p>
+				<strong>Title:</strong>
+				{{ musicData.title }}
+			</p>
+			<p>
+				<strong>Artist:</strong>
+				{{ musicData.artist }}
+			</p>
+			<p>
+				<strong>Banner:</strong>
+				{{ musicData.banner }}
+			</p>
+			<p>
+				<strong>Background:</strong>
+				{{ musicData.background }}
+			</p>
+			<p>
+				<strong>CD Title:</strong>
+				{{ musicData.cdTitle }}
+			</p>
+			<p>
+				<strong>Music:</strong>
+				{{ musicData.music }}
+			</p>
+			<p>
+				<strong>Sample Start:</strong>
+				{{ musicData.sampleStart }}
+			</p>
+			<p>
+				<strong>Sample Length:</strong>
+				{{ musicData.sampleLength }}
+			</p>
+			<p>
+				<strong>BPMS:</strong>
+				{{ musicData.bpms }}
+			</p>
+			<h3>Notes:</h3>
+			<div *ngFor="let block of musicData.notes">
+				<pre>{{ block }}</pre>
+			</div>
+		</div>
+	</div>
 </ion-content>

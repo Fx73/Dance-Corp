@@ -5,7 +5,7 @@ import { IonContent, IonHeader, IonIcon, IonTitle, IonToolbar } from '@ionic/ang
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LineComponent } from "./line/line.component";
-import { MusicDTO } from './dto/music.dto';
+import { MusicDto } from './dto/music.dto';
 
 @Component({
   selector: 'app-game',
@@ -17,7 +17,7 @@ import { MusicDTO } from './dto/music.dto';
 export class GamePage implements OnInit {
   ArrowDirection = ArrowDirection;
   lines: { arrows: { direction: ArrowDirection }[], time: number }[] = [];
-  MusicDTO = new MusicDTO();
+  MusicDto: Partial<MusicDto> = { notes: [] };
 
   constructor(private ngZone: NgZone) { }
 
@@ -44,9 +44,9 @@ export class GamePage implements OnInit {
   startSequence() {
     let second = 0;
     setInterval(() => {
-      if (second < this.MusicDTO.sequence.length) {
-        const arrows = this.MusicDTO.sequence[second].map((value, index) => {
-          return value === 1 ? { direction: this.getDirection(index) } : null;
+      if (second < this.MusicDto.notes!.length) {
+        const arrows = this.MusicDto.notes![0].stepChart[0].steps.map((value, index) => {
+          return value[0] === 1 ? { direction: this.getDirection(index) } : null;
         }).filter(arrow => arrow !== null);
         this.lines.push({ arrows, time: Date.now() });
         second++;

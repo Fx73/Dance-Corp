@@ -15,7 +15,7 @@
 				Commencer le jeu
 			</ion-button>
 			<ion-button [routerLink]="['/upload']"
-				[disabled]="!isUserLoggedIn()"
+				[disabled]="false && !isUserLoggedIn()"
 				expand="block"
 				size="large"
 				class="home-content">

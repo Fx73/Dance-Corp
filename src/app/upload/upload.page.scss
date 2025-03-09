@@ -1,0 +1,22 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding: 16px;
+  text-align: center;
+}
+
+h2 {
+  margin-bottom: 16px;
+}
+
+input[type="file"] {
+  margin-bottom: 16px;
+}
+
+ion-button {
+  --background: #3880ff;
+  --color: white;
+}
