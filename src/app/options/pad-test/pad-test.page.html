@@ -1,0 +1,49 @@
+<app-header title="Gamepad Test"></app-header>
+
+<ion-content>
+  <div class="container">
+    <h2>Gamepad Information</h2>
+
+    <ng-container *ngIf="gamepadService.gamepad; else noGamepad">
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>Gamepad {{ gamepadService.gamepad.index }}</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <p><strong>Name:</strong> {{ gamepadService.gamepad.id }}</p>
+          <p><strong>Buttons:</strong> {{ gamepadService.getTotalButtons() }}</p>
+          <p><strong>Axes:</strong> {{ gamepadService.getAxes().length }}</p>
+
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>Pressed Buttons</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <div class="buttons-container">
+                <div
+                  *ngFor="let button of gamepadService.gamepad.buttons; let i = index"
+                  [class.active]="gamepadService.isButtonPressed(i)">
+                  Button {{ i }}: {{ button.value }}
+                </div>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-card-content>
+      </ion-card>
+     
+    </ng-container>
+    
+    <ng-template #noGamepad>
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>No Gamepad Detected</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <p>Please connect a gamepad and press any button.</p>
+        </ion-card-content>
+      </ion-card>
+    </ng-template>
+    
+    
+  </div>
+</ion-content>

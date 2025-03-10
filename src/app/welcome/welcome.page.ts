@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, NgZone, OnInit } from '@angular/core';
 import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 
 import { CommonModule } from '@angular/common';
@@ -16,8 +16,12 @@ import { UserComponent } from '../shared/user/user.component';
 })
 export class WelcomePage implements OnInit {
 
+  constructor(private ngZone: NgZone) { }
+
   ngOnInit() {
+
   }
+
 
   isUserLoggedIn() {
     return UserComponent.user !== null

@@ -3,11 +3,11 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'welcome',
+    redirectTo: 'home',
     pathMatch: 'full',
   },
   {
-    path: 'welcome',
+    path: 'home',
     loadComponent: () => import('./welcome/welcome.page').then(m => m.WelcomePage)
   },
   {
@@ -17,5 +17,13 @@ export const routes: Routes = [
   {
     path: 'upload',
     loadComponent: () => import('./upload/upload.page').then(m => m.UploadPage)
+  },
+  {
+    path: 'options',
+    loadComponent: () => import('./options/options.page').then( m => m.OptionsPage)
+  },
+  {
+    path: 'pad-test',
+    loadComponent: () => import('./options/pad-test/pad-test.page').then( m => m.PadTestPage)
   },
 ];

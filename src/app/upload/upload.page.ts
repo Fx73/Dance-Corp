@@ -16,6 +16,7 @@ import { SccReader } from './reader.ssc';
 })
 export class UploadPage {
   musicData: MusicDto | null = null;
+  static musicData: MusicDto | null = null;
 
   onFileSelected(event: any): void {
     const file: File = event.target.files[0];
@@ -24,6 +25,7 @@ export class UploadPage {
       reader.onload = (e) => {
         const content = e.target?.result as string;
         this.musicData = SccReader.parseFile(file.name, content);
+        UploadPage.musicData = this.musicData;
       };
       reader.readAsText(file);
     }

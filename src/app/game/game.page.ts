@@ -1,11 +1,12 @@
 import { ArrowComponent, ArrowDirection } from "./arrow/arrow.component";
-import { Component, NgZone, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { IonContent, IonHeader, IonIcon, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LineComponent } from "./line/line.component";
 import { MusicDto } from './dto/music.dto';
+import { UploadPage } from "../upload/upload.page";
 
 @Component({
   selector: 'app-game',
@@ -17,35 +18,21 @@ import { MusicDto } from './dto/music.dto';
 export class GamePage implements OnInit {
   ArrowDirection = ArrowDirection;
   lines: { arrows: { direction: ArrowDirection }[], time: number }[] = [];
-  MusicDto: Partial<MusicDto> = { notes: [] };
+  musicDto: MusicDto | null = null;
 
-  constructor(private ngZone: NgZone) { }
-
-
+  constructor() { }
 
   ngOnInit() {
-    window.addEventListener('gamepadconnected', (event) => {
-      const gamepad = event.gamepad;
-      this.ngZone.run(() => {
-        console.log(`Gamepad connected: ${gamepad.id}`);
-      });
-    });
-
-    window.addEventListener('gamepaddisconnected', (event) => {
-      this.ngZone.run(() => {
-        console.log('Gamepad disconnected.');
-      });
-    });
-
-    this.updateGamepadStatus();
-    this.startSequence();
+    this.musicDto = UploadPage.musicData;
+    if (this.musicDto)
+      this.startSequence();
   }
 
   startSequence() {
     let second = 0;
     setInterval(() => {
-      if (second < this.MusicDto.notes!.length) {
-        const arrows = this.MusicDto.notes![0].stepChart[0].steps.map((value, index) => {
+      if (second < this.musicDto!.notes!.length) {
+        const arrows = this.musicDto!.notes![0].stepChart[0].steps.map((value, index) => {
           return value[0] === 1 ? { direction: this.getDirection(index) } : null;
         }).filter(arrow => arrow !== null);
         this.lines.push({ arrows, time: Date.now() });
@@ -67,27 +54,6 @@ export class GamePage implements OnInit {
       default:
         return ArrowDirection.Up;
     }
-  }
-
-  updateGamepadStatus() {
-    const gamepads = navigator.getGamepads();
-    for (const gamepad of gamepads) {
-      if (gamepad) {
-        gamepad.buttons.forEach((button, index) => {
-          if (button.pressed) {
-            this.ngZone.run(() => {
-              console.log(`Button ${index} pressed`);
-            });
-          }
-        });
-        gamepad.axes.forEach((axis, index) => {
-          this.ngZone.run(() => {
-            console.log(`Axis ${index}: ${axis}`);
-          });
-        });
-      }
-    }
-    requestAnimationFrame(() => this.updateGamepadStatus());
   }
 
 

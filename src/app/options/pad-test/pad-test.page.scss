@@ -1,0 +1,21 @@
+.buttons-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 10px;
+}
+
+div.active {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+div {
+  padding: 10px;
+  background-color: #a1a1a1;
+  color: black;
+  border-radius: 8px;
+  text-align: center;
+}

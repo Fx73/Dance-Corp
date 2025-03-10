@@ -1,7 +1,6 @@
+import { Component, OnInit } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 
-import { Component } from '@angular/core';
-import { HeaderComponent } from "./shared/header/header.component";
 import { ToastController } from '@ionic/angular';
 
 @Component({
@@ -10,21 +9,21 @@ import { ToastController } from '@ionic/angular';
   styleUrls: ['app.component.scss'],
   imports: [IonApp, IonRouterOutlet],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   static appInstance: AppComponent;
-
-  static presentOkToast(message: string) {
-    AppComponent.appInstance.presentOkToast(message)
-  }
-  static presentWarningToast(message: string) {
-    AppComponent.appInstance.presentWarningToast(message)
-  }
 
   constructor(private toastController: ToastController) {
     AppComponent.appInstance = this;
   }
 
+  ngOnInit() {
 
+  }
+
+
+
+
+  //#region Toasts
   async presentOkToast(message: string) {
     const toast = await this.toastController.create({
       message: message,
@@ -42,4 +41,12 @@ export class AppComponent {
     });
     toast.present();
   }
+
+  static presentOkToast(message: string) {
+    AppComponent.appInstance.presentOkToast(message)
+  }
+  static presentWarningToast(message: string) {
+    AppComponent.appInstance.presentWarningToast(message)
+  }
+  //#endregion
 }
