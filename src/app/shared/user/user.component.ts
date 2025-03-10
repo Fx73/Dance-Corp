@@ -1,6 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { IonicModule, PopoverController } from '@ionic/angular';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { logoGoogle, person } from 'ionicons/icons';
 
 import { IonIcon } from '@ionic/angular/standalone';
 import { LoginComponent } from './login/login.component';
@@ -9,7 +10,6 @@ import { NgIf } from '@angular/common';
 import { Router } from '@angular/router';
 import { User } from 'firebase/auth';
 import { addIcons } from 'ionicons';
-import { person } from 'ionicons/icons';
 
 @Component({
   selector: 'app-user',
@@ -35,7 +35,8 @@ export class UserComponent {
       this.user = _user;
     });
     addIcons({
-      'person': person
+      'person': person,
+      'logoGoogle': logoGoogle
     });
   }
 

@@ -1,60 +1,184 @@
 <app-header title="Upload"></app-header>
-
-
-
-<ion-content>
+<ion-content [fullscreen]="true">
 	<div class="container">
-		<h2>
-			Select a .sm or .ssc File
-		</h2>
-		<input (change)="onFileSelected($event)"
-			type="file"
-			accept=".sm,.ssc">
-
-
-
+		<ion-card>
+			<ion-card-header>
+				<ion-card-title>
+					Select a .sm, .ssc, or .essc File
+				</ion-card-title>
+			</ion-card-header>
+			<ion-card-content>
+				<input (change)="onFileSelected($event)"
+					type="file"
+					accept=".sm,.ssc,.essc">
+			</ion-card-content>
+		</ion-card>
 		<div *ngIf="musicData">
-			<h3>File Information:</h3>
-			<p>
-				<strong>Title:</strong>
-				{{ musicData.title }}
-			</p>
-			<p>
-				<strong>Artist:</strong>
-				{{ musicData.artist }}
-			</p>
-			<p>
-				<strong>Banner:</strong>
-				{{ musicData.banner }}
-			</p>
-			<p>
-				<strong>Background:</strong>
-				{{ musicData.background }}
-			</p>
-			<p>
-				<strong>CD Title:</strong>
-				{{ musicData.cdTitle }}
-			</p>
-			<p>
-				<strong>Music:</strong>
-				{{ musicData.music }}
-			</p>
-			<p>
-				<strong>Sample Start:</strong>
-				{{ musicData.sampleStart }}
-			</p>
-			<p>
-				<strong>Sample Length:</strong>
-				{{ musicData.sampleLength }}
-			</p>
-			<p>
-				<strong>BPMS:</strong>
-				{{ musicData.bpms }}
-			</p>
-			<h3>Notes:</h3>
-			<div *ngFor="let block of musicData.notes">
-				<pre>{{ block }}</pre>
-			</div>
+			<!-- Metadata Card -->
+			<ion-card>
+				<ion-card-header>
+					<ion-card-title>File Metadata</ion-card-title>
+				</ion-card-header>
+				<ion-card-content>
+					<p>
+						<strong>Title:</strong>
+						{{ musicData.title }}
+					</p>
+					<p>
+						<strong>Title (Translit):</strong>
+						{{ musicData.titletranslit }}
+					</p>
+					<p>
+						<strong>Subtitle:</strong>
+						{{ musicData.subtitle }}
+					</p>
+					<p>
+						<strong>
+							Subtitle (Translit):
+						</strong>
+						{{ musicData.subtitletranslit }}
+					</p>
+					<p>
+						<strong>Artist:</strong>
+						{{ musicData.artist }}
+					</p>
+					<p>
+						<strong>Artist (Translit):</strong>
+						{{ musicData.artisttranslit }}
+					</p>
+					<p>
+						<strong>Genre:</strong>
+						{{ musicData.genre }}
+					</p>
+					<p>
+						<strong>Credit:</strong>
+						{{ musicData.credit }}
+					</p>
+					<p>
+						<strong>Banner:</strong>
+						{{ musicData.banner }}
+					</p>
+					<p>
+						<strong>Background:</strong>
+						{{ musicData.background }}
+					</p>
+					<p>
+						<strong>Jacket:</strong>
+						{{ musicData.jacket }}
+					</p>
+					<p>
+						<strong>CD Title:</strong>
+						{{ musicData.cdTitle }}
+					</p>
+					<p>
+						<strong>Music:</strong>
+						{{ musicData.music }}
+					</p>
+					<p>
+						<strong>Offset:</strong>
+						{{ musicData.offset }}
+					</p>
+					<p>
+						<strong>Sample Start:</strong>
+						{{ musicData.sampleStart }}
+					</p>
+					<p>
+						<strong>Sample Length:</strong>
+						{{ musicData.sampleLength }}
+					</p>
+					<p>
+						<strong>BPMS:</strong>
+						{{ musicData.bpms }}
+					</p>
+					<p>
+						<strong>Stops:</strong>
+						{{ musicData.stops }}
+					</p>
+					<p>
+						<strong>Delays:</strong>
+						{{ musicData.delays }}
+					</p>
+					<p>
+						<strong>Warps:</strong>
+						{{ musicData.warps }}
+					</p>
+					<p>
+						<strong>BG Changes:</strong>
+						{{ musicData.bgChanges }}
+					</p>
+				</ion-card-content>
+			</ion-card>
+			<!-- Notes Data Card -->
+			<ion-card>
+				<ion-card-header>
+					<ion-card-title>Notes Data</ion-card-title>
+				</ion-card-header>
+				<ion-card-content>
+					<ion-card *ngFor="let notes of musicData.notes">
+						<ion-card-header>
+							<ion-card-title>
+								{{ notes.chartName || 'Part ' + notes.difficulty }}
+							</ion-card-title>
+						</ion-card-header>
+						<ion-card-content>
+							<p>
+								<strong>Steps Type:</strong>
+								{{ notes.stepsType }}
+							</p>
+							<p>
+								<strong>Description:</strong>
+								{{ notes.description }}
+							</p>
+							<p>
+								<strong>Difficulty:</strong>
+								{{ notes.difficulty }}
+							</p>
+							<p>
+								<strong>Meter:</strong>
+								{{ notes.meter }}
+							</p>
+							<p>
+								<strong>Credit:</strong>
+								{{ notes.credit }}
+							</p>
+							<p>
+								<strong>Total Measures:</strong>
+								{{ notes.stepChart.length }}
+							</p>
+							<p>
+								<strong>Tap:</strong>
+								{{ getStepCount(notes.stepChart, 1) }}
+							</p>
+							<p>
+								<strong>Hold:</strong>
+								{{ getStepCount(notes.stepChart, 2) }}
+							</p>
+							<p>
+								<strong>Roll:</strong>
+								{{ getStepCount(notes.stepChart, 4) }}
+							</p>
+							<p>
+								<strong>Mine:</strong>
+								{{ getStepCount(notes.stepChart, 5) }}
+							</p>
+						</ion-card-content>
+					</ion-card>
+				</ion-card-content>
+			</ion-card>
+			<!-- Additional Fields Card -->
+			<ion-card>
+				<ion-card-header>
+					<ion-card-title>Additional Fields</ion-card-title>
+				</ion-card-header>
+				<ion-card-content>
+					<div *ngFor="let field of musicData.additionalFields | keyvalue">
+						<p>
+							<strong>{{ field.key }}:</strong>
+							{{ field.value }}
+						</p>
+					</div>
+				</ion-card-content>
+			</ion-card>
 		</div>
 	</div>
 </ion-content>

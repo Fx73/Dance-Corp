@@ -1,9 +1,10 @@
+import { IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonContent } from '@ionic/angular/standalone';
+import { Measures, MusicDto } from '../game/dto/music.dto';
+
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from "../shared/header/header.component"; // Importer le SmReader
-import { IonContent } from '@ionic/angular/standalone';
-import { MusicDto } from '../game/dto/music.dto';
 import { SccReader } from './reader.ssc';
 
 @Component({
@@ -11,7 +12,7 @@ import { SccReader } from './reader.ssc';
   templateUrl: './upload.page.html',
   styleUrls: ['./upload.page.scss'],
   standalone: true,
-  imports: [IonContent, CommonModule, FormsModule, HeaderComponent]
+  imports: [IonCardTitle, IonCardContent, IonCardHeader, IonCard, IonContent, CommonModule, FormsModule, HeaderComponent]
 })
 export class UploadPage {
   musicData: MusicDto | null = null;
@@ -27,4 +28,19 @@ export class UploadPage {
       reader.readAsText(file);
     }
   }
+
+  getStepCount(stepChart: Measures[], stepType: number): number {
+    let count = 0;
+    stepChart.forEach(measure => {
+      measure.steps.forEach(row => {
+        row.forEach(step => {
+          if (step === stepType) {
+            count++;
+          }
+        });
+      });
+    });
+    return count;
+  }
+
 }
