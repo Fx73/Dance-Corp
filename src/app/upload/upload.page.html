@@ -88,8 +88,11 @@
 					</p>
 					<p>
 						<strong>BPMS:</strong>
-						{{ musicData.bpms }}
-					</p>
+						<span *ngFor="let bpm of musicData.bpms; let i = index">
+						  {{ bpm.time }}s = {{ bpm.bpm }}{{ i < musicData.bpms.length - 1 ? ',' : '' }}
+						</span>
+					  </p>
+					  
 					<p>
 						<strong>Stops:</strong>
 						{{ musicData.stops }}

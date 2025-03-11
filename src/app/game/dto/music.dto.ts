@@ -15,7 +15,7 @@ export class MusicDto {
   offset?: number;
   sampleStart?: number;
   sampleLength?: number;
-  bpms?: string;
+  bpms: BpmChange[] = [];
   stops?: string;
   delays?: string;
   warps?: string;
@@ -68,7 +68,7 @@ export class MusicDto {
     delete tokenMap["warps"];
     this.bgChanges = tokenMap["bgchanges"];
     delete tokenMap["bgchanges"];
-    this.bpms = tokenMap["bpms"];
+    this.bpms = this.parseBpmChanges(tokenMap["bpms"]);
     delete tokenMap["bpms"];
 
     Object.keys(tokenMap).forEach(key => {
@@ -81,6 +81,19 @@ export class MusicDto {
 
     this.additionalFields = { ...tokenMap };
   }
+
+
+  private parseBpmChanges(bpmChanges: string): BpmChange[] {
+    const changes = bpmChanges.split(',');
+    return changes.map(change => {
+      const [timeStr, bpmStr] = change.split('=');
+      const time = parseFloat(timeStr);
+      const bpm = parseFloat(bpmStr);
+      return { time, bpm };
+    });
+  }
+
+
 }
 
 
@@ -115,4 +128,9 @@ export class Notes {
 
 export class Measures {
   steps: number[][] = [];
+}
+
+export class BpmChange {
+  time: number = 0;
+  bpm: number = 120;
 }

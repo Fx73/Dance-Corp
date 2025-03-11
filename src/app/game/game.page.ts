@@ -1,11 +1,11 @@
 import { ArrowComponent, ArrowDirection } from "./arrow/arrow.component";
 import { Component, OnInit } from '@angular/core';
 import { IonContent, IonHeader, IonIcon, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { MusicDto, Notes } from './dto/music.dto';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LineComponent } from "./line/line.component";
-import { MusicDto } from './dto/music.dto';
 import { UploadPage } from "../upload/upload.page";
 
 @Component({
@@ -16,30 +16,68 @@ import { UploadPage } from "../upload/upload.page";
   imports: [IonIcon, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, ArrowComponent, LineComponent]
 })
 export class GamePage implements OnInit {
-  ArrowDirection = ArrowDirection;
-  lines: { arrows: { direction: ArrowDirection }[], time: number }[] = [];
+  //#region Constants
+  readonly ArrowDirection = ArrowDirection;
+  readonly MAX_BARS: number = 12;
+  //#endregion
+  //#region animations
+  arrowlines: { arrows: { direction: ArrowDirection }[], time: number }[] = [];
+  lines: any[] = [];
+  //#endregion
   musicDto: MusicDto | null = null;
+  notesDto: Notes | undefined;
+  notesIdx: number = 0;
+
+  speed: number = 3000;
+  interval: number = 500;
 
   constructor() { }
 
   ngOnInit() {
+    this.startLinesAnimation();
     this.musicDto = UploadPage.musicData;
-    if (this.musicDto)
-      this.startSequence();
+    if (this.musicDto === null) {
+      return
+    }
+    this.notesDto = this.musicDto.notes[this.notesIdx];
+    this.interval = 60000 / this.musicDto.bpms[0].bpm;
+    this.speed = this.interval * 6;
+    this.startLinesAnimation();
+    this.startSequence();
+  }
+
+  startLinesAnimation(): void {
+    setInterval(() => {
+      if (this.lines.length >= this.MAX_BARS) {
+        this.lines.shift(); // Supprime la barre la plus ancienne
+      }
+      this.lines.push({}); // Ajoute une nouvelle barre
+    }, this.interval);
   }
 
   startSequence() {
-    let second = 0;
+    if (this.notesDto === undefined)
+      return;
+
     setInterval(() => {
-      if (second < this.musicDto!.notes!.length) {
-        const arrows = this.musicDto!.notes![0].stepChart[0].steps.map((value, index) => {
-          return value[0] === 1 ? { direction: this.getDirection(index) } : null;
-        }).filter(arrow => arrow !== null);
-        this.lines.push({ arrows, time: Date.now() });
-        second++;
-      }
     }, 1000);
+
+    let measure = 0;
+    setInterval(() => {
+      let time = 0;
+      setInterval(() => {
+        const arrows = this.notesDto!.stepChart[measure].steps.map((row, index) => {
+          return row.some(step => step === 1) ? { direction: this.getDirection(index) } : null;
+        }).filter(arrow => arrow !== null);
+
+        this.arrowlines.push({ arrows, time: Date.now() });
+        time++;
+      }, 1000);
+      measure++;
+    }, 4000);
+
   }
+
 
   getDirection(index: number): ArrowDirection {
     switch (index) {
@@ -58,3 +96,7 @@ export class GamePage implements OnInit {
 
 
 }
+function assert(arg0: boolean, arg1: string) {
+  throw new Error("Function not implemented.");
+}
+

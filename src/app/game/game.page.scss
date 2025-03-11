@@ -2,3 +2,20 @@ ion-content{
   --background: grey ;
   --overflow: hidden;
 }
+
+.line {
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  animation: moveUp linear infinite;
+  border: 1px solid rgb(0, 0, 0);
+}
+
+@keyframes moveUp {
+  from {
+    bottom: -20px; /* Hors de l'écran en bas */
+  }
+  to {
+    bottom: 100%; /* Hors de l'écran en haut */
+  }
+}

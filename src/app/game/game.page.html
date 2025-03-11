@@ -4,8 +4,11 @@
 	</ion-toolbar>
 </ion-header>
 <ion-content [fullscreen]="true">
-	<ng-container *ngFor="let line of lines">
+	<div *ngFor="let line of lines" class="line" [style.animation-duration]="speed + 'ms'" ></div>
+	  
+	  <!--
+	<ng-container *ngFor="let line of arrowlines">
 		<app-line [arrows]="line.arrows"
 			[position]="line.time"></app-line>
-	</ng-container>
+	</ng-container>-->
 </ion-content>
