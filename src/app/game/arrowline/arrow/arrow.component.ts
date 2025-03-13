@@ -14,8 +14,6 @@ export class ArrowComponent implements OnInit {
 
   @Input()
   direction: ArrowDirection = ArrowDirection.Up;
-
-  position: number = 0;
   transform: string = '';
 
   constructor() {
@@ -23,7 +21,6 @@ export class ArrowComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.position = this.getPosition();
     this.transform = this.getTransform();
   }
 
@@ -37,21 +34,6 @@ export class ArrowComponent implements OnInit {
         return 'rotate(90deg)';
       default:
         return 'rotate(0deg)';
-    }
-  }
-
-  getPosition(): number {
-    switch (this.direction) {
-      case ArrowDirection.Left:
-        return 0;
-      case ArrowDirection.Down:
-        return 25;
-      case ArrowDirection.Up:
-        return 50;
-      case ArrowDirection.Right:
-        return 75;
-      default:
-        return 0;
     }
   }
 }

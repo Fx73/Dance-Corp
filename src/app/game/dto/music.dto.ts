@@ -118,7 +118,6 @@ export class Notes {
 
     this.stepChart = tokenMap["notes"].split(',').map(measure => {
       const measureInstance = new Measures();
-      console.log(measure);
       measureInstance.steps = measure.trim().split('\n').map(line => line.trim().split('').map(step => parseInt(step)));
       return measureInstance;
     });

@@ -7,15 +7,36 @@ ion-content{
   position: absolute;
   width: 100%;
   height: 1px;
+  background-color: black;
   animation: moveUp linear infinite;
-  border: 1px solid rgb(0, 0, 0);
 }
+
+.arrow-container {
+  position: absolute;
+  width: 50vw;
+  height: 100%;
+  overflow-y: visible;
+}
+
+.row-goal {
+  display: flex;
+  justify-content: center;
+  margin-top: 0;
+  padding: 10px;
+}
+
+.arrow-goal {
+  width: 100px;
+  height: auto;
+  margin: 40px;
+}
+
 
 @keyframes moveUp {
   from {
-    bottom: -20px; /* Hors de l'écran en bas */
+    bottom: 0px;
   }
   to {
-    bottom: 100%; /* Hors de l'écran en haut */
+    bottom: 100%;
   }
 }

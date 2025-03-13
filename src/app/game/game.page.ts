@@ -1,11 +1,11 @@
-import { ArrowComponent, ArrowDirection } from "./arrow/arrow.component";
-import { Component, OnInit } from '@angular/core';
+import { ArrowComponent, ArrowDirection } from "./arrowline/arrow/arrow.component";
+import { Component, Input, OnInit, input } from '@angular/core';
 import { IonContent, IonHeader, IonIcon, IonTitle, IonToolbar } from '@ionic/angular/standalone';
-import { MusicDto, Notes } from './dto/music.dto';
+import { Measures, MusicDto, Notes } from './dto/music.dto';
 
+import { ArrowlineComponent } from "./arrowline/arrowline.component";
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LineComponent } from "./line/line.component";
 import { UploadPage } from "../upload/upload.page";
 
 @Component({
@@ -13,69 +13,93 @@ import { UploadPage } from "../upload/upload.page";
   templateUrl: './game.page.html',
   styleUrls: ['./game.page.scss'],
   standalone: true,
-  imports: [IonIcon, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, ArrowComponent, LineComponent]
+  imports: [IonIcon, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, ArrowlineComponent, ArrowComponent]
 })
 export class GamePage implements OnInit {
   //#region Constants
   readonly ArrowDirection = ArrowDirection;
-  readonly MAX_BARS: number = 12;
+  readonly MAX_BARS: number = 8;
   //#endregion
   //#region animations
-  arrowlines: { arrows: { direction: ArrowDirection }[], time: number }[] = [];
+  arrowlines: { arrows: Uint8Array, position: number }[] = [];
   lines: any[] = [];
   //#endregion
   musicDto: MusicDto | null = null;
-  notesDto: Notes | undefined;
+  notesDto: number[][] = [];
+  movingDiv: HTMLElement | null = null;
+
   notesIdx: number = 0;
 
-  speed: number = 3000;
-  interval: number = 500;
+  speed: number = 6000;
+  interval: number = 1000;
 
   constructor() { }
 
   ngOnInit() {
-    this.startLinesAnimation();
+    this.movingDiv = document.getElementById("arrow-container");
     this.musicDto = UploadPage.musicData;
     if (this.musicDto === null) {
       return
     }
-    this.notesDto = this.musicDto.notes[this.notesIdx];
     this.interval = 60000 / this.musicDto.bpms[0].bpm;
     this.speed = this.interval * 6;
+    this.notesDto = this.LoadStepChart(this.musicDto.notes[this.notesIdx].stepChart);
     this.startLinesAnimation();
-    this.startSequence();
+    this.loadArrows();
+    this.startArrows();
   }
+
+  private LoadStepChart(stepChart: Measures[]): number[][] {
+    const normalizedStepChart: number[][] = [];
+    stepChart.forEach(measure => {
+      const stepadd = 16 / measure.steps.length - 1; // 16 = Normalize to quarter of second
+      for (let i = 0; i < measure.steps.length; i++) {
+        normalizedStepChart.push(measure.steps[i]);
+        for (let i = 0; i < stepadd; i++)
+          normalizedStepChart.push([]);
+      }
+    });
+    return normalizedStepChart;
+  }
+
 
   startLinesAnimation(): void {
-    setInterval(() => {
-      if (this.lines.length >= this.MAX_BARS) {
-        this.lines.shift(); // Supprime la barre la plus ancienne
-      }
-      this.lines.push({}); // Ajoute une nouvelle barre
-    }, this.interval);
+    for (let index = 0; index < this.MAX_BARS; index++) {
+      this.lines.push({});
+    }
+
+  }
+  trackBy(_: any, index: number) {
+    return index;
   }
 
-  startSequence() {
-    if (this.notesDto === undefined)
-      return;
+  loadArrows(): void {
+    const quarterNote = (this.interval / this.speed) * 100;
+    let timeIdx = 0;
+    const notes = this.musicDto!.notes[this.notesIdx].stepChart;
 
+    notes.forEach((measure) => {
+      const measurePosition = timeIdx * quarterNote;
+      const divideNote = quarterNote * (1 / measure.steps.length);
+
+      measure.steps.forEach((line, stepIdx) => {
+        const linePosition = measurePosition + stepIdx * divideNote;
+        const arrows = new Uint8Array(Array.from(line, c => parseInt(c.toString(), 10)));
+        this.arrowlines.push({
+          arrows,
+          position: linePosition,
+        });
+      });
+
+      timeIdx++;
+    });
+  }
+
+  startArrows(): void {
     setInterval(() => {
-    }, 1000);
-
-    let measure = 0;
-    setInterval(() => {
-      let time = 0;
-      setInterval(() => {
-        const arrows = this.notesDto!.stepChart[measure].steps.map((row, index) => {
-          return row.some(step => step === 1) ? { direction: this.getDirection(index) } : null;
-        }).filter(arrow => arrow !== null);
-
-        this.arrowlines.push({ arrows, time: Date.now() });
-        time++;
-      }, 1000);
-      measure++;
-    }, 4000);
-
+      const currentTop = parseInt(this.movingDiv!.style.top || "0", 10);
+      this.movingDiv!.style.top = `${currentTop - 10}px`;
+    }, 20);
   }
 
 
@@ -95,8 +119,5 @@ export class GamePage implements OnInit {
   }
 
 
-}
-function assert(arg0: boolean, arg1: string) {
-  throw new Error("Function not implemented.");
 }
 
