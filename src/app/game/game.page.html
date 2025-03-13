@@ -5,10 +5,10 @@
 </ion-header>
 <ion-content [fullscreen]="true">
 	<div class="row-goal">
-		<img src="assets/Arrow/Arrow.png" alt="ArrowLeft" style="transform: rotate(45deg);" class="arrow-goal" />
-		<img src="assets/Arrow/Arrow.png" alt="ArrowUp" style="transform: rotate(-45deg);" class="arrow-goal" />
-		<img src="assets/Arrow/Arrow.png" alt="ArrowDown" style="transform: rotate(135deg);" class="arrow-goal" />
-		<img src="assets/Arrow/Arrow.png" alt="ArrowRight" style="transform: rotate(-135deg);" class="arrow-goal" />		
+		<img src="assets/Arrow/Arrow.png" alt="ArrowLeft" [style]="{ left: 20 + '%', transform: 'rotate(45deg)' }" class="arrow-goal" />
+		<img src="assets/Arrow/Arrow.png" alt="ArrowDown" [style]="{ left: 40 + '%', transform: 'rotate(-45deg)' }" class="arrow-goal" />
+		<img src="assets/Arrow/Arrow.png" alt="ArrowUp" [style]="{ left: 60 + '%', transform: 'rotate(135deg)' }" class="arrow-goal" />
+		<img src="assets/Arrow/Arrow.png" alt="ArrowRight" [style]="{ left: 80 + '%', transform: 'rotate(-135deg)' }" class="arrow-goal" />		
 	</div>
 
 	<div *ngFor="let line of lines; trackBy: trackBy; let index = index"
@@ -18,7 +18,7 @@
 	</div>
 	  
 	<div id="arrow-container" class="arrow-container">
-		<app-arrowline *ngFor="let line of arrowlines" [arrows]="line.arrows"></app-arrowline>
+		<app-arrowline class="arrowline" *ngFor="let line of arrowlines" [arrows]="line.arrows" [style.top]="line.position + '%'"></app-arrowline>
 	</div>
 
 

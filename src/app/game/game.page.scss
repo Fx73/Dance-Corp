@@ -18,17 +18,14 @@ ion-content{
   overflow-y: visible;
 }
 
-.row-goal {
-  display: flex;
-  justify-content: center;
-  margin-top: 0;
-  padding: 10px;
+.arrowline {
+  position: absolute;
+  width: 100vw;
+  height: 10px;
 }
 
 .arrow-goal {
-  width: 100px;
-  height: auto;
-  margin: 40px;
+  position: absolute;
 }
 
 

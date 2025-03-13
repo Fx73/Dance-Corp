@@ -27,13 +27,13 @@ export class ArrowComponent implements OnInit {
   getTransform(): string {
     switch (this.direction) {
       case ArrowDirection.Left:
-        return 'rotate(-90deg)';
+        return 'rotate(45deg)';
       case ArrowDirection.Down:
-        return 'rotate(180deg)';
+        return 'rotate(-45deg)';
+      case ArrowDirection.Up:
+        return 'rotate(135deg)';
       case ArrowDirection.Right:
-        return 'rotate(90deg)';
-      default:
-        return 'rotate(0deg)';
+        return 'rotate(-135deg)';
     }
   }
 }
