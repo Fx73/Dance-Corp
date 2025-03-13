@@ -11,6 +11,12 @@ ion-content{
   animation: moveUp linear infinite;
 }
 
+.arrow-goal {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+}
+
 .arrow-container {
   position: absolute;
   width: 50vw;
@@ -24,9 +30,14 @@ ion-content{
   height: 10px;
 }
 
-.arrow-goal {
+.bar {
   position: absolute;
+  width: 100vw;
+  height: 2px;
+  background-color: rgb(42, 193, 243);
 }
+
+
 
 
 @keyframes moveUp {

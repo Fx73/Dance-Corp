@@ -11,8 +11,11 @@ import { CommonModule } from '@angular/common';
 })
 export class ArrowlineComponent implements OnInit {
   readonly ArrowDirection = ArrowDirection;
+  @Input()
+  beatDivision: number = 1;
 
-  @Input() arrows: Uint8Array = new Uint8Array(4);
+  @Input()
+  arrows: Uint8Array = new Uint8Array(4);
 
   constructor() { }
 

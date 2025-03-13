@@ -6,6 +6,7 @@ import { Measures, MusicDto, Notes } from './dto/music.dto';
 import { ArrowlineComponent } from "./arrowline/arrowline.component";
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from "@angular/router";
 import { UploadPage } from "../upload/upload.page";
 
 @Component({
@@ -16,52 +17,39 @@ import { UploadPage } from "../upload/upload.page";
   imports: [IonIcon, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, ArrowlineComponent, ArrowComponent]
 })
 export class GamePage implements OnInit {
-  //#region Constants
+  //#region App Constants
   readonly ArrowDirection = ArrowDirection;
   readonly MAX_BARS: number = 8;
+  readonly BEAT_INTERVAL = 20;
+  static readonly MAX_BEAT_SUBDIVISION = 16;
   //#endregion
   //#region animations
-  arrowlines: { arrows: Uint8Array, position: number }[] = [];
+  arrowlines: { arrows: Uint8Array, position: number, beatDivision: number }[] = [];
   lines: any[] = [];
-  //#endregion
-  musicDto: MusicDto | null = null;
-  notesDto: number[][] = [];
   movingDiv: HTMLElement | null = null;
-
+  //#endregion
+  //#region Current Music
+  musicDto: MusicDto | null = null;
   notesIdx: number = 0;
+  currentBpm: number = 100;
+  musicLength: number[] = [];
+  //#endregion
 
-  speed: number = 6000;
-  interval: number = 1000;
-
-  constructor() { }
+  constructor(private router: Router) { }
 
   ngOnInit() {
     this.movingDiv = document.getElementById("arrow-container");
     this.musicDto = UploadPage.musicData;
     if (this.musicDto === null) {
-      return
+      this.router.navigate(['/home']);
+      return;
     }
-    this.interval = 60000 / this.musicDto.bpms[0].bpm;
-    this.speed = this.interval * 6;
-    this.notesDto = this.LoadStepChart(this.musicDto.notes[this.notesIdx].stepChart);
+    this.musicLength = Array.from({ length: this.musicDto.notes[this.notesIdx].stepChart.length }, (_, index) => index * this.BEAT_INTERVAL)
+    console.log(this.musicLength)
     this.startLinesAnimation();
     this.loadArrows();
     this.startArrows();
   }
-
-  private LoadStepChart(stepChart: Measures[]): number[][] {
-    const normalizedStepChart: number[][] = [];
-    stepChart.forEach(measure => {
-      const stepadd = 16 / measure.steps.length - 1; // 16 = Normalize to quarter of second
-      for (let i = 0; i < measure.steps.length; i++) {
-        normalizedStepChart.push(measure.steps[i]);
-        for (let i = 0; i < stepadd; i++)
-          normalizedStepChart.push([]);
-      }
-    });
-    return normalizedStepChart;
-  }
-
 
   startLinesAnimation(): void {
     for (let index = 0; index < this.MAX_BARS; index++) {
@@ -74,20 +62,22 @@ export class GamePage implements OnInit {
   }
 
   loadArrows(): void {
-    const quarterNote = (this.interval / this.speed) * 100;
     let timeIdx = 0;
     const notes = this.musicDto!.notes[this.notesIdx].stepChart;
 
     notes.forEach((measure) => {
-      const measurePosition = timeIdx * quarterNote;
-      const divideNote = quarterNote * (1 / measure.steps.length);
+      const measurePosition = timeIdx * this.BEAT_INTERVAL;
+      const divideMeasure = (this.BEAT_INTERVAL * 4) / measure.steps.length;
+      const baseDivisionFactor = GamePage.MAX_BEAT_SUBDIVISION / measure.steps.length;
+      const quarterLength = measure.steps.length / 4;
 
       measure.steps.forEach((line, stepIdx) => {
-        const linePosition = measurePosition + stepIdx * divideNote;
         const arrows = new Uint8Array(Array.from(line, c => parseInt(c.toString(), 10)));
+        const linePosition = measurePosition + stepIdx * divideMeasure;
         this.arrowlines.push({
           arrows,
           position: linePosition,
+          beatDivision: (stepIdx % quarterLength) * baseDivisionFactor
         });
       });
 
@@ -99,7 +89,7 @@ export class GamePage implements OnInit {
     setInterval(() => {
       const currentTop = parseInt(this.movingDiv!.style.top || "0", 10);
       this.movingDiv!.style.top = `${currentTop - 10}px`;
-    }, 20);
+    }, 6000 / this.currentBpm);
   }
 
 

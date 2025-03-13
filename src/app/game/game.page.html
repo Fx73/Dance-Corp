@@ -11,14 +11,16 @@
 		<img src="assets/Arrow/Arrow.png" alt="ArrowRight" [style]="{ left: 80 + '%', transform: 'rotate(-135deg)' }" class="arrow-goal" />		
 	</div>
 
-	<div *ngFor="let line of lines; trackBy: trackBy; let index = index"
+	<!--<div *ngFor="let line of lines; trackBy: trackBy; let index = index"
 		class="line"
 		[style.animation-duration]="speed + 'ms'"
 		[style.animation-delay]="interval * (index + 1) + 'ms'">
-	</div>
+	</div>-->
 	  
+
 	<div id="arrow-container" class="arrow-container">
-		<app-arrowline class="arrowline" *ngFor="let line of arrowlines" [arrows]="line.arrows" [style.top]="line.position + '%'"></app-arrowline>
+		<div *ngFor="let bar of musicLength" class="bar" [style.top]="bar + '%'" > </div>
+		<app-arrowline class="arrowline" *ngFor="let line of arrowlines" [arrows]="line.arrows" [beatDivision]="line.beatDivision" [style.top]="line.position + '%'"></app-arrowline>
 	</div>
 
 
