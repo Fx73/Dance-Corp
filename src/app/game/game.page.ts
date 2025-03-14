@@ -20,9 +20,10 @@ export class GamePage implements OnInit {
   //#region App Constants
   readonly ArrowDirection = ArrowDirection;
   readonly MAX_BARS: number = 8;
-  readonly BEAT_INTERVAL = 20;
+  readonly BEAT_INTERVAL = 150; //en px
   readonly MEASURE_INTERVAL = 4 * this.BEAT_INTERVAL;
   static readonly MAX_BEAT_SUBDIVISION = 16;
+  readonly showBars = true
   //#endregion
   //#region animations
   arrowlines: { arrows: Uint8Array, position: number, beatDivision: number }[] = [];
@@ -45,21 +46,10 @@ export class GamePage implements OnInit {
       this.router.navigate(['/home']);
       return;
     }
-    this.musicLength = Array.from({ length: this.musicDto.notes[this.notesIdx].stepChart.length }, (_, index) => index * this.BEAT_INTERVAL)
-    console.log(this.musicLength)
-    this.startLinesAnimation();
+    if (this.showBars)
+      this.musicLength = Array.from({ length: this.musicDto.notes[this.notesIdx].stepChart.length * 4 }, (_, index) => (index * this.BEAT_INTERVAL + 30))
     this.loadArrows();
     this.startArrows();
-  }
-
-  startLinesAnimation(): void {
-    for (let index = 0; index < this.MAX_BARS; index++) {
-      this.lines.push({});
-    }
-
-  }
-  trackBy(_: any, index: number) {
-    return index;
   }
 
   loadArrows(): void {
@@ -87,10 +77,11 @@ export class GamePage implements OnInit {
   }
 
   startArrows(): void {
-    setInterval(() => {
+    const frameInterval = 60000 / (this.currentBpm * this.BEAT_INTERVAL)
+    const moveArrow = setInterval(() => {
       const currentTop = parseInt(this.movingDiv!.style.top || "0", 10);
-      this.movingDiv!.style.top = `${currentTop - 10}px`;
-    }, 6000 / this.currentBpm);
+      this.movingDiv!.style.top = `${currentTop - 1}px`;
+    }, frameInterval);
   }
 
 
