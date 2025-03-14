@@ -21,6 +21,7 @@ export class GamePage implements OnInit {
   readonly ArrowDirection = ArrowDirection;
   readonly MAX_BARS: number = 8;
   readonly BEAT_INTERVAL = 20;
+  readonly MEASURE_INTERVAL = 4 * this.BEAT_INTERVAL;
   static readonly MAX_BEAT_SUBDIVISION = 16;
   //#endregion
   //#region animations
@@ -30,7 +31,7 @@ export class GamePage implements OnInit {
   //#endregion
   //#region Current Music
   musicDto: MusicDto | null = null;
-  notesIdx: number = 0;
+  notesIdx: number = 2;
   currentBpm: number = 100;
   musicLength: number[] = [];
   //#endregion
@@ -66,8 +67,8 @@ export class GamePage implements OnInit {
     const notes = this.musicDto!.notes[this.notesIdx].stepChart;
 
     notes.forEach((measure) => {
-      const measurePosition = timeIdx * this.BEAT_INTERVAL;
-      const divideMeasure = (this.BEAT_INTERVAL * 4) / measure.steps.length;
+      const measurePosition = timeIdx * this.MEASURE_INTERVAL;
+      const divideMeasure = this.MEASURE_INTERVAL / measure.steps.length;
       const baseDivisionFactor = GamePage.MAX_BEAT_SUBDIVISION / measure.steps.length;
       const quarterLength = measure.steps.length / 4;
 

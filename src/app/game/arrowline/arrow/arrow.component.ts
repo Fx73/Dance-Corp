@@ -44,13 +44,17 @@ export class ArrowComponent implements OnInit {
     }
   }
 
+  readonly firstSubdivision = GamePage.MAX_BEAT_SUBDIVISION / 8;
+  readonly secondSubdivision1 = GamePage.MAX_BEAT_SUBDIVISION / 16;
+  readonly secondSubdivision2 = 3 * GamePage.MAX_BEAT_SUBDIVISION / 16;
+
   getColorFilter(): string {
     switch (this.beatDivision) {
       case 0:
-        return 'sepia(1) saturate(3)  hue-rotate(350deg)'; // Orange
-      case GamePage.MAX_BEAT_SUBDIVISION / 2:
+        return 'sepia(1) saturate(3)  hue-rotate(330deg)'; // Orange
+      case this.firstSubdivision:
         return 'sepia(1) saturate(6) brightness(0.6) hue-rotate(160deg)'; // Blue
-      case GamePage.MAX_BEAT_SUBDIVISION / 4:
+      case this.secondSubdivision1: case this.secondSubdivision2:
         return 'sepia(1) saturate(3) hue-rotate(60deg)'; // Green
       default:
         return 'sepia(1) hue-rotate(10deg)'; // Yellow
