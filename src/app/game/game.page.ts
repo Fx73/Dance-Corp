@@ -5,9 +5,12 @@ import { Measures, MusicDto, Notes } from './dto/music.dto';
 
 import { ArrowlineComponent } from "./arrowline/arrowline.component";
 import { CommonModule } from '@angular/common';
+import { DomSanitizer } from "@angular/platform-browser";
 import { FormsModule } from '@angular/forms';
 import { Router } from "@angular/router";
 import { UploadPage } from "../upload/upload.page";
+
+declare let YT: any;
 
 @Component({
   selector: 'app-game',
@@ -32,18 +35,24 @@ export class GamePage implements OnInit {
   //#endregion
   //#region Current Music
   musicDto: MusicDto | null = null;
-  notesIdx: number = 2;
+  notesIdx: number = 1;
   currentBpm: number = 100;
   musicLength: number[] = [];
+  videoId: string = "";
+  videoUrl: any;
   //#endregion
 
-  constructor(private router: Router) { }
+  constructor(private router: Router, private sanitizer: DomSanitizer) { }
 
   ngOnInit() {
     this.movingDiv = document.getElementById("arrow-container");
     this.musicDto = UploadPage.musicData;
+    this.videoId = this.extractVideoId(this.musicDto?.music ?? "https://youtu.be/u3VFzuUiTGw?si=R_6yFkX2eRHR7YN9")
+    console.log(this.videoId)
+    this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + this.videoId + '?si=w_PIhwe7FnixTNr_&controls=0&autoplay=1')
+    console.log(this.videoId)
     if (this.musicDto === null) {
-      this.router.navigate(['/home']);
+      //this.router.navigate(['/home']);
       return;
     }
     if (this.showBars)
@@ -99,6 +108,49 @@ export class GamePage implements OnInit {
         return ArrowDirection.Up;
     }
   }
+
+
+  startYouTubeBackgroundMusic(url: string): void {
+    const match = url.match(/(?:v=|\/)([0-9A-Za-z_-]{11})/);
+    const videoId = match ? match[1] : '';
+
+    function onYouTubeIframeAPIReady() {
+      new YT.Player('youtube-player', {
+        height: '0',
+        width: '0',
+        videoId: videoId,
+        playerVars: {
+          autoplay: 1,
+          controls: 0,
+          showinfo: 0,
+          modestbranding: 1,
+          loop: 1,
+          fs: 0,
+        },
+        events: {
+          onReady: (event: { target: { mute: () => void; playVideo: () => void; }; }) => {
+            event.target.playVideo();
+          },
+        },
+      });
+    }
+
+    // Charger l'API YouTube
+    if (!document.getElementById('youtube-script')) {
+      const tag = document.createElement('script');
+      tag.id = 'youtube-script';
+      tag.src = 'https://www.youtube.com/iframe_api';
+      document.body.appendChild(tag);
+    }
+  }
+
+  private extractVideoId(url: string): string {
+    const match = url.match(
+      /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:embed\/|watch\?v=)|youtu\.be\/)([0-9A-Za-z_-]{11})/
+    );
+    return match ? match[1] : '';
+  }
+
 
 
 }

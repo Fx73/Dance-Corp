@@ -36,19 +36,19 @@ export class SccReader {
     const tokenMap: Record<string, any> = {};
 
     tokens.forEach(token => {
-      const [key, value] = token.split(':');
+      const [key, value] = token.split(/:(.+?);/);
 
       if (key.toLowerCase() === 'notedata') {
-        const subtokens = value.slice(0, -1).split('@').map(t => t.trim()).filter(t => t.length > 0)
+        const subtokens = value.split('@').map(t => t.trim()).filter(t => t.length > 0)
         const subtokenMap: Record<string, any> = {};
         subtokens.forEach(subtoken => {
           const [key, value] = subtoken.split(':');
-          subtokenMap[key.toLowerCase()] = value.slice(0, -1);
+          subtokenMap[key.toLowerCase()] = value;
         });
         tokenMap[key.toLowerCase()] = subtokenMap;
       }
       else
-        tokenMap[key.toLowerCase()] = value.slice(0, -1);
+        tokenMap[key.toLowerCase()] = value;
 
     });
 
@@ -62,7 +62,7 @@ export class SccReader {
     let noteDataIndex = 0;
 
     tokens.forEach(token => {
-      const [key, value] = token.split(':');
+      const [key, value] = token.split(/:(.+)?;/s);
       const lowerKey = key.toLowerCase();
 
       if (lowerKey === 'notedata') {
@@ -70,13 +70,13 @@ export class SccReader {
         noteDataIndex++;
         tokenMap[`notedata${noteDataIndex}`] = currentNoteData;
       } else if (lowerKey === 'notes' && currentNoteData) {
-        let notes = SccReader.convertNotes(value.slice(0, -1));
+        let notes = SccReader.convertNotes(value);
         currentNoteData[lowerKey] = notes;
         currentNoteData = null;
       } else if (currentNoteData) {
-        currentNoteData[lowerKey] = value.slice(0, -1);
+        currentNoteData[lowerKey] = value;
       } else {
-        tokenMap[lowerKey] = value.slice(0, -1);
+        tokenMap[lowerKey] = value;
       }
     });
 
@@ -89,7 +89,7 @@ export class SccReader {
     let notesContent = '';
 
     tokens.forEach(token => {
-      const [key, value] = token.split(':');
+      const [key, value] = token.split(/:(.+?);/);
       const lowerKey = key.toLowerCase();
 
       if (lowerKey === 'notes') {
@@ -106,7 +106,7 @@ export class SccReader {
         tokenMap['notes'] = notesContent;
 
       } else {
-        tokenMap[lowerKey] = value.slice(0, -1);
+        tokenMap[lowerKey] = value;
       }
     });
 
