@@ -22,7 +22,6 @@ declare let YT: any;
 export class GamePage implements OnInit {
   //#region App Constants
   readonly ArrowDirection = ArrowDirection;
-  readonly MAX_BARS: number = 8;
   readonly BEAT_INTERVAL = 150; //en px
   readonly MEASURE_INTERVAL = 4 * this.BEAT_INTERVAL;
   static readonly MAX_BEAT_SUBDIVISION = 16;
@@ -48,7 +47,6 @@ export class GamePage implements OnInit {
     this.movingDiv = document.getElementById("arrow-container");
     this.musicDto = UploadPage.musicData;
     this.videoId = this.extractVideoId(this.musicDto?.music ?? "https://youtu.be/u3VFzuUiTGw?si=R_6yFkX2eRHR7YN9")
-    console.log(this.videoId)
     this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + this.videoId + '?si=w_PIhwe7FnixTNr_&controls=0&autoplay=1')
     console.log(this.videoId)
     if (this.musicDto === null) {
@@ -83,6 +81,7 @@ export class GamePage implements OnInit {
 
       timeIdx++;
     });
+    console.log(this.arrowlines)
   }
 
   startArrows(): void {
@@ -109,48 +108,12 @@ export class GamePage implements OnInit {
     }
   }
 
-
-  startYouTubeBackgroundMusic(url: string): void {
-    const match = url.match(/(?:v=|\/)([0-9A-Za-z_-]{11})/);
-    const videoId = match ? match[1] : '';
-
-    function onYouTubeIframeAPIReady() {
-      new YT.Player('youtube-player', {
-        height: '0',
-        width: '0',
-        videoId: videoId,
-        playerVars: {
-          autoplay: 1,
-          controls: 0,
-          showinfo: 0,
-          modestbranding: 1,
-          loop: 1,
-          fs: 0,
-        },
-        events: {
-          onReady: (event: { target: { mute: () => void; playVideo: () => void; }; }) => {
-            event.target.playVideo();
-          },
-        },
-      });
-    }
-
-    // Charger l'API YouTube
-    if (!document.getElementById('youtube-script')) {
-      const tag = document.createElement('script');
-      tag.id = 'youtube-script';
-      tag.src = 'https://www.youtube.com/iframe_api';
-      document.body.appendChild(tag);
-    }
-  }
-
   private extractVideoId(url: string): string {
     const match = url.match(
       /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:embed\/|watch\?v=)|youtu\.be\/)([0-9A-Za-z_-]{11})/
     );
     return match ? match[1] : '';
   }
-
 
 
 }
