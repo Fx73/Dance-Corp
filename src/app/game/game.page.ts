@@ -17,7 +17,7 @@ declare let YT: any;
   templateUrl: './game.page.html',
   styleUrls: ['./game.page.scss'],
   standalone: true,
-  imports: [IonIcon, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, ArrowlineComponent, ArrowComponent]
+  imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, ArrowlineComponent]
 })
 export class GamePage implements OnInit {
   //#region App Constants
@@ -35,7 +35,7 @@ export class GamePage implements OnInit {
   //#region Current Music
   musicDto: MusicDto | null = null;
   notesIdx: number = 1;
-  currentBpm: number = 100;
+  currentBpms: number = 0.002; //Beat per milliseconds
   musicLength: number[] = [];
   videoId: string = "";
   videoUrl: any;
@@ -55,6 +55,7 @@ export class GamePage implements OnInit {
     }
     if (this.showBars)
       this.musicLength = Array.from({ length: this.musicDto.notes[this.notesIdx].stepChart.length * 4 }, (_, index) => (index * this.BEAT_INTERVAL + 30))
+    this.currentBpms = this.musicDto.bpms[0].bpm / 60000
     this.loadArrows();
     this.startArrows();
   }
@@ -85,12 +86,28 @@ export class GamePage implements OnInit {
   }
 
   startArrows(): void {
-    const frameInterval = 60000 / (this.currentBpm * this.BEAT_INTERVAL)
-    const moveArrow = setInterval(() => {
-      const currentTop = parseInt(this.movingDiv!.style.top || "0", 10);
-      this.movingDiv!.style.top = `${currentTop - 1}px`;
-    }, frameInterval);
+    let lastChrono: number | undefined;
+
+    const animate = (chrono: number) => {
+      if (lastChrono === undefined) {
+        lastChrono = chrono;
+      } else {
+        const timeElapsed = chrono - lastChrono;
+        lastChrono = chrono;
+
+        // Calculate new position
+        const currentTop = parseInt(this.movingDiv!.style.top || "0", 10);
+        const newTop = currentTop - (timeElapsed * this.currentBpms * this.BEAT_INTERVAL);
+        this.movingDiv!.style.top = `${newTop}px`;
+      }
+
+      window.requestAnimationFrame(animate);
+    };
+    window.requestAnimationFrame(animate);
   }
+
+
+
 
 
   getDirection(index: number): ArrowDirection {

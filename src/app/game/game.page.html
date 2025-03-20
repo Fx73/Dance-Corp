@@ -16,6 +16,12 @@
 
 	<div id="arrow-container" class="arrow-container">
 		<div *ngFor="let bar of musicLength" class="bar" [style.top]="bar + 'px'" > </div>
+		<div *ngFor="let bar of musicLength; let i = index" class="bar" [style.top]="bar + 'px'">
+			<span class="debug-stamp" *ngIf="(i + 1) % 4 === 0">
+			  {{ (i + 1) / 4 }}
+			</span>
+		  </div>
+		  
 		<app-arrowline class="arrowline" *ngFor="let line of arrowlines" [arrows]="line.arrows" [beatDivision]="line.beatDivision" [style.top]="line.position + 'px'"></app-arrowline>
 	</div>
 

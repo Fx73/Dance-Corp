@@ -12,7 +12,7 @@ import { HeaderComponent } from "../../shared/header/header.component";
   templateUrl: './pad-test.page.html',
   styleUrls: ['./pad-test.page.scss'],
   standalone: true,
-  imports: [IonButton, IonCardContent, IonCardTitle, IonCard, IonCardHeader, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, HeaderComponent]
+  imports: [IonButton, IonCardContent, IonCardTitle, IonCard, IonCardHeader, IonContent, CommonModule, FormsModule, HeaderComponent]
 })
 export class PadTestPage {
 

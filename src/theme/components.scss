@@ -1,0 +1,70 @@
+.basicCard {
+  cursor: pointer;
+  padding: 10px;
+  text-align: center;
+  align-items: center;
+  ion-card-header{
+    padding: 1px;
+    ion-card-title{
+      margin: 0px;
+    }
+  }
+  ion-card-content{
+    padding: 2px;
+    color: lightgray;
+    max-height: 240px;
+    ion-item{
+     --background:transparent;
+     --border-color: transparent;
+    }
+    ion-text{
+      display: flex;
+      font-size:smaller;
+      line-height: 1.1;
+      margin-bottom: 1px;
+    }
+  }
+}
+.basicCard:hover {
+  box-shadow: 0 5px 5px -3px rgba(241, 234, 234, 0.2),
+    0 8px 10px 1px rgba(219, 218, 218, 0.14),
+    0 3px 14px 2px rgba(216, 211, 211, 0.12);
+}
+
+
+.cardList{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content:flex-start;
+  ion-card{
+    width: 24vw;
+    height: 50vh;
+  }
+}
+
+
+.menuCardBtn{
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 14px;
+  height: auto;
+  --padding-start:0;
+  --padding-end:0;
+ --background: lightgrey;
+}
+
+
+ion-col{
+  margin: 0;
+  padding: 0;
+}
+
+
+.flex-grid{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
+

@@ -8,14 +8,14 @@
 			<ion-card-subtitle class="home-fontsize">Dance Now</ion-card-subtitle>
 		</ion-card-header>
 		<ion-card-content>
-			<ion-button [routerLink]="['/game']"
+			<ion-button [routerLink]="['/browse']"
 				expand="block"
 				size="large"
 				class="start-button home-content">
 				Commencer le jeu
 			</ion-button>
 			<ion-button [routerLink]="['/upload']"
-				[disabled]="false && !isUserLoggedIn()"
+				[disabled]="!isUserLoggedIn()"
 				expand="block"
 				size="large"
 				class="home-content">

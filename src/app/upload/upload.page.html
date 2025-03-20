@@ -7,10 +7,12 @@
 					Select a .sm, .ssc, or .essc File
 				</ion-card-title>
 			</ion-card-header>
-			<ion-card-content>
-				<input (change)="onFileSelected($event)"
+			<ion-card-content class="flex-align-horizontal">
+					<input (change)="onFileSelected($event)"
 					type="file"
 					accept=".sm,.ssc,.essc">
+					<ion-button *ngIf="musicData" expand="block" (click)="validateAndUpload()" >Validate and upload</ion-button>
+					<ion-button expand="block" (click)="test()" >Test</ion-button>
 			</ion-card-content>
 		</ion-card>
 		<div *ngIf="musicData">
@@ -143,6 +145,10 @@
 							<p>
 								<strong>Credit:</strong>
 								{{ notes.credit }}
+							</p>
+							<p>
+								<strong>Creation Date:</strong>
+								{{ notes.creationDate }}
 							</p>
 							<p>
 								<strong>Total Measures:</strong>

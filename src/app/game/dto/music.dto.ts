@@ -23,12 +23,16 @@ export class MusicDto {
   notes: Notes[] = [];
   additionalFields?: Record<string, string>;
 
-  constructor(tokenMap: Record<string, any>) {
+  get id(): string { return `${this.artist}-${this.title}` }
+
+  constructor(tokenMap?: Record<string, any>) {
+    if (tokenMap === undefined) return
+
     this.title = tokenMap["title"];
     delete tokenMap["title"];
     this.titletranslit = tokenMap["titletranslit"];
     delete tokenMap["titletranslit"];
-    this.title = tokenMap["subtitle"];
+    this.subtitle = tokenMap["subtitle"];
     delete tokenMap["subtitle"];
     this.subtitletranslit = tokenMap["subtitletranslit"];
     delete tokenMap["subtitletranslit"];
@@ -105,9 +109,12 @@ export class Notes {
   difficulty?: string;
   meter?: number;
   credit?: string;
+  creationDate: Date = new Date()
   stepChart: Measures[] = [];
 
-  constructor(tokenMap: Record<string, string>) {
+  constructor(tokenMap?: Record<string, string>) {
+    if (tokenMap === undefined) return
+
     this.chartName = tokenMap["chartname"];
     this.stepsType = tokenMap["stepstype"];
     this.description = tokenMap["description"];
@@ -115,6 +122,8 @@ export class Notes {
     this.difficulty = tokenMap["difficulty"];
     this.meter = parseInt(tokenMap["meter"]);
     this.credit = tokenMap["credit"];
+    const creationDateValue = tokenMap["creationdate"];
+    this.creationDate = creationDateValue ? new Date(creationDateValue) : new Date();
 
     this.stepChart = tokenMap["notes"].split(',').map(measure => {
       const measureInstance = new Measures();

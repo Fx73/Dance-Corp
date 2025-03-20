@@ -1,15 +1,12 @@
 import { Component, Input, OnInit } from '@angular/core';
 
 import { GamePage } from '../../game.page';
-import { IonIcon } from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import { arrowUpOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-arrow',
   templateUrl: './arrow.component.html',
   styleUrls: ['./arrow.component.scss'],
-  imports: [IonIcon]
+  imports: []
 })
 export class ArrowComponent implements OnInit {
 
@@ -23,7 +20,6 @@ export class ArrowComponent implements OnInit {
 
 
   constructor() {
-    addIcons({ arrowUpOutline });
   }
 
   ngOnInit(): void {

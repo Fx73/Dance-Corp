@@ -26,4 +26,8 @@ export const routes: Routes = [
     path: 'pad-test',
     loadComponent: () => import('./options/pad-test/pad-test.page').then( m => m.PadTestPage)
   },
+  {
+    path: 'browse',
+    loadComponent: () => import('./browse/browse.page').then( m => m.BrowsePage)
+  },
 ];
