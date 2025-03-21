@@ -10,6 +10,7 @@ import { Injectable } from '@angular/core';
 export class FireStoreService {
     //#region Constants
     readonly MUSIC_COLLECTION = "musics"
+    readonly NOTE_COLLECTIOn = "notes"
     readonly BATCH_SIZE = 60;
     readonly firestoreConverterMusic = new FirestoreConverter<MusicDto>(MusicDto)
     readonly firestoreConverterNotes = new FirestoreConverter<Notes>(Notes)
@@ -24,7 +25,7 @@ export class FireStoreService {
     async uploadNewMusic(dto: MusicDto): Promise<void> {
         try {
             const docRef = doc(this.db, this.MUSIC_COLLECTION, dto.id).withConverter(this.firestoreConverterMusic);
-            const notesCollectionRef = collection(docRef, 'notes').withConverter(this.firestoreConverterNotes);
+            const notesCollectionRef = collection(docRef, this.NOTE_COLLECTIOn).withConverter(this.firestoreConverterNotes);
 
             const { notes, ...mainData } = dto;
 
@@ -104,6 +105,25 @@ export class FireStoreService {
         });
 
         return musics;
+    }
+
+
+    async getMusicNotes(musicId: string): Promise<Notes[]> {
+        try {
+            const notesCollectionRef = collection(this.db, this.MUSIC_COLLECTION + "/" + musicId + "/" + this.NOTE_COLLECTIOn).withConverter(this.firestoreConverterNotes);
+            const q = query(notesCollectionRef, orderBy('meter'));
+            const querySnapshot = await getDocs(q);
+
+            const notes: Notes[] = [];
+            querySnapshot.forEach(doc => {
+                notes.push(doc.data());
+            });
+
+            return notes;
+        } catch (error) {
+            console.error('Erreur lors de la récupération des notes :', error);
+            throw error;
+        }
     }
 
 

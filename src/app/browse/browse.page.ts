@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { InfiniteScrollCustomEvent, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonHeader, IonImg, IonInfiniteScroll, IonInfiniteScrollContent, IonItem, IonLabel, IonSearchbar, IonText, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { InfiniteScrollCustomEvent, IonBadge, IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonHeader, IonImg, IonInfiniteScroll, IonInfiniteScrollContent, IonItem, IonLabel, IonSearchbar, IonText, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { MusicDto, Notes } from '../game/dto/music.dto';
 
 import { CommonModule } from '@angular/common';
 import { FireStoreService } from '../services/firestore.service';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from "../shared/header/header.component";
-import { MusicDto } from '../game/dto/music.dto';
 import { Router } from '@angular/router';
 
 @Component({
@@ -13,11 +13,13 @@ import { Router } from '@angular/router';
   templateUrl: './browse.page.html',
   styleUrls: ['./browse.page.scss'],
   standalone: true,
-  imports: [IonCardSubtitle, IonLabel, IonText, IonCardContent, IonCardTitle, IonInfiniteScrollContent, IonImg, IonItem, IonInfiniteScroll, IonSearchbar, IonCard, IonCardHeader, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, HeaderComponent]
+  imports: [IonBadge, IonButton, IonCardSubtitle, IonLabel, IonText, IonCardContent, IonCardTitle, IonInfiniteScrollContent, IonImg, IonItem, IonInfiniteScroll, IonSearchbar, IonCard, IonCardHeader, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, HeaderComponent]
 })
 export class BrowsePage implements OnInit {
 
   musics: MusicDto[] = [];
+  notes: Notes[] | undefined;
+  selectedMusic: MusicDto | null = null;
   searchQuery: string = '';
 
 
@@ -27,8 +29,24 @@ export class BrowsePage implements OnInit {
     this.fireStoreService.GetAllMusics(null).then(value => this.musics = value);
   }
 
-  loadMusic(dto: MusicDto) {
+  runGame(note: Notes): void {
+    this.router.navigate(['/game'], {
+      state: {
+        music: this.selectedMusic,
+        note: note
+      }
+    });
+  }
 
+
+  showLevels(music: MusicDto) {
+    if (this.selectedMusic?.id === music.id) {
+      this.selectedMusic = null;
+      this.notes = [];
+      return;
+    }
+    this.selectedMusic = music;
+    this.fireStoreService.getMusicNotes(music.id).then(n => this.notes = n)
   }
 
   onSearch(event: any) {

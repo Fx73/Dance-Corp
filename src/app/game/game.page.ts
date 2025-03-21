@@ -8,9 +8,6 @@ import { CommonModule } from '@angular/common';
 import { DomSanitizer } from "@angular/platform-browser";
 import { FormsModule } from '@angular/forms';
 import { Router } from "@angular/router";
-import { UploadPage } from "../upload/upload.page";
-
-declare let YT: any;
 
 @Component({
   selector: 'app-game',
@@ -33,7 +30,8 @@ export class GamePage implements OnInit {
   movingDiv: HTMLElement | null = null;
   //#endregion
   //#region Current Music
-  musicDto: MusicDto | null = null;
+  music: MusicDto | null = null;
+  notes: Notes | null = null;
   notesIdx: number = 1;
   currentBpms: number = 0.002; //Beat per milliseconds
   musicLength: number[] = [];
@@ -45,24 +43,31 @@ export class GamePage implements OnInit {
 
   ngOnInit() {
     this.movingDiv = document.getElementById("arrow-container");
-    this.musicDto = UploadPage.musicData;
-    this.videoId = this.extractVideoId(this.musicDto?.music ?? "https://youtu.be/u3VFzuUiTGw?si=R_6yFkX2eRHR7YN9")
-    this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + this.videoId + '?si=w_PIhwe7FnixTNr_&controls=0&autoplay=1')
-    console.log(this.videoId)
-    if (this.musicDto === null) {
-      //this.router.navigate(['/home']);
+    const navigation = this.router.getCurrentNavigation();
+    if (navigation?.extras?.state) {
+      this.music = navigation.extras.state['music'];
+      this.notes = navigation.extras.state['note'];
+      console.log('Music received:', this.music);
+      console.log('Note received:', this.notes);
+    }
+    if (this.music === null || this.notes === null) {
+      this.router.navigate(['/home']);
       return;
     }
+
+    this.videoId = this.extractVideoId(this.music?.music ?? "https://youtu.be/u3VFzuUiTGw?si=R_6yFkX2eRHR7YN9")
+    this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + this.videoId + '?si=w_PIhwe7FnixTNr_&controls=0&autoplay=1')
+
     if (this.showBars)
-      this.musicLength = Array.from({ length: this.musicDto.notes[this.notesIdx].stepChart.length * 4 }, (_, index) => (index * this.BEAT_INTERVAL + 30))
-    this.currentBpms = this.musicDto.bpms[0].bpm / 60000
+      this.musicLength = Array.from({ length: this.notes.stepChart.length * 4 }, (_, index) => (index * this.BEAT_INTERVAL + 30))
+    this.currentBpms = this.music.bpms[0].bpm / 60000
     this.loadArrows();
     this.startArrows();
   }
 
   loadArrows(): void {
     let timeIdx = 0;
-    const notes = this.musicDto!.notes[this.notesIdx].stepChart;
+    const notes = this.notes!.stepChart;
 
     notes.forEach((measure) => {
       const measurePosition = timeIdx * this.MEASURE_INTERVAL;
