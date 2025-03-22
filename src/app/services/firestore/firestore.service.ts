@@ -1,5 +1,5 @@
 import { Firestore, addDoc, collection, doc, getDoc, getDocs, getFirestore, limit, orderBy, query, setDoc, startAfter, where } from 'firebase/firestore';
-import { MusicDto, Notes } from './../game/dto/music.dto';
+import { MusicDto, Notes } from '../../game/dto/music.dto';
 
 import { FirestoreConverter } from './firestore.converter';
 import { Injectable } from '@angular/core';

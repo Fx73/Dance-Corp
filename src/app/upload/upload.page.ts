@@ -3,7 +3,7 @@ import { Measures, MusicDto } from '../game/dto/music.dto';
 
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { FireStoreService } from '../services/firestore.service';
+import { FireStoreService } from '../services/firestore/firestore.service';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from "../shared/header/header.component"; // Importer le SmReader
 import { SccReader } from './reader.ssc';
@@ -43,13 +43,6 @@ export class UploadPage {
         console.error('Error uploading music:', error);
       });
     }
-  }
-
-  test() {
-    this.fireStoreService.getMusic("Mike Posner-(SeeB Mix)").then((value) => {
-      this.musicData = value
-      console.log(this.musicData)
-    })
   }
 
   getStepCount(stepChart: Measures[], stepType: number): number {

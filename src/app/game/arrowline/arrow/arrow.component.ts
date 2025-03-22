@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 
+import { ArrowDirection } from 'src/app/shared/enumeration/arrow-direction.enum';
 import { GamePage } from '../../game.page';
 
 @Component({
@@ -57,12 +58,4 @@ export class ArrowComponent implements OnInit {
     }
   }
 
-
-}
-
-export enum ArrowDirection {
-  Left = 'left',
-  Down = 'down',
-  Up = 'up',
-  Right = 'right'
 }

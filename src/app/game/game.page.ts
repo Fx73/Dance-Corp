@@ -1,13 +1,14 @@
-import { ArrowComponent, ArrowDirection } from "./arrowline/arrow/arrow.component";
 import { Component, Input, OnInit, input } from '@angular/core';
 import { IonContent, IonHeader, IonIcon, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { Measures, MusicDto, Notes } from './dto/music.dto';
 
+import { ArrowDirection } from "../shared/enumeration/arrow-direction.enum";
 import { ArrowlineComponent } from "./arrowline/arrowline.component";
 import { CommonModule } from '@angular/common';
 import { DomSanitizer } from "@angular/platform-browser";
 import { FormsModule } from '@angular/forms';
 import { Router } from "@angular/router";
+import { UserConfigService } from "../services/userconfig.service";
 
 @Component({
   selector: 'app-game',
@@ -22,7 +23,6 @@ export class GamePage implements OnInit {
   readonly BEAT_INTERVAL = 150; //en px
   readonly MEASURE_INTERVAL = 4 * this.BEAT_INTERVAL;
   static readonly MAX_BEAT_SUBDIVISION = 16;
-  readonly showBars = true
   //#endregion
   //#region animations
   arrowlines: { arrows: Uint8Array, position: number, beatDivision: number }[] = [];
@@ -39,7 +39,7 @@ export class GamePage implements OnInit {
   videoUrl: any;
   //#endregion
 
-  constructor(private router: Router, private sanitizer: DomSanitizer) { }
+  constructor(private userConfigService: UserConfigService, private router: Router, private sanitizer: DomSanitizer) { }
 
   ngOnInit() {
     this.movingDiv = document.getElementById("arrow-container");
@@ -58,7 +58,7 @@ export class GamePage implements OnInit {
     this.videoId = this.extractVideoId(this.music?.music ?? "https://youtu.be/u3VFzuUiTGw?si=R_6yFkX2eRHR7YN9")
     this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + this.videoId + '?si=w_PIhwe7FnixTNr_&controls=0&autoplay=1')
 
-    if (this.showBars)
+    if (this.userConfigService.getConfig()["showBars"])
       this.musicLength = Array.from({ length: this.notes.stepChart.length * 4 }, (_, index) => (index * this.BEAT_INTERVAL + 30))
     this.currentBpms = this.music.bpms[0].bpm / 60000
     this.loadArrows();

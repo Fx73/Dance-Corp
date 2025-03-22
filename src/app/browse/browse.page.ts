@@ -3,7 +3,7 @@ import { InfiniteScrollCustomEvent, IonBadge, IonButton, IonCard, IonCardContent
 import { MusicDto, Notes } from '../game/dto/music.dto';
 
 import { CommonModule } from '@angular/common';
-import { FireStoreService } from '../services/firestore.service';
+import { FireStoreService } from '../services/firestore/firestore.service';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from "../shared/header/header.component";
 import { Router } from '@angular/router';
@@ -13,7 +13,7 @@ import { Router } from '@angular/router';
   templateUrl: './browse.page.html',
   styleUrls: ['./browse.page.scss'],
   standalone: true,
-  imports: [IonBadge, IonButton, IonCardSubtitle, IonLabel, IonText, IonCardContent, IonCardTitle, IonInfiniteScrollContent, IonImg, IonItem, IonInfiniteScroll, IonSearchbar, IonCard, IonCardHeader, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, HeaderComponent]
+  imports: [IonBadge, IonButton, IonCardSubtitle, IonLabel, IonText, IonCardContent, IonCardTitle, IonInfiniteScrollContent, IonImg, IonItem, IonInfiniteScroll, IonSearchbar, IonCard, IonCardHeader, IonContent, CommonModule, FormsModule, HeaderComponent]
 })
 export class BrowsePage implements OnInit {
 

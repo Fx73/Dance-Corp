@@ -43,9 +43,11 @@ export class AppComponent implements OnInit {
   }
 
   static presentOkToast(message: string) {
+    console.log(message)
     AppComponent.appInstance.presentOkToast(message)
   }
   static presentWarningToast(message: string) {
+    console.warn(message)
     AppComponent.appInstance.presentWarningToast(message)
   }
   //#endregion

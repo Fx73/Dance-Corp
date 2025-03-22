@@ -1,3 +1,20 @@
+ion-col{
+  margin: 0;
+  padding: 0;
+}
+
+
+
+.cardList{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content:flex-start;
+}
+
+
+
+
 .menuCardBtn{
   position: absolute;
   top: 0;
@@ -7,17 +24,4 @@
   --padding-start:0;
   --padding-end:0;
  --background: lightgrey;
-}
-
-
-ion-col{
-  margin: 0;
-  padding: 0;
-}
-
-
-.flex-grid{
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
 }

@@ -1,6 +1,7 @@
-import { ArrowComponent, ArrowDirection } from './arrow/arrow.component';
 import { Component, Input, OnInit } from '@angular/core';
 
+import { ArrowComponent } from './arrow/arrow.component';
+import { ArrowDirection } from 'src/app/shared/enumeration/arrow-direction.enum';
 import { CommonModule } from '@angular/common';
 
 @Component({
