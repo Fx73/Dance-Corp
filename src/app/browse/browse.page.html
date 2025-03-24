@@ -10,13 +10,15 @@
     <ion-card *ngFor="let music of musics"
               (click)="showLevels(music)"
               class="basicCard" [ngClass]="selectedMusic?.id === music.id ? 'selectedCard' : ''">
-      <ion-img [src]="'https://'+music.jacket"></ion-img>
       <ion-card-header>
         <ion-card-title >{{ music.title }}</ion-card-title>
         <ion-card-subtitle>{{ music.artist }}</ion-card-subtitle>
       </ion-card-header>
       <ion-card-content class="basicCardContent" >
+
           <ion-text>BPM :{{ music.bpms[0].bpm }}</ion-text>
+          <ion-img [src]="'https://'+music.jacket"></ion-img>
+
         <ion-card *ngIf="selectedMusic?.id === music.id" class="levelCard">
           <ion-card-content>            
             <ion-button *ngFor="let note of notes" expand="block" (click)="runGame(note)">

@@ -20,14 +20,14 @@ export const routes: Routes = [
   },
   {
     path: 'options',
-    loadComponent: () => import('./options/options.page').then( m => m.OptionsPage)
+    loadComponent: () => import('./options/options.page').then(m => m.OptionsPage)
   },
   {
     path: 'pad-test',
-    loadComponent: () => import('./options/pad-test/pad-test.page').then( m => m.PadTestPage)
+    loadComponent: () => import('./options/pad-test/pad-test.page').then(m => m.PadTestPage)
   },
   {
     path: 'browse',
-    loadComponent: () => import('./browse/browse.page').then( m => m.BrowsePage)
+    loadComponent: () => import('./browse/browse.page').then(m => m.BrowsePage)
   },
 ];

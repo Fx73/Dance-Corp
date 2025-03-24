@@ -12,7 +12,7 @@ export class GamepadService {
     private gamepads: GamepadReference[] = [];
 
     constructor(private userConfigService: UserConfigService, private ngZone: NgZone) {
-        this.gamepads = [{ index: -1, id: 'Keyboard' }]
+        this.gamepads = [{ index: -1, id: "Keyboard" }]
 
         this.onGamepadConnect = this.onGamepadConnect.bind(this);
         this.onGamepadDisconnect = this.onGamepadDisconnect.bind(this);

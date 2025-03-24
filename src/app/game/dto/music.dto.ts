@@ -20,7 +20,7 @@ export class MusicDto {
   delays?: string;
   warps?: string;
   bgChanges?: string;
-  notes: Notes[] = [];
+  notes: NotesDto[] = [];
   additionalFields?: Record<string, string>;
 
   get id(): string { return `${this.artist}-${this.title}` }
@@ -77,7 +77,7 @@ export class MusicDto {
 
     Object.keys(tokenMap).forEach(key => {
       if (key.startsWith('notedata')) {
-        this.notes.push(new Notes(tokenMap[key]))
+        this.notes.push(new NotesDto(tokenMap[key]))
         delete tokenMap[key];
       }
     });
@@ -101,7 +101,7 @@ export class MusicDto {
 }
 
 
-export class Notes {
+export class NotesDto {
   chartName?: string;
   stepsType?: string;
   description?: string;

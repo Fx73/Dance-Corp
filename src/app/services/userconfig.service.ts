@@ -1,4 +1,5 @@
 import { BehaviorSubject } from 'rxjs';
+import { GamepadReference } from './gamepad.service';
 import { Injectable } from '@angular/core';
 import { Player } from '../game/dto/player';
 
@@ -25,7 +26,6 @@ export class UserConfigService {
         for (let i = 0; i < this.configSubject.value.playerNumber; i++) {
             this.players.push(this.instanciatePlayer(i));
         }
-        console.log(this.players)
 
     }
     instanciatePlayer(index: number): Player {
@@ -71,15 +71,27 @@ export class UserConfigService {
         localStorage.setItem(this.CONFIG_STORAGE_KEY, JSON.stringify(this.configSubject.value));
     }
 
-    updatePlayer(option: keyof Player, index: number, value: any): void {
-        if (index < 0 || index >= this.players.length) {
-            console.error(`Invalid player index: ${index}`);
+    assignKeyboardToPlayer(playerIndex: number): void {
+        const player = this.players[playerIndex];
+        if (!player) {
+            console.error(`Invalid player index: ${playerIndex}`);
+            return;
+        }
+        player.keyBindings = Player.defaultKeybinding();
+
+        this.updatePlayer('gamepad', playerIndex, { index: -1, id: "Keyboard" });
+    }
+
+
+    updatePlayer(option: keyof Player, playerIndex: number, value: any): void {
+        if (playerIndex < 0 || playerIndex >= this.players.length) {
+            console.error(`Invalid player index: ${playerIndex}`);
             return;
         }
 
-        const player: Player = this.players[index];
+        const player: Player = this.players[playerIndex];
         (player[option as keyof Player] as any) = value;
-        localStorage.setItem(this.PLAYERS_STORAGE_KEY(index), JSON.stringify(player));
+        localStorage.setItem(this.PLAYERS_STORAGE_KEY(playerIndex), JSON.stringify(player));
     }
 
 

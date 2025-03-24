@@ -1,5 +1,5 @@
 import { Firestore, addDoc, collection, doc, getDoc, getDocs, getFirestore, limit, orderBy, query, setDoc, startAfter, where } from 'firebase/firestore';
-import { MusicDto, Notes } from '../../game/dto/music.dto';
+import { MusicDto, NotesDto } from '../../game/dto/music.dto';
 
 import { FirestoreConverter } from './firestore.converter';
 import { Injectable } from '@angular/core';
@@ -13,7 +13,7 @@ export class FireStoreService {
     readonly NOTE_COLLECTIOn = "notes"
     readonly BATCH_SIZE = 60;
     readonly firestoreConverterMusic = new FirestoreConverter<MusicDto>(MusicDto)
-    readonly firestoreConverterNotes = new FirestoreConverter<Notes>(Notes)
+    readonly firestoreConverterNotes = new FirestoreConverter<NotesDto>(NotesDto)
     //#endregion
     db: Firestore
 
@@ -108,13 +108,13 @@ export class FireStoreService {
     }
 
 
-    async getMusicNotes(musicId: string): Promise<Notes[]> {
+    async getMusicNotes(musicId: string): Promise<NotesDto[]> {
         try {
             const notesCollectionRef = collection(this.db, this.MUSIC_COLLECTION + "/" + musicId + "/" + this.NOTE_COLLECTIOn).withConverter(this.firestoreConverterNotes);
             const q = query(notesCollectionRef, orderBy('meter'));
             const querySnapshot = await getDocs(q);
 
-            const notes: Notes[] = [];
+            const notes: NotesDto[] = [];
             querySnapshot.forEach(doc => {
                 notes.push(doc.data());
             });

@@ -1,0 +1,12 @@
+<div class="player-hud">
+  <div class="player-name">Player {{ playerId }}</div>
+  <div class="score">Score: {{ score }}</div>
+  <div class="performance-container">
+      <div
+          class="performance-bar"
+          [style.width.%]="performance"
+          [style.backgroundColor]="getPerformanceColor()"
+      ></div>
+  </div>
+</div>
+<canvas id="gameCanvas" width="800" height="600"></canvas>

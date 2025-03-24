@@ -27,7 +27,7 @@
             </ion-select>
           </ion-item>
           <ion-item >
-              <ion-button *ngIf="player.gamepad" expand="full" shape="round" fill="outline" [disabled]="playerSelected?.id === player.id" (click)="playerSelected=player">  Key mapping </ion-button>
+              <ion-button *ngIf="player.gamepad" expand="full" shape="round" fill="outline" [disabled]="playerSelected?.id === player.id" (click)="selectPlayer(player)">  Key mapping </ion-button>
           </ion-item>
         </ion-card-content>
       </ion-card>
@@ -41,12 +41,13 @@
         <ion-card-subtitle> {{ playerSelected.gamepad.id }} </ion-card-subtitle>
         <ion-card-content>
           <div class="keybind-container">
-            <ion-item *ngFor="let arrowKey of arrowKeys">
+            <ion-item *ngFor="let arrowKey of arrowKeys; let index = index">
               <ion-label color="primary"> {{arrowKey.toUpperCase()}} </ion-label>
-              <ion-label>  {{ playerSelected.keyBindings[arrowKey] || 'Not Set' }} </ion-label>
+              <ion-label>  {{ (playerSelected.gamepad.index === -1 ? keyboardBindings.get(arrowKey) : gampadBindings.get(arrowKey)) || 'Not Set' }} </ion-label>
               <ion-button slot="end" size="small" color="tertiary"  (click)="openBindPopover(arrowKey)"> Bind </ion-button>
             </ion-item>
           </div>
+          <ion-button color="primary" expand="block" (click)="validateMapping()" style="margin-top: 10px;"> Validate </ion-button>
         </ion-card-content>
       </ion-card>
     </ng-container>

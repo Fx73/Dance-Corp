@@ -1,17 +1,30 @@
+
 <ion-header [translucent]="true">
 	<ion-toolbar>
 		<ion-title>Game</ion-title>
 	</ion-toolbar>
 </ion-header>
+
 <ion-content [fullscreen]="true">
+    <app-player-display
+        *ngFor="let player of players; let i = index"
+        [playerId]="i + 1"
+        [score]="player.score"
+        [performance]="player.performance"
+    ></app-player-display>
+
+</ion-content>
+
+
+<!--
 	<div style="position: fixed; z-index: -99; width: 100%; height: 100%">
 		<iframe width="100%" height="100%" [src]="videoUrl" title="YouTube video player" frameborder="0" allow="autoplay;" referrerpolicy="strict-origin-when-cross-origin" style="pointer-events: none;" allowfullscreen></iframe>	
 	</div>
 	<div class="row-goal">
-		<img src="assets/Arrow/Arrow.png" alt="ArrowLeft" [style]="{ left: 20 + '%', transform: 'rotate(45deg)' }" class="arrow-goal" />
-		<img src="assets/Arrow/Arrow.png" alt="ArrowDown" [style]="{ left: 40 + '%', transform: 'rotate(-45deg)' }" class="arrow-goal" />
-		<img src="assets/Arrow/Arrow.png" alt="ArrowUp" [style]="{ left: 60 + '%', transform: 'rotate(135deg)' }" class="arrow-goal" />
-		<img src="assets/Arrow/Arrow.png" alt="ArrowRight" [style]="{ left: 80 + '%', transform: 'rotate(-135deg)' }" class="arrow-goal" />		
+		<img #arrowLeft src="assets/Arrow/Arrow.png" alt="ArrowLeft" [style]="{ left: 20 + '%', transform: 'rotate(45deg)' }" class="arrow-goal" />
+		<img #arrowDown src="assets/Arrow/Arrow.png" alt="ArrowDown" [style]="{ left: 40 + '%', transform: 'rotate(-45deg)' }" class="arrow-goal" />
+		<img #arrowUp src="assets/Arrow/Arrow.png" alt="ArrowUp" [style]="{ left: 60 + '%', transform: 'rotate(135deg)' }" class="arrow-goal" />
+		<img  #arrowRight src="assets/Arrow/Arrow.png" alt="ArrowRight" [style]="{ left: 80 + '%', transform: 'rotate(-135deg)' }" class="arrow-goal" />		
 	</div>
 
 	<div id="arrow-container" class="arrow-container">
@@ -27,3 +40,4 @@
 
 
 </ion-content>
+-->

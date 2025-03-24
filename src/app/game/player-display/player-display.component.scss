@@ -1,0 +1,29 @@
+.player-hud {
+    color: white;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 10px;
+}
+
+.player-hud .player-name {
+    font-size: 20px;
+    margin-bottom: 5px;
+}
+
+.player-hud .score {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.performance-container {
+    width: 150px;
+    height: 20px;
+    border: 2px solid white;
+    background-color: #333;
+    margin: auto;
+}
+
+.performance-bar {
+    height: 100%;
+    transition: width 0.2s ease-in-out; /* Smooth animations */
+}

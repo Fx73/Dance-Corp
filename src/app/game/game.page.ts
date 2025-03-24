@@ -1,14 +1,18 @@
-import { Component, Input, OnInit, input } from '@angular/core';
+import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild, input } from '@angular/core';
 import { IonContent, IonHeader, IonIcon, IonTitle, IonToolbar } from '@ionic/angular/standalone';
-import { Measures, MusicDto, Notes } from './dto/music.dto';
+import { Measures, MusicDto, NotesDto } from './dto/music.dto';
 
+import { AppComponent } from '../app.component';
 import { ArrowDirection } from "../shared/enumeration/arrow-direction.enum";
 import { ArrowlineComponent } from "./arrowline/arrowline.component";
 import { CommonModule } from '@angular/common';
 import { DomSanitizer } from "@angular/platform-browser";
 import { FormsModule } from '@angular/forms';
+import { KeyboardGamepad } from './keyboardGamepad';
+import { Player } from './dto/player';
 import { Router } from "@angular/router";
 import { UserConfigService } from "../services/userconfig.service";
+import { timestamp } from 'rxjs';
 
 @Component({
   selector: 'app-game',
@@ -17,7 +21,7 @@ import { UserConfigService } from "../services/userconfig.service";
   standalone: true,
   imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, ArrowlineComponent]
 })
-export class GamePage implements OnInit {
+export class GamePage implements OnInit, OnDestroy {
   //#region App Constants
   readonly ArrowDirection = ArrowDirection;
   readonly BEAT_INTERVAL = 150; //en px
@@ -26,12 +30,18 @@ export class GamePage implements OnInit {
   //#endregion
   //#region animations
   arrowlines: { arrows: Uint8Array, position: number, beatDivision: number }[] = [];
+  arrowTargets: Map<ArrowDirection, HTMLElement> = new Map();
+  @ViewChild('arrowLeft', { static: true }) arrowLeft!: ElementRef<HTMLImageElement>;
+  @ViewChild('arrowDown', { static: true }) arrowDown!: ElementRef<HTMLImageElement>;
+  @ViewChild('arrowUp', { static: true }) arrowUp!: ElementRef<HTMLImageElement>;
+  @ViewChild('arrowRight', { static: true }) arrowRight!: ElementRef<HTMLImageElement>;
   lines: any[] = [];
   movingDiv: HTMLElement | null = null;
+  keyboardGamePads: Map<number, KeyboardGamepad> = new Map<number, KeyboardGamepad>();
   //#endregion
   //#region Current Music
   music: MusicDto | null = null;
-  notes: Notes | null = null;
+  notes: NotesDto | null = null;
   notesIdx: number = 1;
   currentBpms: number = 0.002; //Beat per milliseconds
   musicLength: number[] = [];
@@ -41,7 +51,9 @@ export class GamePage implements OnInit {
 
   constructor(private userConfigService: UserConfigService, private router: Router, private sanitizer: DomSanitizer) { }
 
+
   ngOnInit() {
+    // Get Data
     this.movingDiv = document.getElementById("arrow-container");
     const navigation = this.router.getCurrentNavigation();
     if (navigation?.extras?.state) {
@@ -54,20 +66,43 @@ export class GamePage implements OnInit {
       this.router.navigate(['/home']);
       return;
     }
+    this.currentBpms = this.music.bpms[0].bpm / 60000
 
+    // Init game controllers
+    for (const p of this.userConfigService.players) {
+      if (p.gamepad!.index === -1) {
+        this.keyboardGamePads.set(p.id, new KeyboardGamepad(p.keyboardBindings))
+      }
+    }
+
+    //Build Game
+    this.loadTargets()
+    this.loadArrows();
+
+    // Init Music
     this.videoId = this.extractVideoId(this.music?.music ?? "https://youtu.be/u3VFzuUiTGw?si=R_6yFkX2eRHR7YN9")
     this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + this.videoId + '?si=w_PIhwe7FnixTNr_&controls=0&autoplay=1')
 
-    if (this.userConfigService.getConfig()["showBars"])
-      this.musicLength = Array.from({ length: this.notes.stepChart.length * 4 }, (_, index) => (index * this.BEAT_INTERVAL + 30))
-    this.currentBpms = this.music.bpms[0].bpm / 60000
-    this.loadArrows();
-    this.startArrows();
+    this.gameStart();
+  }
+  ngOnDestroy(): void {
+    this.keyboardGamePads.forEach(k => k.destroy())
+    this.keyboardGamePads.clear()
+  }
+
+  loadTargets() {
+    this.arrowTargets.set(ArrowDirection.Left, this.arrowLeft.nativeElement);
+    this.arrowTargets.set(ArrowDirection.Down, this.arrowDown.nativeElement);
+    this.arrowTargets.set(ArrowDirection.Up, this.arrowUp.nativeElement);
+    this.arrowTargets.set(ArrowDirection.Right, this.arrowRight.nativeElement);
   }
 
   loadArrows(): void {
     let timeIdx = 0;
     const notes = this.notes!.stepChart;
+
+    if (this.userConfigService.getConfig()["showBars"])
+      this.musicLength = Array.from({ length: notes.length * 4 }, (_, index) => (index * this.BEAT_INTERVAL + 30))
 
     notes.forEach((measure) => {
       const measurePosition = timeIdx * this.MEASURE_INTERVAL;
@@ -87,31 +122,58 @@ export class GamePage implements OnInit {
 
       timeIdx++;
     });
-    console.log(this.arrowlines)
   }
 
-  startArrows(): void {
-    let lastChrono: number | undefined;
 
-    const animate = (chrono: number) => {
-      if (lastChrono === undefined) {
-        lastChrono = chrono;
-      } else {
-        const timeElapsed = chrono - lastChrono;
-        lastChrono = chrono;
+  timeStampZero: DOMHighResTimeStamp = performance.now();
+  gameStart() {
+    this.timeStampZero = performance.now();
+    this.movingDiv!.style.top = 200 + "px"
+    window.requestAnimationFrame(this.gameLoop.bind(this));
+  }
 
-        // Calculate new position
-        const currentTop = parseInt(this.movingDiv!.style.top || "0", 10);
-        const newTop = currentTop - (timeElapsed * this.currentBpms * this.BEAT_INTERVAL);
-        this.movingDiv!.style.top = `${newTop}px`;
+  gameLoop(timeStamp: DOMHighResTimeStamp) {
+
+    // Watch for inputs
+    const gamepads = navigator.getGamepads();
+    for (const player of this.userConfigService.players) {
+      let gamepad: Gamepad | KeyboardGamepad | null;
+      if (player.gamepad!.index! === -1) {//keyboard
+        gamepad = this.keyboardGamePads.get(player.id) || null
       }
+      else {
+        gamepad = gamepads[player.gamepad!.index!];
+      }
+      if (gamepad) {
+        for (const [action, key] of player.keyBindings) {
+          this.performAction(action, gamepad.buttons[key].pressed)
+        }
+      }
+      else
+        AppComponent.presentWarningToast("Gamepad Lost! Reconnect it!")
+    }
 
-      window.requestAnimationFrame(animate);
-    };
-    window.requestAnimationFrame(animate);
+    // Calculate new position
+    const timeElapsed = timeStamp - this.timeStampZero;
+    const newTop = timeElapsed * this.currentBpms * this.BEAT_INTERVAL - (this.BEAT_INTERVAL * 6)
+    this.movingDiv!.style.top = `-${newTop}px`;
+
+    window.requestAnimationFrame(this.gameLoop.bind(this));
   }
 
 
+  performAction(action: ArrowDirection, isPressed: boolean) {
+    const arrowTarget = this.arrowTargets.get(action);
+    if (!arrowTarget) {
+      console.error(`No arrow element found for action "${action}"`);
+      return;
+    }
+    if (isPressed) {
+      arrowTarget.classList.add('active');
+    } else {
+      arrowTarget.classList.remove('active');
+    }
+  }
 
 
 
