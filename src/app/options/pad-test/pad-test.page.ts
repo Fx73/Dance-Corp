@@ -39,22 +39,22 @@ export class PadTestPage {
   selectPlayer(player: Player) {
     this.playerSelected = player
     this.gampadBindings.clear();
-    for (const k of player.keyBindings) {
-      this.gampadBindings.set(k[0], k[1])
-    }
     this.keyboardBindings.clear();
-    for (const [key, buttonIndex] of Object.entries(player.keyboardBindings)) {
-      const arrowDirection = player.keyBindings.find(([, index]) => index === buttonIndex)?.[0]
-      if (arrowDirection)
-        this.keyboardBindings.set(arrowDirection, key)
-      else
-        console.error("Binding failed on btn " + buttonIndex)
+    // Inverse keyboard bindings (from key to ArrowDirection)
+    for (const [key, direction] of player.keyBindingKeyboard.entries()) {
+      this.keyboardBindings.set(direction, key); // Map ArrowDirection -> key
+    }
+
+    // Inverse gamepad bindings (from button index to ArrowDirection)
+    for (const [button, direction] of player.keyBindingGamepad.entries()) {
+      this.gampadBindings.set(direction, button); // Map ArrowDirection -> button index
     }
   }
 
   updateGamepad(playerIndex: number, gamepadId: string): void {
     if (gamepadId === "Keyboard") {
-      this.userConfigService.assignKeyboardToPlayer(playerIndex)
+      this.userConfigService.updatePlayer('gamepad', playerIndex, { index: -1, id: "Keyboard" });
+
     } else {
       const gamepad = navigator.getGamepads().filter(g => g !== null).find(g => g.id === gamepadId)
       if (gamepad)
@@ -127,26 +127,19 @@ export class PadTestPage {
       return
 
     if (this.playerSelected.gamepad.index === -1) {
-      const keyboardBindingsObject: { [btnLinked: string]: number } = {};
-      this.keyboardBindings.forEach((key, arrowDirection) => {
-        const buttonIndex = this.gampadBindings.get(arrowDirection);
-        if (buttonIndex !== undefined) {
-          keyboardBindingsObject[key] = buttonIndex;
-        } else {
-          console.error(`No button index found for ArrowDirection "${arrowDirection}"`);
-        }
-      });
-      console.log(keyboardBindingsObject)
-      this.userConfigService.updatePlayer('keyboardBindings', this.playerSelected.id, keyboardBindingsObject);
+      const keyboardBindingsObject: Map<string, ArrowDirection> = new Map<string, ArrowDirection>();
+      for (const [direction, key] of this.keyboardBindings.entries()) {
+        keyboardBindingsObject.set(key, direction);
+      }
+      this.userConfigService.updatePlayer("keyBindingKeyboard", this.playerSelected.id, keyboardBindingsObject);
       AppComponent.presentOkToast("Player keyboard mappings have been updated.")
 
     } else {
-      const gamepadBindingsObject: { [ArrowDirection: string]: number } = {};
-      this.gampadBindings.forEach((value, key) => {
-        gamepadBindingsObject[key] = value;
-      });
-      console.log(gamepadBindingsObject)
-      this.userConfigService.updatePlayer('keyBindings', this.playerSelected.id, gamepadBindingsObject);
+      const gamepadBindingsObject: Map<number, ArrowDirection> = new Map<number, ArrowDirection>();
+      for (const [direction, button] of this.gampadBindings.entries()) {
+        gamepadBindingsObject.set(button, direction);
+      }
+      this.userConfigService.updatePlayer('keyBindingGamepad', this.playerSelected.id, gamepadBindingsObject);
       AppComponent.presentOkToast("Player gamepad mappings have been updated.")
     }
 

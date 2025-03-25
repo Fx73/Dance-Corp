@@ -8,12 +8,10 @@ import { CommonModule } from '@angular/common';
 import { DomSanitizer } from "@angular/platform-browser";
 import { FormsModule } from '@angular/forms';
 import { GameRound } from './gameModel/gameRound';
-import { KeyboardGamepad } from './keyboardGamepad';
 import { Player } from './dto/player';
 import { PlayerDisplayComponent } from "./player-display/player-display.component";
 import { Router } from "@angular/router";
 import { UserConfigService } from "../services/userconfig.service";
-import { timestamp } from 'rxjs';
 
 @Component({
   selector: 'app-game',
@@ -59,6 +57,7 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
     }
 
     this.players = this.userConfigService.players;
+    console.log(this.players)
 
     for (const player of this.players) {
       this.gameRounds.push(new GameRound(this.music, notes, player))

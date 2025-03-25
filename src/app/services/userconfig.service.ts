@@ -30,7 +30,7 @@ export class UserConfigService {
     }
     instanciatePlayer(index: number): Player {
         const storedPlayer = localStorage.getItem(this.PLAYERS_STORAGE_KEY(index));
-        const player: Player = storedPlayer ? JSON.parse(storedPlayer) : new Player(index)
+        const player: Player = storedPlayer ? Player.fromJSON(JSON.parse(storedPlayer)) : new Player(index)
 
         // Reassociating the gamepad if it exists and is valid
         if (player.gamepad && player.gamepad.index != -1) {
@@ -70,18 +70,6 @@ export class UserConfigService {
 
         localStorage.setItem(this.CONFIG_STORAGE_KEY, JSON.stringify(this.configSubject.value));
     }
-
-    assignKeyboardToPlayer(playerIndex: number): void {
-        const player = this.players[playerIndex];
-        if (!player) {
-            console.error(`Invalid player index: ${playerIndex}`);
-            return;
-        }
-        player.keyBindings = Player.defaultKeybinding();
-
-        this.updatePlayer('gamepad', playerIndex, { index: -1, id: "Keyboard" });
-    }
-
 
     updatePlayer(option: keyof Player, playerIndex: number, value: any): void {
         if (playerIndex < 0 || playerIndex >= this.players.length) {

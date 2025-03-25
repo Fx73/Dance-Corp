@@ -1,8 +1,10 @@
-import { ArrowState, DancePad } from "./dancepad";
+import { ArrowState, IDancePad } from "../gameController/dancepad.interface";
 import { MusicDto, NotesDto } from "../dto/music.dto";
 
 import { Arrow } from "./arrow";
 import { ArrowDirection } from "../../shared/enumeration/arrow-direction.enum";
+import { DancePadGamepad } from "../gameController/dancepad-gamepad";
+import { DancePadKeyboard } from './../gameController/dancepad-keyboard';
 import { Player } from "../dto/player";
 
 export class GameRound {
@@ -20,7 +22,7 @@ export class GameRound {
 
     //Player Data
     public player: Player
-    dancepad: DancePad
+    dancepad: IDancePad
 
     //Game variables
     public score: number = 0;
@@ -28,8 +30,7 @@ export class GameRound {
     public currentBeat: number = 0
     public currentArrowIndex: number = 0; // Tracks the last note out of game
 
-    //Private
-    private zeroTimeStamp: DOMHighResTimeStamp = 0;
+
 
     constructor(musicDTO: MusicDto, notes: NotesDto, player: Player) {
         this.player = player
@@ -37,9 +38,11 @@ export class GameRound {
         this.bps = musicDTO.bpms[0].bpm / 60
         this.tolerance = this.TOLERANCE_WINDOW * this.bps;
 
-        this.dancepad = new DancePad(player.gamepad!.index!)
+        if (player.gamepad!.index! === -1)
+            this.dancepad = new DancePadKeyboard(player.keyBindingKeyboard)
+        else
+            this.dancepad = new DancePadGamepad(player.gamepad!.index!, player.keyBindingGamepad)
         this.loadArrows(notes)
-        console.log(this.arrowMap)
     }
 
     private loadArrows(notes: NotesDto): void {
@@ -47,17 +50,14 @@ export class GameRound {
             const measure = notes.stepChart[measureIndex];
             const beatPrecision = measure.steps.length / this.BEAT_PER_MEASURE
 
-            console.log(measure)
             for (let stepIndex = 0; stepIndex < measure.steps.length; stepIndex++) {
                 const stepRow = measure.steps[stepIndex];
-                console.log(stepRow)
 
                 // Iterate through the columns to identify active steps
                 for (let columnIndex = 0; columnIndex < stepRow.length; columnIndex++) {
                     if (stepRow[columnIndex] === 1) {  // "Press" arrow
                         const direction = this.getDirectionFromColumn(columnIndex);
                         const beatPosition = (measureIndex * this.BEAT_PER_MEASURE) + (stepIndex / beatPrecision)
-                        console.log("Step found at " + beatPosition + " - Position " + columnIndex)
                         this.arrowMap.push(new Arrow(direction, beatPosition));
                     }
                 }

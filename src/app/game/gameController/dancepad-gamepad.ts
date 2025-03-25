@@ -1,22 +1,18 @@
+import { ArrowState, DancePadInput, IDancePad } from "./dancepad.interface";
+
 import { ArrowDirection } from "src/app/shared/enumeration/arrow-direction.enum";
 
-type DancePadInput = [ArrowState, ArrowState, ArrowState, ArrowState];
-export enum ArrowState {
-    Empty = 0, // No input
-    Press = 1, // Key has just been pressed
-    Hold = 2   // Key is being held down
-}
-
-export class DancePad {
-    private readonly ArrowDirection = ArrowDirection; // Add clarity for mapping directions
+export class DancePadGamepad implements IDancePad {
     private gamepadIndex: number;
     private currentState: Set<number>;
     private previousState: Set<number>;
+    private keyBinding: Map<number, ArrowDirection>;
 
-    constructor(gamepadIndex: number = 0) {
+    constructor(gamepadIndex: number = 0, keyBinding: Map<number, ArrowDirection>) {
         this.gamepadIndex = gamepadIndex;
         this.currentState = new Set();
         this.previousState = new Set();
+        this.keyBinding = keyBinding
     }
 
     // Update gamepad state
@@ -24,12 +20,12 @@ export class DancePad {
         const gamepad = navigator.getGamepads()[this.gamepadIndex];
 
         if (gamepad) {
-            this.previousState = new Set(this.currentState); // Save previous state
-            this.currentState.clear(); // Reset current state
+            this.previousState = new Set(this.currentState);
+            this.currentState.clear();
 
             gamepad.buttons.forEach((button, index) => {
-                if (button.pressed) {
-                    this.currentState.add(index);
+                if (button.pressed && this.keyBinding.has(index)) {
+                    this.currentState.add(this.keyBinding.get(index)!);
                 }
             });
         }
