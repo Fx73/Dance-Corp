@@ -18,7 +18,8 @@ import { UserConfigService } from 'src/app/services/userconfig.service';
   imports: [IonCardSubtitle, IonItem, IonLabel, IonButton, IonCardContent, IonCardTitle, IonCard, IonCardHeader, IonSelect, IonSelectOption, IonContent, CommonModule, FormsModule, HeaderComponent]
 })
 export class PadTestPage {
-  readonly arrowKeys = Object.values(ArrowDirection)
+  readonly ArrowDirection = ArrowDirection;
+  readonly arrowKeys = Object.values(ArrowDirection).filter(value => typeof value === 'number')
   playerSelected: Player | undefined;
   gampadBindings: Map<ArrowDirection, number> = new Map<ArrowDirection, number>();
   keyboardBindings: Map<ArrowDirection, string> = new Map<ArrowDirection, string>();
@@ -70,7 +71,7 @@ export class PadTestPage {
 
     const alert = await this.alertController.create({
       header: 'Waiting for Input',
-      message: `Press a button on your ${gamepad.id} for ${arrowDirection.toUpperCase()}`,
+      message: `Press a button on your ${gamepad.id} for ${ArrowDirection[arrowDirection].toUpperCase()}`,
       backdropDismiss: false,
     });
 

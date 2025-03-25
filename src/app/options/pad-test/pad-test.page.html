@@ -42,7 +42,7 @@
         <ion-card-content>
           <div class="keybind-container">
             <ion-item *ngFor="let arrowKey of arrowKeys; let index = index">
-              <ion-label color="primary"> {{arrowKey.toUpperCase()}} </ion-label>
+              <ion-label color="primary"> {{ArrowDirection[arrowKey].toUpperCase()}} </ion-label>
               <ion-label>  {{ (playerSelected.gamepad.index === -1 ? keyboardBindings.get(arrowKey) : gampadBindings.get(arrowKey)) || 'Not Set' }} </ion-label>
               <ion-button slot="end" size="small" color="tertiary"  (click)="openBindPopover(arrowKey)"> Bind </ion-button>
             </ion-item>
