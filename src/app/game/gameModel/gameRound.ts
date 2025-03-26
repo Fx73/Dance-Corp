@@ -1,4 +1,4 @@
-import { ArrowState, IDancePad } from "../gameController/dancepad.interface";
+import { ArrowState, DancePadInput, IDancePad } from "../gameController/dancepad.interface";
 import { MusicDto, NotesDto } from "../dto/music.dto";
 
 import { Arrow } from "./arrow";
@@ -6,6 +6,7 @@ import { ArrowDirection } from "../../shared/enumeration/arrow-direction.enum";
 import { DancePadGamepad } from "../gameController/dancepad-gamepad";
 import { DancePadKeyboard } from './../gameController/dancepad-keyboard';
 import { Player } from "../dto/player";
+import { Precision } from "../constants/precision.enum";
 
 export class GameRound {
     //#region App Constants
@@ -30,6 +31,8 @@ export class GameRound {
     public currentBeat: number = 0
     public currentArrowIndex: number = 0; // Tracks the last note out of game
 
+    //Display consuming
+    precisionMessage: Precision | null = null;
 
 
     constructor(musicDTO: MusicDto, notes: NotesDto, player: Player) {
@@ -79,14 +82,14 @@ export class GameRound {
         this.currentBeat = elapsedTime / this.bps
 
         // Get DancePad state
-        let padState = this.dancepad.getState()
+        const padstate = this.dancepad.getRefreshedState()
 
         // Check arrows
         let currentArrowCheck = this.currentArrowIndex
         while (this.arrowMap[currentArrowCheck].beatPosition < this.currentBeat + this.tolerance) {
             const arrow = this.arrowMap[currentArrowCheck];
             if (!arrow.isOut) {
-                this.checkArrowPress(arrow, this.currentBeat, padState[arrow.direction])
+                this.checkArrowPress(arrow, this.currentBeat, padstate[arrow.direction])
             }
             currentArrowCheck++
         }
@@ -127,6 +130,7 @@ export class GameRound {
             if (difference <= this.tolerance * 0.25) {
                 // Perfect: Very close to the beat
                 arrow.isValid = true;
+                arrow.isPerfect = true;
                 this.arrowPerfect();
                 console.log(`Perfect hit arrow at beat ${arrow.beatPosition}.`);
                 return;
@@ -149,21 +153,26 @@ export class GameRound {
     arrowPerfect() {
         this.performance = Math.min(100, this.performance + 2);
         this.score += 4
+        this.precisionMessage = Precision.Perfect
     }
     arrowGreat() {
         this.performance = Math.min(100, this.performance + 1);
         this.score += 3
+        this.precisionMessage = Precision.Great
     }
     arrowGood() {
         this.performance = Math.min(100, this.performance + 1);
         this.score += 2
+        this.precisionMessage = Precision.Good
     }
     arrowAlmost() {
         this.performance = Math.max(0, this.performance - 5);
         this.score += 1
+        this.precisionMessage = Precision.Almost
     }
     arrowMissed() {
         this.performance = Math.max(0, this.performance - 10);
+        this.precisionMessage = Precision.Missed
     }
 
 

@@ -1,3 +1,4 @@
+//@decprecated
 export class KeyboardGamepad {
     buttons: { pressed: boolean }[] = [];
 

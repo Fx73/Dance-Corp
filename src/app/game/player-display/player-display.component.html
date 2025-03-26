@@ -11,11 +11,12 @@
 <div style="display: flex; justify-content: center;">
 <div class="canvas-container">
   <div class="guide-line">
-      <img src="assets/Arrow/Arrow.png" alt="ArrowLeft" [width]="ARROW_SIZE" [height]="ARROW_SIZE" [style]="{ left: 20 + '%', transform: 'rotate(45deg) translate(-50%, -50%)' }" class="arrow-goal" />
-      <img src="assets/Arrow/Arrow.png" alt="ArrowDown" [width]="ARROW_SIZE" [height]="ARROW_SIZE" [style]="{ left: 40 + '%', transform: 'rotate(-45deg) translate(-50%, -50%)' }" class="arrow-goal" />
-      <img src="assets/Arrow/Arrow.png" alt="ArrowUp" [width]="ARROW_SIZE" [height]="ARROW_SIZE" [style]="{ left: 60 + '%', transform: 'rotate(135deg) translate(-50%, -50%)' }" class="arrow-goal" />
-      <img src="assets/Arrow/Arrow.png" alt="ArrowRight" [width]="ARROW_SIZE" [height]="ARROW_SIZE" [style]="{ left: 80 + '%', transform: 'rotate(-135deg) translate(-50%, -50%)' }" class="arrow-goal" />		
+      <img src="assets/Arrow/Arrow.png" alt="ArrowLeft" [width]="ARROW_SIZE" [height]="ARROW_SIZE" [style]="{ left: 20 + '%', transform: 'rotate(45deg) translate(-50%, -50%)' }" class="arrow-goal" [ngClass]="{'active': gameRound.dancepad.lastExposedState[ArrowDirection.Left] !== 0}"/>
+      <img src="assets/Arrow/Arrow.png" alt="ArrowDown" [width]="ARROW_SIZE" [height]="ARROW_SIZE" [style]="{ left: 40 + '%', transform: 'rotate(-45deg) translate(-50%, -50%)' }" class="arrow-goal"  [ngClass]="{'active': gameRound.dancepad.lastExposedState[ArrowDirection.Down] !== 0}"/>
+      <img src="assets/Arrow/Arrow.png" alt="ArrowUp" [width]="ARROW_SIZE" [height]="ARROW_SIZE" [style]="{ left: 60 + '%', transform: 'rotate(135deg) translate(-50%, -50%)' }" class="arrow-goal"  [ngClass]="{'active': gameRound.dancepad.lastExposedState[ArrowDirection.Up] !== 0}"/>
+      <img src="assets/Arrow/Arrow.png" alt="ArrowRight" [width]="ARROW_SIZE" [height]="ARROW_SIZE" [style]="{ left: 80 + '%', transform: 'rotate(-135deg) translate(-50%, -50%)' }" class="arrow-goal"  [ngClass]="{'active': gameRound.dancepad.lastExposedState[ArrowDirection.Right] !== 0}"/>		
   </div>
   <canvas #gameCanvas></canvas>
+  <div id="precision-text"></div>
 </div>
 </div>

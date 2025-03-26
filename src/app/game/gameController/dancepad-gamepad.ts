@@ -8,15 +8,18 @@ export class DancePadGamepad implements IDancePad {
     private previousState: Set<number>;
     private keyBinding: Map<number, ArrowDirection>;
 
+    public lastExposedState: DancePadInput;
+
     constructor(gamepadIndex: number = 0, keyBinding: Map<number, ArrowDirection>) {
         this.gamepadIndex = gamepadIndex;
         this.currentState = new Set();
         this.previousState = new Set();
         this.keyBinding = keyBinding
+        this.lastExposedState = [0, 0, 0, 0]
     }
 
     // Update gamepad state
-    public getState(): DancePadInput {
+    public getRefreshedState(): DancePadInput {
         const gamepad = navigator.getGamepads()[this.gamepadIndex];
 
         if (gamepad) {
@@ -29,14 +32,14 @@ export class DancePadGamepad implements IDancePad {
                 }
             });
         }
-        const directions: ArrowState[] = [
+        this.lastExposedState = [
             this.getArrowInput(ArrowDirection.Left),
             this.getArrowInput(ArrowDirection.Down),
             this.getArrowInput(ArrowDirection.Up),
             this.getArrowInput(ArrowDirection.Right)
-        ];
+        ] as DancePadInput;
 
-        return directions as DancePadInput;
+        return this.lastExposedState;
     }
 
     private getArrowInput(direction: ArrowDirection): ArrowState {

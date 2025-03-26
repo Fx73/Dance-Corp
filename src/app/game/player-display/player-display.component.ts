@@ -3,12 +3,15 @@ import { ArrowColor, ArrowImageManager } from './arrowImageManager';
 
 import { Arrow } from '../gameModel/arrow';
 import { ArrowDirection } from 'src/app/shared/enumeration/arrow-direction.enum';
+import { CommonModule } from '@angular/common';
 import { GameRound } from '../gameModel/gameRound';
+import { Precision } from '../constants/precision.enum';
 
 @Component({
   selector: 'app-player-display',
   templateUrl: './player-display.component.html',
   styleUrls: ['./player-display.component.scss'],
+  imports: [CommonModule]
 })
 export class PlayerDisplayComponent implements AfterViewInit {
   //#region App Constants
@@ -20,8 +23,13 @@ export class PlayerDisplayComponent implements AfterViewInit {
 
   @Input() gameRound!: GameRound;
 
+  //#region Displayed Elemments
   @ViewChild('gameCanvas', { static: true }) canvasRef!: ElementRef<HTMLCanvasElement>
   private ctx!: CanvasRenderingContext2D;
+  arrowTargets: Map<ArrowDirection, HTMLElement> = new Map();
+  private precisionTextElement!: HTMLElement;
+  private precisionTextTimeout: NodeJS.Timeout | null = null;
+  //#endregion
 
   private currentVisibleArrows: Arrow[] = []; // Currently visible arrows
   private currentArrowVisibleIndex: number = 0; // Index of the next not arrow in arrowMap
@@ -41,6 +49,9 @@ export class PlayerDisplayComponent implements AfterViewInit {
     }
     this.targetY = canvas.height * this.TARGET_PERCENT
     this.ctx = canvas.getContext('2d')!;
+
+    this.precisionTextElement = document.getElementById('precision-text')!;
+    this.showPrecisionMessage(Precision.Almost)
   }
 
   getPerformanceColor(): string {
@@ -52,7 +63,18 @@ export class PlayerDisplayComponent implements AfterViewInit {
     return 'red';
   }
 
-  public UpdateCanvas() {
+  public Update() {
+    this.UpdateCanvas()
+
+    if (this.gameRound.precisionMessage) {
+      this.showPrecisionMessage(this.gameRound.precisionMessage)
+      this.gameRound.precisionMessage = null;
+    }
+
+
+  }
+
+  private UpdateCanvas() {
     const currentBeat = this.gameRound.currentBeat;
 
     // Clean the canvas
@@ -63,20 +85,14 @@ export class PlayerDisplayComponent implements AfterViewInit {
 
 
     // Update visible Arrows
-    this.currentVisibleArrows = this.currentVisibleArrows.filter(arrow => arrow.beatPosition > currentBeat - 2);
-
-    const arrowMap = this.gameRound.arrowMap;
-    while (this.currentArrowVisibleIndex < arrowMap.length && arrowMap[this.currentArrowVisibleIndex].beatPosition <= currentBeat + 8) {
-      this.currentVisibleArrows.push(arrowMap[this.currentArrowVisibleIndex]);
-      console.log("PUSHED ARROW" + arrowMap[this.currentArrowVisibleIndex].beatPosition)
-      this.currentArrowVisibleIndex++;
-    }
+    this.updateArrowList(currentBeat)
 
     // Build Canvas
     this.RenderBars(canvas, currentBeat);
     this.RenderArrows(this.currentVisibleArrows, canvas, currentBeat);
   }
 
+  //#region Bars
   private RenderBars(canvas: HTMLCanvasElement, currentBeat: number) {
     // Calculate the vertical offset for the `currentBeat` bar
     const baseOffset = this.targetY - (currentBeat % 1) * this.BEAT_INTERVAL;
@@ -111,7 +127,26 @@ export class PlayerDisplayComponent implements AfterViewInit {
     this.ctx.textBaseline = 'middle'; // Vertically center the text relative to the Y position
     this.ctx.fillText(`${measureNumber}`, 10, y - 5); // Draw the text slightly above the bar
   }
+  //#endregion
 
+  //#region Arrows
+  private updateArrowList(currentBeat: number): void {
+    // Remove outdated arrows (those with beatPosition < currentBeat - 2)
+    while (this.currentVisibleArrows.length > 0 && this.currentVisibleArrows[0].beatPosition <= currentBeat - 2) {
+      this.currentVisibleArrows.shift();
+    }
+
+    this.currentVisibleArrows = this.currentVisibleArrows.filter(arrow => !arrow.isPerfect);
+
+    const arrowMap = this.gameRound.arrowMap;
+
+    // Add new arrows to the queue if they fall within the visible window [currentBeat, currentBeat + 8]
+    while (this.currentArrowVisibleIndex < arrowMap.length && arrowMap[this.currentArrowVisibleIndex].beatPosition <= currentBeat + 8) {
+      const arrow = arrowMap[this.currentArrowVisibleIndex];
+      this.currentVisibleArrows.push(arrow);
+      this.currentArrowVisibleIndex++;
+    }
+  }
 
   private RenderArrows(arrows: Arrow[], canvas: HTMLCanvasElement, currentBeat: number) {
     for (const arrow of arrows) {
@@ -122,20 +157,58 @@ export class PlayerDisplayComponent implements AfterViewInit {
   }
 
   private DrawArrow(arrow: Arrow, x: number, y: number): void {
-    // Set styles based on arrow status
-    if (arrow.isValid) {
-      this.ctx.fillStyle = "#00ff00"; // Bright green for valid arrows
-    } else if (arrow.isMissed) {
-      this.ctx.fillStyle = "rgba(255, 0, 0, 0.5)"; // Semi-transparent red for missed arrows
-    } else {
-      this.ctx.fillStyle = "#ffffff"; // Normal white for unvalidated arrows
+    if (arrow.isMissed) {
+      this.ctx.filter = 'brightness(50%)'; // Darken the arrow
+      this.ctx.shadowColor = 'white'; // White glow for contrast
+      this.ctx.shadowBlur = 10; // Add a soft glow effect
     }
 
     // Draw the arrow
     const arrowImage = ArrowImageManager.getArrowImage(arrow.color, arrow.direction);
     this.ctx.drawImage(arrowImage, x - arrowImage.width / 2, y - arrowImage.height / 2);
+
+    // Reset shadow and filter settings
+    if (arrow.isMissed) {
+      this.ctx.filter = 'none';
+      this.ctx.shadowColor = 'transparent';
+      this.ctx.shadowBlur = 0;
+    }
   }
 
+  //#region 
+
+  //#region Player Precision
+  showPrecisionMessage(precision: Precision): void {
+    if (this.precisionTextTimeout) {
+      clearTimeout(this.precisionTextTimeout);
+    }
+    this.precisionTextElement.textContent = precision;
+    this.precisionTextElement.style.setProperty('--gradient-color', this.createGradient(precision));
+
+    // Trigger the CSS animation
+    this.precisionTextElement.classList.remove('show'); // Reset animation if active
+    void this.precisionTextElement.offsetWidth; // Force reflow to restart animation
+    this.precisionTextElement.classList.add('show');
+
+    // Hide the message after 1 second
+    this.precisionTextTimeout = setTimeout(() => {
+      this.precisionTextElement.classList.remove('show');
+    }, 1000);
+  }
+
+  createGradient(precision: Precision): string {
+    switch (precision) {
+      case Precision.Perfect: return 'yellow';
+      case Precision.Great: return 'green';
+      case Precision.Good: return 'blue';
+      case Precision.Almost: return 'violet';
+      case Precision.Missed: return 'black';
+    }
+  }
+
+
+
+  //#endregion
 
 
 }

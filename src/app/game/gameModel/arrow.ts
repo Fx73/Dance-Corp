@@ -7,6 +7,7 @@ export class Arrow {
     color: ArrowColor;
 
     isValid: boolean = false;
+    isPerfect: boolean = false;
     isMissed: boolean = false;
 
     constructor(direction: ArrowDirection, beatPosition: number) {

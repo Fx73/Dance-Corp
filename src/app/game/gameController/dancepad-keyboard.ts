@@ -5,13 +5,15 @@ import { ArrowDirection } from "src/app/shared/enumeration/arrow-direction.enum"
 export class DancePadKeyboard implements IDancePad {
     private currentState: Set<number>;
     private previousState: Set<number>;
-
     private keyBinding: Map<string, ArrowDirection>;
+
+    public lastExposedState: DancePadInput;
 
     constructor(keyBinding: Map<string, ArrowDirection>) {
         this.currentState = new Set();
         this.previousState = new Set();
         this.keyBinding = keyBinding
+        this.lastExposedState = [0, 0, 0, 0]
 
         // Listen for keyboard events
         window.addEventListener('keydown', (event) => this.handleKeyDown(event));
@@ -31,18 +33,17 @@ export class DancePadKeyboard implements IDancePad {
     }
 
     // Update keyboard state and return DancePadInput
-    public getState(): DancePadInput {
-        const directions: ArrowState[] = [
+    public getRefreshedState(): DancePadInput {
+        this.lastExposedState = [
             this.getArrowInput(ArrowDirection.Left),
             this.getArrowInput(ArrowDirection.Down),
             this.getArrowInput(ArrowDirection.Up),
             this.getArrowInput(ArrowDirection.Right)
-        ];
+        ] as DancePadInput;
 
         this.previousState = new Set(this.currentState);
 
-        console.log(directions)
-        return directions as DancePadInput;
+        return this.lastExposedState;
     }
 
     private getArrowInput(direction: ArrowDirection): ArrowState {

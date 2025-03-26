@@ -87,7 +87,7 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
 
 
     for (const playerDiplay of this.playerDisplays)
-      playerDiplay.UpdateCanvas()
+      playerDiplay.Update()
 
     // Schedule the next loop iteration
     requestAnimationFrame(this.gameGlobalLoop.bind(this));
