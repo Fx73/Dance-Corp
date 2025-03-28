@@ -1,4 +1,5 @@
 import { ArrowDirection } from "src/app/shared/enumeration/arrow-direction.enum";
+import { CONFIG } from "../constants/game-config";
 
 export enum ArrowColor {
     Orange = 0,
@@ -10,6 +11,18 @@ export enum ArrowColor {
 export class ArrowImageManager {
     public static readonly ARROW_SIZE = 80 //px
     private static arrowImages: HTMLCanvasElement[][] = [];
+    private static holdImages: HTMLCanvasElement[] = [];
+
+
+    public static getArrowImage(color: ArrowColor, direction: ArrowDirection): HTMLCanvasElement {
+        return ArrowImageManager.arrowImages[color][direction];
+    }
+    public static getHoldForDistance(distance: number): HTMLCanvasElement {
+        const interval = CONFIG.DISPLAY.BEAT_INTERVAL / 10;
+        const closestIndex = Math.min(Math.round(distance / interval), ArrowImageManager.holdImages.length);
+        return ArrowImageManager.holdImages[closestIndex]
+    }
+
 
     static {
         const baseArrowImage = new Image();
@@ -17,10 +30,44 @@ export class ArrowImageManager {
         baseArrowImage.onload = () => {
             ArrowImageManager.PreloadArrowImages(baseArrowImage);
         };
+
+        const holdCenterImage = new Image();
+        holdCenterImage.src = "assets/Arrow/HoldCenter.png";
+
+        const holdCapImage = new Image();
+        holdCapImage.src = "assets/Arrow/HoldBottomCap.png";
+
+        Promise.all([
+            new Promise<void>((resolve) => { holdCenterImage.onload = () => resolve(); }),
+            new Promise<void>((resolve) => { holdCapImage.onload = () => resolve(); })
+        ]).then(() => {
+            this.PreloadHoldImages(holdCenterImage, holdCapImage);
+        });
+
     }
 
-    public static getArrowImage(color: ArrowColor, direction: ArrowDirection): HTMLCanvasElement {
-        return ArrowImageManager.arrowImages[color][direction];
+    public static PreloadHoldImages(centerImage: HTMLImageElement, capImage: HTMLImageElement) {
+        const interval = CONFIG.DISPLAY.BEAT_INTERVAL / 10;
+        const maxMultiplier = 100;
+        for (let multiplier = 0; multiplier <= maxMultiplier; multiplier++) {
+            const img = ArrowImageManager.PreloadHoldImage(centerImage, capImage, multiplier * interval)
+            this.holdImages.push(img)
+        }
+    }
+
+
+
+    private static PreloadHoldImage(centerImage: HTMLImageElement, capImage: HTMLImageElement, height: number): HTMLCanvasElement {
+        const canvas = document.createElement('canvas');
+        canvas.width = this.ARROW_SIZE;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d')!;
+        let y;
+        for (y = 0; y < height - capImage.height; y += centerImage.height) {
+            ctx.drawImage(centerImage, 0, y, canvas.width, centerImage.height);
+        }
+        ctx.drawImage(capImage, 0, y, canvas.width, capImage.height);
+        return canvas
     }
 
     private static PreloadArrowImages(arrowImage: HTMLImageElement): void {
@@ -93,6 +140,7 @@ export class ArrowImageManager {
         const diagonal = Math.sqrt(width * width + height * height);
         canvas.width = diagonal;
         canvas.height = diagonal;
+
         const ctx = canvas.getContext('2d')!;
 
         // Apply rotation to the image

@@ -3,6 +3,8 @@ import { ArrowColor, ArrowImageManager } from './arrowImageManager';
 
 import { Arrow } from '../gameModel/arrow';
 import { ArrowDirection } from 'src/app/shared/enumeration/arrow-direction.enum';
+import { ArrowType } from '../constants/arrow-type.enum';
+import { CONFIG } from '../constants/game-config';
 import { CommonModule } from '@angular/common';
 import { GameRound } from '../gameModel/gameRound';
 import { Precision } from '../constants/precision.enum';
@@ -16,8 +18,7 @@ import { Precision } from '../constants/precision.enum';
 export class PlayerDisplayComponent implements AfterViewInit {
   //#region App Constants
   readonly ArrowDirection = ArrowDirection;
-  readonly BEAT_INTERVAL = 150; //px
-  readonly TARGET_PERCENT = 0.1 // % from top;
+
   readonly ARROW_SIZE = ArrowImageManager.ARROW_SIZE //px
   //#endregion
 
@@ -33,7 +34,7 @@ export class PlayerDisplayComponent implements AfterViewInit {
 
   private currentVisibleArrows: Arrow[] = []; // Currently visible arrows
   private currentArrowVisibleIndex: number = 0; // Index of the next not arrow in arrowMap
-  targetY = this.TARGET_PERCENT;
+  targetY = CONFIG.DISPLAY.TARGET_PERCENT;
 
   constructor() {
   }
@@ -47,7 +48,7 @@ export class PlayerDisplayComponent implements AfterViewInit {
       container.style.width = `${window.innerWidth / 2}px`;
       container.style.height = `${window.innerHeight}px`;
     }
-    this.targetY = canvas.height * this.TARGET_PERCENT
+    this.targetY = canvas.height * CONFIG.DISPLAY.TARGET_PERCENT
     this.ctx = canvas.getContext('2d')!;
 
     this.precisionTextElement = document.getElementById('precision-text')!;
@@ -95,11 +96,11 @@ export class PlayerDisplayComponent implements AfterViewInit {
   //#region Bars
   private RenderBars(canvas: HTMLCanvasElement, currentBeat: number) {
     // Calculate the vertical offset for the `currentBeat` bar
-    const baseOffset = this.targetY - (currentBeat % 1) * this.BEAT_INTERVAL;
+    const baseOffset = this.targetY - (currentBeat % 1) * CONFIG.DISPLAY.BEAT_INTERVAL;
 
     // Draw the visible bars around the `currentBeat`
     for (let i = -10; i <= 10; i++) {
-      const beatY = baseOffset + i * this.BEAT_INTERVAL;
+      const beatY = baseOffset + i * CONFIG.DISPLAY.BEAT_INTERVAL;
       if (beatY >= 0 && beatY <= canvas.height) {
         const beatNumber = Math.floor(currentBeat) + i;
         const isMeasure = beatNumber % 4 === 0;
@@ -132,7 +133,7 @@ export class PlayerDisplayComponent implements AfterViewInit {
   //#region Arrows
   private updateArrowList(currentBeat: number): void {
     // Remove outdated arrows (those with beatPosition < currentBeat - 2)
-    while (this.currentVisibleArrows.length > 0 && this.currentVisibleArrows[0].beatPosition <= currentBeat - 2) {
+    while (this.currentVisibleArrows.length > 0 && ((this.currentVisibleArrows[0].beatEnd ?? this.currentVisibleArrows[0].beatPosition) <= currentBeat - 2)) {
       this.currentVisibleArrows.shift();
     }
 
@@ -150,10 +151,21 @@ export class PlayerDisplayComponent implements AfterViewInit {
 
   private RenderArrows(arrows: Arrow[], canvas: HTMLCanvasElement, currentBeat: number) {
     for (const arrow of arrows) {
-      const arrowY = this.targetY + (arrow.beatPosition - currentBeat) * this.BEAT_INTERVAL;
+      const arrowY = this.targetY + (arrow.beatPosition - currentBeat) * CONFIG.DISPLAY.BEAT_INTERVAL;
       const arrowX = canvas.width * ((arrow.direction + 1) * 0.2)
+
+      if (arrow.type === ArrowType.Hold) {
+        const arrowEndY = this.targetY + (arrow.beatEnd! - currentBeat) * CONFIG.DISPLAY.BEAT_INTERVAL;
+        this.DrawHold(arrow, arrowX, arrowY, arrowEndY)
+      }
+
       this.DrawArrow(arrow, arrowX, arrowY)
     }
+  }
+
+  private DrawHold(arrow: Arrow, x: number, y: number, yend: number) {
+    const holdCenterImage = ArrowImageManager.getHoldForDistance(yend - y);
+    this.ctx.drawImage(holdCenterImage, x - holdCenterImage.width / 2, y);
   }
 
   private DrawArrow(arrow: Arrow, x: number, y: number): void {
@@ -203,6 +215,7 @@ export class PlayerDisplayComponent implements AfterViewInit {
       case Precision.Good: return 'blue';
       case Precision.Almost: return 'violet';
       case Precision.Missed: return 'black';
+      case Precision.Ok: return "gold"
     }
   }
 

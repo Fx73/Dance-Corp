@@ -1,6 +1,6 @@
-export const Config = {
-    version: '1.0',
-  };
+export const AppConfig = {
+  version: '1.0',
+};
 
 export const firebaseConfig = {
   apiKey: "AIzaSyCnpz_Bdko3eaPTvb453sVQo3c5A4jgOAg",

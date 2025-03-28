@@ -12,7 +12,7 @@ export class MusicDto {
   jacket?: string;
   cdTitle?: string;
   music?: string;
-  offset?: number;
+  beat0OffsetInSeconds?: number;
   sampleStart?: number;
   sampleLength?: number;
   bpms: BpmChange[] = [];
@@ -58,8 +58,9 @@ export class MusicDto {
     delete tokenMap["cdtitle"];
     this.music = tokenMap["music"];
     delete tokenMap["music"];
-    this.offset = parseFloat(tokenMap["offset"]);
+    this.beat0OffsetInSeconds = parseFloat(tokenMap["offset"]) ?? parseFloat(tokenMap["beat0OffsetInSeconds"]);
     delete tokenMap["offset"];
+    delete tokenMap["beat0OffsetInSeconds"];
     this.sampleStart = parseFloat(tokenMap["samplestart"]);
     delete tokenMap["samplestart"];
     this.sampleLength = parseFloat(tokenMap["samplelength"]);

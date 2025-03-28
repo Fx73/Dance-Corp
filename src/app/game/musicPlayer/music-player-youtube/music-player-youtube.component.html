@@ -1,0 +1,7 @@
+<youtube-player
+  #musicPlayer
+  [videoId]="extractVideoId(videoId)"
+  (ready)="onReadyInternal($event)"
+  [playerVars]="playerConfig"
+>
+</youtube-player>

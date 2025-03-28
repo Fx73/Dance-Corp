@@ -9,26 +9,11 @@
     <app-player-display *ngFor="let gameRound of gameRounds"
 		[gameRound]="gameRound"
     ></app-player-display>
-
+	<app-music-player-youtube *ngIf="musicOrigin === MusicOrigin.Youtube" [videoId]="music!.music!" (onReady)="onPlayerReady($event)"></app-music-player-youtube>
 </ion-content>
-
 
 <!--
 	<div style="position: fixed; z-index: -99; width: 100%; height: 100%">
 		<iframe width="100%" height="100%" [src]="videoUrl" title="YouTube video player" frameborder="0" allow="autoplay;" referrerpolicy="strict-origin-when-cross-origin" style="pointer-events: none;" allowfullscreen></iframe>	
 	</div>
-
-	<div id="arrow-container" class="arrow-container">
-		<div *ngFor="let bar of musicLength" class="bar" [style.top]="bar + 'px'" > </div>
-		<div *ngFor="let bar of musicLength; let i = index" class="bar" [style.top]="bar + 'px'">
-			<span class="debug-stamp" *ngIf="(i + 1) % 4 === 0">
-			  {{ (i + 1) / 4 }}
-			</span>
-		  </div>
-		  
-		<app-arrowline class="arrowline" *ngFor="let line of arrowlines" [arrows]="line.arrows" [beatDivision]="line.beatDivision" [style.top]="line.position + 'px'"></app-arrowline>
-	</div>
-
-
-</ion-content>
 -->

@@ -3,6 +3,8 @@ import { MusicDto, NotesDto } from "../dto/music.dto";
 
 import { Arrow } from "./arrow";
 import { ArrowDirection } from "../../shared/enumeration/arrow-direction.enum";
+import { ArrowType } from "../constants/arrow-type.enum";
+import { CONFIG } from "../constants/game-config";
 import { DancePadGamepad } from "../gameController/dancepad-gamepad";
 import { DancePadKeyboard } from './../gameController/dancepad-keyboard';
 import { Player } from "../dto/player";
@@ -48,38 +50,41 @@ export class GameRound {
         this.loadArrows(notes)
     }
 
+
     private loadArrows(notes: NotesDto): void {
+        const activeHolds: (Arrow | null)[] = Array(Object.values(ArrowDirection).length).fill(null);
+
         for (let measureIndex = 0; measureIndex < notes.stepChart.length; measureIndex++) {
             const measure = notes.stepChart[measureIndex];
-            const beatPrecision = measure.steps.length / this.BEAT_PER_MEASURE
+            const beatPrecision = measure.steps.length / this.BEAT_PER_MEASURE;
 
             for (let stepIndex = 0; stepIndex < measure.steps.length; stepIndex++) {
                 const stepRow = measure.steps[stepIndex];
+                const beatPosition = (measureIndex * this.BEAT_PER_MEASURE) + (stepIndex / beatPrecision);
 
-                // Iterate through the columns to identify active steps
-                for (let columnIndex = 0; columnIndex < stepRow.length; columnIndex++) {
-                    if (stepRow[columnIndex] === 1) {  // "Press" arrow
-                        const direction = this.getDirectionFromColumn(columnIndex);
-                        const beatPosition = (measureIndex * this.BEAT_PER_MEASURE) + (stepIndex / beatPrecision)
+                for (let direction = 0; direction < stepRow.length; direction++) {
+                    const stepValue = stepRow[direction];
+
+                    if (stepValue === 1) { // Tap
                         this.arrowMap.push(new Arrow(direction, beatPosition));
+
+                    } else if (stepValue === 2) { // Hold
+                        const newArrow = new Arrow(direction, beatPosition, ArrowType.Hold);
+                        activeHolds[direction] = newArrow;
+                        this.arrowMap.push(newArrow);
+
+                    } else if (stepValue === 3 && activeHolds[direction]) { // Continue Hold
+                        activeHolds[direction]!.beatEnd = beatPosition;
                     }
+
                 }
             }
         }
     }
 
-    private getDirectionFromColumn(columnIndex: number): ArrowDirection {
-        switch (columnIndex) {
-            case 0: return ArrowDirection.Left;
-            case 1: return ArrowDirection.Down;
-            case 2: return ArrowDirection.Up;
-            case 3: return ArrowDirection.Right;
-            default: throw new Error(`Unknown column index: ${columnIndex}`);
-        }
-    }
 
     public gameLoop(elapsedTime: number): void {
-        this.currentBeat = elapsedTime / this.bps
+        this.currentBeat = elapsedTime * this.bps
 
         // Get DancePad state
         const padstate = this.dancepad.getRefreshedState()
@@ -111,70 +116,102 @@ export class GameRound {
     }
 
     private checkArrowPress(arrow: Arrow, currentBeat: number, padArrowState: ArrowState) {
+        if (arrow.isTypeHold && arrow.isPressed) {
+            if (arrow.beatEnd !== null && currentBeat > arrow.beatEnd) {
+                this.arrowOk(arrow)
+                return;
+            }
+
+            if (padArrowState !== ArrowState.Hold) {
+                arrow.missedFrames--
+                if (arrow.missedFrames <= 0)
+                    this.arrowMissed(arrow)
+            }
+            else if (arrow.missedFrames < CONFIG.GAME.MAX_MISSED_FRAME_HOLD)
+                arrow.missedFrames++
+
+            return
+        }
+
         if (currentBeat > arrow.beatPosition + (2 * this.tolerance)) {
             arrow.isMissed = true;
-            this.arrowMissed()
+            this.arrowMissed(arrow)
             console.log(`Missed arrow at beat ${arrow.beatPosition}.`);
-            return
+            return;
         }
 
         if (padArrowState === ArrowState.Press) {
             if (currentBeat > arrow.beatPosition + this.tolerance) {
-                arrow.isMissed = true;
-                this.arrowAlmost()
-                console.log(`Almost hit arrow at beat ${arrow.beatPosition}.`);
+                this.arrowAlmost(arrow)
                 return
             }
             const difference = Math.abs(arrow.beatPosition - currentBeat);
 
             if (difference <= this.tolerance * 0.25) {
                 // Perfect: Very close to the beat
-                arrow.isValid = true;
-                arrow.isPerfect = true;
-                this.arrowPerfect();
-                console.log(`Perfect hit arrow at beat ${arrow.beatPosition}.`);
+                this.arrowPerfect(arrow);
                 return;
             } else if (difference <= this.tolerance * 0.5) {
                 // Great: Slightly off but close enough
-                arrow.isValid = true;
-                this.arrowGreat();
-                console.log(`Great hit arrow at beat ${arrow.beatPosition}.`);
+                this.arrowGreat(arrow);
                 return;
             } else if (difference <= this.tolerance) {
                 // Good: Further off but still acceptable
-                arrow.isValid = true;
-                this.arrowGood();
-                console.log(`Good hit arrow at beat ${arrow.beatPosition}.`);
+                this.arrowGood(arrow);
                 return;
             }
         }
     }
 
-    arrowPerfect() {
+    arrowPerfect(arrow: Arrow) {
+        if (arrow.isTypeHold)
+            arrow.isPressed = true;
+        else
+            arrow.isPerfect = true
         this.performance = Math.min(100, this.performance + 2);
         this.score += 4
         this.precisionMessage = Precision.Perfect
     }
-    arrowGreat() {
+    arrowGreat(arrow: Arrow) {
+        if (arrow.isTypeHold)
+            arrow.isPressed = true;
+        else
+            arrow.isValid = true
         this.performance = Math.min(100, this.performance + 1);
         this.score += 3
         this.precisionMessage = Precision.Great
     }
-    arrowGood() {
+    arrowGood(arrow: Arrow) {
+        if (arrow.isTypeHold)
+            arrow.isPressed = true;
+        else
+            arrow.isValid = true
         this.performance = Math.min(100, this.performance + 1);
         this.score += 2
         this.precisionMessage = Precision.Good
     }
-    arrowAlmost() {
+    arrowAlmost(arrow: Arrow) {
+        if (arrow.isTypeHold)
+            arrow.isPressed = true;
+        else
+            arrow.isMissed = true
         this.performance = Math.max(0, this.performance - 5);
         this.score += 1
         this.precisionMessage = Precision.Almost
     }
-    arrowMissed() {
+    arrowMissed(arrow: Arrow) {
+        arrow.isMissed = true;
         this.performance = Math.max(0, this.performance - 10);
         this.precisionMessage = Precision.Missed
     }
-
+    arrowOk(arrow: Arrow) {
+        arrow.isValid = true;
+        const arrowLength = arrow.beatEnd ? Math.round(arrow.beatEnd - arrow.beatPosition) : 1
+        this.performance = Math.min(100, this.performance + arrowLength);
+        this.score += arrowLength / 2
+        this.precisionMessage = Precision.Ok
+        console.log("OK ARROW")
+    }
 
     EndFail() {
         console.log("FAIL")
