@@ -1,5 +1,5 @@
+import { ArrowImageManager } from '../game/player-display/arrowImageManager';
 import { BehaviorSubject } from 'rxjs';
-import { GamepadReference } from './gamepad.service';
 import { Injectable } from '@angular/core';
 import { Player } from '../game/dto/player';
 
@@ -27,6 +27,7 @@ export class UserConfigService {
             this.players.push(this.instanciatePlayer(i));
         }
 
+        ArrowImageManager.Set_ARROW_SIZE(this.configSubject.value.canvasWidth / 4);
     }
     instanciatePlayer(index: number): Player {
         const storedPlayer = localStorage.getItem(this.PLAYERS_STORAGE_KEY(index));
@@ -93,7 +94,10 @@ export class UserConfigService {
 
 class UserConfig {
     playerNumber = 1;
-    showBars = true
 
+    // Display
+    showBars = true
+    canvasWidth = 400
+    canvasHeight = 600
 
 }

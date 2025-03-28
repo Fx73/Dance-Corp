@@ -8,6 +8,7 @@ import { CONFIG } from '../constants/game-config';
 import { CommonModule } from '@angular/common';
 import { GameRound } from '../gameModel/gameRound';
 import { Precision } from '../constants/precision.enum';
+import { UserConfigService } from 'src/app/services/userconfig.service';
 
 @Component({
   selector: 'app-player-display',
@@ -18,7 +19,6 @@ import { Precision } from '../constants/precision.enum';
 export class PlayerDisplayComponent implements AfterViewInit {
   //#region App Constants
   readonly ArrowDirection = ArrowDirection;
-
   readonly ARROW_SIZE = ArrowImageManager.ARROW_SIZE //px
   //#endregion
 
@@ -36,23 +36,26 @@ export class PlayerDisplayComponent implements AfterViewInit {
   private currentArrowVisibleIndex: number = 0; // Index of the next not arrow in arrowMap
   targetY = CONFIG.DISPLAY.TARGET_PERCENT;
 
-  constructor() {
+  constructor(private userConfigService: UserConfigService) {
   }
 
   ngAfterViewInit(): void {
     const canvas = this.canvasRef.nativeElement;
-    canvas.width = window.innerWidth / 2
-    canvas.height = window.innerHeight
+    canvas.width = this.userConfigService.getConfig()['canvasWidth']
+    canvas.height = this.userConfigService.getConfig()['canvasHeight']
     const container = canvas.parentElement;
     if (container) {
-      container.style.width = `${window.innerWidth / 2}px`;
-      container.style.height = `${window.innerHeight}px`;
+      container.style.width = `${canvas.width}px`;
+      container.style.height = `${canvas.height}px`;
     }
     this.targetY = canvas.height * CONFIG.DISPLAY.TARGET_PERCENT
     this.ctx = canvas.getContext('2d')!;
 
     this.precisionTextElement = document.getElementById('precision-text')!;
-    this.showPrecisionMessage(Precision.Almost)
+  }
+
+  get arrowCorrectedSize(): number {
+    return this.ARROW_SIZE / Math.sqrt(2);
   }
 
   getPerformanceColor(): string {
@@ -132,16 +135,16 @@ export class PlayerDisplayComponent implements AfterViewInit {
 
   //#region Arrows
   private updateArrowList(currentBeat: number): void {
-    // Remove outdated arrows (those with beatPosition < currentBeat - 2)
+    // Remove outdated arrows
     while (this.currentVisibleArrows.length > 0 && ((this.currentVisibleArrows[0].beatEnd ?? this.currentVisibleArrows[0].beatPosition) <= currentBeat - 2)) {
       this.currentVisibleArrows.shift();
     }
 
     this.currentVisibleArrows = this.currentVisibleArrows.filter(arrow => !arrow.isPerfect);
 
-    const arrowMap = this.gameRound.arrowMap;
 
     // Add new arrows to the queue if they fall within the visible window [currentBeat, currentBeat + 8]
+    const arrowMap = this.gameRound.arrowMap;
     while (this.currentArrowVisibleIndex < arrowMap.length && arrowMap[this.currentArrowVisibleIndex].beatPosition <= currentBeat + 8) {
       const arrow = arrowMap[this.currentArrowVisibleIndex];
       this.currentVisibleArrows.push(arrow);
@@ -152,7 +155,7 @@ export class PlayerDisplayComponent implements AfterViewInit {
   private RenderArrows(arrows: Arrow[], canvas: HTMLCanvasElement, currentBeat: number) {
     for (const arrow of arrows) {
       const arrowY = this.targetY + (arrow.beatPosition - currentBeat) * CONFIG.DISPLAY.BEAT_INTERVAL;
-      const arrowX = canvas.width * ((arrow.direction + 1) * 0.2)
+      const arrowX = canvas.width * ((arrow.direction + 0.5) * 0.25)
 
       if (arrow.type === ArrowType.Hold) {
         const arrowEndY = this.targetY + (arrow.beatEnd! - currentBeat) * CONFIG.DISPLAY.BEAT_INTERVAL;

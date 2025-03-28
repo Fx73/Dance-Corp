@@ -10,7 +10,7 @@
         <ion-card-subtitle>Check the binding of your pads and test inputs.</ion-card-subtitle>
       </ion-card-header>
       <ion-card-content >
-        <ion-button expand="block" style="height: 100px;" [routerLink]="['/pad-test']">Test</ion-button>
+        <ion-button expand="block" style="height: 100px;" [routerLink]="['/pad-test']">Bind gamepads</ion-button>
       </ion-card-content>
     </ion-card>
 
@@ -35,10 +35,21 @@
         <ion-item>
           <ion-toggle label="" [checked]="this.getConfigValue('showBars')" (ionChange)="updateConfigValue('showBars',$event.detail.checked)">Show Bars</ion-toggle>
         </ion-item>
+        <ion-item>
+          <ion-input label="Game Width"  type="number" [value]="this.getConfigValue('canvasWidth')" (ionChange)="updateConfigValue('canvasWidth', $event.detail.value)">
+          </ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-input label="Game height" type="number" [value]="this.getConfigValue('canvasHeight')" (ionChange)="updateConfigValue('canvasHeight', $event.detail.value)">
+          </ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-button expand="full" (click)="verifyDisplay()">Verify display</ion-button>
+        </ion-item>
       </ion-card-content>
     </ion-card>
     
-    <!-- Redet Card-->
+    <!-- Reset Card-->
     <ion-card class="optionCard">
       <ion-card-header>
         <ion-card-title>Reset Configuration</ion-card-title>
@@ -52,4 +63,9 @@
     </ion-card>
     
   </div>
+  <ion-modal [isOpen]="showPlayerDisplay" (didPresent)="this.playerDisplay?.Update()">
+    <ng-template>
+      <app-player-display [gameRound]="getFakeGameRound()"></app-player-display>
+    </ng-template>
+  </ion-modal>
 </ion-content>

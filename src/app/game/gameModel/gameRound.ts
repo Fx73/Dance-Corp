@@ -4,7 +4,7 @@ import { MusicDto, NotesDto } from "../dto/music.dto";
 import { Arrow } from "./arrow";
 import { ArrowDirection } from "../../shared/enumeration/arrow-direction.enum";
 import { ArrowType } from "../constants/arrow-type.enum";
-import { CONFIG } from "../constants/game-config";
+import { CONFIG } from './../constants/game-config';
 import { DancePadGamepad } from "../gameController/dancepad-gamepad";
 import { DancePadKeyboard } from './../gameController/dancepad-keyboard';
 import { Player } from "../dto/player";
@@ -12,8 +12,6 @@ import { Precision } from "../constants/precision.enum";
 
 export class GameRound {
     //#region App Constants
-    readonly BEAT_PER_MEASURE = 4;
-    readonly TOLERANCE_WINDOW = 0.2; //In seconds
     readonly ArrowDirection = ArrowDirection;
     //#endregion
 
@@ -41,13 +39,15 @@ export class GameRound {
         this.player = player
         this.music = musicDTO;
         this.bps = musicDTO.bpms[0].bpm / 60
-        this.tolerance = this.TOLERANCE_WINDOW * this.bps;
+        this.tolerance = CONFIG.GAME.TOLERANCE_WINDOW * this.bps;
 
         if (player.gamepad!.index! === -1)
             this.dancepad = new DancePadKeyboard(player.keyBindingKeyboard)
         else
             this.dancepad = new DancePadGamepad(player.gamepad!.index!, player.keyBindingGamepad)
         this.loadArrows(notes)
+        console.log(this.arrowMap.length)
+
     }
 
 
@@ -56,11 +56,11 @@ export class GameRound {
 
         for (let measureIndex = 0; measureIndex < notes.stepChart.length; measureIndex++) {
             const measure = notes.stepChart[measureIndex];
-            const beatPrecision = measure.steps.length / this.BEAT_PER_MEASURE;
+            const beatPrecision = measure.steps.length / CONFIG.GAME.BEAT_PER_MEASURE;
 
             for (let stepIndex = 0; stepIndex < measure.steps.length; stepIndex++) {
                 const stepRow = measure.steps[stepIndex];
-                const beatPosition = (measureIndex * this.BEAT_PER_MEASURE) + (stepIndex / beatPrecision);
+                const beatPosition = (measureIndex * CONFIG.GAME.BEAT_PER_MEASURE) + (stepIndex / beatPrecision);
 
                 for (let direction = 0; direction < stepRow.length; direction++) {
                     const stepValue = stepRow[direction];
@@ -91,7 +91,7 @@ export class GameRound {
 
         // Check arrows
         let currentArrowCheck = this.currentArrowIndex
-        while (this.arrowMap[currentArrowCheck].beatPosition < this.currentBeat + this.tolerance) {
+        while (currentArrowCheck < this.arrowMap.length && this.arrowMap[currentArrowCheck].beatPosition < this.currentBeat + this.tolerance) {
             const arrow = this.arrowMap[currentArrowCheck];
             if (!arrow.isOut) {
                 this.checkArrowPress(arrow, this.currentBeat, padstate[arrow.direction])
@@ -99,19 +99,21 @@ export class GameRound {
             currentArrowCheck++
         }
 
-        //Check Fail
-        if (this.performance <= 0) {
-            this.EndFail()
-            return
-        }
 
         // Pass out arrows
         while (this.arrowMap[this.currentArrowIndex].isOut) {
             this.currentArrowIndex++
+            console.log("Passed ", this.currentArrowIndex)
             if (this.currentArrowIndex >= this.arrowMap.length) {
                 this.EndVictory()
                 return
             }
+        }
+
+        //Check Fail
+        if (this.performance <= 0) {
+            this.EndFail()
+            return
         }
     }
 
@@ -195,13 +197,13 @@ export class GameRound {
             arrow.isPressed = true;
         else
             arrow.isMissed = true
-        this.performance = Math.max(0, this.performance - 5);
+        this.performance = Math.max(0, this.performance - 2);
         this.score += 1
         this.precisionMessage = Precision.Almost
     }
     arrowMissed(arrow: Arrow) {
         arrow.isMissed = true;
-        this.performance = Math.max(0, this.performance - 10);
+        this.performance = Math.max(0, this.performance - 6);
         this.precisionMessage = Precision.Missed
     }
     arrowOk(arrow: Arrow) {

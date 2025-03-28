@@ -1,13 +1,18 @@
+import { ArrowImageManager } from "../player-display/arrowImageManager";
+
 export const CONFIG = {
     APP: {
         DEBUG_MODE: false,
     },
     GAME: {
-        MAX_MISSED_FRAME_HOLD: 2,
         BEAT_PER_MEASURE: 4,
+        MAX_MISSED_FRAME_HOLD: 2,
+        TOLERANCE_WINDOW: 0.2 //In seconds
+
+
     },
     DISPLAY: {
-        BEAT_INTERVAL: 150, //px
+        BEAT_INTERVAL: 100, //px
         TARGET_PERCENT: 0.1 // % from top;
     }
 };

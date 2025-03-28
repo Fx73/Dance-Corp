@@ -9,10 +9,14 @@ export enum ArrowColor {
 }
 
 export class ArrowImageManager {
-    public static readonly ARROW_SIZE = 80 //px
+    private static _ARROW_SIZE = 80 //px
+    public static get ARROW_SIZE(): number {
+        return this._ARROW_SIZE;
+    }
+
+
     private static arrowImages: HTMLCanvasElement[][] = [];
     private static holdImages: HTMLCanvasElement[] = [];
-
 
     public static getArrowImage(color: ArrowColor, direction: ArrowDirection): HTMLCanvasElement {
         return ArrowImageManager.arrowImages[color][direction];
@@ -24,7 +28,13 @@ export class ArrowImageManager {
     }
 
 
-    static {
+    public static Set_ARROW_SIZE(size: number) {
+        this._ARROW_SIZE = size;
+        CONFIG.DISPLAY.BEAT_INTERVAL = size * 1.2
+        this.LoadImages()
+    }
+    static { }
+    public static LoadImages() {
         const baseArrowImage = new Image();
         baseArrowImage.src = "assets/Arrow/Arrow.png";
         baseArrowImage.onload = () => {
@@ -135,19 +145,19 @@ export class ArrowImageManager {
 
     private static CreateRotatedImage(image: HTMLCanvasElement, angle: number): HTMLCanvasElement {
         const canvas = document.createElement('canvas');
-        const width = this.ARROW_SIZE;
-        const height = this.ARROW_SIZE;
-        const diagonal = Math.sqrt(width * width + height * height);
-        canvas.width = diagonal;
-        canvas.height = diagonal;
+        canvas.width = this.ARROW_SIZE;
+        canvas.height = this.ARROW_SIZE;
+
+        const diagonal = Math.sqrt(this.ARROW_SIZE * this.ARROW_SIZE * 2);
+        const scaleFactor = this.ARROW_SIZE / Math.sqrt(2);
 
         const ctx = canvas.getContext('2d')!;
 
         // Apply rotation to the image
         ctx.save();
-        ctx.translate(diagonal / 2, diagonal / 2);
+        ctx.translate(this.ARROW_SIZE / 2, this.ARROW_SIZE / 2);
         ctx.rotate(angle);
-        ctx.drawImage(image, -width / 2, -height / 2, width, height);
+        ctx.drawImage(image, -scaleFactor / 2, -scaleFactor / 2, scaleFactor, scaleFactor);
         ctx.restore();
 
         return canvas;

@@ -39,6 +39,7 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
   @ViewChildren(PlayerDisplayComponent) playerDisplaysQuery!: QueryList<PlayerDisplayComponent>;
   private playerDisplays: PlayerDisplayComponent[] = [];
 
+  private gameLoopId: number | null = null;
   zeroTimeStamp: number = 0;
 
   constructor(private userConfigService: UserConfigService, private router: Router, private sanitizer: DomSanitizer) { }
@@ -85,6 +86,10 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnDestroy(): void {
+    if (this.gameLoopId !== null) {
+      cancelAnimationFrame(this.gameLoopId);
+    }
+    this.gameRounds = [];
   }
 
   startGame() {
@@ -107,7 +112,7 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
       playerDiplay.Update()
 
     // Schedule the next loop iteration
-    requestAnimationFrame(this.gameGlobalLoop.bind(this));
+    this.gameLoopId = requestAnimationFrame(this.gameGlobalLoop.bind(this));
   }
 
   //#region Music Player
