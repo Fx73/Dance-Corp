@@ -120,7 +120,6 @@ export class MusicFirestoreService {
             querySnapshot.forEach(doc => {
                 notes.push(doc.data());
             });
-
             return notes;
         } catch (error) {
             console.error('Erreur lors de la récupération des notes :', error);

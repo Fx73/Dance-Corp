@@ -39,21 +39,28 @@
 }
 
 .selectedCard{
-  transition: all 0.3s ease-in-out;
-  width: 64vw !important;
+  transition: all 0.2s ease-in-out;
+  background-color: var(--ion-color-primary);
 }
 
 .levelCard{
-  margin: 0;
+  margin: 2px;
   overflow-y: scroll;
-  background-color: darkslateblue;
-  height: fit-content;
-  width: 31vw;
-  height: 40vh;
-
-  
+  height: 100%;
+  background-size: cover;
 }
-
+.levelCard > ion-card-header{
+  margin: 2px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(4px);
+  ion-card-title{
+    font-size:2rem;
+  }
+  ion-card-subtitle{
+    font-size:1.4rem;
+  }
+}
 
 ::-webkit-scrollbar {
   width: 1px;
@@ -61,4 +68,49 @@
 }
 ::-webkit-scrollbar-thumb {
   background: #8a4646;
+}
+
+.note-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  border-radius: 30px;
+  color: white;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  ion-card-content{
+    padding: 2px 12px;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+
+    .difficulty {
+      font-size: 1.1rem;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      width: 5rem;
+    }
+    
+    .meter{
+      width: 2.8rem;
+      font-size: 1.4rem;
+      margin: 0;
+      padding: 2px;
+      border-radius: 30px;
+      text-align: center;
+    }
+
+    .score {
+      display: flex;
+      align-items: center;
+    }
+
+  }
+}
+.note-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0px 0px 8px 4px rgba(250, 250, 250, 0.6);
 }

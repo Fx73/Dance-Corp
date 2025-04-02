@@ -21,18 +21,18 @@ export class UserMusicDto {
     id: string;
     timesPlayed: number = 0;
 
-    constructor(id: string) {
-        this.id = id;
+    constructor(id?: string) {
+        this.id = id ?? '';
     }
 }
 
 export class UserNoteDto {
     id: string;
     timesPlayed: number = 0;
-    maxScore: number = 0;
-    usedGamepad: string = "";
+    highScore: number = 0;
+    highScoreGamepad: string = "";
 
-    constructor(id: string) {
-        this.id = id;
+    constructor(id?: string) {
+        this.id = id ?? '';
     }
 }

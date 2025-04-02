@@ -53,7 +53,7 @@ export class GameOverComponent implements OnInit {
   }
 
   getPrecisionColor(precision: Precision): string {
-    return Color.createGradient(precision)
+    return Color.precisionGradient(precision)
   }
 
   goToMainMenu(): void {

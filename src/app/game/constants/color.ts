@@ -1,7 +1,8 @@
+import { NoteDifficulty } from "./note-difficulty.enum";
 import { Precision } from "./precision.enum";
 
 export class Color {
-    static createGradient(precision: Precision): string {
+    static precisionGradient(precision: Precision): string {
         switch (precision) {
             case Precision.Perfect: return 'yellow';
             case Precision.Great: return 'green';
@@ -12,4 +13,21 @@ export class Color {
             default: return 'gray';
         }
     }
+
+
+    static noteDifficultyColor(difficulty: NoteDifficulty): string {
+        switch (difficulty) {
+            case NoteDifficulty.Beginner:
+                return 'cyan';
+            case NoteDifficulty.Basic:
+                return 'orange';
+            case NoteDifficulty.Difficult:
+                return 'red';
+            case NoteDifficulty.Expert:
+                return 'limegreen';
+            case NoteDifficulty.Challenge:
+                return 'mediumvioletred';
+        }
+    }
+
 }

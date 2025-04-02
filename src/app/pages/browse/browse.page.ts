@@ -1,29 +1,34 @@
 import { Component, OnInit } from '@angular/core';
-import { InfiniteScrollCustomEvent, IonBadge, IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonHeader, IonImg, IonInfiniteScroll, IonInfiniteScrollContent, IonItem, IonLabel, IonSearchbar, IonText, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { InfiniteScrollCustomEvent, IonBadge, IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonGrid, IonHeader, IonImg, IonInfiniteScroll, IonInfiniteScrollContent, IonItem, IonLabel, IonList, IonMenu, IonRow, IonSearchbar, IonSplitPane, IonTab, IonText, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { MusicDto, NotesDto } from 'src/app/game/gameModel/music.dto';
 
+import { Color } from 'src/app/game/constants/color';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { GradeComponent } from "../../shared/component/grade/grade.component";
 import { HeaderComponent } from "src/app/shared/header/header.component";
 import { MusicFirestoreService } from 'src/app/services/firestore/music.firestore.service';
+import { NoteDifficulty } from 'src/app/game/constants/note-difficulty.enum';
 import { Router } from '@angular/router';
+import { UserFirestoreService } from './../../services/firestore/user.firestore.service';
 
 @Component({
   selector: 'app-browse',
   templateUrl: './browse.page.html',
   styleUrls: ['./browse.page.scss'],
   standalone: true,
-  imports: [IonBadge, IonButton, IonCardSubtitle, IonLabel, IonText, IonCardContent, IonCardTitle, IonInfiniteScrollContent, IonImg, IonItem, IonInfiniteScroll, IonSearchbar, IonCard, IonCardHeader, IonContent, CommonModule, FormsModule, HeaderComponent]
+  imports: [IonSplitPane, IonCardSubtitle, IonMenu, IonText, IonCardContent, IonCardTitle, IonInfiniteScrollContent, IonImg, IonInfiniteScroll, IonSearchbar, IonCard, IonCardHeader, IonContent, CommonModule, FormsModule, HeaderComponent, GradeComponent]
 })
 export class BrowsePage implements OnInit {
 
   musics: MusicDto[] = [];
   notes: NotesDto[] | undefined;
+  userScores: { [key: string]: number } = {};
   selectedMusic: MusicDto | null = null;
   searchQuery: string = '';
 
 
-  constructor(private router: Router, private fireStoreService: MusicFirestoreService) { }
+  constructor(private router: Router, private fireStoreService: MusicFirestoreService, private userFirestoreService: UserFirestoreService) { }
 
   ngOnInit() {
     this.fireStoreService.GetAllMusics(null).then(value => this.musics = value);
@@ -50,6 +55,17 @@ export class BrowsePage implements OnInit {
     }
     this.selectedMusic = music;
     this.fireStoreService.getMusicNotes(music.id).then(n => this.notes = n)
+    if (this.userFirestoreService.getUserData())
+      this.userFirestoreService.getScoresForMusic(this.selectedMusic.id, this.userFirestoreService.getUserData()!.id).then(score => this.userScores = score)
+  }
+  getNoteColor(difficulty: NoteDifficulty | undefined): string {
+    let color = "grey"
+    if (difficulty)
+      color = Color.noteDifficultyColor(difficulty)
+    return color
+  }
+  getGrade(score: number): string {
+    return "A"
   }
 
   onSearch(event: any) {
@@ -64,5 +80,6 @@ export class BrowsePage implements OnInit {
     else
       this.fireStoreService.GetAllMusicsWithSearch(lastMusic?.id ?? null, this.searchQuery).then(value => this.musics = this.musics.concat(value)).catch((e) => { console.log(e.message); event.target.complete() });
   }
+
 
 }

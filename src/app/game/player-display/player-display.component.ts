@@ -202,7 +202,7 @@ export class PlayerDisplayComponent implements AfterViewInit {
       clearTimeout(this.precisionTextTimeout);
     }
     this.precisionTextElement.textContent = precision;
-    this.precisionTextElement.style.setProperty('--gradient-color', Color.createGradient(precision));
+    this.precisionTextElement.style.setProperty('--gradient-color', Color.precisionGradient(precision));
 
     // Trigger the CSS animation
     this.precisionTextElement.classList.remove('show'); // Reset animation if active

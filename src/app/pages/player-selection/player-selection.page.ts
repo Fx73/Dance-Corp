@@ -9,7 +9,6 @@ import { HeaderComponent } from "../../shared/header/header.component";
 import { Player } from 'src/app/game/gameModel/player';
 import { RouterModule } from '@angular/router';
 import { UserConfigService } from 'src/app/services/userconfig.service';
-import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.service';
 import { addCircle } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 
@@ -18,7 +17,7 @@ import { addIcons } from 'ionicons';
   templateUrl: './player-selection.page.html',
   styleUrls: ['./player-selection.page.scss'],
   standalone: true,
-  imports: [IonInput, IonList, IonIcon, IonLabel, IonCardSubtitle, IonCardHeader, IonButton, IonCardContent, IonItem, IonCard, IonCardTitle, IonContent, IonSelectOption, RouterModule, IonSelect, CommonModule, FormsModule, HeaderComponent]
+  imports: [IonInput, IonIcon, IonCardSubtitle, IonCardHeader, IonButton, IonCardContent, IonItem, IonCard, IonCardTitle, IonContent, IonSelectOption, RouterModule, IonSelect, CommonModule, FormsModule, HeaderComponent]
 })
 export class PlayerSelectionPage implements OnInit {
 

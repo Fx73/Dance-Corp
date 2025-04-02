@@ -67,3 +67,37 @@ export class FirestoreConverter<T extends object> {
     }
 
 }
+
+export class SimpleFirestoreConverter<T extends object> {
+    readonly type;
+    readonly IGNORE_UNDEFINED: boolean = true
+    readonly IGNORED_FIELDS: Set<string> = new Set(["additionalFields"])
+
+    constructor(type: { new(): T; }) {
+        this.type = type
+    }
+
+
+    toFirestore(dto: T): DocumentData {
+        const data: DocumentData = {};
+        Object.keys(dto as object).forEach((key) => {
+            if (!this.IGNORED_FIELDS.has(key)) {
+                const value = Reflect.get(dto, key);
+                if (!this.IGNORE_UNDEFINED || value !== undefined) {
+                    data[key] = value;
+                }
+            }
+        });
+        return data;
+    }
+
+
+    fromFirestore(snapshot: QueryDocumentSnapshot<T>): T {
+        const data = snapshot.data();
+        const dto = new this.type()
+        Object.keys(data as object).forEach((key) => {
+            Reflect.set(dto, key, data[key as keyof T]);
+        });
+        return dto;
+    }
+}

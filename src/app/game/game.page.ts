@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren, input } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { IMusicPlayer, MusicOrigin } from './musicPlayer/IMusicPlayer';
-import { IonButton, IonContent, IonHeader, IonIcon, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { IonButton, IonCard, IonContent, IonHeader, IonIcon, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { MusicDto, NotesDto } from './gameModel/music.dto';
 
 import { AppComponent } from '../app.component';
@@ -21,7 +21,7 @@ import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.
   templateUrl: './game.page.html',
   styleUrls: ['./game.page.scss'],
   standalone: true,
-  imports: [IonButton, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, PlayerDisplayComponent, MusicPlayerYoutubeComponent, GameOverComponent]
+  imports: [IonCard, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, PlayerDisplayComponent, MusicPlayerYoutubeComponent, GameOverComponent]
 })
 export class GamePage implements OnInit, OnDestroy, AfterViewInit {
   //#region App Constants
@@ -114,8 +114,7 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
       playerDiplay.Update()
 
     if (this.gameRounds.every(gameRound => gameRound.isFailed || gameRound.isFinished)) {
-      this.isGameOver = true;
-      console.log('Game Over: All game rounds have failed or finished.');
+      this.gameOver()
       return; // Stop loop
     }
 
@@ -125,6 +124,8 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
 
 
   gameOver() {
+    console.log('Game Over: All game rounds have failed or finished.');
+
     this.isGameOver = true;
     for (const gameRound of this.gameRounds)
       this.userFirestoreService.updateUserStatsFromRound(this.music!.id, this.music?.notes[0].chartName!, gameRound)

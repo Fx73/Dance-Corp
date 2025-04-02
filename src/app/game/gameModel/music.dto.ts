@@ -1,3 +1,5 @@
+import { NoteDifficulty } from "../constants/note-difficulty.enum";
+
 export class MusicDto {
   title?: string;
   titletranslit?: string;
@@ -103,11 +105,11 @@ export class MusicDto {
 
 
 export class NotesDto {
-  chartName: string = "NoData";
+  chartName: string = "NoChartNameError";
   stepsType?: string;
   description?: string;
   chartStyle?: string;
-  difficulty?: string;
+  difficulty?: NoteDifficulty;
   meter?: number;
   credit?: string;
   creationDate: Date = new Date()
@@ -119,7 +121,9 @@ export class NotesDto {
     this.stepsType = tokenMap["stepstype"];
     this.description = tokenMap["description"];
     this.chartStyle = tokenMap["chartstyle"];
-    this.difficulty = tokenMap["difficulty"];
+    console.log(tokenMap["difficulty"])
+    this.difficulty = tokenMap["difficulty"] as NoteDifficulty;
+    console.log(this.difficulty)
     this.meter = parseInt(tokenMap["meter"]);
     this.credit = tokenMap["credit"];
     const creationDateValue = tokenMap["creationdate"];
