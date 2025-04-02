@@ -2,9 +2,10 @@ import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild, input }
 import { ArrowColor, ArrowImageManager } from './arrowImageManager';
 
 import { Arrow } from '../gameModel/arrow';
-import { ArrowDirection } from 'src/app/shared/enumeration/arrow-direction.enum';
+import { ArrowDirection } from 'src/app/game/constants/arrow-direction.enum';
 import { ArrowType } from '../constants/arrow-type.enum';
 import { CONFIG } from '../constants/game-config';
+import { Color } from '../constants/color';
 import { CommonModule } from '@angular/common';
 import { GameRound } from '../gameModel/gameRound';
 import { Precision } from '../constants/precision.enum';
@@ -67,6 +68,9 @@ export class PlayerDisplayComponent implements AfterViewInit {
     return 'red';
   }
 
+  getConfigValue<T>(key: any): T {
+    return this.userConfigService.getConfig()[key] as T;
+  }
   public Update() {
     this.UpdateCanvas()
 
@@ -198,7 +202,7 @@ export class PlayerDisplayComponent implements AfterViewInit {
       clearTimeout(this.precisionTextTimeout);
     }
     this.precisionTextElement.textContent = precision;
-    this.precisionTextElement.style.setProperty('--gradient-color', this.createGradient(precision));
+    this.precisionTextElement.style.setProperty('--gradient-color', Color.createGradient(precision));
 
     // Trigger the CSS animation
     this.precisionTextElement.classList.remove('show'); // Reset animation if active
@@ -210,19 +214,6 @@ export class PlayerDisplayComponent implements AfterViewInit {
       this.precisionTextElement.classList.remove('show');
     }, 1000);
   }
-
-  createGradient(precision: Precision): string {
-    switch (precision) {
-      case Precision.Perfect: return 'yellow';
-      case Precision.Great: return 'green';
-      case Precision.Good: return 'blue';
-      case Precision.Almost: return 'violet';
-      case Precision.Missed: return 'black';
-      case Precision.Ok: return "gold"
-    }
-  }
-
-
 
   //#endregion
 

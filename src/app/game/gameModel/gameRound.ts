@@ -1,13 +1,13 @@
 import { ArrowState, DancePadInput, IDancePad } from "../gameController/dancepad.interface";
-import { MusicDto, NotesDto } from "../dto/music.dto";
+import { MusicDto, NotesDto } from "./music.dto";
 
 import { Arrow } from "./arrow";
-import { ArrowDirection } from "../../shared/enumeration/arrow-direction.enum";
+import { ArrowDirection } from "../constants/arrow-direction.enum";
 import { ArrowType } from "../constants/arrow-type.enum";
 import { CONFIG } from './../constants/game-config';
 import { DancePadGamepad } from "../gameController/dancepad-gamepad";
 import { DancePadKeyboard } from './../gameController/dancepad-keyboard';
-import { Player } from "../dto/player";
+import { Player } from "./player";
 import { Precision } from "../constants/precision.enum";
 
 export class GameRound {
@@ -26,16 +26,20 @@ export class GameRound {
     dancepad: IDancePad
 
     //Game variables
+    private isTrainingMode = false;
     public score: number = 0;
     public performance: number = 50;
     public currentBeat: number = 0
     public currentArrowIndex: number = 0; // Tracks the last note out of game
+    public isFailed = false;
+    public isFinished = false;
+    public grade: string = ""; // A, B, C, D, E
 
     //Display consuming
     precisionMessage: Precision | null = null;
 
 
-    constructor(musicDTO: MusicDto, notes: NotesDto, player: Player) {
+    constructor(musicDTO: MusicDto, notes: NotesDto, player: Player, isTrainingMode = false) {
         this.player = player
         this.music = musicDTO;
         this.bps = musicDTO.bpms[0].bpm / 60
@@ -46,7 +50,11 @@ export class GameRound {
         else
             this.dancepad = new DancePadGamepad(player.gamepad!.index!, player.keyBindingGamepad)
         this.loadArrows(notes)
-        console.log(this.arrowMap.length)
+
+        if (isTrainingMode) {
+            this.isTrainingMode = true
+            this.performance = 100
+        }
 
     }
 
@@ -88,6 +96,9 @@ export class GameRound {
 
         // Get DancePad state
         const padstate = this.dancepad.getRefreshedState()
+
+        if (this.isFinished)
+            return
 
         // Check arrows
         let currentArrowCheck = this.currentArrowIndex
@@ -166,48 +177,36 @@ export class GameRound {
     }
 
     arrowPerfect(arrow: Arrow) {
-        if (arrow.isTypeHold)
-            arrow.isPressed = true;
-        else
-            arrow.isPerfect = true
+        arrow.perfect()
         this.performance = Math.min(100, this.performance + 2);
         this.score += 4
-        this.precisionMessage = Precision.Perfect
+        this.precisionMessage = arrow.precision
     }
     arrowGreat(arrow: Arrow) {
-        if (arrow.isTypeHold)
-            arrow.isPressed = true;
-        else
-            arrow.isValid = true
+        arrow.great()
         this.performance = Math.min(100, this.performance + 1);
         this.score += 3
-        this.precisionMessage = Precision.Great
+        this.precisionMessage = arrow.precision
     }
     arrowGood(arrow: Arrow) {
-        if (arrow.isTypeHold)
-            arrow.isPressed = true;
-        else
-            arrow.isValid = true
+        arrow.good()
         this.performance = Math.min(100, this.performance + 1);
         this.score += 2
-        this.precisionMessage = Precision.Good
+        this.precisionMessage = arrow.precision
     }
     arrowAlmost(arrow: Arrow) {
-        if (arrow.isTypeHold)
-            arrow.isPressed = true;
-        else
-            arrow.isMissed = true
+        arrow.almost()
         this.performance = Math.max(0, this.performance - 2);
         this.score += 1
-        this.precisionMessage = Precision.Almost
+        this.precisionMessage = arrow.precision
     }
     arrowMissed(arrow: Arrow) {
-        arrow.isMissed = true;
+        arrow.missed()
         this.performance = Math.max(0, this.performance - 6);
-        this.precisionMessage = Precision.Missed
+        this.precisionMessage = arrow.precision
     }
     arrowOk(arrow: Arrow) {
-        arrow.isValid = true;
+        arrow.ok();
         const arrowLength = arrow.beatEnd ? Math.round(arrow.beatEnd - arrow.beatPosition) : 1
         this.performance = Math.min(100, this.performance + arrowLength);
         this.score += arrowLength / 2
@@ -215,10 +214,25 @@ export class GameRound {
         console.log("OK ARROW")
     }
 
+    updatePerformance(amount: number): void {
+        if (this.isTrainingMode || this.isFailed)
+            return
+
+        this.performance += amount;
+
+        if (this.performance > 100)
+            this.performance = 100;
+        else if (this.performance < 0)
+            this.performance = 0;
+
+    }
+
     EndFail() {
-        console.log("FAIL")
+        this.isFailed = true
+        this.performance = 1
     }
     EndVictory() {
-        console.log("VICTORY")
+        this.isFinished = true;
+        this.grade = "B"
     }
 }

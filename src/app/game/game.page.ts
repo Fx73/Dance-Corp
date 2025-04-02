@@ -1,26 +1,27 @@
 import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren, input } from '@angular/core';
+import { CommonModule, Location } from '@angular/common';
 import { IMusicPlayer, MusicOrigin } from './musicPlayer/IMusicPlayer';
-import { IonContent, IonHeader, IonIcon, IonTitle, IonToolbar } from '@ionic/angular/standalone';
-import { Measures, MusicDto, NotesDto } from './dto/music.dto';
+import { IonButton, IonContent, IonHeader, IonIcon, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { MusicDto, NotesDto } from './gameModel/music.dto';
 
 import { AppComponent } from '../app.component';
-import { ArrowDirection } from "../shared/enumeration/arrow-direction.enum";
-import { CommonModule } from '@angular/common';
-import { DomSanitizer } from "@angular/platform-browser";
+import { ArrowDirection } from "./constants/arrow-direction.enum";
 import { FormsModule } from '@angular/forms';
+import { GameOverComponent } from "./game-over/game-over.component";
 import { GameRound } from './gameModel/gameRound';
 import { MusicPlayerYoutubeComponent } from "./musicPlayer/music-player-youtube/music-player-youtube.component";
-import { Player } from './dto/player';
+import { Player } from './gameModel/player';
 import { PlayerDisplayComponent } from "./player-display/player-display.component";
 import { Router } from "@angular/router";
-import { UserConfigService } from "../services/userconfig.service";
+import { UserConfigService } from "src/app/services/userconfig.service";
+import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.service';
 
 @Component({
   selector: 'app-game',
   templateUrl: './game.page.html',
   styleUrls: ['./game.page.scss'],
   standalone: true,
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, PlayerDisplayComponent, MusicPlayerYoutubeComponent]
+  imports: [IonButton, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, PlayerDisplayComponent, MusicPlayerYoutubeComponent, GameOverComponent]
 })
 export class GamePage implements OnInit, OnDestroy, AfterViewInit {
   //#region App Constants
@@ -33,27 +34,27 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
   musicOrigin: MusicOrigin = MusicOrigin.Youtube
   //#endregion
 
-  players: Player[] = [];
 
-  gameRounds: GameRound[] = []
   @ViewChildren(PlayerDisplayComponent) playerDisplaysQuery!: QueryList<PlayerDisplayComponent>;
   private playerDisplays: PlayerDisplayComponent[] = [];
 
+  players: Player[] = [];
+  gameRounds: GameRound[] = []
+
+  public isGameOver: Boolean = false
   private gameLoopId: number | null = null;
   zeroTimeStamp: number = 0;
 
-  constructor(private userConfigService: UserConfigService, private router: Router, private sanitizer: DomSanitizer) { }
+  constructor(private userConfigService: UserConfigService, private userFirestoreService: UserFirestoreService, private router: Router, private location: Location) { }
 
 
   ngOnInit() {
     // Get Data
-    let notes: NotesDto | undefined
     const navigation = this.router.getCurrentNavigation();
     if (navigation?.extras?.state) {
       this.music = navigation.extras.state['music'];
-      notes = navigation.extras.state['note'];
     }
-    if (this.music === null || notes === undefined || this.music.music === undefined) {
+    if (this.music === null || this.music.music === undefined || this.music.notes.length === 0) {
       this.router.navigate(['/home']);
       return;
     }
@@ -66,9 +67,10 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
     }
 
     this.players = this.userConfigService.players;
+    const isTrainingMode: boolean = this.userConfigService.getConfig()["trainingMode"] ?? false
 
     for (const player of this.players) {
-      this.gameRounds.push(new GameRound(this.music, notes, player))
+      this.gameRounds.push(new GameRound(this.music, this.music.notes[0], player, isTrainingMode))
     }
   }
 
@@ -111,8 +113,21 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
     for (const playerDiplay of this.playerDisplays)
       playerDiplay.Update()
 
+    if (this.gameRounds.every(gameRound => gameRound.isFailed || gameRound.isFinished)) {
+      this.isGameOver = true;
+      console.log('Game Over: All game rounds have failed or finished.');
+      return; // Stop loop
+    }
+
     // Schedule the next loop iteration
     this.gameLoopId = requestAnimationFrame(this.gameGlobalLoop.bind(this));
+  }
+
+
+  gameOver() {
+    this.isGameOver = true;
+    for (const gameRound of this.gameRounds)
+      this.userFirestoreService.updateUserStatsFromRound(this.music!.id, this.music?.notes[0].chartName!, gameRound)
   }
 
   //#region Music Player
@@ -130,6 +145,8 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
   }
   //#endregion
 
-
+  goBack(): void {
+    this.location.back();
+  }
 }
 

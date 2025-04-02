@@ -1,11 +1,9 @@
 import { Component, ViewChild } from '@angular/core';
 import { IonicModule, PopoverController } from '@ionic/angular';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { logoGoogle, person } from 'ionicons/icons';
 
-import { IonIcon } from '@ionic/angular/standalone';
 import { LoginComponent } from './login/login.component';
-import { LoginService } from './../../services/login.service';
+import { LoginFireauthService } from 'src/app/services/firestore/login.fireauth.service';
 import { NgIf } from '@angular/common';
 import { Router } from '@angular/router';
 import { User } from 'firebase/auth';
@@ -29,11 +27,8 @@ export class UserComponent {
     UserComponent.user = value
   }
 
-  constructor(private router: Router, private popoverController: PopoverController, private loginService: LoginService) {
-    this.user = getAuth().currentUser
-    onAuthStateChanged(getAuth(), (_user) => {
-      this.user = _user;
-    });
+  constructor(private router: Router, private popoverController: PopoverController, private loginService: LoginFireauthService) {
+    loginService.listenForUserChanges(user => this.user = user)
     addIcons({
       'person': person,
       'logoGoogle': logoGoogle
@@ -69,35 +64,6 @@ export class UserComponent {
     }
     );
   }
-
-  static guardWaitForAuth(): Promise<boolean> {
-    const timeout = 500;
-    let timeoutId: NodeJS.Timeout;
-
-    const promise = new Promise<boolean>((resolve, reject) => {
-      const unsubscribeFun = onAuthStateChanged(getAuth(), (_user) => {
-        UserComponent.user = _user;
-        clearTimeout(timeoutId);
-        unsubscribeFun();
-
-        if (_user) {
-          resolve(true);
-        } else {
-          resolve(false);
-        }
-      });
-
-      timeoutId = setTimeout(() => {
-        unsubscribeFun();
-        reject(new Error('Timeout occurred'));
-
-      }, timeout);
-    });
-
-    return promise;
-  }
-
-
 
 
 }

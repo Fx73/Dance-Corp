@@ -1,0 +1,69 @@
+<ion-card class="game-over-card">
+  <ion-card-header>
+    <!-- Statut et nom du joueur -->
+    <ion-card-title class="succes-title" [ngClass]="gameRound.isFailed ? 'failed' : 'success'">
+      {{ gameRound.isFailed ? 'Failed' : 'Cleared' }}
+    </ion-card-title>
+    <ion-card-subtitle>{{ gameRound.player.name }}</ion-card-subtitle>
+  </ion-card-header>
+
+  <ion-card-content>
+    <!-- Score -->
+    <ion-item lines="inset">
+      <ion-icon slot="start" name="star-outline" color="warning"></ion-icon>
+      <ion-label>Score:</ion-label>
+      <ion-label slot="end" color="primary" style="font-size: 32px">{{ gameRound.score }} </ion-label>
+    </ion-item>
+
+    <!-- Note (A, B, C, D, E) -->
+    <ion-item lines="inset">
+      <ion-icon slot="start" name="medal-outline" color="primary"></ion-icon>
+      <ion-label>Grade:</ion-label>
+      <ion-badge slot="end" color="secondary">{{ gameRound.grade }}</ion-badge>
+    </ion-item>
+
+    <ion-item lines="none">
+      <ion-list lines="none">
+        <!-- Perfect -->
+        <ion-item>
+          <ion-icon slot="start" name="checkmark-circle-outline" color="success"></ion-icon>
+          <ion-label>Perfect:</ion-label>
+          <ion-badge slot="end" [style.backgroundColor]="getPrecisionColor(Precision.Perfect)"
+            class="precision-badge">{{ precisionCounts.Perfect }}</ion-badge>
+        </ion-item>
+
+        <!-- Great -->
+        <ion-item>
+          <ion-icon slot="start" name="checkmark-circle-outline" color="info"></ion-icon>
+          <ion-label>Great:</ion-label>
+          <ion-badge slot="end" [style.backgroundColor]="getPrecisionColor(Precision.Great)" class="precision-badge">{{
+            precisionCounts.Great }}</ion-badge>
+        </ion-item>
+
+        <!-- Almost -->
+        <ion-item>
+          <ion-icon slot="start" name="checkmark-circle-outline" color="info"></ion-icon>
+          <ion-label>Good:</ion-label>
+          <ion-badge slot="end" [style.backgroundColor]="getPrecisionColor(Precision.Good)" class="precision-badge">{{
+            precisionCounts.Good }}</ion-badge>
+        </ion-item>
+
+        <!-- Almost -->
+        <ion-item>
+          <ion-icon slot="start" name="close-circle-outline" color="danger"></ion-icon>
+          <ion-label>Almost:</ion-label>
+          <ion-badge slot="end" [style.backgroundColor]="getPrecisionColor(Precision.Almost)" class="precision-badge">{{
+            precisionCounts.Almost }}</ion-badge>
+        </ion-item>
+
+        <!-- Missed -->
+        <ion-item>
+          <ion-icon slot="start" name="close-circle-outline" color="danger"></ion-icon>
+          <ion-label>Missed:</ion-label>
+          <ion-badge slot="end" [style.backgroundColor]="getPrecisionColor(Precision.Missed)" class="precision-badge">{{
+            precisionCounts.Missed }}</ion-badge>
+        </ion-item>
+      </ion-list>
+    </ion-item>
+  </ion-card-content>
+</ion-card>

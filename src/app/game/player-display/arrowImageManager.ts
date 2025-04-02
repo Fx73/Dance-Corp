@@ -1,4 +1,4 @@
-import { ArrowDirection } from "src/app/shared/enumeration/arrow-direction.enum";
+import { ArrowDirection } from "src/app/game/constants/arrow-direction.enum";
 import { CONFIG } from "../constants/game-config";
 
 export enum ArrowColor {

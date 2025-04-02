@@ -25,9 +25,10 @@ export class GamepadService {
         console.log('Gamepad connected : ' + gamepad.id);
         this.gamepads.push(gamepad)
 
-        const assignedPlayer = this.userConfigService.players.find(player => player.gamepad?.id === gamepad.id);
+        const assignedIndex = this.userConfigService.players.findIndex(player => player.gamepad?.id === gamepad.id);
+        const assignedPlayer = this.userConfigService.players[assignedIndex];
         if (assignedPlayer) {
-            this.userConfigService.updatePlayer('gamepad', assignedPlayer.id, { index: gamepad.index, id: gamepad.id });
+            this.userConfigService.updatePlayer('gamepad', assignedIndex, { index: gamepad.index, id: gamepad.id });
             AppComponent.presentOkToast(`Reassigning to player ${assignedPlayer.name} gamepad ${gamepad.id} `)
         }
     }

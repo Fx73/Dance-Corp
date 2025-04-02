@@ -6,10 +6,18 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-    <app-player-display *ngFor="let gameRound of gameRounds"
-		[gameRound]="gameRound"
-    ></app-player-display>
-	<app-music-player-youtube *ngIf="musicOrigin === MusicOrigin.Youtube" [videoId]="music!.music!" (onReady)="onPlayerReady($event)"></app-music-player-youtube>
+	<ng-container *ngIf="isGameOver;then gameOverContent else gameContent"></ng-container>
+
+	<ng-template #gameOverContent>
+		<ion-button expand="block" class="return-btn" (click)="goBack()">Back to music list</ion-button>
+		<app-game-over *ngFor="let gameRound of gameRounds" [gameRound]="gameRound"></app-game-over>
+	</ng-template>
+
+	<ng-template #gameContent>
+		<app-player-display *ngFor="let gameRound of gameRounds" [gameRound]="gameRound"></app-player-display>
+		<app-music-player-youtube *ngIf="musicOrigin === MusicOrigin.Youtube" [videoId]="music!.music!" (onReady)="onPlayerReady($event)"></app-music-player-youtube>
+	</ng-template>
+    
 </ion-content>
 
 <!--

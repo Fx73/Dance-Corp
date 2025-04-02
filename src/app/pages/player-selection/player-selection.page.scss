@@ -1,0 +1,57 @@
+.player-card-list {
+  display: flex;
+  justify-content: center;
+  align-items: center;      
+  width: 100%;            
+  gap: 8px;              
+}
+.player-card-list > ion-card{
+  flex: 1 1 25%;   
+  max-width: 25%; 
+  min-width: 180px;
+}
+
+.player-card{
+    background: black;
+}
+
+.add-player-card {
+    background: linear-gradient(135deg, black, transparent);
+    color: white;
+    cursor: pointer;
+    transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+}
+  .add-player-card:hover {
+    transform: scale(1.05);
+  }
+
+
+
+.start-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 10vh;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-light));
+    color: white;
+    font-size: 3rem;
+    font-weight: bold;
+    font-family: "Coiny", system-ui;
+    text-align: center;
+    text-transform: uppercase;
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.3s ease-in-out, background 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  }
+  
+  .start-card:hover {
+    background: linear-gradient(135deg, var(--ion-color-tertiary), var(--ion-color-primary));
+    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.3);
+  }
+  
+  .start-card:active {
+    transform: scale(0.95);
+  }
+  

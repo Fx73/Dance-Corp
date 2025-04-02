@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
-import { LoginService } from 'src/app/services/login.service';
+import { LoginFireauthService } from 'src/app/services/firestore/login.fireauth.service';
 import { NgIf } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
@@ -22,7 +22,7 @@ export class LoginComponent {
   passwordRecoveryForm: FormGroup;
 
 
-  constructor(private fb: FormBuilder, private loginService: LoginService) {
+  constructor(private fb: FormBuilder, private loginService: LoginFireauthService) {
     this.registerForm = this.fb.group({
       email: ['', Validators.compose([Validators.required, Validators.email])],
       password: ['', Validators.compose([Validators.required, Validators.minLength(8)])],

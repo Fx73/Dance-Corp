@@ -1,0 +1,35 @@
+<app-header title="Browse Musics"></app-header>
+<ion-content fullscreen="true">
+  <ion-card>
+    <ion-searchbar [debounce]="1000" (ionInput)="onSearch($event)" show-clear-button="focus"></ion-searchbar>
+  </ion-card>
+  <div class="cardList">
+    <!-- Music cards -->
+    <ion-card *ngFor="let music of musics" (click)="showLevels(music)" class="basicCard"
+      [ngClass]="selectedMusic?.id === music.id ? 'selectedCard' : ''">
+      <ion-card-header>
+        <ion-card-title>{{ music.title }}</ion-card-title>
+        <ion-card-subtitle>{{ music.artist }}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content class="basicCardContent">
+
+        <ion-text>BPM :{{ music.bpms[0].bpm }}</ion-text>
+        <ion-img [src]="'https://'+music.jacket"></ion-img>
+
+        <ion-card *ngIf="selectedMusic?.id === music.id" class="levelCard">
+          <ion-card-content>
+            <ion-button *ngFor="let note of notes" expand="block" (click)="runGame(note)">
+              <ion-item>
+                <ion-badge slot="end" color="light">{{ note.meter }}</ion-badge>
+                <ion-label>{{ note.difficulty }}</ion-label>
+              </ion-item>
+            </ion-button>
+          </ion-card-content>
+        </ion-card>
+      </ion-card-content>
+    </ion-card>
+  </div>
+  <ion-infinite-scroll (ionInfinite)="onIonInfinite($event)">
+    <ion-infinite-scroll-content></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+</ion-content>

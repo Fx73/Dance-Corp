@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { UserGuard } from './shared/guard/user.guard';
 
 export const routes: Routes = [
   {
@@ -8,7 +9,7 @@ export const routes: Routes = [
   },
   {
     path: 'home',
-    loadComponent: () => import('./welcome/welcome.page').then(m => m.WelcomePage)
+    loadComponent: () => import('./pages/welcome/welcome.page').then(m => m.WelcomePage)
   },
   {
     path: 'game',
@@ -16,18 +17,28 @@ export const routes: Routes = [
   },
   {
     path: 'upload',
-    loadComponent: () => import('./upload/upload.page').then(m => m.UploadPage)
+    loadComponent: () => import('./pages/upload/upload.page').then(m => m.UploadPage),
+    canActivate: [UserGuard]
   },
   {
     path: 'options',
-    loadComponent: () => import('./options/options.page').then(m => m.OptionsPage)
+    loadComponent: () => import('./pages/options/options.page').then(m => m.OptionsPage)
   },
   {
-    path: 'pad-test',
-    loadComponent: () => import('./options/pad-test/pad-test.page').then(m => m.PadTestPage)
+    path: 'options/pad-test',
+    loadComponent: () => import('./pages/options/pad-test/pad-test.page').then(m => m.PadTestPage)
   },
   {
-    path: 'browse',
-    loadComponent: () => import('./browse/browse.page').then(m => m.BrowsePage)
+    path: 'play/browse',
+    loadComponent: () => import('./pages/browse/browse.page').then(m => m.BrowsePage),
+  },
+  {
+    path: 'user-profile',
+    loadComponent: () => import('./pages/user-profile/user-profile.page').then(m => m.UserProfilePage),
+    canActivate: [UserGuard]
+  },
+  {
+    path: 'play/player-selection',
+    loadComponent: () => import('./pages/player-selection/player-selection.page').then(m => m.PlayerSelectionPage)
   },
 ];

@@ -1,0 +1,48 @@
+<app-header>Your profile</app-header>
+<ion-content [fullscreen]="true">
+  <div class="card-grid">
+    <ion-card class="user-profile-card base-card">
+      <ion-card-header>
+        <ion-card-title>Account informations</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <app-account></app-account>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card class="user-profile-card base-card">
+      <ion-card-header>
+        <ion-card-title>{{ userData.name }}</ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+        <ion-img *ngIf="userData.avatar" [src]="userData.avatar" class="img-avatar">
+        </ion-img>
+        <ion-item lines="none">
+          <ion-label>Level</ion-label>
+          <ion-badge color="primary">{{ userData.level }}</ion-badge>
+        </ion-item>
+
+        <ion-item lines="none">
+          <ion-label>Music Played</ion-label>
+          <ion-badge label="Game played : " color="secondary">{{ userData.musicPlayed }}</ion-badge>
+        </ion-item>
+
+        <ion-item lines="none">
+          <ion-label>Music Cleared</ion-label>
+          <ion-badge color="success">{{ userData.musicCleared }}</ion-badge>
+        </ion-item>
+
+        <ion-item lines="none">
+          <ion-label>Preferred Gamepad</ion-label>
+          <ion-text>{{ userData.preferedGamepad }}</ion-text>
+        </ion-item>
+
+        <ion-item lines="none">
+          <ion-label>Preferred Music</ion-label>
+          <ion-text>{{ userData.preferedMusic }}</ion-text>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

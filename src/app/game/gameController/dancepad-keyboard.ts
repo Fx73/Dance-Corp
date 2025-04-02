@@ -1,6 +1,6 @@
 import { ArrowState, DancePadInput, IDancePad } from "./dancepad.interface";
 
-import { ArrowDirection } from "src/app/shared/enumeration/arrow-direction.enum";
+import { ArrowDirection } from "src/app/game/constants/arrow-direction.enum";
 
 export class DancePadKeyboard implements IDancePad {
     private currentState: Set<number>;

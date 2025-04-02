@@ -1,7 +1,8 @@
 import { ArrowImageManager } from '../game/player-display/arrowImageManager';
 import { BehaviorSubject } from 'rxjs';
 import { Injectable } from '@angular/core';
-import { Player } from '../game/dto/player';
+import { Player } from '../game/gameModel/player';
+import { UserFirestoreService } from './firestore/user.firestore.service';
 
 @Injectable({
     providedIn: 'root',
@@ -17,7 +18,7 @@ export class UserConfigService {
 
     players: Player[] = []
 
-    constructor() {
+    constructor(private userFirestoreService: UserFirestoreService) {
         const storedConfig: UserConfig = JSON.parse(localStorage.getItem(this.CONFIG_STORAGE_KEY) || '{}');
         const defaultConfig = new UserConfig();
 
@@ -27,17 +28,29 @@ export class UserConfigService {
             this.players.push(this.instanciatePlayer(i));
         }
 
+        // Set logged user to player 0
+        userFirestoreService.userData$.subscribe(user => {
+            if (user) {
+                this.players[0].userId = user?.id
+                this.players[0].name = user.name
+            } else {
+                this.players[0].userId = null
+                this.players[0].name = "Player 0"
+            }
+        })
+
         ArrowImageManager.Set_ARROW_SIZE(this.configSubject.value.canvasWidth / 4);
     }
     instanciatePlayer(index: number): Player {
         const storedPlayer = localStorage.getItem(this.PLAYERS_STORAGE_KEY(index));
-        const player: Player = storedPlayer ? Player.fromJSON(JSON.parse(storedPlayer)) : new Player(index)
+        const player: Player = storedPlayer ? Player.fromJSON(JSON.parse(storedPlayer)) : new Player()
 
         // Reassociating the gamepad if it exists and is valid
         if (player.gamepad && player.gamepad.index != -1) {
             const matchingGamepad = navigator.getGamepads().find(g => g?.id === player.gamepad!.id);
             player.gamepad.index = matchingGamepad ? matchingGamepad.index : null;
         }
+        console.log(player)
         return player
     }
 
@@ -58,7 +71,21 @@ export class UserConfigService {
 
         this.updateConfig("playerNumber", count)
     }
+    addPlayer() {
+        this.players.push(this.instanciatePlayer(this.players.length));
+        this.updateConfig("playerNumber", this.players.length)
+    }
+    removePlayerAt(position: number) {
+        if (position > 0) {
+            const playerToMove = this.players.splice(position, 1)[0];
 
+            this.players.forEach((player, index) => {
+                localStorage.setItem(this.PLAYERS_STORAGE_KEY(index), JSON.stringify(player));
+            });
+            localStorage.setItem(this.PLAYERS_STORAGE_KEY(this.players.length), JSON.stringify(playerToMove));
+        }
+        this.updateConfig("playerNumber", this.players.length)
+    }
 
     updateConfig(option: keyof UserConfig, value: any): void {
         if (!(option in this.configSubject.value)) {
@@ -80,6 +107,8 @@ export class UserConfigService {
 
         const player: Player = this.players[playerIndex];
         (player[option as keyof Player] as any) = value;
+        console.log(player)
+
         localStorage.setItem(this.PLAYERS_STORAGE_KEY(playerIndex), JSON.stringify(player));
     }
 
@@ -93,7 +122,9 @@ export class UserConfigService {
 }
 
 class UserConfig {
-    playerNumber = 1;
+    // Gameplay
+    playerNumber = 1
+    trainingMode = false
 
     // Display
     showBars = true

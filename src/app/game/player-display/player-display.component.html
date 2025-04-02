@@ -5,7 +5,10 @@
           class="performance-bar"
           [style.width.%]="gameRound.performance"
           [style.backgroundColor]="getPerformanceColor()"
-      ></div>
+      >
+      <div class="performance-label" *ngIf="getConfigValue('trainingMode')"> Training Mode </div>
+      <div class="performance-label" *ngIf="gameRound.isFailed"> Failed </div>
+    </div>
   </div>
 </div>
 <div style="display: flex; justify-content: center;">
