@@ -1,3 +1,4 @@
+import { DanceType } from "../constants/dance-type.enum";
 import { NoteDifficulty } from "../constants/note-difficulty.enum";
 
 export class MusicDto {
@@ -21,7 +22,8 @@ export class MusicDto {
   stops?: string;
   delays?: string;
   warps?: string;
-  bgChanges?: string;
+  bgChanges?: TextChange[];
+  labels?: TextChange[];
   notes: NotesDto[] = [];
   additionalFields?: Record<string, string>;
 
@@ -73,10 +75,12 @@ export class MusicDto {
     delete tokenMap["delays"];
     this.warps = tokenMap["warps"];
     delete tokenMap["warps"];
-    this.bgChanges = tokenMap["bgchanges"];
-    delete tokenMap["bgchanges"];
-    this.bpms = this.parseBpmChanges(tokenMap["bpms"]);
+    this.bpms = this.parseChanges<BpmChange>(tokenMap["bpms"], v => parseFloat(v));
     delete tokenMap["bpms"];
+    this.bgChanges = this.parseChanges<TextChange>(tokenMap["bgchanges"], v => v);
+    delete tokenMap["bgchanges"];
+    this.labels = this.parseChanges<TextChange>(tokenMap["labels"], v => v);
+    delete tokenMap["labels"];
 
     Object.keys(tokenMap).forEach(key => {
       if (key.startsWith('notedata')) {
@@ -89,24 +93,26 @@ export class MusicDto {
     this.additionalFields = { ...tokenMap };
   }
 
-
-  private parseBpmChanges(bpmChanges: string): BpmChange[] {
-    const changes = bpmChanges.split(',');
-    return changes.map(change => {
-      const [timeStr, bpmStr] = change.split('=');
+  private parseChanges<T>(token: string, parsefun: (value: string) => any): T[] {
+    const changes = token.split(',');
+    const array: T[] = []
+    for (const change of changes) {
+      const [timeStr, valueStr] = change.split('=');
       const time = parseFloat(timeStr);
-      const bpm = parseFloat(bpmStr);
-      return { time, bpm };
-    });
-  }
+      const value = parsefun(valueStr);
+      console.log(valueStr, value)
+      array.push({ value, time } as unknown as T);
+    }
 
+    return array;
+  }
 
 }
 
 
 export class NotesDto {
   chartName: string = "NoChartNameError";
-  stepsType?: string;
+  stepsType?: DanceType;
   description?: string;
   chartStyle?: string;
   difficulty?: NoteDifficulty;
@@ -118,18 +124,16 @@ export class NotesDto {
   constructor(tokenMap?: Record<string, string>) {
     if (tokenMap === undefined) return
 
-    this.stepsType = tokenMap["stepstype"];
+    this.stepsType = tokenMap["stepstype"] as DanceType;
     this.description = tokenMap["description"];
     this.chartStyle = tokenMap["chartstyle"];
-    console.log(tokenMap["difficulty"])
     this.difficulty = tokenMap["difficulty"] as NoteDifficulty;
-    console.log(this.difficulty)
     this.meter = parseInt(tokenMap["meter"]);
     this.credit = tokenMap["credit"];
     const creationDateValue = tokenMap["creationdate"];
     this.creationDate = creationDateValue ? new Date(creationDateValue) : new Date();
 
-    this.chartName = tokenMap["chartname"] ?? `${this.difficulty}_${this.meter}_${this.creationDate}`;
+    this.chartName = tokenMap["chartname"] ?? `${this.difficulty}_${this.meter}_${this.creationDate.toISOString().split('T')[0]}`;
 
     this.stepChart = tokenMap["notes"].split(',').map(measure => {
       const measureInstance = new Measures();
@@ -146,5 +150,10 @@ export class Measures {
 
 export class BpmChange {
   time: number = 0;
-  bpm: number = 120;
+  value: number = 120;
+}
+
+export class TextChange {
+  time: number = 0;
+  value: string = "";
 }

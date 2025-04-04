@@ -1,192 +1,330 @@
 <app-header title="Upload"></app-header>
-<ion-content [fullscreen]="true">
-	<div class="container">
-		<ion-card>
-			<ion-card-header>
-				<ion-card-title>
-					Select a .sm, .ssc, or .essc File
-				</ion-card-title>
-			</ion-card-header>
-			<ion-card-content class="flex-align-horizontal">
-					<input (change)="onFileSelected($event)"
-					type="file"
-					accept=".sm,.ssc,.essc">
-					<ion-button *ngIf="musicData" expand="block" (click)="validateAndUpload()" >Validate and upload</ion-button>
-			</ion-card-content>
-		</ion-card>
-		<div *ngIf="musicData">
-			<!-- Metadata Card -->
-			<ion-card>
-				<ion-card-header>
-					<ion-card-title>File Metadata</ion-card-title>
-				</ion-card-header>
-				<ion-card-content>
-					<p>
-						<strong>Title:</strong>
-						{{ musicData.title }}
-					</p>
-					<p>
-						<strong>Title (Translit):</strong>
-						{{ musicData.titletranslit }}
-					</p>
-					<p>
-						<strong>Subtitle:</strong>
-						{{ musicData.subtitle }}
-					</p>
-					<p>
-						<strong>
-							Subtitle (Translit):
-						</strong>
-						{{ musicData.subtitletranslit }}
-					</p>
-					<p>
-						<strong>Artist:</strong>
-						{{ musicData.artist }}
-					</p>
-					<p>
-						<strong>Artist (Translit):</strong>
-						{{ musicData.artisttranslit }}
-					</p>
-					<p>
-						<strong>Genre:</strong>
-						{{ musicData.genre }}
-					</p>
-					<p>
-						<strong>Credit:</strong>
-						{{ musicData.credit }}
-					</p>
-					<p>
-						<strong>Banner:</strong>
-						{{ musicData.banner }}
-					</p>
-					<p>
-						<strong>Background:</strong>
-						{{ musicData.background }}
-					</p>
-					<p>
-						<strong>Jacket:</strong>
-						{{ musicData.jacket }}
-					</p>
-					<p>
-						<strong>CD Title:</strong>
-						{{ musicData.cdTitle }}
-					</p>
-					<p>
-						<strong>Music:</strong>
-						{{ musicData.music }}
-					</p>
-					<p>
-						<strong>Beat 0 Offset (in seconds):</strong>
-						{{ musicData.beat0OffsetInSeconds }}
-					</p>
-					<p>
-						<strong>Sample Start:</strong>
-						{{ musicData.sampleStart }}
-					</p>
-					<p>
-						<strong>Sample Length:</strong>
-						{{ musicData.sampleLength }}
-					</p>
-					<p>
-						<strong>BPMS:</strong>
-						<span *ngFor="let bpm of musicData.bpms; let i = index">
-						  {{ bpm.time }}s = {{ bpm.bpm }}{{ i < musicData.bpms.length - 1 ? ',' : '' }}
-						</span>
-					  </p>
-					  
-					<p>
-						<strong>Stops:</strong>
-						{{ musicData.stops }}
-					</p>
-					<p>
-						<strong>Delays:</strong>
-						{{ musicData.delays }}
-					</p>
-					<p>
-						<strong>Warps:</strong>
-						{{ musicData.warps }}
-					</p>
-					<p>
-						<strong>BG Changes:</strong>
-						{{ musicData.bgChanges }}
-					</p>
-				</ion-card-content>
-			</ion-card>
-			<!-- Notes Data Card -->
-			<ion-card>
-				<ion-card-header>
-					<ion-card-title>Notes Data</ion-card-title>
-				</ion-card-header>
-				<ion-card-content>
-					<ion-card *ngFor="let notes of musicData.notes">
-						<ion-card-header>
-							<ion-card-title>
-								{{ notes.chartName || 'Part ' + notes.difficulty }}
-							</ion-card-title>
-						</ion-card-header>
-						<ion-card-content>
-							<p>
-								<strong>Steps Type:</strong>
-								{{ notes.stepsType }}
-							</p>
-							<p>
-								<strong>Description:</strong>
-								{{ notes.description }}
-							</p>
-							<p>
-								<strong>Difficulty:</strong>
-								{{ notes.difficulty }}
-							</p>
-							<p>
-								<strong>Meter:</strong>
-								{{ notes.meter }}
-							</p>
-							<p>
-								<strong>Credit:</strong>
-								{{ notes.credit }}
-							</p>
-							<p>
-								<strong>Creation Date:</strong>
-								{{ notes.creationDate }}
-							</p>
-							<p>
-								<strong>Total Measures:</strong>
-								{{ notes.stepChart.length }}
-							</p>
-							<p>
-								<strong>Tap:</strong>
-								{{ getStepCount(notes.stepChart, 1) }}
-							</p>
-							<p>
-								<strong>Hold:</strong>
-								{{ getStepCount(notes.stepChart, 2) }}
-							</p>
-							<p>
-								<strong>Roll:</strong>
-								{{ getStepCount(notes.stepChart, 4) }}
-							</p>
-							<p>
-								<strong>Mine:</strong>
-								{{ getStepCount(notes.stepChart, 5) }}
-							</p>
-						</ion-card-content>
-					</ion-card>
-				</ion-card-content>
-			</ion-card>
-			<!-- Additional Fields Card -->
-			<ion-card>
-				<ion-card-header>
-					<ion-card-title>Additional Fields</ion-card-title>
-				</ion-card-header>
-				<ion-card-content>
-					<div *ngFor="let field of musicData.additionalFields | keyvalue">
+<ion-content [fullscreen]="false">
+	<ion-card *ngIf="musicData == null" class="base-card">
+		<ion-card-header>
+			<ion-card-title> Select a .sm, .ssc, or .essc File </ion-card-title>
+		</ion-card-header>
+		<ion-card-content class="flex-align-horizontal">
+			<input (change)="onFileSelected($event)" type="file" accept=".sm,.ssc,.essc">
+		</ion-card-content>
+	</ion-card>
+
+
+	<ion-grid *ngIf="musicData !== null">
+		<ion-row>
+			<ion-col size="8">
+				<!-- Metadata Card -->
+				<ion-card class="base-card">
+					<ion-card-header>
+						<ion-card-title>File Metadata</ion-card-title>
+					</ion-card-header>
+					<ion-card-content>
+						<ion-list lines="none" class="datalist">
+							<ion-item>
+								<ion-input label="Title" [(ngModel)]="musicData.title"
+									[disabled]="!isEditing"></ion-input>
+							</ion-item>
+
+							<ion-item>
+								<ion-input label="Title (Translit)" [(ngModel)]="musicData.titletranslit"
+									[disabled]="!isEditing"></ion-input>
+							</ion-item>
+
+							<ion-item>
+								<ion-input label="Subtitle" [(ngModel)]="musicData.subtitle"
+									[disabled]="!isEditing"></ion-input>
+							</ion-item>
+
+							<ion-item>
+								<ion-input label="Subtitle (Translit)" [(ngModel)]="musicData.subtitletranslit"
+									[disabled]="!isEditing"></ion-input>
+							</ion-item>
+
+							<ion-item>
+								<ion-input label="Artist" [(ngModel)]="musicData.artist"
+									[disabled]="!isEditing"></ion-input>
+							</ion-item>
+
+							<ion-item>
+								<ion-input label="Artist (Translit)" [(ngModel)]="musicData.artisttranslit"
+									[disabled]="!isEditing"></ion-input>
+							</ion-item>
+
+							<ion-item>
+								<ion-input label="Genre" [(ngModel)]="musicData.genre"
+									[disabled]="!isEditing"></ion-input>
+							</ion-item>
+
+							<ion-item>
+								<ion-input label="Credit" [(ngModel)]="musicData.credit"
+									[disabled]="!isEditing"></ion-input>
+							</ion-item>
+
+							<ion-item>
+								<ion-input label="Banner" [(ngModel)]="musicData.banner"
+									[disabled]="!isEditing"></ion-input>
+							</ion-item>
+
+							<ion-item>
+								<ion-input label="Background" [(ngModel)]="musicData.background"
+									[disabled]="!isEditing"></ion-input>
+							</ion-item>
+
+							<ion-item>
+								<ion-input label="Jacket" [(ngModel)]="musicData.jacket"
+									[disabled]="!isEditing"></ion-input>
+							</ion-item>
+
+							<ion-item>
+								<ion-input label="CD Title" [(ngModel)]="musicData.cdTitle"
+									[disabled]="!isEditing"></ion-input>
+							</ion-item>
+
+							<ion-item>
+								<ion-input label="Music" [(ngModel)]="musicData.music"
+									[disabled]="!isEditing"></ion-input>
+							</ion-item>
+
+							<ion-item>
+								<ion-input label="Beat 0 Offset (seconds)" type="number"
+									[(ngModel)]="musicData.beat0OffsetInSeconds" [disabled]="!isEditing"></ion-input>
+							</ion-item>
+
+							<ion-item>
+								<ion-input label="Sample Start" type="number" [(ngModel)]="musicData.sampleStart"
+									[disabled]="!isEditing"></ion-input>
+							</ion-item>
+
+							<ion-item>
+								<ion-input label="Sample Length" type="number" [(ngModel)]="musicData.sampleLength"
+									[disabled]="!isEditing"></ion-input>
+							</ion-item>
+
+							<ion-item>
+								<ion-label>Bpms</ion-label>
+								<ion-list *ngIf="musicData.bpms">
+									<ion-item *ngFor="let bpm of musicData.bpms; let i = index">
+										<ion-input label="Time (s)" type="number" [(ngModel)]="bpm.time"
+											[disabled]="!isEditing"></ion-input>
+										<ion-input label="BPM" type="number" [(ngModel)]="bpm.value"
+											[disabled]="!isEditing"></ion-input>
+										<ion-button *ngIf="isEditing" color="danger" [disabled]="!isEditing"
+											(click)="musicData.bpms.splice(i, 1);">
+											<ion-icon slot="icon-only" name="remove-outline"></ion-icon>
+										</ion-button>
+									</ion-item>
+									<ion-item *ngIf="isEditing">
+										<ion-button color="success" size="small"
+											(click)="musicData.bpms.push({ time: 0, value: 120 })">
+											<ion-icon slot="icon-only" name="add-outline"></ion-icon>
+										</ion-button>
+									</ion-item>
+								</ion-list>
+							</ion-item>
+
+							<ion-item>
+								<ion-label>Backgrounds</ion-label>
+								<ion-list *ngIf="musicData.bgChanges">
+									<ion-item *ngFor="let bgChange of musicData.bgChanges; let i = index">
+										<ion-input label="Time (s)" type="number" [(ngModel)]="bgChange.time"
+											[disabled]="!isEditing"></ion-input>
+										<ion-input label="Background" [(ngModel)]="bgChange.value"
+											[disabled]="!isEditing"></ion-input>
+										<ion-button *ngIf="isEditing" color="danger" [disabled]="!isEditing"
+											(click)="musicData.bgChanges.splice(i, 1);">
+											<ion-icon slot="icon-only" name="remove-outline"></ion-icon>
+										</ion-button>
+									</ion-item>
+									<ion-item *ngIf="isEditing">
+										<ion-button color="success" size="small"
+											(click)="musicData.bgChanges.push({ time: 0, value: '' })">
+											<ion-icon slot="icon-only" name="add-outline"></ion-icon>
+										</ion-button>
+									</ion-item>
+								</ion-list>
+							</ion-item>
+
+							<ion-item>
+								<ion-label>Labels</ion-label>
+								<ion-list *ngIf="musicData.labels">
+									<ion-item *ngFor="let label of musicData.labels; let i = index">
+										<ion-input label="Time (s)" type="number" [(ngModel)]="label.time"
+											[disabled]="!isEditing"></ion-input>
+										<ion-input label="Text" [(ngModel)]="label.value"
+											[disabled]="!isEditing"></ion-input>
+										<ion-button *ngIf="isEditing" color="danger" [disabled]="!isEditing"
+											(click)="musicData.labels.splice(i, 1);">
+											<ion-icon slot="icon-only" name="remove-outline"></ion-icon>
+										</ion-button>
+									</ion-item>
+									<ion-item *ngIf="isEditing">
+										<ion-button color="success" size="small"
+											(click)="musicData.labels.push({ time: 0, value: '' })">
+											<ion-icon slot="icon-only" name="add-outline"></ion-icon>
+										</ion-button>
+									</ion-item>
+								</ion-list>
+							</ion-item>
+						</ion-list>
+
 						<p>
-							<strong>{{ field.key }}:</strong>
-							{{ field.value }}
+							<strong>Stops:</strong>
+							{{ musicData.stops }}
 						</p>
-					</div>
-				</ion-card-content>
-			</ion-card>
-		</div>
-	</div>
+						<p>
+							<strong>Delays:</strong>
+							{{ musicData.delays }}
+						</p>
+						<p>
+							<strong>Warps:</strong>
+							{{ musicData.warps }}
+						</p>
+					</ion-card-content>
+				</ion-card>
+			</ion-col>
+
+			<ion-col>
+				<ion-card class="base-card btn-action-card">
+					<ion-card-content>
+						<ion-button [color]="isEditing ? 'success' : 'primary'" (click)="toggleEdit()" expand="block">
+							{{ isEditing ? 'Save' : 'Edit music' }}
+						</ion-button>
+						<ion-button (click)="validateAndUpload()" [disabled]="isEditing" expand="block">
+							Upload music</ion-button>
+						<ion-button color="danger" (click)="deleteFile()" size="small">
+							<ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+						</ion-button>
+					</ion-card-content>
+				</ion-card>
+
+				<!-- Image Preview Card -->
+				<ion-card class="base-card">
+					<ion-card-header>
+						<ion-card-title>Image previews</ion-card-title>
+					</ion-card-header>
+					<ion-card-content>
+						<ion-item>
+							<ion-label position="stacked"> Jacket </ion-label>
+							<ion-img label="Hello" [src]="'https://'+musicData.jacket" class="preview-image" />
+						</ion-item>
+						<ion-item *ngFor="let bgChange of musicData.bgChanges; let i = index">
+							<ion-label position="stacked"> Background at {{bgChange.time}} </ion-label>
+							<ion-img label="Hello" [src]="'https://'+bgChange.value" class="preview-image" />
+						</ion-item>
+					</ion-card-content>
+				</ion-card>
+				<ion-card class="base-card">
+					<ion-card-header>
+						<ion-card-title>Music preview</ion-card-title>
+					</ion-card-header>
+					<ion-card-content>
+						<ion-item>
+							<ion-label position="stacked">Music</ion-label>
+							<ion-icon *ngIf="" name="checkmark-circle" color="success"></ion-icon>
+							<ion-icon *ngIf="" name="close-circle" color="danger"></ion-icon>
+						</ion-item>
+					</ion-card-content>
+				</ion-card>
+			</ion-col>
+		</ion-row>
+
+		<ion-row>
+			<ion-col>
+				<!-- Notes Data Card -->
+				<ion-card class="base-card">
+					<ion-card-header>
+						<ion-card-title>Notes Data</ion-card-title>
+					</ion-card-header>
+					<ion-card-content class="card-grid">
+						<ion-card *ngFor="let notes of musicData.notes">
+							<ion-card-header>
+								<ion-card-title>
+									<ion-input [(ngModel)]="notes.chartName" [disabled]="!isEditing"></ion-input>
+								</ion-card-title>
+							</ion-card-header>
+							<ion-card-content>
+								<ion-list>
+									<ion-item>
+										<ion-select label="Dance Type" [(ngModel)]="notes.stepsType"
+											[disabled]="!isEditing">
+											<ion-select-option *ngFor="let type of DanceTypeList" [value]="type">
+												{{ type }}
+											</ion-select-option>
+										</ion-select>
+									</ion-item>
+
+									<ion-item>
+										<ion-input label="Description" [(ngModel)]="notes.description"
+											[disabled]="!isEditing"></ion-input>
+									</ion-item>
+
+									<ion-item>
+										<ion-select label="Difficulty" [(ngModel)]="notes.difficulty"
+											[disabled]="!isEditing">
+											<ion-select-option *ngFor="let level of NoteDifficultyList" [value]="level">
+												{{ level }}
+											</ion-select-option>
+										</ion-select>
+									</ion-item>
+
+									<ion-item>
+										<ion-input label="Meter" type="number" [(ngModel)]="notes.meter"
+											[disabled]="!isEditing"></ion-input>
+									</ion-item>
+
+									<ion-item>
+										<ion-input label="Credit" [(ngModel)]="notes.credit"
+											[disabled]="!isEditing"></ion-input>
+									</ion-item>
+
+									<ion-item>
+										<ion-input label="Creation Date" type="date" [(ngModel)]="notes.creationDate"
+											[disabled]="!isEditing"></ion-input>
+									</ion-item>
+								</ion-list>
+								<p>
+									<strong>Total Measures:</strong>
+									{{ notes.stepChart.length }}
+								</p>
+								<p>
+									<strong>Tap:</strong>
+									{{ getStepCount(notes.stepChart, 1) }}
+								</p>
+								<p>
+									<strong>Hold:</strong>
+									{{ getStepCount(notes.stepChart, 2) }}
+								</p>
+								<p>
+									<strong>Roll:</strong>
+									{{ getStepCount(notes.stepChart, 4) }}
+								</p>
+								<p>
+									<strong>Mine:</strong>
+									{{ getStepCount(notes.stepChart, 5) }}
+								</p>
+							</ion-card-content>
+						</ion-card>
+					</ion-card-content>
+				</ion-card>
+			</ion-col>
+		</ion-row>
+		<ion-row>
+			<ion-col>
+				<!-- Additional Fields Card -->
+				<ion-card class="base-card">
+					<ion-card-header>
+						<ion-card-title>Additional Fields</ion-card-title>
+					</ion-card-header>
+					<ion-card-content>
+						<div *ngFor="let field of musicData.additionalFields | keyvalue">
+							<p>
+								<strong>{{ field.key }}:</strong>
+								{{ field.value }}
+							</p>
+						</div>
+					</ion-card-content>
+				</ion-card>
+			</ion-col>
+		</ion-row>
+	</ion-grid>
 </ion-content>

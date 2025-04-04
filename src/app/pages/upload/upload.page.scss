@@ -6,7 +6,19 @@ input[type="file"] {
   margin-bottom: 16px;
 }
 
-ion-button {
-  --background: #3880ff;
-  --color: white;
+
+.btn-action-card{
+  padding: 1px;
+
+  ion-button {
+    --background: #3880ff;
+    --color: white;
+  }
+}
+
+.datalist{
+  ion-label{color: var(--ion-color-primary);}
+  ::ng-deep ion-input .label-text{
+    color: var(--ion-color-primary);
+}
 }

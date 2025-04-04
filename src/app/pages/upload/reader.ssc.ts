@@ -86,24 +86,24 @@ export class SccReader {
   static tokenizeSM(content: string): Record<string, any> {
     const tokens = this.tokenizeCommon(content);
     const tokenMap: Record<string, any> = {};
-    let notesContent = '';
-
+    let noteDataIndex = 0;
     tokens.forEach(token => {
-      const [key, value] = token.split(/:(.+?);/);
+      const [key, ...rest] = token.split(":");
+      const value = rest.join(":");
+
       const lowerKey = key.toLowerCase();
 
       if (lowerKey === 'notes') {
-        const lines = value.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+        const lines = value.split(':').map(line => line.trim());
+        let currentNoteData: Record<string, string> = {};
+        noteDataIndex++;
+        currentNoteData['stepstype'] = lines[0];
+        currentNoteData['credits'] = lines[1];
+        currentNoteData['difficulty'] = lines[2];
+        currentNoteData['meter'] = lines[3];
+        currentNoteData['notes'] = SccReader.convertNotes(lines[5]);
 
-        tokenMap['stepstype'] = lines[0];
-        tokenMap['credits'] = lines[1];
-        tokenMap['difficulty'] = lines[2];
-        tokenMap['meter'] = parseInt(lines[3]);
-
-        // Supprimer les lignes de métadonnées et conserver les notes
-        notesContent = lines.slice(5).join('\n').trim();
-        notesContent = SccReader.convertNotes(notesContent);
-        tokenMap['notes'] = notesContent;
+        tokenMap[`notedata${noteDataIndex}`] = currentNoteData;
 
       } else {
         tokenMap[lowerKey] = value;

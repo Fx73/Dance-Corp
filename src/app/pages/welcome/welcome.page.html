@@ -16,7 +16,8 @@
 				class="home-content">
 				Upload a file
 			</ion-button>
-			<ion-button [routerLink]="['/user-profile']" expand="block" size="large" class="home-content">
+			<ion-button [routerLink]="['/user-profile']" [disabled]="!isUserLoggedIn()" expand="block" size="large"
+				class="home-content">
 				My Profile
 			</ion-button>
 			<ion-button [routerLink]="['/options']" expand="block" size="large" class="home-content">

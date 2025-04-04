@@ -42,7 +42,7 @@ export class GameRound {
     constructor(musicDTO: MusicDto, notes: NotesDto, player: Player, isTrainingMode = false) {
         this.player = player
         this.music = musicDTO;
-        this.bps = musicDTO.bpms[0].bpm / 60
+        this.bps = musicDTO.bpms[0].value / 60
         this.tolerance = CONFIG.GAME.TOLERANCE_WINDOW * this.bps;
 
         if (player.gamepad!.index! === -1)
