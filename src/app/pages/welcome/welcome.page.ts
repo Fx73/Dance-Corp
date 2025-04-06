@@ -1,11 +1,10 @@
 import { Component, NgZone, OnInit } from '@angular/core';
-import { IonBadge, IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonHeader, IonItem, IonLabel, IonText, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { IonBadge, IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonGrid, IonHeader, IonImg, IonItem, IonLabel, IonRow, IonText, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from "../../shared/header/header.component";
 import { RouterModule } from '@angular/router';
-import { UserComponent } from '../../shared/user/user.component';
 import { UserDto } from '../user-profile/user.dto';
 import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.service';
 
@@ -14,13 +13,13 @@ import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.
   templateUrl: './welcome.page.html',
   styleUrls: ['./welcome.page.scss'],
   standalone: true,
-  imports: [IonBadge, IonLabel, IonItem, IonCardHeader, IonCardTitle, IonCardContent, IonCardSubtitle, IonCard, IonButton, IonContent, CommonModule, FormsModule, HeaderComponent, RouterModule]
+  imports: [IonImg, IonCol, IonRow, IonGrid, IonBadge, IonLabel, IonItem, IonCardHeader, IonCardTitle, IonCardContent, IonCardSubtitle, IonCard, IonButton, IonContent, CommonModule, FormsModule, HeaderComponent, RouterModule]
 })
 export class WelcomePage implements OnInit {
-  userData: UserDto | null;
+  userData: UserDto | null = null;
 
-  constructor(userService: UserFirestoreService, private ngZone: NgZone) {
-    this.userData = userService.getUserData()
+  constructor(userService: UserFirestoreService) {
+    userService.userData$.subscribe(userData => this.userData = userData)
   }
 
   ngOnInit() {
@@ -29,7 +28,7 @@ export class WelcomePage implements OnInit {
 
 
   isUserLoggedIn() {
-    return UserComponent.user !== null
+    return this.userData !== null
   }
 
 }

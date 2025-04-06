@@ -1,6 +1,3 @@
-ion-card{
-  border-radius: 4px;
-}
 .home-content{
   --border-radius : 20px;
   --border-style: solid;
@@ -11,4 +8,13 @@ ion-card{
   color: #020f1fdc;
   height: 1.4em;
 
+}
+
+.welcome-start-card{
+  background: right 50% / cover  no-repeat  url(src/assets/Splash/BannerStart.png) ;
+}
+.welcome-start-card:hover {
+  opacity: 0.8;
+  filter: blur(1px) contrast(110%);
+  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.3);
 }
