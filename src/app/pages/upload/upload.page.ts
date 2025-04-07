@@ -1,5 +1,6 @@
 import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonContent, IonGrid, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonList, IonRow, IonSelect, IonSelectOption } from '@ionic/angular/standalone';
 import { Measures, MusicDto } from 'src/app/game/gameModel/music.dto';
+import { SccReader, SccWriter } from './reader.ssc';
 import { addOutline, checkmarkCircle, closeCircle, removeOutline, trashOutline } from 'ionicons/icons';
 
 import { CommonModule } from '@angular/common';
@@ -10,8 +11,8 @@ import { HeaderComponent } from "src/app/shared/header/header.component"; // Imp
 import { HttpClient } from '@angular/common/http';
 import { MusicFirestoreService } from 'src/app/services/firestore/music.firestore.service';
 import { NoteDifficulty } from './../../game/constants/note-difficulty.enum';
-import { SccReader } from './reader.ssc';
 import { addIcons } from 'ionicons';
+import { writeFileSync } from 'fs';
 
 @Component({
   selector: 'app-upload',
@@ -36,7 +37,7 @@ export class UploadPage {
 
     const storedData = localStorage.getItem(this.MUSICEDIT_STORAGE_KEY);
     if (storedData) {
-      this.musicData = JSON.parse(storedData);
+      this.musicData = SccReader.parseFile('stored.essc', storedData);
     }
   }
 
@@ -101,12 +102,46 @@ export class UploadPage {
 
   saveChanges(): void {
     if (this.musicData) {
-      localStorage.setItem(this.MUSICEDIT_STORAGE_KEY, JSON.stringify(this.musicData));
+      localStorage.setItem(this.MUSICEDIT_STORAGE_KEY, SccWriter.writeSscFile(this.musicData, true));
     }
   }
 
   deleteFile() {
     this.musicData = null;
     localStorage.removeItem(this.MUSICEDIT_STORAGE_KEY);
+  }
+
+  exportEssc(): void {
+    const esscContent = SccWriter.writeSscFile(this.musicData!, true);
+    const filename = `${this.musicData?.artist}_${this.musicData?.title}.essc`;
+
+    const blob = new Blob([esscContent], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+  }
+
+  exportSsc(): void {
+    const esscContent = SccWriter.writeSscFile(this.musicData!);
+    const filename = `${this.musicData?.artist}_${this.musicData?.title}.ssc`;
+
+    const blob = new Blob([esscContent], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
   }
 }

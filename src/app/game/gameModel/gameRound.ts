@@ -1,5 +1,5 @@
 import { ArrowState, DancePadInput, IDancePad } from "../gameController/dancepad.interface";
-import { MusicDto, NotesDto } from "./music.dto";
+import { MusicDto, NoteDataDto } from "./music.dto";
 
 import { Arrow } from "./arrow";
 import { ArrowDirection } from "../constants/arrow-direction.enum";
@@ -39,9 +39,10 @@ export class GameRound {
     precisionMessage: Precision | null = null;
 
 
-    constructor(musicDTO: MusicDto, notes: NotesDto, player: Player, isTrainingMode = false) {
+    constructor(musicDTO: MusicDto, notes: NoteDataDto, player: Player, isTrainingMode = false) {
         this.player = player
         this.music = musicDTO;
+        console.log(musicDTO.bpms[0])
         this.bps = musicDTO.bpms[0].value / 60
         this.tolerance = CONFIG.GAME.TOLERANCE_WINDOW * this.bps;
 
@@ -59,7 +60,7 @@ export class GameRound {
     }
 
 
-    private loadArrows(notes: NotesDto): void {
+    private loadArrows(notes: NoteDataDto): void {
         const activeHolds: (Arrow | null)[] = Array(Object.values(ArrowDirection).length).fill(null);
 
         for (let measureIndex = 0; measureIndex < notes.stepChart.length; measureIndex++) {

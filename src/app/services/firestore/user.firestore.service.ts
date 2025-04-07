@@ -119,14 +119,11 @@ export class UserFirestoreService {
         const notesCollection = collection(musicRef, this.USER_NOTES_COLLECTION);
         const querySnapshot = await getDocs(notesCollection);
 
-        console.log("Requested : ", musicId)
-
         const scores: { [noteId: string]: number } = {};
         querySnapshot.forEach(doc => {
             const data = doc.data();
             scores[doc.id] = data['highScore']; // Stocke chaque note avec son high score
         });
-        console.log("Got : ", scores)
 
         return scores;
     }

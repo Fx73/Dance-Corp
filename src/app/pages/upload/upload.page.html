@@ -66,11 +66,6 @@
 							</ion-item>
 
 							<ion-item>
-								<ion-input label="Background" [(ngModel)]="musicData.background"
-									[disabled]="!isEditing"></ion-input>
-							</ion-item>
-
-							<ion-item>
 								<ion-input label="Jacket" [(ngModel)]="musicData.jacket"
 									[disabled]="!isEditing"></ion-input>
 							</ion-item>
@@ -86,8 +81,8 @@
 							</ion-item>
 
 							<ion-item>
-								<ion-input label="Beat 0 Offset (seconds)" type="number"
-									[(ngModel)]="musicData.beat0OffsetInSeconds" [disabled]="!isEditing"></ion-input>
+								<ion-input label="Beat 0 Offset (seconds)" type="number" [(ngModel)]="musicData.offset"
+									[disabled]="!isEditing"></ion-input>
 							</ion-item>
 
 							<ion-item>
@@ -191,6 +186,9 @@
 						</ion-button>
 						<ion-button (click)="validateAndUpload()" [disabled]="isEditing" expand="block">
 							Upload music</ion-button>
+						<ion-button (click)="exportEssc()" size="small">
+							Export Essc
+						</ion-button>
 						<ion-button color="danger" (click)="deleteFile()" size="small">
 							<ion-icon slot="icon-only" name="trash-outline"></ion-icon>
 						</ion-button>
@@ -236,7 +234,7 @@
 						<ion-card-title>Notes Data</ion-card-title>
 					</ion-card-header>
 					<ion-card-content class="card-grid">
-						<ion-card *ngFor="let notes of musicData.notes">
+						<ion-card *ngFor="let notes of musicData.noteData">
 							<ion-card-header>
 								<ion-card-title>
 									<ion-input [(ngModel)]="notes.chartName" [disabled]="!isEditing"></ion-input>

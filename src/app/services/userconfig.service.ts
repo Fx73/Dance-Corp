@@ -1,4 +1,4 @@
-import { ArrowImageManager } from '../game/player-display/arrowImageManager';
+import { ArrowImageManager } from '../game/gameDisplay/arrowImageManager';
 import { BehaviorSubject } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { Player } from '../game/gameModel/player';
@@ -50,7 +50,6 @@ export class UserConfigService {
             const matchingGamepad = navigator.getGamepads().find(g => g?.id === player.gamepad!.id);
             player.gamepad.index = matchingGamepad ? matchingGamepad.index : null;
         }
-        console.log(player)
         return player
     }
 
@@ -107,7 +106,6 @@ export class UserConfigService {
 
         const player: Player = this.players[playerIndex];
         (player[option as keyof Player] as any) = value;
-        console.log(player)
 
         localStorage.setItem(this.PLAYERS_STORAGE_KEY(playerIndex), JSON.stringify(player));
     }

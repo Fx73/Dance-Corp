@@ -13,7 +13,7 @@ import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.
   templateUrl: './welcome.page.html',
   styleUrls: ['./welcome.page.scss'],
   standalone: true,
-  imports: [IonImg, IonCol, IonRow, IonGrid, IonBadge, IonLabel, IonItem, IonCardHeader, IonCardTitle, IonCardContent, IonCardSubtitle, IonCard, IonButton, IonContent, CommonModule, FormsModule, HeaderComponent, RouterModule]
+  imports: [IonCol, IonRow, IonGrid, IonBadge, IonLabel, IonItem, IonCardHeader, IonCardTitle, IonCardContent, IonCard, IonButton, IonContent, CommonModule, FormsModule, HeaderComponent, RouterModule]
 })
 export class WelcomePage implements OnInit {
   userData: UserDto | null = null;

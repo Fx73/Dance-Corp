@@ -2,7 +2,7 @@ import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, QueryLi
 import { CommonModule, Location } from '@angular/common';
 import { IMusicPlayer, MusicOrigin } from './musicPlayer/IMusicPlayer';
 import { IonButton, IonCard, IonContent, IonHeader, IonIcon, IonTitle, IonToolbar } from '@ionic/angular/standalone';
-import { MusicDto, NotesDto } from './gameModel/music.dto';
+import { MusicDto, NoteDataDto } from './gameModel/music.dto';
 
 import { AppComponent } from '../app.component';
 import { ArrowDirection } from "./constants/arrow-direction.enum";
@@ -11,7 +11,7 @@ import { GameOverComponent } from "./game-over/game-over.component";
 import { GameRound } from './gameModel/gameRound';
 import { MusicPlayerYoutubeComponent } from "./musicPlayer/music-player-youtube/music-player-youtube.component";
 import { Player } from './gameModel/player';
-import { PlayerDisplayComponent } from "./player-display/player-display.component";
+import { PlayerDisplayComponent } from "./gameDisplay/player-display.component";
 import { Router } from "@angular/router";
 import { UserConfigService } from "src/app/services/userconfig.service";
 import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.service';
@@ -32,6 +32,7 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
   music: MusicDto | null = null;
   musicPlayer!: IMusicPlayer;
   musicOrigin: MusicOrigin = MusicOrigin.Youtube
+  backgroundUrl: string = "assets/Splash/Texture.png";
   //#endregion
 
 
@@ -54,7 +55,7 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
     if (navigation?.extras?.state) {
       this.music = navigation.extras.state['music'];
     }
-    if (this.music === null || this.music.music === undefined || this.music.notes.length === 0) {
+    if (this.music === null || this.music.music === undefined || this.music.noteData.length === 0) {
       this.router.navigate(['/home']);
       return;
     }
@@ -70,7 +71,7 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
     const isTrainingMode: boolean = this.userConfigService.getConfig()["trainingMode"] ?? false
 
     for (const player of this.players) {
-      this.gameRounds.push(new GameRound(this.music, this.music.notes[0], player, isTrainingMode))
+      this.gameRounds.push(new GameRound(this.music, this.music.noteData[0], player, isTrainingMode))
     }
   }
 
@@ -96,9 +97,10 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
 
   startGame() {
     this.musicPlayer.play()
-    this.zeroTimeStamp = Math.round(performance.now()) + (this.music!.beat0OffsetInSeconds ?? 0) * 1000;
+    this.zeroTimeStamp = Math.round(performance.now()) + (this.music!.offset ?? 0) * 1000;
     this.gameGlobalLoop(this.zeroTimeStamp)
     console.log("Game has started")
+    console.log(this.gameRounds[0].arrowMap)
   }
 
 
@@ -108,7 +110,6 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
 
     for (const gameRound of this.gameRounds)
       gameRound.gameLoop(elapsedTime)
-
 
     for (const playerDiplay of this.playerDisplays)
       playerDiplay.Update()
@@ -128,7 +129,7 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
 
     this.isGameOver = true;
     for (const gameRound of this.gameRounds)
-      this.userFirestoreService.updateUserStatsFromRound(this.music!.id, this.music?.notes[0].chartName!, gameRound)
+      this.userFirestoreService.updateUserStatsFromRound(this.music!.id, this.music?.noteData[0].chartName!, gameRound)
   }
 
   //#region Music Player

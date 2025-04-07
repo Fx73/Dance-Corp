@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { InfiniteScrollCustomEvent, IonBadge, IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonGrid, IonHeader, IonImg, IonInfiniteScroll, IonInfiniteScrollContent, IonItem, IonLabel, IonList, IonMenu, IonRow, IonSearchbar, IonSplitPane, IonTab, IonText, IonTitle, IonToolbar } from '@ionic/angular/standalone';
-import { MusicDto, NotesDto } from 'src/app/game/gameModel/music.dto';
+import { MusicDto, NoteDataDto } from 'src/app/game/gameModel/music.dto';
 
 import { Color } from 'src/app/game/constants/color';
 import { CommonModule } from '@angular/common';
@@ -22,7 +22,7 @@ import { UserFirestoreService } from './../../services/firestore/user.firestore.
 export class BrowsePage implements OnInit {
 
   musics: MusicDto[] = [];
-  notes: NotesDto[] | undefined;
+  notes: NoteDataDto[] | undefined;
   userScores: { [key: string]: number } = {};
   selectedMusic: MusicDto | null = null;
   searchQuery: string = '';
@@ -34,11 +34,11 @@ export class BrowsePage implements OnInit {
     this.fireStoreService.GetAllMusics(null).then(value => this.musics = value);
   }
 
-  runGame(note: NotesDto): void {
+  runGame(note: NoteDataDto): void {
     if (!this.selectedMusic)
       return
 
-    this.selectedMusic.notes = [note]
+    this.selectedMusic.noteData = [note]
     this.router.navigate(['/game'], {
       state: {
         music: this.selectedMusic,

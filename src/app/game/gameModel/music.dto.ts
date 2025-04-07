@@ -1,3 +1,5 @@
+import { BpmChange, TextChange } from "./timedChange";
+
 import { DanceType } from "../constants/dance-type.enum";
 import { NoteDifficulty } from "../constants/note-difficulty.enum";
 
@@ -11,11 +13,10 @@ export class MusicDto {
   genre?: string;
   credit?: string;
   banner?: string;
-  background?: string;
   jacket?: string;
   cdTitle?: string;
   music?: string;
-  beat0OffsetInSeconds?: number;
+  offset?: number; //beat0OffsetInSeconds
   sampleStart?: number;
   sampleLength?: number;
   bpms: BpmChange[] = [];
@@ -24,7 +25,7 @@ export class MusicDto {
   warps?: string;
   bgChanges?: TextChange[];
   labels?: TextChange[];
-  notes: NotesDto[] = [];
+  noteData: NoteDataDto[] = [];
   additionalFields?: Record<string, string>;
 
   get id(): string { return `${this.artist}-${this.title}` }
@@ -50,8 +51,6 @@ export class MusicDto {
     delete tokenMap["credit"];
     this.banner = tokenMap["banner"];
     delete tokenMap["banner"];
-    this.background = tokenMap["background"];
-    delete tokenMap["background"];
     this.jacket = tokenMap["jacket"];
     delete tokenMap["jacket"];
     if (this.jacket === undefined) this.jacket = tokenMap["cdimage"];
@@ -62,7 +61,7 @@ export class MusicDto {
     delete tokenMap["cdtitle"];
     this.music = tokenMap["music"];
     delete tokenMap["music"];
-    this.beat0OffsetInSeconds = parseFloat(tokenMap["offset"]) ?? parseFloat(tokenMap["beat0OffsetInSeconds"]);
+    this.offset = parseFloat(tokenMap["offset"]) ?? parseFloat(tokenMap["beat0OffsetInSeconds"]);
     delete tokenMap["offset"];
     delete tokenMap["beat0OffsetInSeconds"];
     this.sampleStart = parseFloat(tokenMap["samplestart"]);
@@ -78,30 +77,34 @@ export class MusicDto {
     this.bpms = this.parseChanges<BpmChange>(tokenMap["bpms"], v => parseFloat(v));
     delete tokenMap["bpms"];
     this.bgChanges = this.parseChanges<TextChange>(tokenMap["bgchanges"], v => v);
+    if (tokenMap["background"] && !this.bgChanges) {
+      this.bgChanges = [new TextChange(0, tokenMap["background"])];
+
+    }
+    delete tokenMap["background"];
     delete tokenMap["bgchanges"];
     this.labels = this.parseChanges<TextChange>(tokenMap["labels"], v => v);
     delete tokenMap["labels"];
 
     Object.keys(tokenMap).forEach(key => {
       if (key.startsWith('notedata')) {
-        this.notes.push(new NotesDto(tokenMap[key]))
+        this.noteData.push(new NoteDataDto(tokenMap[key]))
         delete tokenMap[key];
       }
     });
-    this.notes.sort((a, b) => (a.meter || 0) - (b.meter || 0));
+    this.noteData.sort((a, b) => (a.meter || 0) - (b.meter || 0));
 
     this.additionalFields = { ...tokenMap };
   }
 
-  private parseChanges<T>(token: string, parsefun: (value: string) => any): T[] {
+  private parseChanges<ITimedChange>(token: string, parsefun: (value: string) => any): ITimedChange[] {
     const changes = token.split(',');
-    const array: T[] = []
+    const array: ITimedChange[] = []
     for (const change of changes) {
       const [timeStr, valueStr] = change.split('=');
       const time = parseFloat(timeStr);
       const value = parsefun(valueStr);
-      console.log(valueStr, value)
-      array.push({ value, time } as unknown as T);
+      array.push({ value, time } as ITimedChange);
     }
 
     return array;
@@ -110,7 +113,7 @@ export class MusicDto {
 }
 
 
-export class NotesDto {
+export class NoteDataDto {
   chartName: string = "NoChartNameError";
   stepsType?: DanceType;
   description?: string;
@@ -146,14 +149,4 @@ export class NotesDto {
 
 export class Measures {
   steps: number[][] = [];
-}
-
-export class BpmChange {
-  time: number = 0;
-  value: number = 120;
-}
-
-export class TextChange {
-  time: number = 0;
-  value: string = "";
 }

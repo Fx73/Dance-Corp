@@ -1,6 +1,7 @@
 import { Firestore, addDoc, collection, doc, getDoc, getDocs, getFirestore, limit, orderBy, query, setDoc, startAfter, where } from 'firebase/firestore';
-import { MusicDto, NotesDto } from '../../game/gameModel/music.dto';
+import { MusicDto, NoteDataDto } from '../../game/gameModel/music.dto';
 
+import { AppComponent } from 'src/app/app.component';
 import { FirestoreConverter } from './firestore.converter';
 import { Injectable } from '@angular/core';
 
@@ -13,7 +14,7 @@ export class MusicFirestoreService {
     readonly NOTE_COLLECTION = "notes"
     readonly BATCH_SIZE = 60;
     readonly firestoreConverterMusic = new FirestoreConverter<MusicDto>(MusicDto)
-    readonly firestoreConverterNotes = new FirestoreConverter<NotesDto>(NotesDto)
+    readonly firestoreConverterNotes = new FirestoreConverter<NoteDataDto>(NoteDataDto)
     //#endregion
     db: Firestore
 
@@ -24,21 +25,20 @@ export class MusicFirestoreService {
 
     async uploadNewMusic(dto: MusicDto): Promise<void> {
         try {
+            console.log(dto.id)
             const docRef = doc(this.db, this.MUSIC_COLLECTION, dto.id).withConverter(this.firestoreConverterMusic);
             const notesCollectionRef = collection(docRef, this.NOTE_COLLECTION).withConverter(this.firestoreConverterNotes);
 
-            const { notes, ...mainData } = dto;
-
+            const { noteData: notes, ...mainData } = dto;
             await setDoc(docRef, mainData);
             for (const note of notes) {
                 const noteRef = doc(notesCollectionRef, note.chartName);
                 await setDoc(noteRef, note);
             }
 
-
-            console.log('Music successfully uploaded!');
+            AppComponent.presentOkToast("Music successfully uploaded!")
         } catch (error) {
-            console.error('Error uploading music:', error);
+            AppComponent.presentWarningToast("Error uploading music: " + error)
             throw error;
         }
     }
@@ -110,13 +110,13 @@ export class MusicFirestoreService {
     }
 
 
-    async getMusicNotes(musicId: string): Promise<NotesDto[]> {
+    async getMusicNotes(musicId: string): Promise<NoteDataDto[]> {
         try {
             const notesCollectionRef = collection(this.db, this.MUSIC_COLLECTION + "/" + musicId + "/" + this.NOTE_COLLECTION).withConverter(this.firestoreConverterNotes);
             const q = query(notesCollectionRef, orderBy('meter'));
             const querySnapshot = await getDocs(q);
 
-            const notes: NotesDto[] = [];
+            const notes: NoteDataDto[] = [];
             querySnapshot.forEach(doc => {
                 notes.push(doc.data());
             });
