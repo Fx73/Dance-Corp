@@ -47,9 +47,9 @@ export class OptionsPage {
   }
   getFakeGameRound(): GameRound {
     const arrowMap: Arrow[] = [
-      new Arrow(0, 1, ArrowType.Tap),
+      new Arrow(0, 1, ArrowType.Hold, 1.5),
       new Arrow(1, 2, ArrowType.Tap),
-      new Arrow(2, 3, ArrowType.Hold, 5),
+      new Arrow(2, 3, ArrowType.Tap),
       new Arrow(3, 4, ArrowType.Tap),
       new Arrow(0, 6, ArrowType.Hold, 8),
       new Arrow(2, 7, ArrowType.Tap),

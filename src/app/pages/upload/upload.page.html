@@ -179,14 +179,15 @@
 			</ion-col>
 
 			<ion-col>
+				<!-- Buttons card-->
 				<ion-card class="base-card btn-action-card">
 					<ion-card-content>
-						<ion-button [color]="isEditing ? 'success' : 'primary'" (click)="toggleEdit()" expand="block">
+						<ion-button color="success" (click)="toggleEdit()" expand="block">
 							{{ isEditing ? 'Save' : 'Edit music' }}
 						</ion-button>
 						<ion-button (click)="validateAndUpload()" [disabled]="isEditing" expand="block">
 							Upload music</ion-button>
-						<ion-button (click)="exportEssc()" size="small">
+						<ion-button (click)="exportEssc()" [disabled]="isEditing" size="small">
 							Export Essc
 						</ion-button>
 						<ion-button color="danger" (click)="deleteFile()" size="small">

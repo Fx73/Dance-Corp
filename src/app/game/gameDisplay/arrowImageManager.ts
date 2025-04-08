@@ -13,6 +13,7 @@ export class ArrowImageManager {
     public static get ARROW_SIZE(): number {
         return this._ARROW_SIZE;
     }
+    private static _HOLD_PRELOAD_PRECISION = 4 // part of beat
 
 
     private static arrowImages: HTMLCanvasElement[][] = [];
@@ -22,7 +23,7 @@ export class ArrowImageManager {
         return ArrowImageManager.arrowImages[color][direction];
     }
     public static getHoldForDistance(distance: number): HTMLCanvasElement {
-        const interval = CONFIG.DISPLAY.BEAT_INTERVAL / 10;
+        const interval = CONFIG.DISPLAY.BEAT_INTERVAL / this._HOLD_PRELOAD_PRECISION;
         const closestIndex = Math.min(Math.round(distance / interval), ArrowImageManager.holdImages.length);
         return ArrowImageManager.holdImages[closestIndex]
     }
@@ -57,8 +58,8 @@ export class ArrowImageManager {
     }
 
     public static PreloadHoldImages(centerImage: HTMLImageElement, capImage: HTMLImageElement) {
-        const interval = CONFIG.DISPLAY.BEAT_INTERVAL / 10;
-        const maxMultiplier = 100;
+        const interval = CONFIG.DISPLAY.BEAT_INTERVAL / ArrowImageManager._HOLD_PRELOAD_PRECISION;
+        const maxMultiplier = ArrowImageManager._HOLD_PRELOAD_PRECISION * 10;
         for (let multiplier = 0; multiplier <= maxMultiplier; multiplier++) {
             const img = ArrowImageManager.PreloadHoldImage(centerImage, capImage, multiplier * interval)
             this.holdImages.push(img)
@@ -72,10 +73,21 @@ export class ArrowImageManager {
         canvas.width = this.ARROW_SIZE;
         canvas.height = height;
         const ctx = canvas.getContext('2d')!;
-        let y;
-        for (y = 0; y < height - capImage.height; y += centerImage.height) {
+        let y = 0;
+
+        // Draw the center images
+        while (y + centerImage.height <= height - capImage.height) {
             ctx.drawImage(centerImage, 0, y, canvas.width, centerImage.height);
+            y += centerImage.height;
         }
+
+        // Adjust last center image to fit the remaining space
+        const remainingHeight = height - capImage.height - y;
+        if (remainingHeight > 0) {
+            ctx.drawImage(centerImage, 0, y, canvas.width, remainingHeight);
+            y += remainingHeight;
+        }
+        // Draw the bottom cap image
         ctx.drawImage(capImage, 0, y, canvas.width, capImage.height);
         return canvas
     }

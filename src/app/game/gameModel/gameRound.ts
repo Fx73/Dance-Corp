@@ -2,7 +2,7 @@ import { ArrowState, DancePadInput, IDancePad } from "../gameController/dancepad
 import { MusicDto, NoteDataDto } from "./music.dto";
 
 import { Arrow } from "./arrow";
-import { ArrowDirection } from "../constants/arrow-direction.enum";
+import { ArrowDirection } from 'src/app/game/constants/arrow-direction.enum';
 import { ArrowType } from "../constants/arrow-type.enum";
 import { CONFIG } from './../constants/game-config';
 import { DancePadGamepad } from "../gameController/dancepad-gamepad";
@@ -13,6 +13,7 @@ import { Precision } from "../constants/precision.enum";
 export class GameRound {
     //#region App Constants
     readonly ArrowDirection = ArrowDirection;
+    readonly MAX_SCORE = 1000000;
     //#endregion
 
     //Game Data
@@ -33,16 +34,19 @@ export class GameRound {
     public currentArrowIndex: number = 0; // Tracks the last note out of game
     public isFailed = false;
     public isFinished = false;
+    public comboCount: number = 0;
     public grade: string = ""; // A, B, C, D, E
 
+    private scorePerArrow: number = 0;
+    private scorePerHoldBeat: number = 0;
+
     //Display consuming
-    precisionMessage: Precision | null = null;
+    precisionMessage: Arrow[] = []; // Message to display on the screen
 
 
     constructor(musicDTO: MusicDto, notes: NoteDataDto, player: Player, isTrainingMode = false) {
         this.player = player
         this.music = musicDTO;
-        console.log(musicDTO.bpms[0])
         this.bps = musicDTO.bpms[0].value / 60
         this.tolerance = CONFIG.GAME.TOLERANCE_WINDOW * this.bps;
 
@@ -51,6 +55,7 @@ export class GameRound {
         else
             this.dancepad = new DancePadGamepad(player.gamepad!.index!, player.keyBindingGamepad)
         this.loadArrows(notes)
+        this.calculateScore()
 
         if (isTrainingMode) {
             this.isTrainingMode = true
@@ -92,6 +97,25 @@ export class GameRound {
     }
 
 
+    private calculateScore() {
+        const holdArrows = this.arrowMap.filter(arrow => arrow.isTypeHold)
+
+        // Calculate total hold percentage for score
+        const totalHoldTime = holdArrows.reduce((total, arrow) => total + (arrow.beatEnd!) - arrow.beatPosition, 0);
+        const totalDanceTime = this.arrowMap[this.arrowMap.length - 1].beatEnd ?? this.arrowMap[this.arrowMap.length - 1].beatPosition;
+        const holdPercentage = totalHoldTime / totalDanceTime;
+
+        // Point attribution
+        const holdPoints = (this.MAX_SCORE / 2) * holdPercentage;
+        const arrowPoints = 1000000 - holdPoints;
+
+        this.scorePerArrow = arrowPoints / this.arrowMap.length;
+        this.scorePerHoldBeat = holdPoints / totalHoldTime;
+
+
+    }
+
+
     public gameLoop(elapsedTime: number): void {
         this.currentBeat = elapsedTime * this.bps
 
@@ -115,7 +139,6 @@ export class GameRound {
         // Pass out arrows
         while (this.arrowMap[this.currentArrowIndex].isOut) {
             this.currentArrowIndex++
-            console.log("Passed ", this.currentArrowIndex)
             if (this.currentArrowIndex >= this.arrowMap.length) {
                 this.EndVictory()
                 return
@@ -157,6 +180,7 @@ export class GameRound {
         if (padArrowState === ArrowState.Press) {
             if (currentBeat > arrow.beatPosition + this.tolerance) {
                 this.arrowAlmost(arrow)
+                console.log(`Almost arrow at beat ${arrow.beatPosition}.`);
                 return
             }
             const difference = Math.abs(arrow.beatPosition - currentBeat);
@@ -164,14 +188,17 @@ export class GameRound {
             if (difference <= this.tolerance * 0.25) {
                 // Perfect: Very close to the beat
                 this.arrowPerfect(arrow);
+                console.log(`Perfect arrow at beat ${arrow.beatPosition}.`);
                 return;
             } else if (difference <= this.tolerance * 0.5) {
                 // Great: Slightly off but close enough
                 this.arrowGreat(arrow);
+                console.log(`Great arrow at beat ${arrow.beatPosition}.`);
                 return;
             } else if (difference <= this.tolerance) {
                 // Good: Further off but still acceptable
                 this.arrowGood(arrow);
+                console.log(`Good arrow at beat ${arrow.beatPosition}.`);
                 return;
             }
         }
@@ -179,40 +206,44 @@ export class GameRound {
 
     arrowPerfect(arrow: Arrow) {
         arrow.perfect()
-        this.performance = Math.min(100, this.performance + 2);
-        this.score += 4
-        this.precisionMessage = arrow.precision
+        this.updatePerformance(2);
+        this.score += this.scorePerArrow
+        this.comboCount++
+        this.precisionMessage.push(arrow)
     }
     arrowGreat(arrow: Arrow) {
         arrow.great()
-        this.performance = Math.min(100, this.performance + 1);
-        this.score += 3
-        this.precisionMessage = arrow.precision
+        this.updatePerformance(1);
+        this.score += this.scorePerArrow * 0.8
+        this.comboCount++
+        this.precisionMessage.push(arrow)
     }
     arrowGood(arrow: Arrow) {
         arrow.good()
-        this.performance = Math.min(100, this.performance + 1);
-        this.score += 2
-        this.precisionMessage = arrow.precision
+        this.updatePerformance(1);
+        this.score += this.scorePerArrow * 0.6
+        this.comboCount++
+        this.precisionMessage.push(arrow)
     }
     arrowAlmost(arrow: Arrow) {
         arrow.almost()
-        this.performance = Math.max(0, this.performance - 2);
-        this.score += 1
-        this.precisionMessage = arrow.precision
+        this.updatePerformance(- 3);
+        this.score += this.scorePerArrow * 0.2
+        this.comboCount = 0
+        this.precisionMessage.push(arrow)
     }
     arrowMissed(arrow: Arrow) {
         arrow.missed()
-        this.performance = Math.max(0, this.performance - 6);
-        this.precisionMessage = arrow.precision
+        this.updatePerformance(-4)
+        this.comboCount = 0
+        this.precisionMessage.push(arrow)
     }
     arrowOk(arrow: Arrow) {
         arrow.ok();
-        const arrowLength = arrow.beatEnd ? Math.round(arrow.beatEnd - arrow.beatPosition) : 1
+        const arrowLength = arrow.beatEnd! - arrow.beatPosition
         this.performance = Math.min(100, this.performance + arrowLength);
-        this.score += arrowLength / 2
-        this.precisionMessage = Precision.Ok
-        console.log("OK ARROW")
+        this.score += arrowLength * this.scorePerHoldBeat
+        this.precisionMessage.push(arrow)
     }
 
     updatePerformance(amount: number): void {

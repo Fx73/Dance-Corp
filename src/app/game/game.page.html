@@ -4,12 +4,13 @@
 	</ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" [style]="'--background: url(' + backgroundUrl + ')'">
 	<ng-container *ngIf="isGameOver;then gameOverContent else gameContent"></ng-container>
 
 	<ng-template #gameOverContent>
 		<app-game-over *ngFor="let gameRound of gameRounds" [gameRound]="gameRound"></app-game-over>
-		<ion-card class="base-card start-card" style="height: 15vh;" (click)="goBack()"> Back to music list </ion-card>
+		<ion-card class="base-card start-card" style="height: 15vh;" (click)="goBack()"> Back to music list
+		</ion-card>
 	</ng-template>
 
 	<ng-template #gameContent>
@@ -17,7 +18,6 @@
 		<app-music-player-youtube *ngIf="musicOrigin === MusicOrigin.Youtube" [videoId]="music!.music!"
 			(onReady)="onPlayerReady($event)"></app-music-player-youtube>
 	</ng-template>
-
 </ion-content>
 
 <!--

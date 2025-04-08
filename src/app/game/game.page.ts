@@ -33,6 +33,7 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
   musicPlayer!: IMusicPlayer;
   musicOrigin: MusicOrigin = MusicOrigin.Youtube
   backgroundUrl: string = "assets/Splash/Texture.png";
+  private nextBgTime: number | null = null;
   //#endregion
 
 
@@ -66,6 +67,7 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
     } else {
       this.musicOrigin = musicOrigin
     }
+    if (this.music!.bgChanges) this.nextBgTime = this.music!.bgChanges[0].time
 
     this.players = this.userConfigService.players;
     const isTrainingMode: boolean = this.userConfigService.getConfig()["trainingMode"] ?? false
@@ -100,7 +102,6 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
     this.zeroTimeStamp = Math.round(performance.now()) + (this.music!.offset ?? 0) * 1000;
     this.gameGlobalLoop(this.zeroTimeStamp)
     console.log("Game has started")
-    console.log(this.gameRounds[0].arrowMap)
   }
 
 
@@ -113,6 +114,12 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
 
     for (const playerDiplay of this.playerDisplays)
       playerDiplay.Update()
+
+    if (this.nextBgTime && elapsedTime >= this.nextBgTime) {
+      const bgChange = this.music!.bgChanges?.find(change => change.time === this.nextBgTime);
+      this.backgroundUrl = bgChange?.value || 'assets/Splash/Texture.png';
+      this.nextBgTime = bgChange?.time ?? null;
+    }
 
     if (this.gameRounds.every(gameRound => gameRound.isFailed || gameRound.isFinished)) {
       this.gameOver()

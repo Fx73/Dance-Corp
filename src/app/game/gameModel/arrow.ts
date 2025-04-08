@@ -36,7 +36,8 @@ export class Arrow {
         if (this.isTypeHold)
             this.isPressed = true;
         else
-            this.precision = Precision.Perfect
+            this.isValid = true
+        this.precision = Precision.Perfect
     }
     public great() {
         if (this.isTypeHold)
