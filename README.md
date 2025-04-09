@@ -50,6 +50,8 @@ With the possibility of web development may come new features as leaderboard, ea
 
 
 ## 🛠️ App design
+It is built using Angular and Ionic Framework. It has been divided into the following parts.
+
 ### Game 
  MVC pattern : 
   - gameModel with gameRound as main game loop
