@@ -2,10 +2,10 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonIcon, IonItem, IonLabel, IonList } from "@ionic/angular/standalone";
 import { checkmarkCircleOutline, closeCircleOutline, medalOutline, starOutline } from 'ionicons/icons';
 
-import { Color } from '../constants/color';
+import { Color } from 'src/app/game/constants/color';
 import { CommonModule } from '@angular/common';
-import { GameRound } from '../gameModel/gameRound';
-import { Precision } from '../constants/precision.enum';
+import { GameRound } from 'src/app/game/gameModel/gameRound';
+import { Precision } from 'src/app/game/constants/precision.enum';
 import { addIcons } from 'ionicons';
 
 @Component({

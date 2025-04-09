@@ -7,7 +7,7 @@ import { MusicDto, NoteDataDto } from './gameModel/music.dto';
 import { AppComponent } from '../app.component';
 import { ArrowDirection } from "./constants/arrow-direction.enum";
 import { FormsModule } from '@angular/forms';
-import { GameOverComponent } from "./game-over/game-over.component";
+import { GameOverComponent } from "./gameDisplay/game-over/game-over.component";
 import { GameRound } from './gameModel/gameRound';
 import { MusicPlayerYoutubeComponent } from "./musicPlayer/music-player-youtube/music-player-youtube.component";
 import { Player } from './gameModel/player';

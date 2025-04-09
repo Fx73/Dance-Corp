@@ -25,6 +25,9 @@
 						<ion-button [routerLink]="['/options']" expand="block" size="large" class="home-content">
 							Options
 						</ion-button>
+						<ion-button [routerLink]="['/about']" expand="block" size="large" class="home-content">
+							Help
+						</ion-button>
 					</ion-card-content>
 				</ion-card>
 			</ion-col>
@@ -49,6 +52,7 @@
 						<ion-label>Log in to save stats and data</ion-label>
 					</ion-card-content>
 				</ion-card>
+				<app-login *ngIf="userData === null" [isSmall]="false"></app-login>
 			</ion-col>
 		</ion-row>
 	</ion-grid>

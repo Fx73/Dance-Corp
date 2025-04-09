@@ -1,0 +1,44 @@
+<app-header title="About this web app"></app-header>
+
+<ion-content [fullscreen]="false">
+  <ion-card class="base-card">
+    <ion-card-content class="ion-padding">
+      <h1> 🌟 About this app </h1>
+      <p>This web app is a project aiming to recreate the Step Mania experience in a web browser.</p>
+      <p>For more information, visit the project sources: <a href="https://dev.azure.com/CochonCorp/Dance-Corp">Azure
+          Devops</a></p>
+      <ion-icon name="logo-angular"></ion-icon>
+      <ion-icon name="logo-html5"></ion-icon>
+      <ion-icon name="logo-css3"></ion-icon>
+      <ion-icon name="logo-ionic"></ion-icon>
+
+
+      <h1> 📁 File Reader </h1>
+      <p> Reader accepts stepmania files, SM and SSC.</p>
+      <p> It create an Essc file (extended scc) which is actually an scc with unused field remove and one change : all
+        special
+        notes are converted to integer as following</p>
+      <p> 0 = no note</p>
+      <p> 1 = tap note</p>
+      <p> 2 = hold head</p>
+      <p> 3 = Hold/roll/Minefield end</p>
+      <p> 4 = Roll head</p>
+      <p> 5 = Mine <i>(was M)</i></p>
+      <p> 6 = Minefield head<i>(was N)</i></p>
+      <p> 7 = Fake<i>(was F)</i></p>
+      <p> 8 = Hidden<i>(was H)</i></p>
+
+
+      <h1> Score calculation</h1>
+      <p> The score is calculated based on a perfect score of 1 000 000. It is divided between tap and hold based on
+        hold duration (100% time hold would mean 50% score in hold). Then each note is a subdivision of the score and
+        each hold is following the hold time to get its score</p>
+
+
+      <h1> Issue and suggestions </h1>
+      <p> If you have any issue or suggestion, please open an issue on the project page or send me a mail</p>
+      <p> <a href="https://dev.azure.com/CochonCorp/Dance-Corp">Azure Devops</a></p>
+      <a href="mailto:fx73000@yahoo.fr?subject=DanceCorp - Issue/Suggestion">Send email</a>
+    </ion-card-content>
+  </ion-card>
+</ion-content>
