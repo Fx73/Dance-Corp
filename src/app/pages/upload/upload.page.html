@@ -75,12 +75,12 @@
 									[disabled]="!isEditing"></ion-input>
 							</ion-item>
 
-							<ion-item>
+							<ion-item [disabled]="this.isLockedDB">
 								<ion-input label="Music" [(ngModel)]="musicData.music"
 									[disabled]="!isEditing"></ion-input>
 							</ion-item>
 
-							<ion-item>
+							<ion-item [disabled]="this.isLockedDB">
 								<ion-input label="Beat 0 Offset (seconds)" type="number" [(ngModel)]="musicData.offset"
 									[disabled]="!isEditing"></ion-input>
 							</ion-item>
@@ -95,7 +95,7 @@
 									[disabled]="!isEditing"></ion-input>
 							</ion-item>
 
-							<ion-item>
+							<ion-item [disabled]="this.isLockedDB">
 								<ion-label>Bpms</ion-label>
 								<ion-list *ngIf="musicData.bpms">
 									<ion-item *ngFor="let bpm of musicData.bpms; let i = index">
@@ -185,8 +185,8 @@
 						<ion-button color="success" (click)="toggleEdit()" expand="block">
 							{{ isEditing ? 'Save' : 'Edit music' }}
 						</ion-button>
-						<ion-button (click)="validateAndUpload()" [disabled]="isEditing" expand="block">
-							Upload music</ion-button>
+						<ion-button (click)="Upload()" [disabled]="isEditing" expand="block">
+							{{ isEditDB ? 'Update music' : 'Upload music'}}</ion-button>
 						<ion-button (click)="exportEssc()" [disabled]="isEditing" size="small">
 							Export Essc
 						</ion-button>

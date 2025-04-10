@@ -1,18 +1,18 @@
+import { ActivatedRoute, Router } from '@angular/router';
 import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonContent, IonGrid, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonList, IonRow, IonSelect, IonSelectOption } from '@ionic/angular/standalone';
 import { Measures, MusicDto } from 'src/app/game/gameModel/music.dto';
 import { SccReader, SccWriter } from './reader.ssc';
 import { addOutline, checkmarkCircle, closeCircle, removeOutline, trashOutline } from 'ionicons/icons';
 
+import { AppComponent } from 'src/app/app.component';
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { DanceType } from './../../game/constants/dance-type.enum';
 import { FormsModule } from '@angular/forms';
-import { HeaderComponent } from "src/app/shared/header/header.component"; // Importer le SmReader
-import { HttpClient } from '@angular/common/http';
+import { HeaderComponent } from 'src/app/shared/component/header/header.component';
 import { MusicFirestoreService } from 'src/app/services/firestore/music.firestore.service';
 import { NoteDifficulty } from './../../game/constants/note-difficulty.enum';
 import { addIcons } from 'ionicons';
-import { writeFileSync } from 'fs';
 
 @Component({
   selector: 'app-upload',
@@ -24,21 +24,44 @@ import { writeFileSync } from 'fs';
 export class UploadPage {
 
   //#region Constants
-  private readonly MUSICEDIT_STORAGE_KEY = "musicEdit"
+  private static readonly MUSICEDIT_STORAGE_KEY = "musicEdit"
   readonly DanceTypeList = Object.values(DanceType);
   readonly NoteDifficultyList = Object.values(NoteDifficulty);
   //#endregion
 
   musicData: MusicDto | null = null;
   isEditing = false;
+  isEditDB = false;
+  isLockedDB = false;
 
-  constructor(private fireStoreService: MusicFirestoreService) {
+  constructor(private route: ActivatedRoute, private fireStoreService: MusicFirestoreService) {
     addIcons({ trashOutline, removeOutline, addOutline, checkmarkCircle, closeCircle });
 
-    const storedData = localStorage.getItem(this.MUSICEDIT_STORAGE_KEY);
-    if (storedData) {
-      this.musicData = SccReader.parseFile('stored.essc', storedData);
-    }
+  }
+
+  ngOnInit() {
+    this.route.queryParams.subscribe(params => {
+      if (params['music'])
+        this.fireStoreService.getMusicWithNotes(params['music'])
+          .then(music => {
+            this.musicData = music
+            this.isEditDB = true
+            this.isLockedDB = (music?.noteData ?? []).length > 0
+          })
+      else {
+        this.musicData = UploadPage.readLocalMusic();
+        this.checkMusicExist()
+      }
+
+    });
+  }
+
+  public static readLocalMusic(): MusicDto | null {
+    const storedData = localStorage.getItem(UploadPage.MUSICEDIT_STORAGE_KEY);
+    if (storedData)
+      return SccReader.parseFile('stored.essc', storedData);
+    else
+      return null;
   }
 
   onFileSelected(event: any): void {
@@ -48,20 +71,33 @@ export class UploadPage {
       reader.onload = (e) => {
         const content = e.target?.result as string;
         this.musicData = SccReader.parseFile(file.name, content);
-        console.log(this.musicData)
         this.saveChanges();
+        this.checkMusicExist();
       };
       reader.readAsText(file);
     }
   }
 
-  validateAndUpload(): void {
-    if (this.musicData) {
-      this.fireStoreService.uploadNewMusic(this.musicData).then(() => {
-        console.log('Music uploaded successfully!');
-      }).catch((error: any) => {
-        console.error('Error uploading music:', error);
-      });
+  async checkMusicExist() {
+    if (!this.musicData) return;
+    const existingMusic = await this.fireStoreService.getMusic(this.musicData.id);
+    if (existingMusic) {
+      AppComponent.presentWarningToast("This music already exists in the database. Switching to edit mode.");
+      this.isEditDB = true;
+      const notes = await this.fireStoreService.getMusicNotes(this.musicData.id);
+      if (notes.length > 0) this.isLockedDB = true;
+      existingMusic.noteData = notes.concat(this.musicData.noteData);
+      this.musicData = existingMusic;
+    }
+  }
+
+  Upload(): void {
+    if (this.musicData === null) return;
+    if (this.isEditDB) {
+      this.fireStoreService.updateMusic(this.musicData)
+    }
+    else {
+      this.fireStoreService.uploadNewMusic(this.musicData)
     }
   }
 
@@ -102,13 +138,13 @@ export class UploadPage {
 
   saveChanges(): void {
     if (this.musicData) {
-      localStorage.setItem(this.MUSICEDIT_STORAGE_KEY, SccWriter.writeSscFile(this.musicData, true));
+      localStorage.setItem(UploadPage.MUSICEDIT_STORAGE_KEY, SccWriter.writeSscFile(this.musicData, true));
     }
   }
 
   deleteFile() {
     this.musicData = null;
-    localStorage.removeItem(this.MUSICEDIT_STORAGE_KEY);
+    localStorage.removeItem(UploadPage.MUSICEDIT_STORAGE_KEY);
   }
 
   exportEssc(): void {

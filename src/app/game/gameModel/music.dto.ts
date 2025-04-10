@@ -121,6 +121,7 @@ export class NoteDataDto {
   difficulty?: NoteDifficulty;
   meter?: number;
   credit?: string;
+  creatorId?: string;
   creationDate: Date = new Date()
   stepChart: Measures[] = [];
 

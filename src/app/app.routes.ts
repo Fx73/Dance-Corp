@@ -16,6 +16,11 @@ export const routes: Routes = [
     loadComponent: () => import('./game/game.page').then(m => m.GamePage)
   },
   {
+    path: 'browse-upload',
+    loadComponent: () => import('./pages/browse-upload/browse-upload.page').then(m => m.BrowseUploadPage),
+    canActivate: [UserGuard]
+  },
+  {
     path: 'upload',
     loadComponent: () => import('./pages/upload/upload.page').then(m => m.UploadPage),
     canActivate: [UserGuard]
@@ -43,6 +48,6 @@ export const routes: Routes = [
   },
   {
     path: 'about',
-    loadComponent: () => import('./pages/about/about.page').then( m => m.AboutPage)
+    loadComponent: () => import('./pages/about/about.page').then(m => m.AboutPage)
   },
 ];

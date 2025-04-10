@@ -6,7 +6,7 @@ import { ArrowType } from '../../game/constants/arrow-type.enum';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GameRound } from '../../game/gameModel/gameRound';
-import { HeaderComponent } from "../../shared/header/header.component";
+import { HeaderComponent } from "src/app/shared/component/header/header.component";
 import { PlayerDisplayComponent } from '../../game/gameDisplay/player-display.component';
 import { RouterModule } from '@angular/router';
 import { UserConfigService } from 'src/app/services/userconfig.service';

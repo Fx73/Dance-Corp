@@ -1,9 +1,10 @@
-import { Firestore, addDoc, collection, doc, getDoc, getDocs, getFirestore, limit, orderBy, query, setDoc, startAfter, where } from 'firebase/firestore';
+import { Firestore, addDoc, collection, doc, getDoc, getDocs, getFirestore, limit, orderBy, query, setDoc, startAfter, updateDoc, where } from 'firebase/firestore';
 import { MusicDto, NoteDataDto } from '../../game/gameModel/music.dto';
 
 import { AppComponent } from 'src/app/app.component';
 import { FirestoreConverter } from './firestore.converter';
 import { Injectable } from '@angular/core';
+import { UserFirestoreService } from './user.firestore.service';
 
 @Injectable({
     providedIn: 'root'
@@ -18,20 +19,24 @@ export class MusicFirestoreService {
     //#endregion
     db: Firestore
 
-    constructor() {
+    constructor(private userFirestoreService: UserFirestoreService) {
         this.db = getFirestore()
     }
 
 
     async uploadNewMusic(dto: MusicDto): Promise<void> {
         try {
-            console.log(dto.id)
+            const userId = this.userFirestoreService.getUserData()?.id;
+            if (!userId) throw new Error("User not authenticated");
+
             const docRef = doc(this.db, this.MUSIC_COLLECTION, dto.id).withConverter(this.firestoreConverterMusic);
             const notesCollectionRef = collection(docRef, this.NOTE_COLLECTION).withConverter(this.firestoreConverterNotes);
 
             const { noteData: notes, ...mainData } = dto;
             await setDoc(docRef, mainData);
             for (const note of notes) {
+                if (!note.creatorId) note.creatorId = userId;
+                if (!note.credit) note.credit = this.userFirestoreService.getUserData()?.name;
                 const noteRef = doc(notesCollectionRef, note.chartName);
                 await setDoc(noteRef, note);
             }
@@ -41,6 +46,50 @@ export class MusicFirestoreService {
             AppComponent.presentWarningToast("Error uploading music: " + error)
             throw error;
         }
+    }
+
+    async updateMusic(dto: MusicDto): Promise<void> {
+        try {
+            const userId = this.userFirestoreService.getUserData()?.id;
+            if (!userId) throw new Error("User not authenticated");
+
+            const docRef = doc(this.db, this.MUSIC_COLLECTION, dto.id).withConverter(this.firestoreConverterMusic);
+            const notesCollectionRef = collection(docRef, this.NOTE_COLLECTION).withConverter(this.firestoreConverterNotes);
+
+            const { noteData: notes, ...mainData } = dto;
+            await updateDoc(docRef, mainData);
+
+            for (const note of notes) {
+                // Only allow updates if the user is the creator OR it's a new note
+                const noteRef = doc(notesCollectionRef, note.chartName);
+                console.log(note)
+                console.log(note.creatorId)
+                console.log(note.creatorId, userId, note.creatorId === userId)
+                if (note.creatorId === userId) {
+                    console.log("Update")
+                    await updateDoc(noteRef, { ...note });
+                } else if (!note.creatorId) {
+                    if (!note.creatorId) note.creatorId = userId; // Assign creator if it's new
+                    if (!note.credit) note.credit = this.userFirestoreService.getUserData()?.name;
+                    console.log("Create")
+                    await setDoc(noteRef, note);
+                }
+                else {
+                    console.log(`Skipping update for note ${note.chartName} - Not the creator`);
+                }
+            }
+
+            AppComponent.presentOkToast("Music successfully updated!");
+
+        } catch (error) {
+            AppComponent.presentWarningToast("Error updating music: " + error);
+            throw error;
+        }
+    }
+
+    async existsMusic(musicId: string): Promise<boolean> {
+        const docSnap = await getDoc(doc(this.db, this.MUSIC_COLLECTION, musicId))
+        return docSnap.exists();
     }
 
     async getMusic(documentId: string): Promise<MusicDto | null> {
@@ -120,11 +169,20 @@ export class MusicFirestoreService {
             querySnapshot.forEach(doc => {
                 notes.push(doc.data());
             });
+            console.log("Notes retrieved:", notes);
             return notes;
         } catch (error) {
-            console.error('Erreur lors de la récupération des notes :', error);
+            console.error('Error retrieving notes :', error);
             throw error;
         }
+    }
+
+    async getMusicWithNotes(musicId: string): Promise<MusicDto | null> {
+        const music = await this.getMusic(musicId);
+        if (music)
+            music.noteData = await this.getMusicNotes(musicId);
+
+        return music;
     }
 
 

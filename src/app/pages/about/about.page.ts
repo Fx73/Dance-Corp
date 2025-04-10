@@ -4,7 +4,7 @@ import { logoAngular, logoCss3, logoHtml5, logoIonic } from 'ionicons/icons';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HeaderComponent } from "../../shared/header/header.component";
+import { HeaderComponent } from "src/app/shared/component/header/header.component";
 import { addIcons } from 'ionicons';
 
 @Component({

@@ -1,0 +1,37 @@
+<app-header title="Browse Musics"></app-header>
+<ion-content fullscreen="false">
+  <div id="music-list">
+    <ion-searchbar [debounce]="1000" (ionInput)="onSearch($event)" show-clear-button="focus"
+      style="background-color:white"></ion-searchbar>
+    <div class="cardList">
+      <!-- Local storage Music or add music-->
+      <ion-card (click)="pickMusic()" class="basicCard selectedCard">
+        <ion-card-header *ngIf="storedMusic">
+          <ion-card-title>{{ storedMusic.title }}</ion-card-title>
+          <ion-card-subtitle>{{ storedMusic.artist }}</ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-header *ngIf="!storedMusic">
+          <ion-card-title>➕ Add Music</ion-card-title>
+        </ion-card-header>
+        <ion-card-content *ngIf="storedMusic" class="basicCardContent">
+          <ion-img [src]="'https://' + storedMusic.jacket"></ion-img>
+        </ion-card-content>
+        <i>- Locally stored music -</i>
+      </ion-card>
+
+      <!-- Music cards -->
+      <ion-card *ngFor="let music of musics" (click)="pickMusic(music)" class="basicCard">
+        <ion-img [src]="'https://'+music.jacket"></ion-img>
+        <ion-card-header>
+          <ion-card-title>{{ music.title }}</ion-card-title>
+          <ion-card-subtitle>{{ music.artist }}</ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content class="basicCardContent">
+        </ion-card-content>
+      </ion-card>
+    </div>
+    <ion-infinite-scroll (ionInfinite)="onIonInfinite($event)">
+      <ion-infinite-scroll-content></ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+  </div>
+</ion-content>

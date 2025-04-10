@@ -4,7 +4,7 @@ import { IonAvatar, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardTit
 import { AccountComponent } from "./account/account.component";
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HeaderComponent } from "../../shared/header/header.component";
+import { HeaderComponent } from "src/app/shared/component/header/header.component";
 import { LoginFireauthService } from 'src/app/services/firestore/login.fireauth.service';
 import { User } from 'firebase/auth';
 import { UserDto } from './user.dto';

@@ -6,7 +6,7 @@ import { Color } from 'src/app/game/constants/color';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GradeComponent } from "../../shared/component/grade/grade.component";
-import { HeaderComponent } from "src/app/shared/header/header.component";
+import { HeaderComponent } from "src/app/shared/component/header/header.component";
 import { MusicFirestoreService } from 'src/app/services/firestore/music.firestore.service';
 import { NoteDifficulty } from 'src/app/game/constants/note-difficulty.enum';
 import { Router } from '@angular/router';

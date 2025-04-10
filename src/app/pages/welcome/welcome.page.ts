@@ -3,7 +3,7 @@ import { IonBadge, IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSub
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HeaderComponent } from "../../shared/header/header.component";
+import { HeaderComponent } from "src/app/shared/component/header/header.component";
 import { LoginComponent } from "../../shared/user/login/login.component";
 import { RouterModule } from '@angular/router';
 import { UserDto } from '../user-profile/user.dto';

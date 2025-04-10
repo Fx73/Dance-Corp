@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { IonicModule, PopoverController } from '@ionic/angular';
 
 import { RouterModule } from '@angular/router';
-import { UserComponent } from '../user/user.component';
+import { UserComponent } from '../../user/user.component';
 
 @Component({
   selector: 'app-header',
