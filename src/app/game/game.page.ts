@@ -15,13 +15,14 @@ import { PlayerDisplayComponent } from "./gameDisplay/player-display.component";
 import { Router } from "@angular/router";
 import { UserConfigService } from "src/app/services/userconfig.service";
 import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.service';
+import { WaitingScreenComponent } from "./gameDisplay/waiting-screen/waiting-screen.component";
 
 @Component({
   selector: 'app-game',
   templateUrl: './game.page.html',
   styleUrls: ['./game.page.scss'],
   standalone: true,
-  imports: [IonCard, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, PlayerDisplayComponent, MusicPlayerYoutubeComponent, GameOverComponent]
+  imports: [IonCard, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, PlayerDisplayComponent, MusicPlayerYoutubeComponent, GameOverComponent, WaitingScreenComponent]
 })
 export class GamePage implements OnInit, OnDestroy, AfterViewInit {
   //#region App Constants
@@ -34,11 +35,15 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
   musicOrigin: MusicOrigin = MusicOrigin.Youtube
   backgroundUrl: string = "assets/Splash/Texture.png";
   private nextBgTime: number | null = null;
+  loadingMusic: boolean = true;
   //#endregion
 
 
+  @ViewChild(WaitingScreenComponent) waitingScreen!: WaitingScreenComponent;
+
   @ViewChildren(PlayerDisplayComponent) playerDisplaysQuery!: QueryList<PlayerDisplayComponent>;
   private playerDisplays: PlayerDisplayComponent[] = [];
+
 
   players: Player[] = [];
   gameRounds: GameRound[] = []
@@ -80,15 +85,21 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
   ngAfterViewInit() {
     this.playerDisplays = this.playerDisplaysQuery.toArray();
     if (this.musicPlayer)
-      this.startGame()
+      this.waitingScreen.startCountdown();
   }
 
   onPlayerReady(player: IMusicPlayer) {
     this.musicPlayer = player
     if (this.playerDisplays.length > 0)
-      this.startGame()
+      this.waitingScreen.startCountdown();
 
   }
+
+  handleCountdownFinished() {
+    this.loadingMusic = false;
+    this.startGame();
+  }
+
 
   ngOnDestroy(): void {
     if (this.gameLoopId !== null) {

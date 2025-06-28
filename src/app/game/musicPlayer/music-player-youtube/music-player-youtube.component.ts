@@ -32,10 +32,13 @@ export class MusicPlayerYoutubeComponent implements IMusicPlayer {
   constructor() { }
 
   onReadyInternal(event: any): void {
+    console.log('YouTube Player is ready');
     this.player.stopVideo();
-    console.log(event, 'Is Ready');
     this.onReady.emit(this);
+
   }
+
+
 
   play(): void {
     this.player.playVideo();
@@ -47,6 +50,10 @@ export class MusicPlayerYoutubeComponent implements IMusicPlayer {
 
   getCurrentTime(): number {
     return this.player.getCurrentTime();
+  }
+
+  setToTime(time: number): void {
+    this.player.seekTo(time, true);
   }
 
   public extractVideoId(url: string): string {

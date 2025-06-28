@@ -12,7 +12,8 @@
     <ion-item lines="inset">
       <ion-icon slot="start" name="star-outline" color="warning"></ion-icon>
       <ion-label>Score:</ion-label>
-      <ion-label slot="end" color="primary" style="font-size: 32px">{{ gameRound.score }} </ion-label>
+      <ion-label slot="end" color="primary" style="font-size: 32px">{{ gameRound.score | number:'1.0-0': 'fr'}}
+      </ion-label>
     </ion-item>
 
     <!-- Note (A, B, C, D, E) -->

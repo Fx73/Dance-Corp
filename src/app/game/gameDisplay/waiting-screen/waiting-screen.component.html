@@ -1,0 +1,15 @@
+<div class="loading-overlay">
+  <div class="song-info-card">
+    <img [src]="coverUrl" alt="Cover" />
+    <h2>{{ title }}</h2>
+    <h4>{{ artist }}</h4>
+    <p>Niveau : {{ level }}</p>
+
+    <ion-spinner name="bubbles"></ion-spinner>
+    <p *ngIf="countdown === null" class="loading-message">Loading music ...</p>
+    <div class="countdown" *ngIf="countdown !== null">
+      {{ countdown }}
+    </div>
+
+  </div>
+</div>
