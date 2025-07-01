@@ -61,7 +61,7 @@ export class MusicDto {
     delete tokenMap["cdtitle"];
     this.music = tokenMap["music"];
     delete tokenMap["music"];
-    this.offset = parseFloat(tokenMap["offset"]) ?? parseFloat(tokenMap["beat0OffsetInSeconds"]);
+    this.offset = tokenMap["offset"] ? parseFloat(tokenMap["offset"]) ?? parseFloat(tokenMap["beat0OffsetInSeconds"]) : undefined;
     delete tokenMap["offset"];
     delete tokenMap["beat0OffsetInSeconds"];
     this.sampleStart = parseFloat(tokenMap["samplestart"]);
@@ -74,7 +74,7 @@ export class MusicDto {
     delete tokenMap["delays"];
     this.warps = tokenMap["warps"];
     delete tokenMap["warps"];
-    this.bpms = this.parseChanges<BpmChange>(tokenMap["bpms"], v => parseFloat(v));
+    this.bpms = this.parseChanges<BpmChange>(tokenMap["bpms"], v => parseFloat(v))!;
     delete tokenMap["bpms"];
     this.bgChanges = this.parseChanges<TextChange>(tokenMap["bgchanges"], v => v);
     if (tokenMap["background"] && !this.bgChanges) {
@@ -97,8 +97,8 @@ export class MusicDto {
     this.additionalFields = { ...tokenMap };
   }
 
-  private parseChanges<ITimedChange>(token: string, parsefun: (value: string) => any): ITimedChange[] {
-    if (!token) return [];
+  private parseChanges<ITimedChange>(token: string, parsefun: (value: string) => any): ITimedChange[] | undefined {
+    if (!token) return undefined;
     const changes = token.split(',');
     const array: ITimedChange[] = []
     for (const change of changes) {

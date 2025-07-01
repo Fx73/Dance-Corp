@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, QueryList, Type, ViewChild, ViewChildren, input } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, OnDestroy, OnInit, QueryList, Type, ViewChild, ViewChildren, input } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { IMusicPlayer, MusicOrigin } from './musicPlayer/IMusicPlayer';
 import { IonButton, IonCard, IonContent, IonHeader, IonIcon, IonTitle, IonToolbar } from '@ionic/angular/standalone';
@@ -24,7 +24,7 @@ import { WaitingScreenComponent } from "./gameDisplay/waiting-screen/waiting-scr
   templateUrl: './game.page.html',
   styleUrls: ['./game.page.scss'],
   standalone: true,
-  imports: [IonCard, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, PlayerDisplayComponent, GameOverComponent, WaitingScreenComponent]
+  imports: [IonCard, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, PlayerDisplayComponent, GameOverComponent, WaitingScreenComponent, MusicPlayerYoutubeComponent, MusicPlayerSoundcloudComponent]
 })
 export class GamePage implements OnInit, OnDestroy, AfterViewInit {
   //#region App Constants
@@ -34,7 +34,7 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
   //#region Music
   music: MusicDto | null = null;
   musicPlayer!: IMusicPlayer;
-  musicOrigin: MusicOrigin = MusicOrigin.Youtube
+  musicOrigin: MusicOrigin | null = null
   backgroundUrl: string = "assets/Splash/Texture.png";
   private nextBgTime: number | null = null;
   loadingMusic: boolean = true;
@@ -46,8 +46,6 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
   @ViewChildren(PlayerDisplayComponent) playerDisplaysQuery!: QueryList<PlayerDisplayComponent>;
   private playerDisplays: PlayerDisplayComponent[] = [];
 
-  musicPlayerComponent: Type<IMusicPlayer> | undefined;
-
 
   players: Player[] = [];
   gameRounds: GameRound[] = []
@@ -56,7 +54,7 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
   private gameLoopId: number | null = null;
   zeroTimeStamp: number = 0;
 
-  constructor(private userConfigService: UserConfigService, private userFirestoreService: UserFirestoreService, private musicCacheService: MusicCacheService, private router: Router, private location: Location) { }
+  constructor(private cdr: ChangeDetectorRef, private userConfigService: UserConfigService, private userFirestoreService: UserFirestoreService, private musicCacheService: MusicCacheService, private router: Router, private location: Location) { }
 
 
   ngOnInit() {
@@ -71,13 +69,11 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
     }
 
     // Prepare Music Player
-    const musicOrigin = this.pickMusicPlayer(this.music!.music!)
-    if (musicOrigin == null) {
+    this.musicOrigin = this.pickMusicPlayer(this.music!.music!)
+    if (this.musicOrigin == null) {
       AppComponent.presentWarningToast("Error loading music in player !")
       return;
     }
-    this.musicOrigin = musicOrigin
-    this.musicPlayerComponent = this.resolveMusicPlayer(this.musicOrigin);
 
     // Cache init if allowed
     if (this.musicOriginAllowCache(this.musicOrigin) && this.userConfigService.getConfig()["allowCache"]) {
@@ -95,6 +91,7 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
     for (const player of this.players) {
       this.gameRounds.push(new GameRound(this.music, this.music.noteData[0], player, isTrainingMode))
     }
+    console.log("Game Rounds initialized:", this.gameRounds);
   }
 
   ngAfterViewInit() {
@@ -107,7 +104,7 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
     this.musicPlayer = player
     if (this.playerDisplays.length > 0)
       this.waitingScreen.startCountdown();
-
+    this.cdr.detectChanges();
   }
 
   handleCountdownFinished() {
@@ -177,17 +174,6 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
 
     return null;
   }
-  private resolveMusicPlayer(origin: MusicOrigin): Type<IMusicPlayer> {
-    switch (origin) {
-      case MusicOrigin.Youtube:
-        return MusicPlayerYoutubeComponent;
-      case MusicOrigin.Soundcloud:
-        return MusicPlayerSoundcloudComponent;
-      default:
-        throw new Error("Unsupported player");
-    }
-  }
-
 
   private musicOriginAllowCache(musicOrigin: MusicOrigin): boolean {
     switch (musicOrigin) {

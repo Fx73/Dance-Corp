@@ -30,7 +30,7 @@
     "@capacitor/status-bar": "7.0.0",
     "@ionic/angular": "^8.0.0",
     "@types/mocha": "^10.0.10",
-    "discord-rpc": "^4.0.1",
+    "ffmpeg-static": "^5.2.0",
     "firebase": "^11.4.0",
     "firebase-admin": "^13.2.0",
     "ionicons": "^7.0.0",

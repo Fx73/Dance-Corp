@@ -18,9 +18,12 @@
 
 	<ng-template #gameContent>
 		<app-player-display *ngFor="let gameRound of gameRounds" [gameRound]="gameRound"></app-player-display>
-		<ng-container *ngIf="musicPlayerComponent" [ngComponentOutlet]="musicPlayerComponent"></ng-container>
-		<!--app-music-player-youtube *ngIf="musicOrigin === MusicOrigin.Youtube" [musicUrl]="music!.music!"
-			(onReady)="onPlayerReady($event)"></app-music-player-youtube-->
+		<!-- Music Player -->
+		<app-music-player-youtube *ngIf="musicOrigin === MusicOrigin.Youtube" [musicUrl]="music?.music!"
+			(onReady)="onPlayerReady($event)"></app-music-player-youtube>
+		<app-music-player-soundcloud *ngIf="musicOrigin === MusicOrigin.Soundcloud" [musicUrl]="music?.music!"
+			(onReady)="onPlayerReady($event)"></app-music-player-soundcloud>
+
 	</ng-template>
 </ion-content>
 

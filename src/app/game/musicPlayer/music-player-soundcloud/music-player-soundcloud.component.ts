@@ -1,47 +1,58 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ViewChild,
+} from '@angular/core';
 
 import { IMusicPlayer } from '../IMusicPlayer';
+import { Soundcloud } from 'soundcloud.ts';
+
+declare var SC: any;
 
 @Component({
   selector: 'app-music-player-soundcloud',
   templateUrl: './music-player-soundcloud.component.html',
   styleUrls: ['./music-player-soundcloud.component.scss'],
+  standalone: true,
 })
-
-export class MusicPlayerSoundcloudComponent implements IMusicPlayer, OnInit, AfterViewInit {
-
+export class MusicPlayerSoundcloudComponent
+  implements IMusicPlayer, OnInit, AfterViewInit {
   @Input()
   musicUrl!: string;
   @Output()
   onReady: EventEmitter<IMusicPlayer> = new EventEmitter<IMusicPlayer>();
 
-  //readonly soundcloud = new Soundcloud()
+  readonly soundcloud = new Soundcloud();
 
-
+  widgetSC: any;
 
   async ngOnInit(): Promise<void> {
-    //const track = await this.soundcloud.tracks.get(this.musicUrl);
-    //console.log(track);
-
+    const iframe = document.getElementById('sc-player') as HTMLIFrameElement;
+    this.widgetSC = SC.Widget(iframe);
+    this.widgetSC.load(this.musicUrl);
+    this.widgetSC.bind(SC.Widget.Events.READY, () => this.onReady.emit(this));
   }
 
-  ngAfterViewInit() {
-
-  }
+  ngAfterViewInit() { }
 
   play() {
-
+    this.widgetSC.play();
   }
 
   stop() {
-
+    this.widgetSC.pause();
   }
 
   getCurrentTime(): number {
-    return 0
+    return 0;
   }
 
   setToTime(time: number): void {
-    throw new Error('Method not implemented.');
+    this.widgetSC.seekTo(time);
   }
 }

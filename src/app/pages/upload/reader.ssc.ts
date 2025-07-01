@@ -19,6 +19,7 @@ export class SccReader {
 
     console.log("Token Map:", tokenMap);
     const musicData = new MusicDto(tokenMap);
+    console.log("Parsed Music Data:", musicData);
     return musicData;
   }
 
