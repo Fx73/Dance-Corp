@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GameRound } from '../../game/gameModel/gameRound';
 import { HeaderComponent } from "src/app/shared/component/header/header.component";
+import { MusicCacheService } from './../../services/dataCache/music.cache.service';
 import { PlayerDisplayComponent } from '../../game/gameDisplay/player-display.component';
 import { RouterModule } from '@angular/router';
 import { UserConfigService } from 'src/app/services/userconfig.service';
@@ -22,7 +23,11 @@ export class OptionsPage {
   @ViewChild(PlayerDisplayComponent) playerDisplay?: PlayerDisplayComponent;
   showPlayerDisplay = false;
 
-  constructor(private userConfigService: UserConfigService) {
+  constructor(private userConfigService: UserConfigService, private musicCacheService: MusicCacheService) {
+    // Initialize player display if needed
+    if (this.userConfigService.getConfig()['showPlayerDisplay']) {
+      this.showPlayerDisplay = true;
+    }
   }
 
   pinFormatter(value: number) {
@@ -67,6 +72,8 @@ export class OptionsPage {
     this.userConfigService.resetToDefault();
     location.reload();
   }
-
+  clearMusicCache() {
+    this.musicCacheService.clearCache();
+  }
 
 }

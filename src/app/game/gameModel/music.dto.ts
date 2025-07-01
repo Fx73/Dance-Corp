@@ -98,6 +98,7 @@ export class MusicDto {
   }
 
   private parseChanges<ITimedChange>(token: string, parsefun: (value: string) => any): ITimedChange[] {
+    if (!token) return [];
     const changes = token.split(',');
     const array: ITimedChange[] = []
     for (const change of changes) {
@@ -110,6 +111,13 @@ export class MusicDto {
     return array;
   }
 
+  static fromJSON(obj: any): MusicDto {
+    const instance = Object.assign(new MusicDto(), obj);
+    instance.noteData = Array.isArray(obj.noteData)
+      ? obj.noteData.map((n: Record<string, string> | undefined) => new NoteDataDto(n))
+      : [];
+    return instance;
+  }
 }
 
 

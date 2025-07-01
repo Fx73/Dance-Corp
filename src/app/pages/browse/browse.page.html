@@ -12,6 +12,8 @@
           <ion-card *ngFor="let note of notes" class="note-card" (click)="runGame(note)"
             [style.backgroundColor]="getNoteColor(note.difficulty)">
             <ion-card-content>
+              <ion-img *ngIf="!isSinglePlayer" class="player-number-icon"
+                [src]="note.stepsType === DanceType.DanceSingle ? 'assets/Icons/SingleDance.png' : 'assets/Icons/DoubleDance.png'"></ion-img>
               <div class="difficulty">
                 {{ note.difficulty }}
               </div>

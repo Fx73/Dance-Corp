@@ -1,9 +1,3 @@
-<youtube-player
-  #musicPlayer
-  [videoId]="extractVideoId(videoId)"
-  (ready)="onReadyInternal($event)"
-  [playerVars]="playerConfig"
-  width="1"
-  height="1"
->
+<youtube-player #musicPlayer [videoId]="extractVideoId(musicUrl)" (ready)="onReadyInternal($event)"
+  [playerVars]="playerConfig" width="1" height="1">
 </youtube-player>

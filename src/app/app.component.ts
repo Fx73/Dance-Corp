@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 
 import { DiscordSDK } from '@discord/embedded-app-sdk';
-import { DiscordService } from './services/discord.service';
 import { ToastController } from '@ionic/angular';
 
 @Component({
@@ -15,7 +14,7 @@ export class AppComponent implements OnInit {
   static appInstance: AppComponent;
   static discordSdk: DiscordSDK;
 
-  constructor(private toastController: ToastController, private discordService: DiscordService) {
+  constructor(private toastController: ToastController) {
     AppComponent.appInstance = this;
   }
 

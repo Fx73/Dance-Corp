@@ -23,7 +23,7 @@ export class MusicPlayerYoutubeComponent implements IMusicPlayer {
   };
 
   @Input()
-  videoId!: string;
+  musicUrl!: string;
   @Output()
   onReady: EventEmitter<IMusicPlayer> = new EventEmitter<IMusicPlayer>();
 

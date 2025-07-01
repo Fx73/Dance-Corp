@@ -2,6 +2,7 @@ import { Firestore, addDoc, collection, doc, getDoc, getDocs, getFirestore, limi
 import { MusicDto, NoteDataDto } from '../../game/gameModel/music.dto';
 
 import { AppComponent } from 'src/app/app.component';
+import { DanceType } from 'src/app/game/constants/dance-type.enum';
 import { FirestoreConverter } from './firestore.converter';
 import { Injectable } from '@angular/core';
 import { UserFirestoreService } from './user.firestore.service';
@@ -129,7 +130,7 @@ export class MusicFirestoreService {
         querySnapshot.forEach((doc) => {
             musics.push(doc.data());
         });
-
+        console.log("Musics retrieved:", musics);
         return musics;
     }
 
@@ -159,7 +160,7 @@ export class MusicFirestoreService {
     }
 
 
-    async getMusicNotes(musicId: string): Promise<NoteDataDto[]> {
+    async getMusicNotes(musicId: string, onlySingle: boolean = false): Promise<NoteDataDto[]> {
         try {
             const notesCollectionRef = collection(this.db, this.MUSIC_COLLECTION + "/" + musicId + "/" + this.NOTE_COLLECTION).withConverter(this.firestoreConverterNotes);
             const q = query(notesCollectionRef, orderBy('meter'));
@@ -167,7 +168,8 @@ export class MusicFirestoreService {
 
             const notes: NoteDataDto[] = [];
             querySnapshot.forEach(doc => {
-                notes.push(doc.data());
+                if (!onlySingle || doc.data().stepsType === DanceType.DanceSingle)
+                    notes.push(doc.data());
             });
             console.log("Notes retrieved:", notes);
             return notes;

@@ -17,18 +17,21 @@ export class SccReader {
       throw new Error('Unsupported file format');
     }
 
+    console.log("Token Map:", tokenMap);
     const musicData = new MusicDto(tokenMap);
     return musicData;
   }
 
 
   static tokenizeCommon(content: string): string[] {
-    // Supprimer les commentaires de type //
+    // Remove https:// 
+    content = content.replace(/https?:\/\//g, '');
+    // Remove single-line comments //
     content = content.replace(/\/\/.*$/gm, '');
-    // Supprimer les commentaires de type /* */
+    // Remove multi-line comments /* */
     content = content.replace(/\/\*[\s\S]*?\*\//g, '');
 
-    // Découper le contenu en tokens avec le symbole #
+    // Split the content into tokens using the # symbol
     const tokens = content.split('#').map(token => token.trim()).filter(token => token.length > 0);
     return tokens;
   }

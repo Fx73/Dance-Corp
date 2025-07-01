@@ -64,7 +64,7 @@
     </ion-card>
 
     <!-- Reset Card-->
-    <ion-card class="base-card">
+    <ion-card class="base-card danger-card">
       <ion-card-header>
         <ion-card-title>Reset Configuration</ion-card-title>
         <ion-card-subtitle>This will reset all settings to their default values and clear all preferences
@@ -76,6 +76,32 @@
         </ion-button>
       </ion-card-content>
     </ion-card>
+
+    <!-- Music Cache Settings Card -->
+    <ion-card class="base-card danger-card">
+      <ion-card-header>
+        <ion-card-title>Music Storage</ion-card-title>
+        <ion-card-subtitle>
+          Manage local storage of song data. Disabling can reduce storage but may cause slower loading and prevent
+          you from accessing the app offline.
+        </ion-card-subtitle>
+      </ion-card-header>
+
+      <!-- Music Cache Options -->
+      <ion-card-content>
+        <ion-item>
+          <ion-toggle [checked]="this.getConfigValue('allowCache')"
+            (ionChange)="updateConfigValue('allowCache', $event.detail.checked)"
+            helperText="Disabling will not clear existing cache">
+            Enable Cache
+          </ion-toggle>
+        </ion-item>
+        <ion-button expand="block" color="danger" (click)="clearMusicCache()">
+          Clear All Stored Songs
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+
 
   </div>
   <ion-modal [isOpen]="showPlayerDisplay" (didPresent)="this.playerDisplay?.Update()">

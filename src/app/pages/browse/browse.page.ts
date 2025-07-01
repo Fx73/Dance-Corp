@@ -4,12 +4,15 @@ import { MusicDto, NoteDataDto } from 'src/app/game/gameModel/music.dto';
 
 import { Color } from 'src/app/game/constants/color';
 import { CommonModule } from '@angular/common';
+import { DanceType } from 'src/app/game/constants/dance-type.enum';
 import { FormsModule } from '@angular/forms';
 import { GradeComponent } from "../../shared/component/grade/grade.component";
 import { HeaderComponent } from "src/app/shared/component/header/header.component";
+import { MusicCacheService } from './../../services/dataCache/music.cache.service';
 import { MusicFirestoreService } from 'src/app/services/firestore/music.firestore.service';
 import { NoteDifficulty } from 'src/app/game/constants/note-difficulty.enum';
 import { Router } from '@angular/router';
+import { UserConfigService } from 'src/app/services/userconfig.service';
 import { UserFirestoreService } from './../../services/firestore/user.firestore.service';
 
 @Component({
@@ -20,6 +23,7 @@ import { UserFirestoreService } from './../../services/firestore/user.firestore.
   imports: [IonSplitPane, IonCardSubtitle, IonMenu, IonText, IonCardContent, IonCardTitle, IonInfiniteScrollContent, IonImg, IonInfiniteScroll, IonSearchbar, IonCard, IonCardHeader, IonContent, CommonModule, FormsModule, HeaderComponent, GradeComponent]
 })
 export class BrowsePage implements OnInit {
+  readonly DanceType = DanceType;
 
   musics: MusicDto[] = [];
   notes: NoteDataDto[] | undefined;
@@ -27,11 +31,13 @@ export class BrowsePage implements OnInit {
   selectedMusic: MusicDto | null = null;
   searchQuery: string = '';
 
+  isSinglePlayer: boolean = true;
 
-  constructor(private router: Router, private fireStoreService: MusicFirestoreService, private userFirestoreService: UserFirestoreService) { }
+  constructor(private router: Router, private fireStoreService: MusicFirestoreService, private musicCacheService: MusicCacheService, private userFirestoreService: UserFirestoreService, private userConfigService: UserConfigService) { }
 
   ngOnInit() {
     this.fireStoreService.GetAllMusics(null).then(value => this.musics = value);
+    this.isSinglePlayer = this.userConfigService.players.length === 1;
   }
 
   runGame(note: NoteDataDto): void {
@@ -54,7 +60,7 @@ export class BrowsePage implements OnInit {
       return;
     }
     this.selectedMusic = music;
-    this.fireStoreService.getMusicNotes(music.id).then(n => this.notes = n)
+    this.musicCacheService.getMusicNotes(music.id, this.isSinglePlayer).then(n => this.notes = n)
     if (this.userFirestoreService.getUserData())
       this.userFirestoreService.getScoresForMusic(this.selectedMusic.id, this.userFirestoreService.getUserData()!.id).then(score => this.userScores = score)
   }
