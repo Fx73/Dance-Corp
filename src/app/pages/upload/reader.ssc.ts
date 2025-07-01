@@ -32,7 +32,14 @@ export class SccReader {
     content = content.replace(/\/\*[\s\S]*?\*\//g, '');
 
     // Split the content into tokens using the # symbol
-    const tokens = content.split('#').map(token => token.trim()).filter(token => token.length > 0);
+    const tokenRegex = /#([\s\S]*?);/g;
+    const tokens: string[] = [];
+
+    let match;
+    while ((match = tokenRegex.exec(content)) !== null) {
+      const innerToken = match[1].trim();
+      tokens.push(innerToken);
+    }
     return tokens;
   }
 
