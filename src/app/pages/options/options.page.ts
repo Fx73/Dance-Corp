@@ -3,6 +3,7 @@ import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, Ion
 
 import { Arrow } from '../../game/gameModel/arrow';
 import { ArrowType } from '../../game/constants/arrow-type.enum';
+import { BrowseUploadPage } from '../browse-upload/browse-upload.page';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GameRound } from '../../game/gameModel/gameRound';
@@ -75,5 +76,8 @@ export class OptionsPage {
   clearMusicCache() {
     this.musicCacheService.clearCache();
   }
+  clearMusicEditCache() {
+    BrowseUploadPage.clearEditRegistry()
 
+  }
 }

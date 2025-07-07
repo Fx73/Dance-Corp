@@ -3,6 +3,8 @@
 	<ion-card *ngIf="musicData == null" class="base-card">
 		<ion-card-header>
 			<ion-card-title> Select a .sm, .ssc, or .essc File </ion-card-title>
+			<ion-card-subtitle><i> Make sure artist is perfect in your file, you will not be able to edit it later.
+					Title, BPM, offset and music link will be locked after first upload.</i> </ion-card-subtitle>
 		</ion-card-header>
 		<ion-card-content class="flex-align-horizontal">
 			<input (change)="onFileSelected($event)" type="file" accept=".sm,.ssc,.essc">
@@ -20,95 +22,99 @@
 					</ion-card-header>
 					<ion-card-content>
 						<ion-list lines="none" class="datalist">
-							<ion-item>
-								<ion-input label="Title" [(ngModel)]="musicData.title"
-									[disabled]="!isEditing"></ion-input>
+							<ion-item [disabled]="this.isEditDB">
+								<ion-input label="Title" [(ngModel)]="musicData.title" (ionChange)="onEndEditing()"
+									[disabled]="isEditProtected"></ion-input>
 							</ion-item>
 
-							<ion-item>
+							<ion-item [title]="dbMusicData?.titletranslit"
+								[class.changed]="isMusicChanged('titletranslit')">
 								<ion-input label="Title (Translit)" [(ngModel)]="musicData.titletranslit"
-									[disabled]="!isEditing"></ion-input>
+									(ionChange)="onEndEditing()" [disabled]="isEditProtected"></ion-input>
 							</ion-item>
 
-							<ion-item>
+							<ion-item [title]="dbMusicData?.subtitle" [class.changed]="isMusicChanged('subtitle')">
 								<ion-input label="Subtitle" [(ngModel)]="musicData.subtitle"
-									[disabled]="!isEditing"></ion-input>
+									(ionChange)="onEndEditing()" [disabled]="isEditProtected"></ion-input>
 							</ion-item>
 
-							<ion-item>
+							<ion-item [title]="dbMusicData?.subtitletranslit"
+								[class.changed]="isMusicChanged('subtitletranslit')">
 								<ion-input label="Subtitle (Translit)" [(ngModel)]="musicData.subtitletranslit"
-									[disabled]="!isEditing"></ion-input>
+									(ionChange)="onEndEditing()" [disabled]="isEditProtected"></ion-input>
 							</ion-item>
 
 							<ion-item>
-								<ion-input label="Artist" [(ngModel)]="musicData.artist"
-									[disabled]="!isEditing"></ion-input>
+								<ion-input label="Artist" [value]="musicData.artist" disabled></ion-input>
 							</ion-item>
 
-							<ion-item>
+							<ion-item [title]="dbMusicData?.artisttranslit"
+								[class.changed]="isMusicChanged('artisttranslit')">
 								<ion-input label="Artist (Translit)" [(ngModel)]="musicData.artisttranslit"
-									[disabled]="!isEditing"></ion-input>
+									(ionChange)="onEndEditing()" [disabled]="isEditProtected"></ion-input>
 							</ion-item>
 
-							<ion-item>
-								<ion-input label="Genre" [(ngModel)]="musicData.genre"
-									[disabled]="!isEditing"></ion-input>
+							<ion-item [title]="dbMusicData?.genre" [class.changed]="isMusicChanged('genre')">
+								<ion-input label="Genre" [(ngModel)]="musicData.genre" (ionChange)="onEndEditing()"
+									[disabled]="isEditProtected"></ion-input>
 							</ion-item>
 
-							<ion-item>
-								<ion-input label="Credit" [(ngModel)]="musicData.credit"
-									[disabled]="!isEditing"></ion-input>
+							<ion-item [title]="dbMusicData?.credit" [class.changed]="isMusicChanged('credit')">
+								<ion-input label="Credit" [(ngModel)]="musicData.credit" (ionChange)="onEndEditing()"
+									[disabled]="isEditProtected"></ion-input>
 							</ion-item>
 
-							<ion-item>
-								<ion-input label="Banner" [(ngModel)]="musicData.banner"
-									[disabled]="!isEditing"></ion-input>
+							<ion-item [title]="dbMusicData?.banner" [class.changed]="isMusicChanged('banner')">
+								<ion-input label="Banner" [(ngModel)]="musicData.banner" (ionChange)="onEndEditing()"
+									[disabled]="isEditProtected"></ion-input>
 							</ion-item>
 
-							<ion-item>
-								<ion-input label="Jacket" [(ngModel)]="musicData.jacket"
-									[disabled]="!isEditing"></ion-input>
+							<ion-item [title]="dbMusicData?.jacket" [class.changed]="isMusicChanged('jacket')">
+								<ion-input label="Jacket" [(ngModel)]="musicData.jacket" (ionChange)="onEndEditing()"
+									[disabled]="isEditProtected"></ion-input>
 							</ion-item>
 
-							<ion-item>
-								<ion-input label="CD Title" [(ngModel)]="musicData.cdTitle"
-									[disabled]="!isEditing"></ion-input>
+							<ion-item [title]="dbMusicData?.cdTitle" [class.changed]="isMusicChanged('cdTitle')">
+								<ion-input label="CD Title" [(ngModel)]="musicData.cdTitle" (ionChange)="onEndEditing()"
+									[disabled]="isEditProtected"></ion-input>
 							</ion-item>
 
-							<ion-item [disabled]="this.isLockedDB">
-								<ion-input label="Music" [(ngModel)]="musicData.music"
-									[disabled]="!isEditing"></ion-input>
+							<ion-item [disabled]="this.isEditDB">
+								<ion-input label="Music" [(ngModel)]="musicData.music" (ionChange)="onEndEditing()"
+									[disabled]="isEditProtected"></ion-input>
 							</ion-item>
 
-							<ion-item [disabled]="this.isLockedDB">
+							<ion-item [disabled]="this.isEditDB">
 								<ion-input label="Beat 0 Offset (seconds)" type="number" [(ngModel)]="musicData.offset"
-									[disabled]="!isEditing"></ion-input>
+									(ionChange)="onEndEditing()" [disabled]="isEditProtected"></ion-input>
 							</ion-item>
 
-							<ion-item>
+							<ion-item [title]="dbMusicData?.sampleStart"
+								[class.changed]="isMusicChanged('sampleStart')">
 								<ion-input label="Sample Start" type="number" [(ngModel)]="musicData.sampleStart"
-									[disabled]="!isEditing"></ion-input>
+									(ionChange)="onEndEditing()" [disabled]="isEditProtected"></ion-input>
 							</ion-item>
 
-							<ion-item>
+							<ion-item [title]="dbMusicData?.sampleLength"
+								[class.changed]="isMusicChanged('sampleLength')">
 								<ion-input label="Sample Length" type="number" [(ngModel)]="musicData.sampleLength"
-									[disabled]="!isEditing"></ion-input>
+									(ionChange)="onEndEditing()" [disabled]="isEditProtected"></ion-input>
 							</ion-item>
 
-							<ion-item [disabled]="this.isLockedDB">
+							<ion-item [disabled]="this.isEditDB">
 								<ion-label>Bpms</ion-label>
 								<ion-list *ngIf="musicData.bpms">
 									<ion-item *ngFor="let bpm of musicData.bpms; let i = index">
 										<ion-input label="Time (s)" type="number" [(ngModel)]="bpm.time"
-											[disabled]="!isEditing"></ion-input>
+											[disabled]="isEditProtected"></ion-input>
 										<ion-input label="BPM" type="number" [(ngModel)]="bpm.value"
-											[disabled]="!isEditing"></ion-input>
-										<ion-button *ngIf="isEditing" color="danger" [disabled]="!isEditing"
+											[disabled]="isEditProtected"></ion-input>
+										<ion-button *ngIf="isEditProtected" color="danger" [disabled]="isEditProtected"
 											(click)="musicData.bpms.splice(i, 1);">
 											<ion-icon slot="icon-only" name="remove-outline"></ion-icon>
 										</ion-button>
 									</ion-item>
-									<ion-item *ngIf="isEditing">
+									<ion-item *ngIf="isEditProtected">
 										<ion-button color="success" size="small"
 											(click)="musicData.bpms.push({ time: 0, value: 120 })">
 											<ion-icon slot="icon-only" name="add-outline"></ion-icon>
@@ -117,20 +123,22 @@
 								</ion-list>
 							</ion-item>
 
-							<ion-item>
+							<ion-item [title]="dbMusicData?.bgChanges?.length + ' items'"
+								[class.changed]="isMusicChanged('bgChanges')">
 								<ion-label>Backgrounds</ion-label>
 								<ion-list *ngIf="musicData.bgChanges">
-									<ion-item *ngFor="let bgChange of musicData.bgChanges; let i = index">
+									<ion-item *ngFor="let bgChange of musicData.bgChanges; let i = index"
+										[title]="dbMusicData?.bgChanges?.[i]?.time + ':' + dbMusicData?.bgChanges?.[i]?.value">
 										<ion-input label="Time (s)" type="number" [(ngModel)]="bgChange.time"
-											[disabled]="!isEditing"></ion-input>
+											[disabled]="isEditProtected"></ion-input>
 										<ion-input label="Background" [(ngModel)]="bgChange.value"
-											[disabled]="!isEditing"></ion-input>
-										<ion-button *ngIf="isEditing" color="danger" [disabled]="!isEditing"
+											[disabled]="isEditProtected"></ion-input>
+										<ion-button *ngIf="isEditProtected" color="danger" [disabled]="isEditProtected"
 											(click)="musicData.bgChanges.splice(i, 1);">
 											<ion-icon slot="icon-only" name="remove-outline"></ion-icon>
 										</ion-button>
 									</ion-item>
-									<ion-item *ngIf="isEditing">
+									<ion-item *ngIf="isEditProtected">
 										<ion-button color="success" size="small"
 											(click)="musicData.bgChanges.push({ time: 0, value: '' })">
 											<ion-icon slot="icon-only" name="add-outline"></ion-icon>
@@ -139,20 +147,22 @@
 								</ion-list>
 							</ion-item>
 
-							<ion-item>
+							<ion-item [class.changed]="isMusicChanged('labels')"
+								[title]="dbMusicData?.labels?.length + ' items'">
 								<ion-label>Labels</ion-label>
 								<ion-list *ngIf="musicData.labels">
-									<ion-item *ngFor="let label of musicData.labels; let i = index">
+									<ion-item *ngFor="let label of musicData.labels; let i = index"
+										[title]="dbMusicData?.labels?.[i]?.time + ':' + dbMusicData?.labels?.[i]?.value">
 										<ion-input label="Time (s)" type="number" [(ngModel)]="label.time"
-											[disabled]="!isEditing"></ion-input>
+											[disabled]="isEditProtected"></ion-input>
 										<ion-input label="Text" [(ngModel)]="label.value"
-											[disabled]="!isEditing"></ion-input>
-										<ion-button *ngIf="isEditing" color="danger" [disabled]="!isEditing"
+											[disabled]="isEditProtected"></ion-input>
+										<ion-button *ngIf="isEditProtected" color="danger" [disabled]="isEditProtected"
 											(click)="musicData.labels.splice(i, 1);">
 											<ion-icon slot="icon-only" name="remove-outline"></ion-icon>
 										</ion-button>
 									</ion-item>
-									<ion-item *ngIf="isEditing">
+									<ion-item *ngIf="isEditProtected">
 										<ion-button color="success" size="small"
 											(click)="musicData.labels.push({ time: 0, value: '' })">
 											<ion-icon slot="icon-only" name="add-outline"></ion-icon>
@@ -176,39 +186,51 @@
 						</p>
 					</ion-card-content>
 				</ion-card>
+				<ion-card class="base-card">
+					<ion-card-header>
+						<ion-card-title>Background previews</ion-card-title>
+					</ion-card-header>
+					<ion-card-content>
+						<ion-item *ngFor="let bgChange of musicData.bgChanges; let i = index">
+							<ion-label position="stacked"> Background at {{bgChange.time}} </ion-label>
+							<ion-img [src]="'https://'+bgChange.value" class="preview-image" />
+						</ion-item>
+					</ion-card-content>
+				</ion-card>
 			</ion-col>
 
 			<ion-col>
 				<!-- Buttons card-->
 				<ion-card class="base-card btn-action-card">
 					<ion-card-content>
-						<ion-button color="success" (click)="toggleEdit()" expand="block">
-							{{ isEditing ? 'Save' : 'Edit music' }}
-						</ion-button>
-						<ion-button (click)="Upload()" [disabled]="isEditing" expand="block">
+						<ion-button (click)="uploadMusic()" [disabled]="isEditProtected || !isMusicDirty()"
+							expand="block">
 							{{ isEditDB ? 'Update music' : 'Upload music'}}</ion-button>
-						<ion-button (click)="exportEssc()" [disabled]="isEditing" size="small">
+						<ion-button *ngIf="isEditDB" (click)="uploadAllNotes()"
+							[disabled]="isEditProtected || !isAnyNoteDirty()" expand="block">
+							Upload All notes </ion-button>
+						<ion-button *ngIf="isEditDB && noNotes()" color="danger" (click)="deleteMusic()"
+							[disabled]="isEditProtected" expand="block"> Delete
+							Music </ion-button>
+						<ion-button (click)="exportEssc()" [disabled]="isEditProtected" size="small">
 							Export Essc
-						</ion-button>
-						<ion-button color="danger" (click)="deleteFile()" size="small">
-							<ion-icon slot="icon-only" name="trash-outline"></ion-icon>
 						</ion-button>
 					</ion-card-content>
 				</ion-card>
-
+				<ion-card *ngIf="isMusicDirty() || isAnyNoteDirty()" class="base-card danger-card">
+					<ion-button color="danger" (click)="deleteFile()" size="small" expand="block">
+						<ion-icon slot="icon-only" name="trash-outline"></ion-icon>Remove music from local edit
+					</ion-button>
+				</ion-card>
 				<!-- Image Preview Card -->
 				<ion-card class="base-card">
 					<ion-card-header>
-						<ion-card-title>Image previews</ion-card-title>
+						<ion-card-title>Jacket preview</ion-card-title>
 					</ion-card-header>
 					<ion-card-content>
 						<ion-item>
 							<ion-label position="stacked"> Jacket </ion-label>
-							<ion-img label="Hello" [src]="'https://'+musicData.jacket" class="preview-image" />
-						</ion-item>
-						<ion-item *ngFor="let bgChange of musicData.bgChanges; let i = index">
-							<ion-label position="stacked"> Background at {{bgChange.time}} </ion-label>
-							<ion-img label="Hello" [src]="'https://'+bgChange.value" class="preview-image" />
+							<ion-img [src]="'https://'+musicData.jacket" class="preview-image" />
 						</ion-item>
 					</ion-card-content>
 				</ion-card>
@@ -216,17 +238,15 @@
 					<ion-card-header>
 						<ion-card-title>Music preview</ion-card-title>
 					</ion-card-header>
-					<ion-card-content>
-						<ion-item>
-							<ion-label position="stacked">Music</ion-label>
-							<ion-icon *ngIf="" name="checkmark-circle" color="success"></ion-icon>
-							<ion-icon *ngIf="" name="close-circle" color="danger"></ion-icon>
-						</ion-item>
+					<ion-card-content style="max-width: 30vw;">
+						<app-music-player-youtube *ngIf="isMusicOriginYt()"
+							[musicUrl]="musicData.music!"></app-music-player-youtube>
+						<app-music-player-soundcloud *ngIf="isMusicOriginSc()"
+							[musicUrl]="musicData.music!"></app-music-player-soundcloud>
 					</ion-card-content>
 				</ion-card>
 			</ion-col>
 		</ion-row>
-
 		<ion-row>
 			<ion-col>
 				<!-- Notes Data Card -->
@@ -235,73 +255,89 @@
 						<ion-card-title>Notes Data</ion-card-title>
 					</ion-card-header>
 					<ion-card-content class="card-grid">
-						<ion-card *ngFor="let notes of musicData.noteData">
+						<ion-card *ngFor="let note of musicData.noteData" [disabled]="!isNoteMine(note)">
+							@let noteDb = getDbNote(note.chartName);
 							<ion-card-header>
 								<ion-card-title>
-									<ion-input [(ngModel)]="notes.chartName" [disabled]="!isEditing"></ion-input>
+									<ion-input [(ngModel)]="note.chartName" [disabled]="isEditProtected"></ion-input>
 								</ion-card-title>
 							</ion-card-header>
 							<ion-card-content>
 								<ion-list>
-									<ion-item>
-										<ion-select label="Dance Type" [(ngModel)]="notes.stepsType"
-											[disabled]="!isEditing">
+									<ion-item [title]="noteDb?.stepsType">
+										<ion-select label="Dance Type" [(ngModel)]="note.stepsType"
+											[disabled]="isEditProtected">
 											<ion-select-option *ngFor="let type of DanceTypeList" [value]="type">
 												{{ type }}
 											</ion-select-option>
 										</ion-select>
 									</ion-item>
 
-									<ion-item>
-										<ion-input label="Description" [(ngModel)]="notes.description"
-											[disabled]="!isEditing"></ion-input>
+									<ion-item [title]="noteDb?.description">
+										<ion-input label="Description" [(ngModel)]="note.description"
+											[disabled]="isEditProtected"></ion-input>
 									</ion-item>
 
-									<ion-item>
-										<ion-select label="Difficulty" [(ngModel)]="notes.difficulty"
-											[disabled]="!isEditing">
+									<ion-item [title]="noteDb?.difficulty">
+										<ion-select label="Difficulty" [(ngModel)]="note.difficulty"
+											[disabled]="isEditProtected">
 											<ion-select-option *ngFor="let level of NoteDifficultyList" [value]="level">
 												{{ level }}
 											</ion-select-option>
 										</ion-select>
 									</ion-item>
 
-									<ion-item>
-										<ion-input label="Meter" type="number" [(ngModel)]="notes.meter"
-											[disabled]="!isEditing"></ion-input>
+									<ion-item [title]="noteDb?.meter">
+										<ion-input label="Meter" type="number" [(ngModel)]="note.meter"
+											[disabled]="isEditProtected"></ion-input>
 									</ion-item>
 
-									<ion-item>
-										<ion-input label="Credit" [(ngModel)]="notes.credit"
-											[disabled]="!isEditing"></ion-input>
+									<ion-item [title]="noteDb?.credit">
+										<ion-input label="Credit" [(ngModel)]="note.credit"
+											[disabled]="isEditProtected"></ion-input>
 									</ion-item>
 
-									<ion-item>
-										<ion-input label="Creation Date" type="date" [(ngModel)]="notes.creationDate"
-											[disabled]="!isEditing"></ion-input>
+									<ion-item [title]="noteDb?.creationDate">
+										<ion-input label="Creation Date" type="date" [(ngModel)]="note.creationDate"
+											[disabled]="isEditProtected"></ion-input>
 									</ion-item>
 								</ion-list>
 								<p>
 									<strong>Total Measures:</strong>
-									{{ notes.stepChart.length }}
+									{{ note.stepChart.length }}
 								</p>
 								<p>
 									<strong>Tap:</strong>
-									{{ getStepCount(notes.stepChart, 1) }}
+									{{ getStepCount(note.stepChart, 1) }}
 								</p>
 								<p>
 									<strong>Hold:</strong>
-									{{ getStepCount(notes.stepChart, 2) }}
+									{{ getStepCount(note.stepChart, 2) }}
 								</p>
 								<p>
 									<strong>Roll:</strong>
-									{{ getStepCount(notes.stepChart, 4) }}
+									{{ getStepCount(note.stepChart, 4) }}
 								</p>
 								<p>
 									<strong>Mine:</strong>
-									{{ getStepCount(notes.stepChart, 5) }}
+									{{ getStepCount(note.stepChart, 5) }}
 								</p>
 							</ion-card-content>
+							<!-- Notes Buttons card-->
+							<ion-card *ngIf="isNoteMine(note)" class="base-card btn-action-card">
+								<ion-card-content>
+									<ion-button (click)="TestNote(note)" color="tertiary" size="small" expand="block">
+										Test </ion-button>
+									<ion-button (click)="uploadNote(note)" size="small"
+										[color]="isNoteInDb(note)?'primary':'success'" expand="block"
+										[disabled]="isEditProtected || (isNoteInDb(note) && !isNoteDirty(note))">
+										{{ isNoteInDb(note) ? 'Update notes' : 'Upload notes'}}</ion-button>
+									<ion-button (click)="deleteNote(note)" color="danger" size="small" expand="block"
+										[disabled]="isEditProtected"> {{ isNoteInDb(note) ? 'Delete from database' :
+										'Remove
+										notes'}} </ion-button>
+								</ion-card-content>
+							</ion-card>
 						</ion-card>
 					</ion-card-content>
 				</ion-card>

@@ -22,3 +22,8 @@ input[type="file"] {
     color: var(--ion-color-primary);
 }
 }
+
+ion-item.changed {
+  border-left: 3px solid #f57c00;
+  background: #fff7f0;
+}

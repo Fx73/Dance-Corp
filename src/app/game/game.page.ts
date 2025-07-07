@@ -1,6 +1,6 @@
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, OnDestroy, OnInit, QueryList, Type, ViewChild, ViewChildren, input } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import { IMusicPlayer, MusicOrigin } from './musicPlayer/IMusicPlayer';
+import { IMusicPlayer, MusicOrigin, MusicPlayerCommon } from './musicPlayer/IMusicPlayer';
 import { IonButton, IonCard, IonContent, IonHeader, IonIcon, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { MusicDto, NoteDataDto } from './gameModel/music.dto';
 
@@ -69,15 +69,15 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
     }
 
     // Prepare Music Player
-    this.musicOrigin = this.pickMusicPlayer(this.music!.music!)
+    this.musicOrigin = MusicPlayerCommon.pickMusicPlayer(this.music!.music!)
     if (this.musicOrigin == null) {
       AppComponent.presentWarningToast("Error loading music in player !")
       return;
     }
 
     // Cache init if allowed
-    if (this.musicOriginAllowCache(this.musicOrigin) && this.userConfigService.getConfig()["allowCache"]) {
-      this.musicCacheService.addMusicToCache(this.music!)
+    if (MusicPlayerCommon.musicOriginAllowCache(this.musicOrigin) && this.userConfigService.getConfig()["allowCache"]) {
+      //this.musicCacheService.addMusicToCache(this.music!)
     }
 
 
@@ -161,38 +161,6 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
     for (const gameRound of this.gameRounds)
       this.userFirestoreService.updateUserStatsFromRound(this.music!.id, this.music?.noteData[0].chartName!, gameRound)
   }
-
-  //#region Music Player
-  private pickMusicPlayer(uri: string): MusicOrigin | null {
-    if (!uri) return null;
-
-    if (uri.includes("youtube") || uri.includes("youtu.be"))
-      return MusicOrigin.Youtube;
-
-    if (uri.includes("soundcloud.com"))
-      return MusicOrigin.Soundcloud;
-
-    return null;
-  }
-
-  private musicOriginAllowCache(musicOrigin: MusicOrigin): boolean {
-    switch (musicOrigin) {
-      case MusicOrigin.Youtube:
-        return false;
-      case MusicOrigin.Soundcloud:
-        return true;
-      default:
-        return false;
-    }
-  }
-
-  extractVideoId(url: string): string {
-    const match = url.match(
-      /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:embed\/|watch\?v=)|youtu\.be\/)([0-9A-Za-z_-]{11})/
-    );
-    return match ? match[1] : '';
-  }
-  //#endregion
 
   goBack(): void {
     this.location.back();

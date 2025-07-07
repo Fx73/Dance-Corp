@@ -41,6 +41,15 @@ export class AppComponent implements OnInit {
     toast.present();
   }
 
+  async presentErrorToast(message: string) {
+    const toast = await this.toastController.create({
+      message: message,
+      duration: 6000,
+      color: 'danger'
+    });
+    toast.present();
+  }
+
   static presentOkToast(message: string) {
     console.log(message)
     AppComponent.appInstance.presentOkToast(message)
@@ -48,6 +57,10 @@ export class AppComponent implements OnInit {
   static presentWarningToast(message: string) {
     console.warn(message)
     AppComponent.appInstance.presentWarningToast(message)
+  }
+  static presentErrorToast(message: string) {
+    console.error(message)
+    AppComponent.appInstance.presentErrorToast(message)
   }
   //#endregion
 }

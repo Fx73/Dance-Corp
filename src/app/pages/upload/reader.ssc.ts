@@ -17,7 +17,6 @@ export class SccReader {
       throw new Error('Unsupported file format');
     }
 
-    console.log("Token Map:", tokenMap);
     const musicData = new MusicDto(tokenMap);
     console.log("Parsed Music Data:", musicData);
     return musicData;
@@ -50,8 +49,11 @@ export class SccReader {
     let currentNoteData: Record<string, string> | null = null;
     let noteDataIndex = 0;
 
+    console.log("Tokens:", tokens);
+
+
     tokens.forEach(token => {
-      const [key, value] = token.split(/:(.+)?;/s);
+      const [key, value] = token.split(/:(.*)/s);
       const lowerKey = key.toLowerCase();
 
       if (lowerKey === 'notedata') {
@@ -68,6 +70,8 @@ export class SccReader {
         tokenMap[lowerKey] = value;
       }
     });
+
+    console.log("Token Map:", tokenMap);
 
     return tokenMap;
   }
@@ -138,6 +142,27 @@ export class SccReader {
     }).join('');
   }
 
+  static extractBasicMetadataFromSSC(content: string): { title?: string; artist?: string; jacket?: string } {
+    const tokens = SccReader.tokenizeCommon(content);
+    const result: { title?: string; artist?: string; jacket?: string } = {};
+
+    for (const token of tokens) {
+      const [rawKey, rawValue] = token.split(/:(.*)/s);
+      const key = rawKey.toLowerCase().trim();
+      const value = rawValue?.trim();
+
+      if (key === 'title' || key === 'artist' || key === 'jacket') {
+        result[key] = value;
+      }
+
+      if (result.title && result.artist && result.jacket) {
+        return result;
+      }
+    }
+
+    return result;
+  }
+
 }
 
 
@@ -179,8 +204,10 @@ export class SccWriter {
       return value.map((v: ITimedChange) => v.time.toFixed(3) + '=' + v.value).join(',');
     }
 
-    if (value instanceof Date)
+    if (value instanceof Date) {
       return value.toISOString().split('T')[0];
+
+    }
 
     return value.toString();
   }

@@ -8,8 +8,8 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
+import { IMusicPlayer, MusicPlayerCommon } from '../IMusicPlayer';
 
-import { IMusicPlayer } from '../IMusicPlayer';
 import { Soundcloud } from 'soundcloud.ts';
 
 declare var SC: any;
@@ -20,8 +20,9 @@ declare var SC: any;
   styleUrls: ['./music-player-soundcloud.component.scss'],
   standalone: true,
 })
-export class MusicPlayerSoundcloudComponent
+export class MusicPlayerSoundcloudComponent extends MusicPlayerCommon
   implements IMusicPlayer, OnInit, AfterViewInit {
+
   @Input()
   musicUrl!: string;
   @Output()
@@ -31,7 +32,10 @@ export class MusicPlayerSoundcloudComponent
 
   widgetSC: any;
 
+
+
   async ngOnInit(): Promise<void> {
+
     const iframe = document.getElementById('sc-player') as HTMLIFrameElement;
     this.widgetSC = SC.Widget(iframe);
     this.widgetSC.load(this.musicUrl);

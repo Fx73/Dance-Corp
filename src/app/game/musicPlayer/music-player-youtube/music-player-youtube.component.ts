@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { IMusicPlayer, MusicPlayerCommon } from '../IMusicPlayer';
 import { YOUTUBE_PLAYER_CONFIG, YouTubePlayer } from '@angular/youtube-player';
 
-import { IMusicPlayer } from '../IMusicPlayer';
 import { NgModule } from '@angular/core';
 
 @Component({
@@ -15,7 +15,7 @@ import { NgModule } from '@angular/core';
     }
   }]
 })
-export class MusicPlayerYoutubeComponent implements IMusicPlayer {
+export class MusicPlayerYoutubeComponent extends MusicPlayerCommon implements IMusicPlayer {
   playerConfig = {
     controls: 0,
     mute: 0,
@@ -29,7 +29,9 @@ export class MusicPlayerYoutubeComponent implements IMusicPlayer {
 
   @ViewChild('musicPlayer') player!: YouTubePlayer;
 
-  constructor() { }
+  constructor() {
+    super();
+  }
 
   onReadyInternal(event: any): void {
     console.log('YouTube Player is ready');
@@ -60,6 +62,7 @@ export class MusicPlayerYoutubeComponent implements IMusicPlayer {
     const match = url.match(
       /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:embed\/|watch\?v=)|youtu\.be\/)([0-9A-Za-z_-]{11})/
     );
+    console.log('Extracted video ID:', match);
     return match ? match[1] : '';
   }
 }

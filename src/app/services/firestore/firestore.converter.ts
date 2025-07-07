@@ -1,4 +1,4 @@
-import { DocumentData, QueryDocumentSnapshot } from "firebase/firestore";
+import { DocumentData, QueryDocumentSnapshot, Timestamp } from "firebase/firestore";
 
 export class FirestoreConverter<T extends object> {
     readonly IGNORE_UNDEFINED: boolean = true
@@ -25,6 +25,8 @@ export class FirestoreConverter<T extends object> {
             }
             else if (Array.isArray(value))
                 data[key] = value.map(v => Object(v) === v ? this.toFirestoreRecurse(v) : v)
+            else if (value instanceof Date)
+                data[key] = value
             else if (Object(value) === value)
                 data[key] = this.toFirestoreRecurse(value)
             else
@@ -45,6 +47,8 @@ export class FirestoreConverter<T extends object> {
             let value = data[key]
             if (Array.isArray(value))
                 value = this.mapArrayRecurse(value)
+            else if (value instanceof Timestamp)
+                value = value.toDate()
             else if (Object(value) === value)
                 value = this.fromFirestoreRecurse(value)
 

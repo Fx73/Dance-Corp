@@ -4,24 +4,31 @@
     <ion-searchbar [debounce]="1000" (ionInput)="onSearch($event)" show-clear-button="focus"
       style="background-color:white"></ion-searchbar>
     <div class="cardList">
-      <!-- Local storage Music or add music-->
-      <ion-card (click)="pickMusic()" class="basicCard selectedCard">
-        <ion-card-header *ngIf="storedMusic">
-          <ion-card-title>{{ storedMusic.title }}</ion-card-title>
-          <ion-card-subtitle>{{ storedMusic.artist }}</ion-card-subtitle>
+      <!-- Add music-->
+      <ion-card (click)="pickMusic()" class="basicCard add-card">
+        <ion-card-header>
+          <ion-card-title>Add Music</ion-card-title>
         </ion-card-header>
-        <ion-card-header *ngIf="!storedMusic">
-          <ion-card-title>➕ Add Music</ion-card-title>
-        </ion-card-header>
-        <ion-card-content *ngIf="storedMusic" class="basicCardContent">
-          <ion-img [src]="'https://' + storedMusic.jacket"></ion-img>
+        <ion-card-content>
+          <ion-icon name="add-circle-outline" style="font-size: 20rem; color: var(--ion-color-tertiary);"></ion-icon>
         </ion-card-content>
-        <i>- Locally stored music -</i>
+      </ion-card>
+
+      <!-- Edited music -->
+      <ion-card *ngFor="let music of storedMusics" (click)="pickMusic(music)" class="basicCard stored-card">
+        <ion-card-header>
+          <ion-badge color="secondary">In Edition</ion-badge>
+          <ion-card-title>{{ music.title }}</ion-card-title>
+          <ion-card-subtitle>{{ music.artist }}</ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content class="basicCardContent">
+          <ion-img [src]="'https://' + music.jacket"></ion-img>
+        </ion-card-content>
       </ion-card>
 
       <!-- Music cards -->
       <ion-card *ngFor="let music of musics" (click)="pickMusic(music)" class="basicCard">
-        <ion-img [src]="'https://'+music.jacket"></ion-img>
+        <ion-img [src]="'https://'+music.jacket" [style.max-height.%]="80"></ion-img>
         <ion-card-header>
           <ion-card-title>{{ music.title }}</ion-card-title>
           <ion-card-subtitle>{{ music.artist }}</ion-card-subtitle>

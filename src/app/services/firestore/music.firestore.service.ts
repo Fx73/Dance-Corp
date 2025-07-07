@@ -1,4 +1,4 @@
-import { Firestore, addDoc, collection, doc, getDoc, getDocs, getFirestore, limit, orderBy, query, setDoc, startAfter, updateDoc, where } from 'firebase/firestore';
+import { Firestore, addDoc, collection, deleteDoc, doc, documentId, getDoc, getDocs, getFirestore, limit, orderBy, query, setDoc, startAfter, updateDoc, where } from 'firebase/firestore';
 import { MusicDto, NoteDataDto } from '../../game/gameModel/music.dto';
 
 import { AppComponent } from 'src/app/app.component';
@@ -6,6 +6,7 @@ import { DanceType } from 'src/app/game/constants/dance-type.enum';
 import { FirestoreConverter } from './firestore.converter';
 import { Injectable } from '@angular/core';
 import { UserFirestoreService } from './user.firestore.service';
+import { firestore } from 'firebase-admin';
 
 @Injectable({
     providedIn: 'root'
@@ -25,22 +26,14 @@ export class MusicFirestoreService {
     }
 
 
-    async uploadNewMusic(dto: MusicDto): Promise<void> {
+    async uploadMusic(dto: MusicDto): Promise<void> {
         try {
             const userId = this.userFirestoreService.getUserData()?.id;
             if (!userId) throw new Error("User not authenticated");
 
-            const docRef = doc(this.db, this.MUSIC_COLLECTION, dto.id).withConverter(this.firestoreConverterMusic);
-            const notesCollectionRef = collection(docRef, this.NOTE_COLLECTION).withConverter(this.firestoreConverterNotes);
-
+            const musicRef = doc(this.db, this.MUSIC_COLLECTION, dto.id).withConverter(this.firestoreConverterMusic);
             const { noteData: notes, ...mainData } = dto;
-            await setDoc(docRef, mainData);
-            for (const note of notes) {
-                if (!note.creatorId) note.creatorId = userId;
-                if (!note.credit) note.credit = this.userFirestoreService.getUserData()?.name;
-                const noteRef = doc(notesCollectionRef, note.chartName);
-                await setDoc(noteRef, note);
-            }
+            await setDoc(musicRef, mainData);
 
             AppComponent.presentOkToast("Music successfully uploaded!")
         } catch (error) {
@@ -54,30 +47,59 @@ export class MusicFirestoreService {
             const userId = this.userFirestoreService.getUserData()?.id;
             if (!userId) throw new Error("User not authenticated");
 
-            const docRef = doc(this.db, this.MUSIC_COLLECTION, dto.id).withConverter(this.firestoreConverterMusic);
+            const musicRef = doc(this.db, this.MUSIC_COLLECTION, dto.id).withConverter(this.firestoreConverterMusic);
+            const { noteData: notes, ...mainData } = dto;
+            await updateDoc(musicRef, mainData);
+
+            AppComponent.presentOkToast("Music successfully updated!");
+        } catch (error) {
+            AppComponent.presentWarningToast("Error updating music: " + error);
+            throw error;
+        }
+    }
+
+
+    async uploadNote(musicId: string, note: NoteDataDto): Promise<void> {
+        try {
+            const userId = this.userFirestoreService.getUserData()?.id;
+            if (!userId) throw new Error("User not authenticated");
+
+            if (note.creatorId !== userId)
+                throw new Error("User is not the creator of this note");
+
+            const docRef = doc(this.db, this.MUSIC_COLLECTION, musicId).withConverter(this.firestoreConverterMusic);
             const notesCollectionRef = collection(docRef, this.NOTE_COLLECTION).withConverter(this.firestoreConverterNotes);
 
-            const { noteData: notes, ...mainData } = dto;
-            await updateDoc(docRef, mainData);
+            const noteRef = doc(notesCollectionRef, note.chartName);
+            await setDoc(noteRef, note);
+
+        } catch (error) {
+            AppComponent.presentWarningToast("Error updating notes: " + error);
+            throw error;
+        }
+    }
+
+    async uploadAllNotes(musicId: string, notes: NoteDataDto[]): Promise<void> {
+        try {
+            const userId = this.userFirestoreService.getUserData()?.id;
+            if (!userId) throw new Error("User not authenticated");
+
+            const docRef = doc(this.db, this.MUSIC_COLLECTION, musicId).withConverter(this.firestoreConverterMusic);
+            const notesCollectionRef = collection(docRef, this.NOTE_COLLECTION).withConverter(this.firestoreConverterNotes);
 
             for (const note of notes) {
                 // Only allow updates if the user is the creator OR it's a new note
                 const noteRef = doc(notesCollectionRef, note.chartName);
-                console.log(note)
-                console.log(note.creatorId)
-                console.log(note.creatorId, userId, note.creatorId === userId)
-                if (note.creatorId === userId) {
-                    console.log("Update")
-                    await updateDoc(noteRef, { ...note });
-                } else if (!note.creatorId) {
-                    if (!note.creatorId) note.creatorId = userId; // Assign creator if it's new
+                if (!note.creatorId) {// Assign creator if it's new
+                    note.creatorId = userId;
                     if (!note.credit) note.credit = this.userFirestoreService.getUserData()?.name;
-                    console.log("Create")
+                }
+
+                if (note.creatorId === userId)
                     await setDoc(noteRef, note);
-                }
-                else {
+                else
                     console.log(`Skipping update for note ${note.chartName} - Not the creator`);
-                }
+
             }
 
             AppComponent.presentOkToast("Music successfully updated!");
@@ -87,6 +109,9 @@ export class MusicFirestoreService {
             throw error;
         }
     }
+
+
+
 
     async existsMusic(musicId: string): Promise<boolean> {
         const docSnap = await getDoc(doc(this.db, this.MUSIC_COLLECTION, musicId))
@@ -114,13 +139,24 @@ export class MusicFirestoreService {
     async GetAllMusics(lastMusicId: string | null): Promise<MusicDto[]> {
         const musics: MusicDto[] = [];
         const musicRef = collection(this.db, this.MUSIC_COLLECTION).withConverter(this.firestoreConverterMusic);;
+        console.log("Query at ", lastMusicId);
 
-        const q = query(
-            musicRef,
-            orderBy('title'),
-            startAfter(lastMusicId),
-            limit(this.BATCH_SIZE)
-        );
+        let q;
+
+        if (lastMusicId) {
+            q = query(
+                musicRef,
+                orderBy(documentId()),
+                startAfter(lastMusicId),
+                limit(this.BATCH_SIZE)
+            );
+        } else {
+            q = query(
+                musicRef,
+                orderBy(documentId()),
+                limit(this.BATCH_SIZE)
+            );
+        }
 
         const querySnapshot = await getDocs(q);
 
@@ -130,7 +166,7 @@ export class MusicFirestoreService {
         querySnapshot.forEach((doc) => {
             musics.push(doc.data());
         });
-        console.log("Musics retrieved:", musics);
+        console.log("Musics retrieved :", musics);
         return musics;
     }
 
@@ -138,14 +174,25 @@ export class MusicFirestoreService {
         const musics: MusicDto[] = [];
         const musicRef = collection(this.db, this.MUSIC_COLLECTION).withConverter(this.firestoreConverterMusic);
 
-        const q = query(
-            musicRef,
-            where('title', ">=", searchTerm),
-            where('title', "<", searchTerm + "z"),
-            orderBy('title'),
-            startAfter(lastMusicId),
-            limit(this.BATCH_SIZE)
-        );
+        let q;
+        if (lastMusicId) {
+            q = query(
+                musicRef,
+                where('title', ">=", searchTerm),
+                where('title', "<", searchTerm + "z"),
+                orderBy(documentId()),
+                startAfter(lastMusicId),
+                limit(this.BATCH_SIZE)
+            );
+        } else {
+            q = query(
+                musicRef,
+                where('title', ">=", searchTerm),
+                where('title', "<", searchTerm + "z"),
+                orderBy(documentId()),
+                limit(this.BATCH_SIZE)
+            );
+        }
 
         const querySnapshot = await getDocs(q);
 
@@ -183,10 +230,44 @@ export class MusicFirestoreService {
         const music = await this.getMusic(musicId);
         if (music)
             music.noteData = await this.getMusicNotes(musicId);
-
         return music;
     }
 
+    async deleteMusic(musicId: string): Promise<void> {
+        try {
+            const musicRef = doc(this.db, this.MUSIC_COLLECTION, musicId);
+            const notesCollectionRef = collection(musicRef, this.NOTE_COLLECTION)
+            const snapshot = await getDocs(notesCollectionRef);
+            if (!snapshot.empty) {
+                console.warn("Cannot delete, notes are still present on music :", musicId);
+            }
 
+            await deleteDoc(musicRef);
+            AppComponent.presentOkToast("Music successfully deleted!");
+        } catch (error) {
+            AppComponent.presentErrorToast("Error deleting music: " + error);
+            throw error;
+        }
+    }
+
+    async deleteNote(musicId: string, note: NoteDataDto) {
+        try {
+            const userId = this.userFirestoreService.getUserData()?.id;
+            if (!userId) throw new Error("User not authenticated");
+
+            if (note.creatorId !== userId)
+                throw new Error("User is not the creator of this note");
+
+            const docRef = doc(this.db, this.MUSIC_COLLECTION, musicId).withConverter(this.firestoreConverterMusic);
+            const notesCollectionRef = collection(docRef, this.NOTE_COLLECTION).withConverter(this.firestoreConverterNotes);
+
+            const noteRef = doc(notesCollectionRef, note.chartName);
+            await deleteDoc(noteRef);
+
+        } catch (error) {
+            AppComponent.presentWarningToast("Error updating notes: " + error);
+            throw error;
+        }
+    }
 }
 

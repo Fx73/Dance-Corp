@@ -16,7 +16,7 @@ export class MusicDto {
   jacket?: string;
   cdTitle?: string;
   music?: string;
-  offset?: number; //beat0OffsetInSeconds
+  offset: number = 0; //beat0OffsetInSeconds
   sampleStart?: number;
   sampleLength?: number;
   bpms: BpmChange[] = [];
@@ -61,7 +61,7 @@ export class MusicDto {
     delete tokenMap["cdtitle"];
     this.music = tokenMap["music"];
     delete tokenMap["music"];
-    this.offset = tokenMap["offset"] ? parseFloat(tokenMap["offset"]) ?? parseFloat(tokenMap["beat0OffsetInSeconds"]) : undefined;
+    this.offset = tokenMap["offset"] ? parseFloat(tokenMap["offset"]) ?? parseFloat(tokenMap["beat0OffsetInSeconds"]) : 0;
     delete tokenMap["offset"];
     delete tokenMap["beat0OffsetInSeconds"];
     this.sampleStart = parseFloat(tokenMap["samplestart"]);
@@ -114,9 +114,13 @@ export class MusicDto {
   static fromJSON(obj: any): MusicDto {
     const instance = Object.assign(new MusicDto(), obj);
     instance.noteData = Array.isArray(obj.noteData)
-      ? obj.noteData.map((n: Record<string, string> | undefined) => new NoteDataDto(n))
+      ? obj.noteData.map((n: Record<string, string> | undefined) => NoteDataDto.fromJSON(n))
       : [];
     return instance;
+  }
+
+  deepClone(): MusicDto {
+    return MusicDto.fromJSON(JSON.parse(JSON.stringify(this)));
   }
 }
 
@@ -142,9 +146,9 @@ export class NoteDataDto {
     this.difficulty = tokenMap["difficulty"] as NoteDifficulty;
     this.meter = parseInt(tokenMap["meter"]);
     this.credit = tokenMap["credit"];
+    this.creatorId = tokenMap["creatorid"];
     const creationDateValue = tokenMap["creationdate"];
     this.creationDate = creationDateValue ? new Date(creationDateValue) : new Date();
-
     this.chartName = tokenMap["chartname"] ?? `${this.difficulty}_${this.meter}_${this.creationDate.toISOString().split('T')[0]}`;
 
     this.stepChart = tokenMap["notes"].split(',').map(measure => {
@@ -154,8 +158,22 @@ export class NoteDataDto {
     });
 
   }
+
+  static fromJSON(obj: any): NoteDataDto {
+    const instance = Object.assign(new NoteDataDto(), obj);
+    instance.stepChart = Array.isArray(obj.stepChart)
+      ? obj.stepChart.map((n: Record<string, string> | undefined) => Measures.fromJSON(n))
+      : [];
+    return instance;
+  }
 }
 
 export class Measures {
   steps: number[][] = [];
+
+  static fromJSON(obj: any): Measures {
+    const instance = Object.assign(new Measures(), obj);
+    instance.steps = Array.isArray(obj.steps) ? obj.steps.map((row: any) => Array.isArray(row) ? row.map(Number) : []) : [];
+    return instance;
+  }
 }
