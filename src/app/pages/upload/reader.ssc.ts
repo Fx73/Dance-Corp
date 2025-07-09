@@ -1,6 +1,7 @@
 import { Measures, MusicDto } from "src/app/game/gameModel/music.dto";
 
 import { ITimedChange } from 'src/app/game/gameModel/timedChange';
+import { NoteEvaluator } from "./DifficultyCriteria";
 
 export class SccReader {
 
@@ -19,6 +20,15 @@ export class SccReader {
 
     const musicData = new MusicDto(tokenMap);
     console.log("Parsed Music Data:", musicData);
+
+    for (const noteData of musicData.noteData) {
+      if (!noteData.difficultyCriterias) {
+        const evaluator = new NoteEvaluator(musicData.bpms, noteData.stepChart);
+        evaluator.evaluateCriterias();
+        noteData.difficultyCriterias = evaluator.criterias;
+      }
+    }
+
     return musicData;
   }
 
@@ -206,7 +216,6 @@ export class SccWriter {
 
     if (value instanceof Date) {
       return value.toISOString().split('T')[0];
-
     }
 
     return value.toString();

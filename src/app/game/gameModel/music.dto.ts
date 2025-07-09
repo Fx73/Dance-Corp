@@ -1,6 +1,7 @@
 import { BpmChange, TextChange } from "./timedChange";
 
 import { DanceType } from "../constants/dance-type.enum";
+import { DifficultyCriteria } from "src/app/pages/upload/DifficultyCriteria";
 import { NoteDifficulty } from "../constants/note-difficulty.enum";
 
 export class MusicDto {
@@ -132,6 +133,7 @@ export class NoteDataDto {
   chartStyle?: string;
   difficulty?: NoteDifficulty;
   meter?: number;
+  difficultyCriterias?: DifficultyCriteria;
   credit?: string;
   creatorId?: string;
   creationDate: Date = new Date()
@@ -156,6 +158,7 @@ export class NoteDataDto {
       measureInstance.steps = measure.trim().split('\n').map(line => line.trim().split('').map(step => parseInt(step)));
       return measureInstance;
     });
+    this.difficultyCriterias = tokenMap["difficultycriterias"] ? DifficultyCriteria.ParseCriteria(tokenMap["difficultycriterias"]) : undefined;
 
   }
 
@@ -177,3 +180,4 @@ export class Measures {
     return instance;
   }
 }
+
