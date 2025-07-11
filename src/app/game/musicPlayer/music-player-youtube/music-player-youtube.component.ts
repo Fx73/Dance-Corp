@@ -62,7 +62,6 @@ export class MusicPlayerYoutubeComponent extends MusicPlayerCommon implements IM
     const match = url.match(
       /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:embed\/|watch\?v=)|youtu\.be\/)([0-9A-Za-z_-]{11})/
     );
-    console.log('Extracted video ID:', match);
     return match ? match[1] : '';
   }
 }

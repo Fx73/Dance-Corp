@@ -1,18 +1,17 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, OnDestroy, OnInit, QueryList, Type, ViewChild, ViewChildren, input } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { IMusicPlayer, MusicOrigin, MusicPlayerCommon } from './musicPlayer/IMusicPlayer';
-import { IonButton, IonCard, IonContent, IonHeader, IonIcon, IonTitle, IonToolbar } from '@ionic/angular/standalone';
-import { MusicDto, NoteDataDto } from './gameModel/music.dto';
+import { IonCard, IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 
 import { AppComponent } from '../app.component';
 import { ArrowDirection } from "./constants/arrow-direction.enum";
 import { FormsModule } from '@angular/forms';
+import { GameManager } from './game.manager';
 import { GameOverComponent } from "./gameDisplay/game-over/game-over.component";
-import { GameRound } from './gameModel/gameRound';
 import { MusicCacheService } from './../services/dataCache/music.cache.service';
+import { MusicDto } from './gameModel/music.dto';
 import { MusicPlayerSoundcloudComponent } from './musicPlayer/music-player-soundcloud/music-player-soundcloud.component';
 import { MusicPlayerYoutubeComponent } from "./musicPlayer/music-player-youtube/music-player-youtube.component";
-import { Player } from './gameModel/player';
 import { PlayerDisplayComponent } from "./gameDisplay/player-display.component";
 import { Router } from "@angular/router";
 import { UserConfigService } from "src/app/services/userconfig.service";
@@ -30,29 +29,19 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
   //#region App Constants
   readonly ArrowDirection = ArrowDirection;
   readonly MusicOrigin = MusicOrigin;
+  readonly backgroundUrl: string = "assets/Splash/Texture.png";
   //#endregion
-  //#region Music
-  music: MusicDto | null = null;
-  musicPlayer!: IMusicPlayer;
-  musicOrigin: MusicOrigin | null = null
-  backgroundUrl: string = "assets/Splash/Texture.png";
-  private nextBgTime: number | null = null;
+
+  //#region Loading
   loadingMusic: boolean = true;
+  @ViewChild(WaitingScreenComponent) waitingScreen!: WaitingScreenComponent;
   //#endregion
 
-
-  @ViewChild(WaitingScreenComponent) waitingScreen!: WaitingScreenComponent;
-
-  @ViewChildren(PlayerDisplayComponent) playerDisplaysQuery!: QueryList<PlayerDisplayComponent>;
-  private playerDisplays: PlayerDisplayComponent[] = [];
-
-
-  players: Player[] = [];
-  gameRounds: GameRound[] = []
-
-  public isGameOver: Boolean = false
-  private gameLoopId: number | null = null;
-  zeroTimeStamp: number = 0;
+  //#region Game
+  game: GameManager | null = null;
+  music: MusicDto | null = null;
+  musicOrigin: MusicOrigin | null = null
+  //#endregion
 
   constructor(private cdr: ChangeDetectorRef, private userConfigService: UserConfigService, private userFirestoreService: UserFirestoreService, private musicCacheService: MusicCacheService, private router: Router, private location: Location) { }
 
@@ -64,6 +53,7 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
       this.music = navigation.extras.state['music'];
     }
     if (this.music === null || this.music.music === undefined || this.music.noteData.length === 0) {
+      console.error("Music data is missing or incomplete.");
       this.router.navigate(['/home']);
       return;
     }
@@ -72,95 +62,54 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
     this.musicOrigin = MusicPlayerCommon.pickMusicPlayer(this.music!.music!)
     if (this.musicOrigin == null) {
       AppComponent.presentWarningToast("Error loading music in player !")
+      this.router.navigate(['/home']);
       return;
     }
 
-    // Cache init if allowed
-    if (MusicPlayerCommon.musicOriginAllowCache(this.musicOrigin) && this.userConfigService.getConfig()["allowCache"]) {
-      //this.musicCacheService.addMusicToCache(this.music!)
-    }
-
-
-    // Prepare Background
-    if (this.music!.bgChanges) this.nextBgTime = this.music!.bgChanges[0].time
-
-    // Prepare Players
+    const players = this.userConfigService.players;
     const isTrainingMode: boolean = this.userConfigService.getConfig()["trainingMode"] ?? false
-    this.players = this.userConfigService.players;
-
-    for (const player of this.players) {
-      this.gameRounds.push(new GameRound(this.music, this.music.noteData[0], player, isTrainingMode))
-    }
-    console.log("Game Rounds initialized:", this.gameRounds);
+    this.game = new GameManager(this.music!, players, isTrainingMode, this.userFirestoreService);
   }
 
+  @ViewChildren(PlayerDisplayComponent) playerDisplaysQuery!: QueryList<PlayerDisplayComponent>;
+  private playerDisplays: PlayerDisplayComponent[] = [];
   ngAfterViewInit() {
     this.playerDisplays = this.playerDisplaysQuery.toArray();
-    if (this.musicPlayer)
-      this.waitingScreen.startCountdown();
+    console.log("Player Displays initialized:", this.playerDisplays, this.musicPlayer);
+    if (this.musicPlayer && this.playerDisplays.length > 0)
+      this.initGame();
   }
 
-  onPlayerReady(player: IMusicPlayer) {
-    this.musicPlayer = player
-    if (this.playerDisplays.length > 0)
-      this.waitingScreen.startCountdown();
+  private musicPlayer!: IMusicPlayer;
+  onPlayerReady(mPlayer: IMusicPlayer) {
+    this.musicPlayer = mPlayer;
+    console.log("Music Player is ready:", this.musicPlayer, this.playerDisplays);
+    if (this.musicPlayer && this.playerDisplays.length > 0)
+      this.initGame();
+  }
+
+  private hasGameBeenInitialized = false;
+  initGame() {
+    console.log("Initializing game with music:", this.music?.music);
+    if (this.hasGameBeenInitialized) return;
+    this.hasGameBeenInitialized = true;
+
+    this.game!.registerExternalComponents(this.musicPlayer, /*this.playerDisplays*/);
+
+    this.waitingScreen.startCountdown();
     this.cdr.detectChanges();
   }
 
   handleCountdownFinished() {
     this.loadingMusic = false;
-    this.startGame();
+    this.game?.startGame();
   }
 
 
   ngOnDestroy(): void {
-    if (this.gameLoopId !== null) {
-      cancelAnimationFrame(this.gameLoopId);
-    }
-    this.gameRounds = [];
+    this.game?.gameDestroy();
   }
 
-  startGame() {
-    this.musicPlayer.play()
-    this.zeroTimeStamp = Math.round(performance.now()) + (this.music!.offset ?? 0) * 1000;
-    this.gameGlobalLoop(this.zeroTimeStamp)
-    console.log("Game has started")
-  }
-
-
-  private gameGlobalLoop(currentTimestamp: DOMHighResTimeStamp): void {
-    const roundedTimestamp = Math.round(currentTimestamp)
-    const elapsedTime = (roundedTimestamp - this.zeroTimeStamp) / 1000; // In seconds
-
-    for (const gameRound of this.gameRounds)
-      gameRound.gameLoop(elapsedTime)
-
-    for (const playerDiplay of this.playerDisplays)
-      playerDiplay.Update()
-
-    if (this.nextBgTime && elapsedTime >= this.nextBgTime) {
-      const bgChange = this.music!.bgChanges?.find(change => change.time === this.nextBgTime);
-      this.backgroundUrl = bgChange?.value || 'assets/Splash/Texture.png';
-      this.nextBgTime = bgChange?.time ?? null;
-    }
-
-    if (this.gameRounds.every(gameRound => gameRound.isFailed || gameRound.isFinished)) {
-      this.gameOver()
-      return; // Stop loop
-    }
-
-    // Schedule the next loop iteration
-    this.gameLoopId = requestAnimationFrame(this.gameGlobalLoop.bind(this));
-  }
-
-
-  gameOver() {
-    console.log('Game Over: All game rounds have failed or finished.');
-
-    this.isGameOver = true;
-    for (const gameRound of this.gameRounds)
-      this.userFirestoreService.updateUserStatsFromRound(this.music!.id, this.music?.noteData[0].chartName!, gameRound)
-  }
 
   goBack(): void {
     this.location.back();

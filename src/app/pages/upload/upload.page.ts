@@ -126,7 +126,6 @@ export class UploadPage {
         return !this.deepShallowEqualArrayOfObjects(a, b);
       return JSON.stringify(a) !== JSON.stringify(b);
     }
-    console.log(`Comparing key: ${key}`, a, b);
 
     if (typeof a === 'object' && typeof b === 'object') {
       return !this.shallowEqual(a, b);

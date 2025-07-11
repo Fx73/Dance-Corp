@@ -3,6 +3,7 @@ import { IMusicPlayer, MusicOrigin, MusicPlayerCommon } from 'src/app/game/music
 import { MusicDto, NoteDataDto } from 'src/app/game/gameModel/music.dto';
 
 import { ArrowDirection } from 'src/app/game/constants/arrow-direction.enum';
+import { GameManager } from 'src/app/game/game.manager';
 import { GameRound } from 'src/app/game/gameModel/gameRound';
 import { IonicModule } from '@ionic/angular';
 import { ModalController } from '@ionic/angular/standalone';
@@ -27,46 +28,29 @@ export class TestNoteComponent implements OnInit {
   //#endregion
   @Input() noteData!: NoteDataDto;
   @Input() music!: MusicDto;
+  musicOrigin: MusicOrigin | null = null
 
   @ViewChild(PlayerDisplayComponent)
   playerDisplay!: PlayerDisplayComponent;
-  musicPlayer: IMusicPlayer | undefined;
-  player: Player | undefined;
-  gameRound: GameRound | undefined;
-  musicOrigin: MusicOrigin | null = null
 
-  zeroTimeStamp: number | undefined;
-  gameLoopId: number | undefined;
+  game: GameManager | null = null;
+
+
 
   constructor(private modalController: ModalController, private userConfigService: UserConfigService) {
   }
 
   ngOnInit() {
     this.musicOrigin = MusicPlayerCommon.pickMusicPlayer(this.music.music!);
-    this.player = this.userConfigService.players[0] || new Player();
-    this.gameRound = new GameRound(this.music, this.noteData, this.player, true);
+
   }
 
 
-  onPlayerReady(player: IMusicPlayer) {
-    this.musicPlayer = player
-    this.musicPlayer.play()
-    this.zeroTimeStamp = Math.round(performance.now()) + (this.music!.offset ?? 0) * 1000;
-    this.gameGlobalLoop(this.zeroTimeStamp)
-  }
-
-
-
-  private gameGlobalLoop(currentTimestamp: DOMHighResTimeStamp): void {
-    const roundedTimestamp = Math.round(currentTimestamp)
-    const elapsedTime = (roundedTimestamp - this.zeroTimeStamp!) / 1000; // In seconds
-
-    this.gameRound?.gameLoop(elapsedTime)
-
-    this.playerDisplay.Update()
-
-    // Schedule the next loop iteration
-    this.gameLoopId = requestAnimationFrame(this.gameGlobalLoop.bind(this));
+  onPlayerReady(musicPlayer: IMusicPlayer) {
+    const player = this.userConfigService.players[0] || new Player();
+    this.game = new GameManager(this.music!, [player], true, null!);
+    this.game.registerExternalComponents(musicPlayer);
+    this.game.startGame();
   }
 
 
@@ -76,10 +60,7 @@ export class TestNoteComponent implements OnInit {
   }
 
   ngOnDestroy(): void {
-    this.musicPlayer?.stop();
-    if (this.gameLoopId) {
-      cancelAnimationFrame(this.gameLoopId);
-    }
+    this.game?.gameDestroy();
   }
 
 }

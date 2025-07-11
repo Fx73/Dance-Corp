@@ -60,6 +60,8 @@ export class PlayerDisplayComponent implements AfterViewInit {
     this.precisionTextElement.push(document.getElementById('precision-text-up')!);
     this.precisionTextElement.push(document.getElementById('precision-text-right')!);
     this.comboTextElement = document.getElementById('combo-text')!;
+
+    this.loopUpdate();
   }
 
   get arrowCorrectedSize(): number {
@@ -83,9 +85,16 @@ export class PlayerDisplayComponent implements AfterViewInit {
     return Math.round(this.gameRound.score).toLocaleString('fr-FR');
   }
 
+  private loopUpdate() {
+    if (this.gameRound.isFailed || this.gameRound.isFinished) {
+      return;
+    }
+    this.Update(this.gameRound.currentBeat);
+    requestAnimationFrame(() => this.loopUpdate());
+  }
 
-  public Update() {
-    this.UpdateCanvas()
+  public Update(currentBeat: number): void {
+    this.UpdateCanvas(currentBeat)
 
     if (this.gameRound.precisionMessage.length > 0) {
       for (const msg of this.gameRound.precisionMessage) {
@@ -100,9 +109,7 @@ export class PlayerDisplayComponent implements AfterViewInit {
 
   }
 
-  private UpdateCanvas() {
-    const currentBeat = this.gameRound.currentBeat;
-
+  private UpdateCanvas(currentBeat: number): void {
     // Clean the canvas
     const canvas = this.canvasRef.nativeElement;
     const canvasHeight = canvas.height;

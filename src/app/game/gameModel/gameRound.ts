@@ -18,9 +18,6 @@ export class GameRound {
 
     //Game Data
     arrowMap: Arrow[] = []; // Map of the complete game
-    music: MusicDto;
-    bps: number; // Beat Per Second (BPM/60)
-    tolerance: number; //In beat
 
     //Player Data
     public player: Player
@@ -30,7 +27,6 @@ export class GameRound {
     private isTrainingMode = false;
     public score: number = 0;
     public performance: number = 50;
-    public currentBeat: number = 0
     public currentArrowIndex: number = 0; // Tracks the last note out of game
     public isFailed = false;
     public isFinished = false;
@@ -42,13 +38,10 @@ export class GameRound {
 
     //Display consuming
     precisionMessage: Arrow[] = []; // Message to display on the screen
+    currentBeat: number = 0; // Current beat in the game to display
 
-
-    constructor(musicDTO: MusicDto, notes: NoteDataDto, player: Player, isTrainingMode = false) {
+    constructor(notes: NoteDataDto, player: Player, isTrainingMode = false) {
         this.player = player
-        this.music = musicDTO;
-        this.bps = musicDTO.bpms[0].value / 60
-        this.tolerance = CONFIG.GAME.TOLERANCE_WINDOW * this.bps;
 
         if (player.gamepad!.index! === -1)
             this.dancepad = new DancePadKeyboard(player.keyBindingKeyboard)
@@ -116,8 +109,8 @@ export class GameRound {
     }
 
 
-    public gameLoop(elapsedTime: number): void {
-        this.currentBeat = elapsedTime * this.bps
+    public gameLoop(currentBeat: number, tolerance: number): void {
+        this.currentBeat = currentBeat;
 
         // Get DancePad state
         const padstate = this.dancepad.getRefreshedState()
@@ -127,10 +120,10 @@ export class GameRound {
 
         // Check arrows
         let currentArrowCheck = this.currentArrowIndex
-        while (currentArrowCheck < this.arrowMap.length && this.arrowMap[currentArrowCheck].beatPosition < this.currentBeat + this.tolerance) {
+        while (currentArrowCheck < this.arrowMap.length && this.arrowMap[currentArrowCheck].beatPosition < currentBeat + tolerance) {
             const arrow = this.arrowMap[currentArrowCheck];
             if (!arrow.isOut) {
-                this.checkArrowPress(arrow, this.currentBeat, padstate[arrow.direction])
+                this.checkArrowPress(arrow, currentBeat, padstate[arrow.direction], tolerance);
             }
             currentArrowCheck++
         }
@@ -152,7 +145,7 @@ export class GameRound {
         }
     }
 
-    private checkArrowPress(arrow: Arrow, currentBeat: number, padArrowState: ArrowState) {
+    private checkArrowPress(arrow: Arrow, currentBeat: number, padArrowState: ArrowState, tolerance: number) {
         if (arrow.isTypeHold && arrow.isPressed) {
             if (arrow.beatEnd !== null && currentBeat > arrow.beatEnd) {
                 this.arrowOk(arrow)
@@ -170,7 +163,7 @@ export class GameRound {
             return
         }
 
-        if (currentBeat > arrow.beatPosition + (2 * this.tolerance)) {
+        if (currentBeat > arrow.beatPosition + (2 * tolerance)) {
             arrow.isMissed = true;
             this.arrowMissed(arrow)
             console.log(`Missed arrow at beat ${arrow.beatPosition}.`);
@@ -178,24 +171,24 @@ export class GameRound {
         }
 
         if (padArrowState === ArrowState.Press) {
-            if (currentBeat > arrow.beatPosition + this.tolerance) {
+            if (currentBeat > arrow.beatPosition + tolerance) {
                 this.arrowAlmost(arrow)
                 console.log(`Almost arrow at beat ${arrow.beatPosition}.`);
                 return
             }
             const difference = Math.abs(arrow.beatPosition - currentBeat);
 
-            if (difference <= this.tolerance * 0.25) {
+            if (difference <= tolerance * 0.25) {
                 // Perfect: Very close to the beat
                 this.arrowPerfect(arrow);
                 console.log(`Perfect arrow at beat ${arrow.beatPosition}.`);
                 return;
-            } else if (difference <= this.tolerance * 0.5) {
+            } else if (difference <= tolerance * 0.5) {
                 // Great: Slightly off but close enough
                 this.arrowGreat(arrow);
                 console.log(`Great arrow at beat ${arrow.beatPosition}.`);
                 return;
-            } else if (difference <= this.tolerance) {
+            } else if (difference <= tolerance) {
                 // Good: Further off but still acceptable
                 this.arrowGood(arrow);
                 console.log(`Good arrow at beat ${arrow.beatPosition}.`);

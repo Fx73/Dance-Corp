@@ -49,7 +49,7 @@ export class OptionsPage {
 
   verifyDisplay(): void {
     this.showPlayerDisplay = true;
-    this.playerDisplay?.Update()
+    this.playerDisplay?.Update(0)
   }
   getFakeGameRound(): GameRound {
     const arrowMap: Arrow[] = [

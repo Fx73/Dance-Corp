@@ -3,4 +3,4 @@
 <app-music-player-soundcloud *ngIf="musicOrigin === MusicOrigin.Soundcloud" [musicUrl]="music.music!"
   (onReady)="onPlayerReady($event)"></app-music-player-soundcloud>
 
-<app-player-display *ngIf="gameRound" [gameRound]="gameRound!"></app-player-display>
+<app-player-display *ngIf="game?.gameRounds" [gameRound]="game!.gameRounds[0]"></app-player-display>

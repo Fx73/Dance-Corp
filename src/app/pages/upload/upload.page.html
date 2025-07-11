@@ -239,10 +239,10 @@
 						<ion-card-title>Music preview</ion-card-title>
 					</ion-card-header>
 					<ion-card-content style="max-width: 30vw;">
-						<app-music-player-youtube *ngIf="isMusicOriginYt()"
-							[musicUrl]="musicData.music!"></app-music-player-youtube>
-						<app-music-player-soundcloud *ngIf="isMusicOriginSc()"
-							[musicUrl]="musicData.music!"></app-music-player-soundcloud>
+						<app-music-player-youtube *ngIf="isMusicOriginYt()" [musicUrl]="musicData.music!"
+							[isRealSize]="true"></app-music-player-youtube>
+						<app-music-player-soundcloud *ngIf="isMusicOriginSc()" [musicUrl]="musicData.music!"
+							[isRealSize]="true"></app-music-player-soundcloud>
 					</ion-card-content>
 				</ion-card>
 			</ion-col>

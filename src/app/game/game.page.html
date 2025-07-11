@@ -8,23 +8,25 @@
 	<app-waiting-screen *ngIf="loadingMusic" [title]="music!.title" [artist]="music!.artist" [coverUrl]="music!.jacket"
 		(onCountdownFinished)="handleCountdownFinished()"></app-waiting-screen>
 
-	<ng-container *ngIf="isGameOver;then gameOverContent else gameContent"></ng-container>
+	<ng-container *ngIf="game">
+		<ng-container *ngIf="game.isGameOver;then gameOverContent else gameContent"></ng-container>
 
-	<ng-template #gameOverContent>
-		<app-game-over *ngFor="let gameRound of gameRounds" [gameRound]="gameRound"></app-game-over>
-		<ion-card class="base-card start-card" style="height: 15vh;" (click)="goBack()"> Back to music list
-		</ion-card>
-	</ng-template>
+		<ng-template #gameOverContent>
+			<app-game-over *ngFor="let gameRound of game.gameRounds" [gameRound]="gameRound"></app-game-over>
+			<ion-card class="base-card start-card" style="height: 15vh;" (click)="goBack()"> Back to music list
+			</ion-card>
+		</ng-template>
 
-	<ng-template #gameContent>
-		<app-player-display *ngFor="let gameRound of gameRounds" [gameRound]="gameRound"></app-player-display>
-		<!-- Music Player -->
-		<app-music-player-youtube *ngIf="musicOrigin === MusicOrigin.Youtube" [musicUrl]="music?.music!"
-			(onReady)="onPlayerReady($event)"></app-music-player-youtube>
-		<app-music-player-soundcloud *ngIf="musicOrigin === MusicOrigin.Soundcloud" [musicUrl]="music?.music!"
-			(onReady)="onPlayerReady($event)"></app-music-player-soundcloud>
+		<ng-template #gameContent>
+			<app-player-display *ngFor="let gameRound of game.gameRounds" [gameRound]="gameRound"></app-player-display>
+		</ng-template>
+	</ng-container>
+	<!-- Music Player -->
+	<app-music-player-youtube *ngIf="musicOrigin === MusicOrigin.Youtube" [musicUrl]="music?.music!"
+		(onReady)="onPlayerReady($event)"></app-music-player-youtube>
+	<app-music-player-soundcloud *ngIf="musicOrigin === MusicOrigin.Soundcloud" [musicUrl]="music?.music!"
+		(onReady)="onPlayerReady($event)"></app-music-player-soundcloud>
 
-	</ng-template>
 </ion-content>
 
 <!--
