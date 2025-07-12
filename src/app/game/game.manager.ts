@@ -17,6 +17,17 @@ export class GameManager {
         for (const player of players) {
             this.gameRounds.push(new GameRound(this.music.noteData[0], player, this.isTrainingMode))
         }
+
+        let cumulatedTimeStart = 0;
+        for (let i = 0; i < this.music.bpms.length; i++) {
+            const bps = this.music.bpms[i].value / 60; // Convert BPM to BPS
+            const beatStart = this.music.bpms[i].time;
+            const timeStart = cumulatedTimeStart;
+            this.bpmSections.push(new BPMSection(timeStart, beatStart, bps));
+            if (this.music.bpms[i + 1]) {
+                cumulatedTimeStart += (this.music.bpms[i + 1].time - this.music.bpms[i].time) / bps;
+            }
+        }
     }
 
     public gameRounds: GameRound[] = [];
@@ -25,8 +36,10 @@ export class GameManager {
 
 
     private currentBPMIndex = 0;
+    private bpmSections: BPMSection[] = [];
     private currentBackgroundIndex = 0;
     private zeroTimeStamp: number = 0;
+    private correctionOffset: number = 0;
 
     public registerExternalComponents(musicPlayer: IMusicPlayer/*, playerDisplays: PlayerDisplayComponent[]*/) {
         this.musicPlayer = musicPlayer;
@@ -35,7 +48,8 @@ export class GameManager {
 
 
     public startGame() {
-        this.zeroTimeStamp = Math.round(performance.now()) + (this.music!.offset ?? 0) * 1000;
+        console.log(this.music!.offset)
+        this.zeroTimeStamp = Math.round(performance.now()) - (this.music!.offset * 1000);
         this.musicPlayer.play()
         this.gameGlobalLoop(this.zeroTimeStamp)
         console.log("Game has started")
@@ -45,13 +59,16 @@ export class GameManager {
     private gameLoopId: number | null = null;
     private gameGlobalLoop(currentTimestamp: DOMHighResTimeStamp): void {
         const roundedTimestamp = Math.round(currentTimestamp)
-        const elapsedTime = (roundedTimestamp - this.zeroTimeStamp) / 1000; // In seconds
-        const currentBPS = this.music!.bpms[this.currentBPMIndex].value / 60;
-        const currentBeat = elapsedTime * currentBPS;
-        const tolerance = CONFIG.GAME.TOLERANCE_WINDOW * currentBPS;
+        const elapsedTime = (roundedTimestamp - this.zeroTimeStamp) / 1000 /*+ this.correctionOffset*/; // In seconds
+
+        const section = this.bpmSections[this.currentBPMIndex];
+        const timeInSection = elapsedTime - section.timeStart;
+        const beatInSection = timeInSection * section.bps;
+        const currentBeat = section.beatStart + beatInSection;
 
 
-        if (this.music!.bpms[this.currentBPMIndex + 1] && elapsedTime >= this.music!.bpms[this.currentBPMIndex + 1].time) {
+
+        if (this.bpmSections[this.currentBPMIndex + 1] && elapsedTime >= this.bpmSections[this.currentBPMIndex + 1].timeStart) {
             this.currentBPMIndex++;
         }
 
@@ -60,7 +77,7 @@ export class GameManager {
         }
 
         for (const gameRound of this.gameRounds)
-            gameRound.gameLoop(currentBeat, tolerance)
+            gameRound.gameLoop(currentBeat, CONFIG.GAME.TOLERANCE_WINDOW * this.bpmSections[this.currentBPMIndex].bps)
 
         /*for (const playerDiplay of this.playerDisplays)
             playerDiplay.Update(currentBeat)*/
@@ -71,9 +88,16 @@ export class GameManager {
             return; // Stop loop
         }
 
+        // sync with musicPlayer
+        const musicCurrentTime = this.musicPlayer.getCurrentTime();
+        //const musicDifference = (musicCurrentTime - this.music!.offset) - elapsedTime
+        //this.correctionOffset += musicDifference * 0.1
+        console.log(musicCurrentTime - this.music!.offset, elapsedTime)
+
         // Schedule the next loop iteration
         this.gameLoopId = requestAnimationFrame(this.gameGlobalLoop.bind(this));
     }
+
 
     //#Region Game Over
     private _isGameOver: boolean = false;
@@ -103,4 +127,16 @@ export class GameManager {
         this.musicPlayer.stop();
     }
     //#EndRegion
+}
+
+class BPMSection {
+    timeStart: number;
+    beatStart: number;
+    bps: number;
+
+    constructor(timeStart: number, beatStart: number, bps: number) {
+        this.timeStart = timeStart;
+        this.beatStart = beatStart;
+        this.bps = bps;
+    }
 }

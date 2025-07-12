@@ -53,7 +53,7 @@ export class MusicPlayerSoundcloudComponent extends MusicPlayerCommon
   }
 
   getCurrentTime(): number {
-    return 0;
+    return this.widgetSC;
   }
 
   setToTime(time: number): void {

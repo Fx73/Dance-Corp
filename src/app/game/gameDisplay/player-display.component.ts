@@ -156,7 +156,7 @@ export class PlayerDisplayComponent implements AfterViewInit {
 
   private drawMeasureNumber(measureNumber: number, y: number, canvasWidth: number): void {
     this.ctx.fillStyle = '#ffffff'; // White text color
-    this.ctx.font = '14px Arial'; // Font size and type
+    this.ctx.font = '18px Arial'; // Font size and type
     this.ctx.textAlign = 'left'; // Align the text to the left
     this.ctx.textBaseline = 'middle'; // Vertically center the text relative to the Y position
     this.ctx.fillText(`${measureNumber}`, 10, y - 5); // Draw the text slightly above the bar
