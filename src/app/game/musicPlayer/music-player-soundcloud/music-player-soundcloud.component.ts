@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { IMusicPlayer, MusicPlayerCommon } from '../IMusicPlayer';
 
-import { Soundcloud } from 'soundcloud.ts';
+//import { Soundcloud } from 'soundcloud.ts';
 
 declare var SC: any;
 
@@ -28,7 +28,7 @@ export class MusicPlayerSoundcloudComponent extends MusicPlayerCommon
   @Output()
   onReady: EventEmitter<IMusicPlayer> = new EventEmitter<IMusicPlayer>();
 
-  readonly soundcloud = new Soundcloud();
+  //readonly soundcloud = new Soundcloud();
 
   widgetSC: any;
 

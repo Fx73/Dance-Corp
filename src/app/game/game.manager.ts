@@ -39,27 +39,34 @@ export class GameManager {
     private bpmSections: BPMSection[] = [];
     private currentBackgroundIndex = 0;
     private zeroTimeStamp: number = 0;
-    private correctionOffset: number = 0;
 
     public registerExternalComponents(musicPlayer: IMusicPlayer/*, playerDisplays: PlayerDisplayComponent[]*/) {
         this.musicPlayer = musicPlayer;
         // this.playerDisplays = playerDisplays;
     }
 
+    public async startGame() {
+        console.log("Waiting for audio to start…");
 
-    public startGame() {
-        console.log(this.music!.offset)
-        this.zeroTimeStamp = Math.round(performance.now()) - (this.music!.offset * 1000);
-        this.musicPlayer.play()
-        this.gameGlobalLoop(this.zeroTimeStamp)
-        console.log("Game has started")
+        this.musicPlayer.play();
+        await new Promise<void>(resolve => { const check = () => { const t = this.musicPlayer.getCurrentTime(); if (t > 0) { resolve(); } else { requestAnimationFrame(check); } }; check(); });
+
+        const musicCurrentTime = this.musicPlayer.getCurrentTime();
+        this.zeroTimeStamp = Math.round(performance.now()) - (musicCurrentTime * 1000) - (this.music!.offset * 1000);
+
+
+        this.gameGlobalLoop(this.zeroTimeStamp);
+
+        console.log("Game has started");
     }
+
+
 
 
     private gameLoopId: number | null = null;
     private gameGlobalLoop(currentTimestamp: DOMHighResTimeStamp): void {
         const roundedTimestamp = Math.round(currentTimestamp)
-        const elapsedTime = (roundedTimestamp - this.zeroTimeStamp) / 1000 /*+ this.correctionOffset*/; // In seconds
+        const elapsedTime = (roundedTimestamp - this.zeroTimeStamp) / 1000; // In seconds
 
         const section = this.bpmSections[this.currentBPMIndex];
         const timeInSection = elapsedTime - section.timeStart;
@@ -90,9 +97,6 @@ export class GameManager {
 
         // sync with musicPlayer
         const musicCurrentTime = this.musicPlayer.getCurrentTime();
-        //const musicDifference = (musicCurrentTime - this.music!.offset) - elapsedTime
-        //this.correctionOffset += musicDifference * 0.1
-        console.log(musicCurrentTime - this.music!.offset, elapsedTime)
 
         // Schedule the next loop iteration
         this.gameLoopId = requestAnimationFrame(this.gameGlobalLoop.bind(this));

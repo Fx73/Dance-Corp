@@ -21,6 +21,7 @@
 			<app-player-display *ngFor="let gameRound of game.gameRounds" [gameRound]="gameRound"></app-player-display>
 		</ng-template>
 	</ng-container>
+
 	<!-- Music Player -->
 	<app-music-player-youtube *ngIf="musicOrigin === MusicOrigin.Youtube" [musicUrl]="music?.music!"
 		(onReady)="onPlayerReady($event)"></app-music-player-youtube>

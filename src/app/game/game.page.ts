@@ -108,6 +108,8 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
 
   ngOnDestroy(): void {
     this.game?.gameDestroy();
+    this.location
+
   }
 
 

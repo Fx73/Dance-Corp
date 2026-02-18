@@ -64,12 +64,17 @@ export class MusicFirestoreService {
             const userId = this.userFirestoreService.getUserData()?.id;
             if (!userId) throw new Error("User not authenticated");
 
+            if (!note.creatorId) {// Assign creator if it's new
+                note.creatorId = userId;
+                if (!note.credit) note.credit = this.userFirestoreService.getUserData()?.name;
+            }
+
             if (note.creatorId !== userId)
                 throw new Error("User is not the creator of this note");
 
             const docRef = doc(this.db, this.MUSIC_COLLECTION, musicId).withConverter(this.firestoreConverterMusic);
             const notesCollectionRef = collection(docRef, this.NOTE_COLLECTION).withConverter(this.firestoreConverterNotes);
-
+            console.log(note.chartName)
             const noteRef = doc(notesCollectionRef, note.chartName);
             await setDoc(noteRef, note);
 
