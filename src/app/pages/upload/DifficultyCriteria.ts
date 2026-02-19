@@ -1,6 +1,5 @@
 import { ITimedChange } from "src/app/game/gameModel/timedChange";
 import { Measures } from "src/app/game/gameModel/music.dto";
-import { c } from "@angular/core/navigation_types.d-u4EOrrdZ";
 
 export class DifficultyCriteria {
   endurance: number = 0;  //measures sustained effort

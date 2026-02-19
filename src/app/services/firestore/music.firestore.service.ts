@@ -6,7 +6,6 @@ import { DanceType } from 'src/app/game/constants/dance-type.enum';
 import { FirestoreConverter } from './firestore.converter';
 import { Injectable } from '@angular/core';
 import { UserFirestoreService } from './user.firestore.service';
-import { firestore } from 'firebase-admin';
 
 @Injectable({
     providedIn: 'root'

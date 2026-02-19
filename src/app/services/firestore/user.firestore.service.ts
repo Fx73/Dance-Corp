@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Firestore, FirestoreDataConverter, QueryDocumentSnapshot, collection, doc, getDoc, getDocs, getFirestore, setDoc, updateDoc } from 'firebase/firestore';
+import { DocumentData, Firestore, FirestoreDataConverter, QueryDocumentSnapshot, collection, doc, getDoc, getDocs, getFirestore, setDoc, updateDoc } from 'firebase/firestore';
 import { UserDto, UserMusicDto, UserNoteDto } from 'src/app/pages/user-profile/user.dto';
 
 import { GameRound } from 'src/app/game/gameModel/gameRound';
@@ -129,7 +129,7 @@ export class UserFirestoreService {
     }
 
     readonly userConverter: FirestoreDataConverter<UserDto> = {
-        toFirestore(user: UserDto): FirebaseFirestore.DocumentData {
+        toFirestore(user: UserDto): DocumentData {
             return {
                 id: user.id,
                 name: user.name,

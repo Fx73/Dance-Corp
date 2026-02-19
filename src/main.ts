@@ -1,5 +1,3 @@
-import * as firestore from "firebase-admin";
-
 import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular/standalone';
 import { PreloadAllModules, RouteReuseStrategy, provideRouter, withPreloading, withRouterConfig } from '@angular/router';
 import { getFirestore, initializeFirestore } from 'firebase/firestore';
