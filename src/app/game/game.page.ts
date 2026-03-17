@@ -107,9 +107,9 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
 
 
   ngOnDestroy(): void {
+    this.musicOrigin = null;
     this.game?.gameDestroy();
-    this.location
-
+    this.game = null;
   }
 
 

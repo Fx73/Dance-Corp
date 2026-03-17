@@ -1,18 +1,33 @@
 <app-header title="Upload"></app-header>
 <ion-content [fullscreen]="false">
-	<ion-card *ngIf="musicData == null" class="base-card">
+	@if(!isEditDB && !isEditLocal) {
+	@if(isLoading) {
+	<ion-card class="base-card">
+		<ion-card-header>
+			<ion-card-title>Loading...</ion-card-title>
+		</ion-card-header>
+		<ion-card-content class="flex-align-horizontal">
+			<ion-spinner name="crescent"></ion-spinner>
+		</ion-card-content>
+	</ion-card>
+	}
+	@else {
+	<ion-card class="base-card">
 		<ion-card-header>
 			<ion-card-title> Select a .sm, .ssc, or .essc File </ion-card-title>
-			<ion-card-subtitle><i> Make sure artist is perfect in your file, you will not be able to edit it later.
-					Title, BPM, offset and music link will be locked after first upload.</i> </ion-card-subtitle>
+			<ion-card-subtitle><i> Make sure artist, title are perfect in your file, you will not be able to edit later
+					!
+					To prevent any destruction, Artist, Title, BPM, offset and music link will be locked after first
+					upload.</i> </ion-card-subtitle>
 		</ion-card-header>
 		<ion-card-content class="flex-align-horizontal">
 			<input (change)="onFileSelected($event)" type="file" accept=".sm,.ssc,.essc">
 		</ion-card-content>
 	</ion-card>
-
-
-	<ion-grid *ngIf="musicData !== null">
+	}
+	}
+	@else {
+	<ion-grid>
 		<ion-row>
 			<ion-col size="8">
 				<!-- Metadata Card -->
@@ -21,155 +36,40 @@
 						<ion-card-title>File Metadata</ion-card-title>
 					</ion-card-header>
 					<ion-card-content>
-						<ion-list lines="none" class="datalist">
-							<ion-item [disabled]="this.isEditDB">
-								<ion-input label="Title" [(ngModel)]="musicData.title" (ionChange)="onEndEditing()"
-									[disabled]="isEditProtected"></ion-input>
-							</ion-item>
+						<ion-list lines="none">
+							<music-editable-field label="Title" [value]="musicData.title" [valueDb]="musicDataDb?.title" [isEditing]="false"></music-editable-field>
 
-							<ion-item [title]="dbMusicData?.titletranslit"
-								[class.changed]="isMusicChanged('titletranslit')">
-								<ion-input label="Title (Translit)" [(ngModel)]="musicData.titletranslit"
-									(ionChange)="onEndEditing()" [disabled]="isEditProtected"></ion-input>
-							</ion-item>
+							<music-editable-field label="Title (Translit)" [(value)]="musicData.titletranslit" [valueDb]="musicDataDb?.titletranslit" (valueChange)="onEndEditing()" [isEditing]="isEditLocal"> </music-editable-field>
 
-							<ion-item [title]="dbMusicData?.subtitle" [class.changed]="isMusicChanged('subtitle')">
-								<ion-input label="Subtitle" [(ngModel)]="musicData.subtitle"
-									(ionChange)="onEndEditing()" [disabled]="isEditProtected"></ion-input>
-							</ion-item>
+							<music-editable-field label="Subtitle" [(value)]="musicData.subtitle" [valueDb]="musicDataDb?.subtitle" (valueChange)="onEndEditing()" [isEditing]="isEditLocal"> </music-editable-field>
 
-							<ion-item [title]="dbMusicData?.subtitletranslit"
-								[class.changed]="isMusicChanged('subtitletranslit')">
-								<ion-input label="Subtitle (Translit)" [(ngModel)]="musicData.subtitletranslit"
-									(ionChange)="onEndEditing()" [disabled]="isEditProtected"></ion-input>
-							</ion-item>
+							<music-editable-field label="Subtitle (Translit)" [(value)]="musicData.subtitletranslit" [valueDb]="musicDataDb?.subtitletranslit" (valueChange)="onEndEditing()" [isEditing]="isEditLocal"> </music-editable-field>
 
-							<ion-item>
-								<ion-input label="Artist" [value]="musicData.artist" disabled></ion-input>
-							</ion-item>
+							<music-editable-field label="Artist" [value]="musicData.artist" [valueDb]="musicDataDb?.artist " (valueChange)="onEndEditing()" [isEditing]="false"> </music-editable-field>
 
-							<ion-item [title]="dbMusicData?.artisttranslit"
-								[class.changed]="isMusicChanged('artisttranslit')">
-								<ion-input label="Artist (Translit)" [(ngModel)]="musicData.artisttranslit"
-									(ionChange)="onEndEditing()" [disabled]="isEditProtected"></ion-input>
-							</ion-item>
+							<music-editable-field label="Genre" [(value)]="musicData.genre" [valueDb]="musicDataDb?.genre" (valueChange)="onEndEditing()" [isEditing]="isEditLocal"> </music-editable-field>
 
-							<ion-item [title]="dbMusicData?.genre" [class.changed]="isMusicChanged('genre')">
-								<ion-input label="Genre" [(ngModel)]="musicData.genre" (ionChange)="onEndEditing()"
-									[disabled]="isEditProtected"></ion-input>
-							</ion-item>
+							<music-editable-field label="Credit" [(value)]="musicData.credit" [valueDb]="musicDataDb?.credit" (valueChange)="onEndEditing()" [isEditing]="isEditLocal"> </music-editable-field>
 
-							<ion-item [title]="dbMusicData?.credit" [class.changed]="isMusicChanged('credit')">
-								<ion-input label="Credit" [(ngModel)]="musicData.credit" (ionChange)="onEndEditing()"
-									[disabled]="isEditProtected"></ion-input>
-							</ion-item>
+							<music-editable-field label="Banner" [(value)]="musicData.banner" [valueDb]="musicDataDb?.banner" (valueChange)="onEndEditing()" [isEditing]="isEditLocal"> </music-editable-field>
 
-							<ion-item [title]="dbMusicData?.banner" [class.changed]="isMusicChanged('banner')">
-								<ion-input label="Banner" [(ngModel)]="musicData.banner" (ionChange)="onEndEditing()"
-									[disabled]="isEditProtected"></ion-input>
-							</ion-item>
+							<music-editable-field label="Jacket" [(value)]="musicData.jacket" [valueDb]="musicDataDb?.jacket" (valueChange)="onEndEditing()" [isEditing]="isEditLocal"> </music-editable-field>
 
-							<ion-item [title]="dbMusicData?.jacket" [class.changed]="isMusicChanged('jacket')">
-								<ion-input label="Jacket" [(ngModel)]="musicData.jacket" (ionChange)="onEndEditing()"
-									[disabled]="isEditProtected"></ion-input>
-							</ion-item>
+							<music-editable-field label="CD Title" [(value)]="musicData.cdTitle" [valueDb]="musicDataDb?.cdTitle" (valueChange)="onEndEditing()" [isEditing]="isEditLocal"> </music-editable-field>
 
-							<ion-item [title]="dbMusicData?.cdTitle" [class.changed]="isMusicChanged('cdTitle')">
-								<ion-input label="CD Title" [(ngModel)]="musicData.cdTitle" (ionChange)="onEndEditing()"
-									[disabled]="isEditProtected"></ion-input>
-							</ion-item>
+							<music-editable-field label="Music" [(value)]="musicData.music" [valueDb]="musicDataDb?.music" (valueChange)="onEndEditing()" [isEditing]="isEditLocal"> </music-editable-field>
 
-							<ion-item [disabled]="this.isEditDB">
-								<ion-input label="Music" [(ngModel)]="musicData.music" (ionChange)="onEndEditing()"
-									[disabled]="isEditProtected"></ion-input>
-							</ion-item>
+							<music-editable-field label="Beat 0 Offset (seconds)" type="number" [(value)]="musicData.offset" [valueDb]="musicDataDb?.offset" (valueChange)="onEndEditing()" [isEditing]="isEditLocal && !isEditDB"> </music-editable-field>
 
-							<ion-item [disabled]="this.isEditDB">
-								<ion-input label="Beat 0 Offset (seconds)" type="number" [(ngModel)]="musicData.offset"
-									(ionChange)="onEndEditing()" [disabled]="isEditProtected"></ion-input>
-							</ion-item>
+							<music-editable-field label="Sample Start" type="number" [(value)]="musicData.sampleStart" [valueDb]="musicDataDb?.sampleStart" (valueChange)="onEndEditing()" [isEditing]="isEditLocal"> </music-editable-field>
 
-							<ion-item [title]="dbMusicData?.sampleStart"
-								[class.changed]="isMusicChanged('sampleStart')">
-								<ion-input label="Sample Start" type="number" [(ngModel)]="musicData.sampleStart"
-									(ionChange)="onEndEditing()" [disabled]="isEditProtected"></ion-input>
-							</ion-item>
+							<music-editable-field label="Sample Length" type="number" [(value)]="musicData.sampleLength" [valueDb]="musicDataDb?.sampleLength" (valueChange)="onEndEditing()" [isEditing]="isEditLocal"> </music-editable-field>
 
-							<ion-item [title]="dbMusicData?.sampleLength"
-								[class.changed]="isMusicChanged('sampleLength')">
-								<ion-input label="Sample Length" type="number" [(ngModel)]="musicData.sampleLength"
-									(ionChange)="onEndEditing()" [disabled]="isEditProtected"></ion-input>
-							</ion-item>
+							<music-editable-list label="Bpms" [(value)]="musicData.bpms" [valueDb]="musicDataDb?.bpms" valueType="number" (valueChange)="onEndEditing()" [isEditing]="isEditLocal && !isEditDB"> </music-editable-list>
 
-							<ion-item [disabled]="this.isEditDB">
-								<ion-label>Bpms</ion-label>
-								<ion-list *ngIf="musicData.bpms">
-									<ion-item *ngFor="let bpm of musicData.bpms; let i = index">
-										<ion-input label="Time (s)" type="number" [(ngModel)]="bpm.time"
-											[disabled]="isEditProtected"></ion-input>
-										<ion-input label="BPM" type="number" [(ngModel)]="bpm.value"
-											[disabled]="isEditProtected"></ion-input>
-										<ion-button *ngIf="isEditProtected" color="danger" [disabled]="isEditProtected"
-											(click)="musicData.bpms.splice(i, 1);">
-											<ion-icon slot="icon-only" name="remove-outline"></ion-icon>
-										</ion-button>
-									</ion-item>
-									<ion-item *ngIf="isEditProtected">
-										<ion-button color="success" size="small"
-											(click)="musicData.bpms.push({ time: 0, value: 120 })">
-											<ion-icon slot="icon-only" name="add-outline"></ion-icon>
-										</ion-button>
-									</ion-item>
-								</ion-list>
-							</ion-item>
+							<music-editable-list label="Backgrounds" [(value)]="musicData.bgChanges " [valueDb]="musicDataDb?.bgChanges" valueType="string" (valueChange)="onEndEditing()" [isEditing]="isEditLocal"> </music-editable-list>
 
-							<ion-item [title]="dbMusicData?.bgChanges?.length + ' items'"
-								[class.changed]="isMusicChanged('bgChanges')">
-								<ion-label>Backgrounds</ion-label>
-								<ion-list *ngIf="musicData.bgChanges">
-									<ion-item *ngFor="let bgChange of musicData.bgChanges; let i = index"
-										[title]="dbMusicData?.bgChanges?.[i]?.time + ':' + dbMusicData?.bgChanges?.[i]?.value">
-										<ion-input label="Time (s)" type="number" [(ngModel)]="bgChange.time"
-											[disabled]="isEditProtected"></ion-input>
-										<ion-input label="Background" [(ngModel)]="bgChange.value"
-											[disabled]="isEditProtected"></ion-input>
-										<ion-button *ngIf="isEditProtected" color="danger" [disabled]="isEditProtected"
-											(click)="musicData.bgChanges.splice(i, 1);">
-											<ion-icon slot="icon-only" name="remove-outline"></ion-icon>
-										</ion-button>
-									</ion-item>
-									<ion-item *ngIf="isEditProtected">
-										<ion-button color="success" size="small"
-											(click)="musicData.bgChanges.push({ time: 0, value: '' })">
-											<ion-icon slot="icon-only" name="add-outline"></ion-icon>
-										</ion-button>
-									</ion-item>
-								</ion-list>
-							</ion-item>
-
-							<ion-item [class.changed]="isMusicChanged('labels')"
-								[title]="dbMusicData?.labels?.length + ' items'">
-								<ion-label>Labels</ion-label>
-								<ion-list *ngIf="musicData.labels">
-									<ion-item *ngFor="let label of musicData.labels; let i = index"
-										[title]="dbMusicData?.labels?.[i]?.time + ':' + dbMusicData?.labels?.[i]?.value">
-										<ion-input label="Time (s)" type="number" [(ngModel)]="label.time"
-											[disabled]="isEditProtected"></ion-input>
-										<ion-input label="Text" [(ngModel)]="label.value"
-											[disabled]="isEditProtected"></ion-input>
-										<ion-button *ngIf="isEditProtected" color="danger" [disabled]="isEditProtected"
-											(click)="musicData.labels.splice(i, 1);">
-											<ion-icon slot="icon-only" name="remove-outline"></ion-icon>
-										</ion-button>
-									</ion-item>
-									<ion-item *ngIf="isEditProtected">
-										<ion-button color="success" size="small"
-											(click)="musicData.labels.push({ time: 0, value: '' })">
-											<ion-icon slot="icon-only" name="add-outline"></ion-icon>
-										</ion-button>
-									</ion-item>
-								</ion-list>
-							</ion-item>
+							<music-editable-list label="Labels" [(value)]="musicData.labels" [valueDb]="musicDataDb?.labels" valueType="string" (valueChange)="onEndEditing()" [isEditing]="isEditLocal"> </music-editable-list>
 						</ion-list>
 
 						<p>
@@ -191,10 +91,12 @@
 						<ion-card-title>Background previews</ion-card-title>
 					</ion-card-header>
 					<ion-card-content>
-						<ion-item *ngFor="let bgChange of musicData.bgChanges; let i = index">
+						@for (bgChange of (isEditLocal ? musicData : musicDataDb)?.bgChanges; track $index) {
+						<ion-item>
 							<ion-label position="stacked"> Background at {{bgChange.time}} </ion-label>
 							<ion-img [src]="'https://'+bgChange.value" class="preview-image" />
 						</ion-item>
+						}
 					</ion-card-content>
 				</ion-card>
 			</ion-col>
@@ -203,24 +105,22 @@
 				<!-- Buttons card-->
 				<ion-card class="base-card btn-action-card">
 					<ion-card-content>
-						<ion-button (click)="uploadMusic()" [disabled]="isEditProtected || !isMusicDirty()"
-							expand="block">
-							{{ isEditDB ? 'Update music' : 'Upload music'}}</ion-button>
-						<ion-button *ngIf="isEditDB" (click)="uploadAllNotes()"
-							[disabled]="isEditProtected || !isAnyNoteDirty()" expand="block">
-							Upload All notes </ion-button>
-						<ion-button *ngIf="isEditDB && noNotes()" color="danger" (click)="deleteMusic()"
-							[disabled]="isEditProtected" expand="block"> Delete
-							Music </ion-button>
-						<ion-button (click)="exportEssc()" [disabled]="isEditProtected" size="small">
+						@if (isEditLocal) {
+						<ion-button (click)="uploadMusic()" color="success" expand="block"> {{ isEditDB ? 'Update music' : 'Upload music'}} </ion-button>
+						@if (isEditDB) {
+						<ion-button (click)="uploadAllNotes()" expand="block"> Upload All notes </ion-button>
+						<ion-button color="danger" (click)="deleteMusic()" [disabled]="!noNotes()" expand="block"> Delete Music </ion-button>
+						}
+						<ion-button color="danger" (click)="deleteFile()" size="small" expand="block"> <ion-icon name="trash-outline"></ion-icon>Discard local edit </ion-button>
+						}
+						@else {
+						<ion-button (click)="onStartEdit()" expand="block"> Edit Music </ion-button>
+						}
+
+						<ion-button (click)="exportEssc()" size="small">
 							Export Essc
 						</ion-button>
 					</ion-card-content>
-				</ion-card>
-				<ion-card *ngIf="isMusicDirty() || isAnyNoteDirty()" class="base-card danger-card">
-					<ion-button color="danger" (click)="deleteFile()" size="small" expand="block">
-						<ion-icon slot="icon-only" name="trash-outline"></ion-icon>Remove music from local edit
-					</ion-button>
 				</ion-card>
 				<!-- Image Preview Card -->
 				<ion-card class="base-card">
@@ -230,7 +130,7 @@
 					<ion-card-content>
 						<ion-item>
 							<ion-label position="stacked"> Jacket </ion-label>
-							<ion-img [src]="'https://'+musicData.jacket" class="preview-image" />
+							<ion-img [src]="'https://'+(isEditLocal ? musicData : musicDataDb)?.jacket" class="preview-image" />
 						</ion-item>
 					</ion-card-content>
 				</ion-card>
@@ -239,14 +139,18 @@
 						<ion-card-title>Music preview</ion-card-title>
 					</ion-card-header>
 					<ion-card-content style="max-width: 30vw;">
-						<app-music-player-youtube *ngIf="isMusicOriginYt()" [musicUrl]="musicData.music!"
-							[isRealSize]="true"></app-music-player-youtube>
-						<app-music-player-soundcloud *ngIf="isMusicOriginSc()" [musicUrl]="musicData.music!"
-							[isRealSize]="true"></app-music-player-soundcloud>
+						@switch (MusicPlayerCommon.pickMusicPlayer((isEditLocal ? musicData : musicDataDb)?.music ?? "")) {
+						@case (MusicOrigin.Youtube){
+						<app-music-player-youtube [musicUrl]="(isEditLocal ? musicData : musicDataDb)?.music!" [isRealSize]="true"></app-music-player-youtube>
+						}
+						@case (MusicOrigin.Soundcloud){
+						<app-music-player-soundcloud [musicUrl]="(isEditLocal ? musicData : musicDataDb)?.music!" [isRealSize]="true"></app-music-player-soundcloud> }
+						}
 					</ion-card-content>
 				</ion-card>
 			</ion-col>
 		</ion-row>
+
 		<ion-row>
 			<ion-col>
 				<!-- Notes Data Card -->
@@ -255,51 +159,43 @@
 						<ion-card-title>Notes Data</ion-card-title>
 					</ion-card-header>
 					<ion-card-content class="card-grid">
-						<ion-card *ngFor="let note of musicData.noteData" [disabled]="!isNoteMine(note)">
-							@let noteDb = getDbNote(note.chartName);
+						@for (note of (isEditLocal ? musicData : musicDataDb)?.noteData; track $index) {
+						@let noteDb = getDbNote(note.chartName);
+						<ion-card [disabled]="!isNoteMine(note)">
 							<ion-card-header>
 								<ion-card-title>
-									<ion-input [(ngModel)]="note.chartName" [disabled]="isEditProtected"></ion-input>
+									<ion-input [(ngModel)]="note.chartName" [disabled]="!isEditLocal || noteDb !== undefined"></ion-input>
 								</ion-card-title>
 							</ion-card-header>
 							<ion-card-content>
 								<ion-list>
 									<ion-item [title]="noteDb?.stepsType">
-										<ion-select label="Dance Type" [(ngModel)]="note.stepsType"
-											[disabled]="isEditProtected">
+										<ion-select label="Dance Type" [(ngModel)]="note.stepsType" [disabled]="!isEditLocal">
 											<ion-select-option *ngFor="let type of DanceTypeList" [value]="type">
 												{{ type }}
 											</ion-select-option>
 										</ion-select>
 									</ion-item>
 
-									<ion-item [title]="noteDb?.description">
-										<ion-input label="Description" [(ngModel)]="note.description"
-											[disabled]="isEditProtected"></ion-input>
-									</ion-item>
+									<music-editable-field label="Description" [(value)]="note.description" [valueDb]="noteDb?.description" [isEditing]="isEditLocal" (valueChange)="onEndEditing()">
+									</music-editable-field>
 
 									<ion-item [title]="noteDb?.difficulty">
-										<ion-select label="Difficulty" [(ngModel)]="note.difficulty"
-											[disabled]="isEditProtected">
+										<ion-select label="Difficulty" [(ngModel)]="note.difficulty" [disabled]="!isEditLocal">
 											<ion-select-option *ngFor="let level of NoteDifficultyList" [value]="level">
 												{{ level }}
 											</ion-select-option>
 										</ion-select>
 									</ion-item>
 
-									<ion-item [title]="noteDb?.meter">
-										<ion-input label="Meter" type="number" [(ngModel)]="note.meter"
-											[disabled]="isEditProtected"></ion-input>
-									</ion-item>
+									<music-editable-field label="Meter" [(value)]="note.meter" [valueDb]="noteDb?.meter" [isEditing]="isEditLocal" type="number" (valueChange)="onEndEditing()">
+									</music-editable-field>
 
-									<ion-item [title]="noteDb?.credit">
-										<ion-input label="Credit" [(ngModel)]="note.credit"
-											[disabled]="isEditProtected"></ion-input>
-									</ion-item>
+									<music-editable-field label="Credit" [(value)]="note.credit" [valueDb]="noteDb?.credit" [isEditing]="isEditLocal" (valueChange)="onEndEditing()">
+									</music-editable-field>
 
 									<ion-item [title]="noteDb?.creationDate">
-										<ion-input label="Creation Date" type="date" [(ngModel)]="note.creationDate"
-											[disabled]="isEditProtected"></ion-input>
+										<ion-label> <strong class="primary">Creation Date:</strong> {{ (note.creationDate | date:'dd/MM/yyyy') }} </ion-label>
 									</ion-item>
 								</ion-list>
 								<p>
@@ -324,25 +220,24 @@
 								</p>
 							</ion-card-content>
 							<!-- Notes Buttons card-->
-							<ion-card *ngIf="isNoteMine(note)" class="base-card btn-action-card">
+							@if (isNoteMine(note) && isEditLocal) {
+							<ion-card class="base-card btn-action-card">
 								<ion-card-content>
 									<ion-button (click)="TestNote(note)" color="tertiary" size="small" expand="block">
 										Test </ion-button>
-									<ion-button (click)="uploadNote(note)" size="small"
-										[color]="isNoteInDb(note)?'primary':'success'" expand="block"
-										[disabled]="isEditProtected || (isNoteInDb(note) && !isNoteDirty(note))">
-										{{ isNoteInDb(note) ? 'Update notes' : 'Upload notes'}}</ion-button>
-									<ion-button (click)="deleteNote(note)" color="danger" size="small" expand="block"
-										[disabled]="isEditProtected"> {{ isNoteInDb(note) ? 'Delete from database' :
-										'Remove
-										notes'}} </ion-button>
+									<ion-button (click)="uploadNote(note)" size="small" [color]="noteDb?'primary':'success'" expand="block">
+										{{ noteDb ? 'Update notes' : 'Upload notes'}}</ion-button>
+									<ion-button (click)="deleteNote(note)" color="danger" size="small" expand="block" [disabled]="!isEditLocal"> {{ noteDb ? 'Delete from database' : 'Remove notes'}} </ion-button>
 								</ion-card-content>
 							</ion-card>
+							}
 						</ion-card>
+						}
 					</ion-card-content>
 				</ion-card>
 			</ion-col>
 		</ion-row>
+
 		<ion-row>
 			<ion-col>
 				<!-- Additional Fields Card -->
@@ -362,4 +257,5 @@
 			</ion-col>
 		</ion-row>
 	</ion-grid>
+	}
 </ion-content>

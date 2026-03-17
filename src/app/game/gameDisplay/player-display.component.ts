@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild, input } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { ArrowColor, ArrowImageManager } from './arrowImageManager';
 
 import { Arrow } from '../gameModel/arrow';
@@ -40,7 +40,7 @@ export class PlayerDisplayComponent implements AfterViewInit {
   private currentArrowVisibleIndex: number = 0; // Index of the next not arrow in arrowMap
   targetY = CONFIG.DISPLAY.TARGET_PERCENT;
 
-  constructor(private userConfigService: UserConfigService) {
+  constructor(private userConfigService: UserConfigService, private cd: ChangeDetectorRef) {
   }
 
   ngAfterViewInit(): void {
@@ -105,7 +105,7 @@ export class PlayerDisplayComponent implements AfterViewInit {
       }
       this.gameRound.precisionMessage = [];
     }
-
+    this.cd.markForCheck()
 
   }
 

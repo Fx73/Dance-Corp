@@ -5,6 +5,7 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" [style]="'--background: url(' + backgroundUrl + ')'">
+
 	<app-waiting-screen *ngIf="loadingMusic" [title]="music!.title" [artist]="music!.artist" [coverUrl]="music!.jacket"
 		(onCountdownFinished)="handleCountdownFinished()"></app-waiting-screen>
 

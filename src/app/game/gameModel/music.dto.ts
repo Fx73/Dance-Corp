@@ -24,8 +24,8 @@ export class MusicDto {
   stops?: string;
   delays?: string;
   warps?: string;
-  bgChanges?: TextChange[];
-  labels?: TextChange[];
+  bgChanges: TextChange[] = [];
+  labels: TextChange[] = [];
   noteData: NoteDataDto[] = [];
   additionalFields?: Record<string, string>;
 
@@ -77,14 +77,13 @@ export class MusicDto {
     delete tokenMap["warps"];
     this.bpms = this.parseChanges<BpmChange>(tokenMap["bpms"], v => parseFloat(v))!;
     delete tokenMap["bpms"];
-    this.bgChanges = this.parseChanges<TextChange>(tokenMap["bgchanges"], v => v);
+    this.bgChanges = this.parseChanges<TextChange>(tokenMap["bgchanges"], v => v) ?? [];
     if (tokenMap["background"] && !this.bgChanges) {
       this.bgChanges = [new TextChange(0, tokenMap["background"])];
-
     }
     delete tokenMap["background"];
     delete tokenMap["bgchanges"];
-    this.labels = this.parseChanges<TextChange>(tokenMap["labels"], v => v);
+    this.labels = this.parseChanges<TextChange>(tokenMap["labels"], v => v) ?? [];
     delete tokenMap["labels"];
 
     Object.keys(tokenMap).forEach(key => {

@@ -1,13 +1,13 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core';
 
 import { IonSpinner } from "@ionic/angular/standalone";
-import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-waiting-screen',
   templateUrl: './waiting-screen.component.html',
   styleUrls: ['./waiting-screen.component.scss'],
-  imports: [IonSpinner, NgIf]
+  standalone: true,
+  imports: [IonSpinner]
 
 })
 export class WaitingScreenComponent implements OnInit {
@@ -16,7 +16,8 @@ export class WaitingScreenComponent implements OnInit {
   @Input() coverUrl: string | undefined;
   @Input() level: string | undefined;
 
-  countdown: number | null = null;
+  countdown = signal<number | null>(null);
+
   @Output() onCountdownFinished = new EventEmitter<void>();
 
   constructor() { }
@@ -24,10 +25,10 @@ export class WaitingScreenComponent implements OnInit {
   ngOnInit() { }
 
   startCountdown() {
-    this.countdown = 3;
+    this.countdown.set(3);
     const interval = setInterval(() => {
-      this.countdown!--;
-      if (this.countdown === 0) {
+      this.countdown.update((prev: number | null) => (prev || 0) - 1);
+      if (this.countdown() === 0) {
         clearInterval(interval);
         setTimeout(() => {
           this.onCountdownFinished.emit();

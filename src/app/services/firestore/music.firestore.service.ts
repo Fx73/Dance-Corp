@@ -42,11 +42,23 @@ export class MusicFirestoreService {
     }
 
     async updateMusic(dto: MusicDto): Promise<void> {
+        const protectedFields: (keyof MusicDto)[] = ['artist', 'title', 'bpms', 'offset', 'music'];
         try {
             const userId = this.userFirestoreService.getUserData()?.id;
             if (!userId) throw new Error("User not authenticated");
 
             const musicRef = doc(this.db, this.MUSIC_COLLECTION, dto.id).withConverter(this.firestoreConverterMusic);
+
+
+
+            // check protected fields are not modified
+            const current = (await getDoc(musicRef)).data();
+            if (!current) throw new Error("Music not found");
+            for (const field of protectedFields) {
+                if (dto[field] !== current[field])
+                    throw new Error(`Field "${field}" cannot be modified after upload.`);
+            }
+
             const { noteData: notes, ...mainData } = dto;
             await updateDoc(musicRef, mainData);
 
@@ -105,8 +117,6 @@ export class MusicFirestoreService {
                     console.log(`Skipping update for note ${note.chartName} - Not the creator`);
 
             }
-
-            AppComponent.presentOkToast("Music successfully updated!");
 
         } catch (error) {
             AppComponent.presentWarningToast("Error updating music: " + error);
@@ -254,7 +264,7 @@ export class MusicFirestoreService {
         }
     }
 
-    async deleteNote(musicId: string, note: NoteDataDto) {
+    async deleteNote(musicId: string, note: NoteDataDto): Promise<void> {
         try {
             const userId = this.userFirestoreService.getUserData()?.id;
             if (!userId) throw new Error("User not authenticated");

@@ -1,0 +1,10 @@
+ion-item.changed {
+  border-left: 3px solid #f57c00;
+  background: #fff7f0;
+}
+ion-label{
+    color: var(--ion-color-primary);
+}
+::ng-deep ion-input .label-text{
+    color: var(--ion-color-primary);
+}

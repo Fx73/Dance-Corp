@@ -39,6 +39,9 @@
 
 .stored-card{
   background-color: var(--ion-color-secondary);
+  ion-card-title{
+    color: var(--ion-color-dark);
+  }
 }
 .add-card{
   transition: all 0.2s ease-in-out;

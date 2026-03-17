@@ -181,7 +181,7 @@ export class SccWriter {
     return Object.keys(dto).map(key => [key, dto[key]]);
   }
 
-  static writeSscFile(dto: MusicDto, isEssc: boolean = false): string {
+  static writeSscFile(dto: MusicDto): string {
     let esscContent = '';
     const fileFields = SccWriter.getOrderedFields(dto).filter(([key]) => key !== 'noteData' && key !== 'additionalFields');
     for (const [key, value] of fileFields) {

@@ -1,5 +1,7 @@
-import { ActivatedRoute, Router } from '@angular/router';
-import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonGrid, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonList, IonRow, IonSelect, IonSelectOption, ModalController } from '@ionic/angular/standalone';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { ChangeDetectorRef, Component } from '@angular/core';
+import { CommonModule, Location } from '@angular/common';
+import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonGrid, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonList, IonRow, IonSelect, IonSelectOption, IonSpinner, ModalController } from '@ionic/angular/standalone';
 import { Measures, MusicDto, NoteDataDto } from 'src/app/game/gameModel/music.dto';
 import { MusicOrigin, MusicPlayerCommon } from 'src/app/game/musicPlayer/IMusicPlayer';
 import { SccReader, SccWriter } from './reader.ssc';
@@ -7,11 +9,11 @@ import { addOutline, checkmarkCircle, closeCircle, removeOutline, trashOutline }
 
 import { AppComponent } from 'src/app/app.component';
 import { BrowseUploadPage } from '../browse-upload/browse-upload.page';
-import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
 import { DanceType } from './../../game/constants/dance-type.enum';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from 'src/app/shared/component/header/header.component';
+import { MusicEditableFieldComponent } from './editable-field/editable-field.component';
+import { MusicEditableListComponent } from './editable-list/editable-list.component';
 import { MusicFirestoreService } from 'src/app/services/firestore/music.firestore.service';
 import { MusicPlayerSoundcloudComponent } from "../../game/musicPlayer/music-player-soundcloud/music-player-soundcloud.component";
 import { MusicPlayerYoutubeComponent } from "../../game/musicPlayer/music-player-youtube/music-player-youtube.component";
@@ -25,86 +27,159 @@ import { addIcons } from 'ionicons';
   templateUrl: './upload.page.html',
   styleUrls: ['./upload.page.scss'],
   standalone: true,
-  imports: [IonCardSubtitle, IonImg, IonCol, IonRow, IonGrid, IonInput, IonItem, IonLabel, IonList, FormsModule, IonIcon, IonButton, IonCardTitle, IonCardContent, IonCardHeader, IonCard, IonContent, IonSelect, IonSelectOption, CommonModule, FormsModule, HeaderComponent, IonButton, MusicPlayerYoutubeComponent, MusicPlayerSoundcloudComponent]
+  imports: [IonSpinner, MusicEditableFieldComponent, MusicEditableListComponent, IonCardSubtitle, IonImg, IonCol, IonRow, IonGrid, IonInput, IonItem, IonLabel, IonList, FormsModule, IonIcon, IonButton, IonCardTitle, IonCardContent, IonCardHeader, IonCard, IonContent, IonSelect, IonSelectOption, CommonModule, FormsModule, HeaderComponent, IonButton, MusicPlayerYoutubeComponent, MusicPlayerSoundcloudComponent]
 })
 export class UploadPage {
   //#region Constants
   public static readonly MUSICEDIT_STORAGE_KEY = (musicId: string) => `MUSICEDIT_${musicId}`;
-
+  MusicPlayerCommon = MusicPlayerCommon;
+  MusicOrigin = MusicOrigin;
   readonly DanceTypeList = Object.values(DanceType);
   readonly NoteDifficultyList = Object.values(NoteDifficulty);
   //#endregion
 
-  musicData: MusicDto | null = null;
-  dbMusicData: MusicDto | null = null;
-  isEditProtected = false;
+  musicData: MusicDto = new MusicDto();
+  musicDataDb: MusicDto | null = null;
   isEditDB = false;
+  isEditLocal = false;
 
 
-  constructor(private modalController: ModalController, private route: ActivatedRoute, private fireStoreService: MusicFirestoreService, private userService: UserFirestoreService) {
+  isLoading = false;
+
+  constructor(private modalController: ModalController, private route: ActivatedRoute, private fireStoreService: MusicFirestoreService, private userService: UserFirestoreService, private cd: ChangeDetectorRef, private location: Location, private router: Router) {
     addIcons({ trashOutline, removeOutline, addOutline, checkmarkCircle, closeCircle });
 
   }
 
   async ngOnInit() {
     const musicId = this.route.snapshot.queryParamMap.get('music');
-    console.log("Music ID from query params:", musicId);
     if (musicId) {
-      const storedData = localStorage.getItem(UploadPage.MUSICEDIT_STORAGE_KEY(musicId));
-      if (storedData) {
-        this.musicData = SccReader.parseFile(`${musicId}.essc`, storedData);
-      }
+      this.isLoading = true;
+      this.loadLocalMusic(musicId);
       await this.loadDbMusic(musicId);
 
       if (!this.musicData) {
-        if (!this.dbMusicData) {
+        if (!this.musicDataDb) {
           AppComponent.presentErrorToast("Music not found in local storage or database.");
           return;
         }
-        this.musicData = this.dbMusicData.deepClone();
+        this.musicData = this.musicDataDb.deepClone();
       }
     }
 
   }
 
+  //#region Load
+  async loadDbMusic(musicId: string) {
+    const data = await this.fireStoreService.getMusicWithNotes(musicId);
+    if (data) {
+      this.musicDataDb = data;
+      this.isEditDB = true;
+      this.isLoading = false;
+
+      this.cd.markForCheck()
+    }
+
+  }
+
+  loadLocalMusic(musicId: string) {
+    const storedData = localStorage.getItem(UploadPage.MUSICEDIT_STORAGE_KEY(musicId));
+    if (storedData) {
+      this.musicData = SccReader.parseFile(`${musicId}.essc`, storedData);
+      this.isEditLocal = true;
+      this.isLoading = false;
+
+      this.cd.markForCheck()
+    }
+  }
+
+  async switchToMusicPage() {
+    this.location.back();
+
+    const sub = this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        sub.unsubscribe();
+        this.router.navigate(['/upload'], {
+          queryParams: { music: this.musicData.id }
+        });
+      }
+    });
+  }
+
+  //#endregion
+
+  //#region New Music
 
   onFileSelected(event: any): void {
     const file: File = event.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = async (e) => {
         const content = e.target?.result as string;
         this.musicData = SccReader.parseFile(file.name, content);
         this.saveChanges();
-        this.loadDbMusic(this.musicData.id);
+        this.isEditLocal = true;
+        AppComponent.presentOkToast("Music loaded successfully : " + this.musicData.id);
+
+        if (await this.fireStoreService.existsMusic(this.musicData.id)) {
+          AppComponent.presentWarningToast("This music already exists in the database. You are now editing the local version. Uploading will overwrite the database version.");
+          this.switchToMusicPage();
+        } else {
+          this.cd.detectChanges()
+        }
       };
       reader.readAsText(file);
     }
   }
 
-  async loadDbMusic(musicId: string) {
-    this.dbMusicData = await this.fireStoreService.getMusicWithNotes(musicId);
-    if (this.dbMusicData) {
-      this.isEditDB = true;
-    }
+  onStartEdit() {
+    this.musicData = this.musicDataDb!.deepClone();
+    this.isEditLocal = true;
+    this.cd.detectChanges()
+
   }
 
-  uploadMusic(): void {
+  exportEssc(): void {
+    const esscContent = SccWriter.writeSscFile(this.musicData!);
+    const filename = `${this.musicData?.artist}_${this.musicData?.title}.essc`;
+
+    const blob = new Blob([esscContent], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+  }
+  //#endregion
+
+  //#region Upload
+  async uploadMusic(): Promise<void> {
     if (this.musicData === null) return;
     if (this.isEditDB) {
-      this.fireStoreService.updateMusic(this.musicData)
+      await this.fireStoreService.updateMusic(this.musicData)
+      await this.loadDbMusic(this.musicData.id);
     }
     else {
-      this.fireStoreService.uploadMusic(this.musicData)
+      await this.fireStoreService.uploadMusic(this.musicData)
       this.isEditDB = true
+      await this.location.back();
+      this.router.navigate(['/upload'], {
+        queryParams: { music: this.musicData.id }
+      });
     }
-    this.loadDbMusic(this.musicData.id)
   }
 
-  uploadAllNotes(): void {
+  async uploadAllNotes(): Promise<void> {
     if (this.musicData === null || !this.isEditDB) return;
-    this.fireStoreService.uploadAllNotes(this.musicData.id, this.musicData.noteData)
-    this.loadDbMusic(this.musicData.id)
+    await this.fireStoreService.uploadAllNotes(this.musicData.id, this.musicData.noteData)
+    AppComponent.presentOkToast("All notes uploaded successfully!");
+
+    await this.loadDbMusic(this.musicData.id)
 
   }
 
@@ -114,76 +189,63 @@ export class UploadPage {
     this.loadDbMusic(this.musicData.id)
 
   }
+  //#endregion
 
-  isMusicChanged<K extends keyof MusicDto>(key: K): boolean {
-    if (this.dbMusicData === null) return false;
-    if (key === 'additionalFields' || key === 'noteData') return false;
+  //#region Delete
+  deleteFile() {
+    if (this.musicData === null) return;
+    localStorage.removeItem(UploadPage.MUSICEDIT_STORAGE_KEY(this.musicData.id));
+    BrowseUploadPage.removeFromEditRegistry(this.musicData.id);
+    this.musicData = new MusicDto();
+    this.isEditLocal = false;
 
-    const a = this.dbMusicData?.[key];
-    const b = this.musicData?.[key];
-    if (Array.isArray(a) && Array.isArray(b)) {
-      if (typeof a[0] === 'object')
-        return !this.deepShallowEqualArrayOfObjects(a, b);
-      return JSON.stringify(a) !== JSON.stringify(b);
+    if (!this.isEditDB) {
+      this.location.back();
+      AppComponent.presentOkToast("Music has been discarded");
+    } else {
+      AppComponent.presentOkToast("Music changes have been removed")
     }
 
-    if (typeof a === 'object' && typeof b === 'object') {
-      return !this.shallowEqual(a, b);
+  }
+
+  async deleteMusic() {
+    if (!this.musicDataDb) return;
+    await this.fireStoreService.deleteMusic(this.musicDataDb.id);
+    this.musicDataDb = null;
+    this.isEditDB = false;
+    AppComponent.presentOkToast("Music deleted successfully from database.");
+  }
+
+
+
+  deleteNote(note: NoteDataDto): void {
+    if (!this.musicData) return;
+
+    if (this.musicDataDb && this.musicDataDb.noteData.some(n => n.chartName === note.chartName)) {
+      this.fireStoreService.deleteNote(this.musicData.id, note)
+      this.musicDataDb.noteData = this.musicDataDb.noteData.filter(n => n.chartName !== note.chartName)
+      AppComponent.presentOkToast("Note deleted successfully from database.");
+
+    } else {
+      this.musicData.noteData = this.musicData.noteData.filter(n => n.chartName !== note.chartName)
+      this.saveChanges();
     }
-    const normalize = (val: any) =>
-      val === null || val === undefined || (typeof val === 'string' && val.trim() === '') ? '' : val;
 
-    return normalize(a) !== normalize(b);
+  }
+  //#endregion
+
+  //#region Local editing
+  onEndEditing() {
+    this.saveChanges()
   }
 
-  isNoteChanged<K extends keyof NoteDataDto>(note: NoteDataDto, key: K): boolean {
-    const dbNote = this.dbMusicData?.noteData.find(n => n.chartName === note.chartName)
-
-    if (!dbNote) return true;
-
-    const a = dbNote[key];
-    const b = note[key];
-
-    if (Array.isArray(a) || typeof a === 'object') {
-      return JSON.stringify(a) !== JSON.stringify(b);
+  saveChanges(): void {
+    if (this.musicData) {
+      localStorage.setItem(UploadPage.MUSICEDIT_STORAGE_KEY(this.musicData.id), SccWriter.writeSscFile(this.musicData));
+      BrowseUploadPage.addToEditRegistry(this.musicData.id);
     }
-
-    return a !== b;
   }
-
-  deepShallowEqualArrayOfObjects<T>(arr1: T[], arr2: T[]): boolean {
-    if (arr1.length !== arr2.length) return false;
-    return arr1.every((item, index) => this.shallowEqual(item, arr2[index]));
-  }
-
-  shallowEqual(obj1: any, obj2: any): boolean {
-    const keys1 = Object.keys(obj1).sort();
-    const keys2 = Object.keys(obj2).sort();
-    if (keys1.length !== keys2.length) return false;
-    return keys1.every(key => obj2.hasOwnProperty(key) && obj1[key] === obj2[key]);
-  }
-
-
-  isMusicDirty(): boolean {
-    if (!this.dbMusicData || !this.musicData) return true;
-
-    const keys = Object.keys(this.musicData) as (keyof MusicDto)[];
-    return keys.some(key => this.isMusicChanged(key));
-  }
-
-  isNoteDirty(note: NoteDataDto): boolean {
-    if (!this.dbMusicData || !this.musicData) return true;
-
-    const keys = Object.keys(note) as (keyof NoteDataDto)[];
-    return keys.some(key => this.isNoteChanged(note, key));
-  }
-
-  isAnyNoteDirty(): boolean {
-    if (!this.dbMusicData || !this.musicData) return true;
-    return this.musicData.noteData.some(note => this.isNoteDirty(note));
-  }
-
-
+  //#endregion
 
 
   getStepCount(stepChart: Measures[], stepType: number): number {
@@ -214,56 +276,6 @@ export class UploadPage {
     })
   }
 
-  onEndEditing() {
-    this.saveChanges()
-  }
-
-  saveChanges(): void {
-    if (this.musicData) {
-      localStorage.setItem(UploadPage.MUSICEDIT_STORAGE_KEY(this.musicData.id), SccWriter.writeSscFile(this.musicData, true));
-      BrowseUploadPage.addToEditRegistry(this.musicData.id);
-    }
-  }
-
-  deleteFile() {
-    if (this.musicData) {
-      localStorage.removeItem(UploadPage.MUSICEDIT_STORAGE_KEY(this.musicData.id));
-      BrowseUploadPage.removeFromEditRegistry(this.musicData.id);
-    }
-    if (this.dbMusicData) {
-      this.musicData = this.dbMusicData.deepClone();
-      AppComponent.presentOkToast("Changes have been removed")
-    } else {
-      this.musicData = null
-      AppComponent.presentOkToast("Music has been deleted")
-    }
-  }
-
-  deleteMusic() {
-    if (!this.musicData) return;
-
-    this.fireStoreService.deleteMusic(this.musicData.id).then(() => {
-      AppComponent.presentOkToast("Music deleted successfully.");
-      this.isEditDB = false;
-      this.dbMusicData = null;
-      this.saveChanges();
-    }).catch((error: { message: string; }) => {
-      AppComponent.presentErrorToast("Failed to delete music: " + error.message);
-    });
-  }
-  deleteNote(note: NoteDataDto): void {
-    if (!this.musicData) return;
-    if (this.dbMusicData && this.dbMusicData.noteData.some(n => n.chartName === note.chartName)) {
-      this.fireStoreService.deleteNote(this.musicData.id, note)
-      this.dbMusicData.noteData = this.dbMusicData.noteData.filter(n => n.chartName !== note.chartName)
-      this.saveChanges()
-
-    } else {
-      this.musicData.noteData = this.musicData.noteData.filter(n => n.chartName !== note.chartName)
-    }
-
-  }
-
   async TestNote(note: NoteDataDto) {
     const modal = await this.modalController.create({
       component: TestNoteComponent,
@@ -277,63 +289,19 @@ export class UploadPage {
     await modal.present()
   }
 
-  exportEssc(): void {
-    const esscContent = SccWriter.writeSscFile(this.musicData!, true);
-    const filename = `${this.musicData?.artist}_${this.musicData?.title}.essc`;
 
-    const blob = new Blob([esscContent], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-
-  }
-
-  exportSsc(): void {
-    const esscContent = SccWriter.writeSscFile(this.musicData!);
-    const filename = `${this.musicData?.artist}_${this.musicData?.title}.ssc`;
-
-    const blob = new Blob([esscContent], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-
-  }
 
   noNotes(): boolean {
-    if (!this.musicData || !this.musicData.noteData) return true;
-    return this.musicData.noteData.length === 0;
+    if (!this.musicDataDb || !this.musicDataDb.noteData) return true;
+    return this.musicDataDb.noteData.length === 0;
   }
-
   isNoteMine(note: NoteDataDto): boolean {
     if (!note.creatorId || note.creatorId.trim() === "") return true;
     return note.creatorId === this.userService.getUserData()?.id;
   }
-  isNoteInDb(note: NoteDataDto): boolean {
-    return this.dbMusicData?.noteData.some(n => n.chartName === note.chartName) ?? false;
-  }
   getDbNote(chartName: string): NoteDataDto | undefined {
-    return this.dbMusicData?.noteData.find(n => n.chartName === chartName);
+    return this.musicDataDb?.noteData.find(n => n.chartName === chartName);
   }
 
-  isMusicOriginYt(): boolean {
-    if (!this.musicData?.music) return false;
-    return MusicPlayerCommon.pickMusicPlayer(this.musicData.music) === MusicOrigin.Youtube;
-  }
-  isMusicOriginSc(): boolean {
-    if (!this.musicData?.music) return false;
-    return MusicPlayerCommon.pickMusicPlayer(this.musicData.music) === MusicOrigin.Soundcloud;
-  }
 
 }

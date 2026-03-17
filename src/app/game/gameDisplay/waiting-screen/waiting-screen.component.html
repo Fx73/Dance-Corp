@@ -6,10 +6,12 @@
     <p>Niveau : {{ level }}</p>
 
     <ion-spinner name="bubbles"></ion-spinner>
-    <p *ngIf="countdown === null" class="loading-message">Loading music ...</p>
-    <div class="countdown" *ngIf="countdown !== null">
-      {{ countdown }}
+    @if (countdown() !== null) {
+    <div class="countdown">
+      {{ countdown() }}
     </div>
-
+    }@else{
+    <p class="loading-message">Loading music ...</p>
+    }
   </div>
 </div>

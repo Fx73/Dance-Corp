@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { InfiniteScrollCustomEvent, IonBadge, IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonGrid, IonHeader, IonImg, IonInfiniteScroll, IonInfiniteScrollContent, IonItem, IonLabel, IonList, IonMenu, IonRow, IonSearchbar, IonSplitPane, IonTab, IonText, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { Component, OnInit, signal } from '@angular/core';
+import { InfiniteScrollCustomEvent, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonImg, IonInfiniteScroll, IonInfiniteScrollContent, IonMenu, IonSearchbar, IonSplitPane, IonText } from '@ionic/angular/standalone';
 import { MusicDto, NoteDataDto } from 'src/app/game/gameModel/music.dto';
 
 import { Color } from 'src/app/game/constants/color';
@@ -25,8 +25,8 @@ import { UserFirestoreService } from './../../services/firestore/user.firestore.
 export class BrowsePage implements OnInit {
   readonly DanceType = DanceType;
 
-  musics: MusicDto[] = [];
-  notes: NoteDataDto[] | undefined;
+  musics = signal<MusicDto[]>([]);
+  notes = signal<NoteDataDto[] | undefined>(undefined);
   userScores: { [key: string]: number } = {};
   selectedMusic: MusicDto | null = null;
   searchQuery: string = '';
@@ -36,9 +36,10 @@ export class BrowsePage implements OnInit {
   constructor(private router: Router, private fireStoreService: MusicFirestoreService, private musicCacheService: MusicCacheService, private userFirestoreService: UserFirestoreService, private userConfigService: UserConfigService) { }
 
   ngOnInit() {
-    this.fireStoreService.GetAllMusics(null).then(value => this.musics = value);
+    this.fireStoreService.GetAllMusics(null).then(value => this.musics.set(value)).catch(e => console.log(e.message));
     this.isSinglePlayer = this.userConfigService.players.length === 1;
   }
+
 
   runGame(note: NoteDataDto): void {
     if (!this.selectedMusic)
@@ -56,11 +57,11 @@ export class BrowsePage implements OnInit {
   showLevels(music: MusicDto) {
     if (this.selectedMusic?.id === music.id) {
       this.selectedMusic = null;
-      this.notes = [];
+      this.notes.set([]);
       return;
     }
     this.selectedMusic = music;
-    this.musicCacheService.getMusicNotes(music.id, this.isSinglePlayer).then(n => this.notes = n)
+    this.musicCacheService.getMusicNotes(music.id, this.isSinglePlayer).then(n => this.notes.set(n))
     if (this.userFirestoreService.getUserData())
       this.userFirestoreService.getScoresForMusic(this.selectedMusic.id, this.userFirestoreService.getUserData()!.id).then(score => this.userScores = score)
   }
@@ -76,15 +77,15 @@ export class BrowsePage implements OnInit {
 
   onSearch(event: any) {
     this.searchQuery = event.target.value.toLowerCase();
-    this.fireStoreService.GetAllMusicsWithSearch(null, this.searchQuery).then(value => this.musics = value);
+    this.fireStoreService.GetAllMusicsWithSearch(null, this.searchQuery).then(value => { this.musics.set(value) });
   }
 
   onIonInfinite(event: InfiniteScrollCustomEvent) {
-    const lastMusic: MusicDto = this.musics.at(-1)!
+    const lastMusic: MusicDto = this.musics().at(-1)!
     if (this.searchQuery === '')
-      this.fireStoreService.GetAllMusics(lastMusic?.id ?? null).then(value => this.musics = this.musics.concat(value)).catch((e) => { console.log(e.message); event.target.complete() });
+      this.fireStoreService.GetAllMusics(lastMusic?.id ?? null).then(value => this.musics.update(prev => [...prev, ...value])).catch((e) => { console.log(e.message); event.target.complete() });
     else
-      this.fireStoreService.GetAllMusicsWithSearch(lastMusic?.id ?? null, this.searchQuery).then(value => this.musics = this.musics.concat(value)).catch((e) => { console.log(e.message); event.target.complete() });
+      this.fireStoreService.GetAllMusicsWithSearch(lastMusic?.id ?? null, this.searchQuery).then(value => this.musics.update(prev => [...prev, ...value])).catch((e) => { console.log(e.message); event.target.complete() });
   }
 
 

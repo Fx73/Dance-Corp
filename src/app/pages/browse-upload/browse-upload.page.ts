@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { InfiniteScrollCustomEvent, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonIcon, IonImg, IonInfiniteScroll, IonInfiniteScrollContent, IonSearchbar, IonText } from '@ionic/angular/standalone';
 import { MusicDto, NoteDataDto } from 'src/app/game/gameModel/music.dto';
 
@@ -23,8 +23,8 @@ import { addIcons } from 'ionicons';
 export class BrowseUploadPage implements OnInit {
 
   storedMusics: MusicDto[] = [];
-  musics: MusicDto[] = [];
-  notes: NoteDataDto[] | undefined;
+  musics = signal<MusicDto[]>([]);
+  notes = signal<NoteDataDto[] | undefined>(undefined);
   userScores: { [key: string]: number } = {};
   searchQuery: string = '';
 
@@ -52,7 +52,10 @@ export class BrowseUploadPage implements OnInit {
         if (index !== -1) BrowseUploadPage.EditRegistry.splice(index, 1);
       }
     }
-    this.fireStoreService.GetAllMusics(null).then(value => this.musics = value);
+    this.fireStoreService.GetAllMusics(null).then(value => {
+      const filtered = value.filter(m => !this.storedMusics.some(s => s.id === m.id));
+      this.musics.set(filtered);
+    });
 
   }
 
@@ -68,15 +71,15 @@ export class BrowseUploadPage implements OnInit {
 
   onSearch(event: any) {
     this.searchQuery = event.target.value.toLowerCase();
-    this.fireStoreService.GetAllMusicsWithSearch(null, this.searchQuery).then(value => this.musics = value);
+    this.fireStoreService.GetAllMusicsWithSearch(null, this.searchQuery).then(value => this.musics.set(value));
   }
 
   onIonInfinite(event: InfiniteScrollCustomEvent) {
-    const lastMusic: MusicDto = this.musics.at(-1)!
+    const lastMusic: MusicDto = this.musics().at(-1)!
     if (this.searchQuery === '')
-      this.fireStoreService.GetAllMusics(lastMusic?.id ?? null).then(value => this.musics = this.musics.concat(value)).catch((e) => { console.log(e.message); event.target.complete() });
+      this.fireStoreService.GetAllMusics(lastMusic?.id ?? null).then(value => this.musics.set([...this.musics(), ...value])).catch((e) => { console.log(e.message); event.target.complete() });
     else
-      this.fireStoreService.GetAllMusicsWithSearch(lastMusic?.id ?? null, this.searchQuery).then(value => this.musics = this.musics.concat(value)).catch((e) => { console.log(e.message); event.target.complete() });
+      this.fireStoreService.GetAllMusicsWithSearch(lastMusic?.id ?? null, this.searchQuery).then(value => this.musics.set([...this.musics(), ...value])).catch((e) => { console.log(e.message); event.target.complete() });
   }
 
 

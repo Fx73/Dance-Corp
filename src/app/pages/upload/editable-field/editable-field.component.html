@@ -1,0 +1,13 @@
+<ion-item [class.changed]="isChanged" [title]="valueDb">
+
+  @if (isEditing) {
+  <ion-input [label]="label" [type]="type" [value]="value" (ionChange)="onInputChange($event)">
+  </ion-input>
+  }
+  @else {
+  <ion-label>
+    <strong class="primary">{{ label }}:</strong> {{ valueDb ?? value ?? '—' }}
+  </ion-label>
+  }
+
+</ion-item>

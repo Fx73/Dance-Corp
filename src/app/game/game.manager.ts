@@ -96,7 +96,7 @@ export class GameManager {
         }
 
         // sync with musicPlayer
-        const musicCurrentTime = this.musicPlayer.getCurrentTime();
+        //const musicCurrentTime = this.musicPlayer.getCurrentTime();
 
         // Schedule the next loop iteration
         this.gameLoopId = requestAnimationFrame(this.gameGlobalLoop.bind(this));
@@ -128,7 +128,7 @@ export class GameManager {
             cancelAnimationFrame(this.gameLoopId);
         }
         this.gameRounds = [];
-        this.musicPlayer.stop();
+        this.musicPlayer?.stop();
     }
     //#EndRegion
 }

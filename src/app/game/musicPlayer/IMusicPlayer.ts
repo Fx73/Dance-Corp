@@ -38,6 +38,9 @@ export class MusicPlayerCommon {
         if (uri.includes("soundcloud.com"))
             return MusicOrigin.Soundcloud;
 
+        if (uri.startsWith("local://"))
+            return MusicOrigin.Local;
+
         return null;
     }
 
@@ -56,4 +59,5 @@ export class MusicPlayerCommon {
 export enum MusicOrigin {
     Youtube = 0,
     Soundcloud = 1,
+    Local = 2
 }

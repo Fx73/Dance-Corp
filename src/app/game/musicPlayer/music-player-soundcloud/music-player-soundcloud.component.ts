@@ -46,17 +46,37 @@ export class MusicPlayerSoundcloudComponent extends MusicPlayerCommon
 
   play() {
     this.widgetSC.play();
+    this.startPolling();
   }
 
   stop() {
     this.widgetSC.pause();
+    this.stopPolling();
   }
+
+  //#region CurrentTime management
+  private polling: any = null
+  private lastKnownTime = 0;
+  startPolling() {
+    this.polling = setInterval(() => {
+      this.widgetSC.getPosition((ms: number) => {
+        this.lastKnownTime = ms / 1000;
+      });
+    }, 100);
+  }
+
+  stopPolling() {
+    clearInterval(this.polling);
+  }
+
 
   getCurrentTime(): number {
-    return this.widgetSC;
+    return this.lastKnownTime;
   }
+  //#endregion
+
 
   setToTime(time: number): void {
-    this.widgetSC.seekTo(time);
+    this.widgetSC.seekTo(time * 1000);
   }
 }
