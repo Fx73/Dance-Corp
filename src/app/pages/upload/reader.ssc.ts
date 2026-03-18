@@ -59,7 +59,7 @@ export class SccReader {
     let currentNoteData: Record<string, string> | null = null;
     let noteDataIndex = 0;
 
-    console.log("Tokens:", tokens);
+    //console.log("Tokens:", tokens);
 
 
     tokens.forEach(token => {
@@ -81,7 +81,7 @@ export class SccReader {
       }
     });
 
-    console.log("Token Map:", tokenMap);
+    //console.log("Token Map:", tokenMap);
 
     return tokenMap;
   }

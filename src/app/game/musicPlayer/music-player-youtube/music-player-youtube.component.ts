@@ -2,8 +2,6 @@ import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angu
 import { IMusicPlayer, MusicPlayerCommon } from '../IMusicPlayer';
 import { YOUTUBE_PLAYER_CONFIG, YouTubePlayer } from '@angular/youtube-player';
 
-import { NgModule } from '@angular/core';
-
 @Component({
   selector: 'app-music-player-youtube',
   templateUrl: './music-player-youtube.component.html',

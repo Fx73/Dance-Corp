@@ -1,11 +1,12 @@
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
+import { Directory, Filesystem } from '@capacitor/filesystem';
 import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonGrid, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonList, IonRow, IonSelect, IonSelectOption, IonSpinner, ModalController } from '@ionic/angular/standalone';
 import { Measures, MusicDto, NoteDataDto } from 'src/app/game/gameModel/music.dto';
 import { MusicOrigin, MusicPlayerCommon } from 'src/app/game/musicPlayer/IMusicPlayer';
 import { SccReader, SccWriter } from './reader.ssc';
-import { addOutline, checkmarkCircle, closeCircle, removeOutline, trashOutline } from 'ionicons/icons';
+import { addOutline, checkmarkCircle, closeCircle, folder, logoSoundcloud, logoYoutube, removeOutline, trashOutline } from 'ionicons/icons';
 
 import { AppComponent } from 'src/app/app.component';
 import { BrowseUploadPage } from '../browse-upload/browse-upload.page';
@@ -15,24 +16,26 @@ import { HeaderComponent } from 'src/app/shared/component/header/header.componen
 import { MusicEditableFieldComponent } from './editable-field/editable-field.component';
 import { MusicEditableListComponent } from './editable-list/editable-list.component';
 import { MusicFirestoreService } from 'src/app/services/firestore/music.firestore.service';
+import { MusicPlayerLocalComponent } from "src/app/game/musicPlayer/music-player-local/music-player-local.component";
 import { MusicPlayerSoundcloudComponent } from "../../game/musicPlayer/music-player-soundcloud/music-player-soundcloud.component";
 import { MusicPlayerYoutubeComponent } from "../../game/musicPlayer/music-player-youtube/music-player-youtube.component";
 import { NoteDifficulty } from './../../game/constants/note-difficulty.enum';
 import { TestNoteComponent } from './test-note/test-note.component';
 import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.service';
 import { addIcons } from 'ionicons';
+import { doc } from 'firebase/firestore';
 
 @Component({
   selector: 'app-upload',
   templateUrl: './upload.page.html',
   styleUrls: ['./upload.page.scss'],
   standalone: true,
-  imports: [IonSpinner, MusicEditableFieldComponent, MusicEditableListComponent, IonCardSubtitle, IonImg, IonCol, IonRow, IonGrid, IonInput, IonItem, IonLabel, IonList, FormsModule, IonIcon, IonButton, IonCardTitle, IonCardContent, IonCardHeader, IonCard, IonContent, IonSelect, IonSelectOption, CommonModule, FormsModule, HeaderComponent, IonButton, MusicPlayerYoutubeComponent, MusicPlayerSoundcloudComponent]
+  imports: [IonSpinner, MusicEditableFieldComponent, MusicEditableListComponent, IonCardSubtitle, IonImg, IonCol, IonRow, IonGrid, IonInput, IonItem, IonLabel, IonList, FormsModule, IonIcon, IonButton, IonCardTitle, IonCardContent, IonCardHeader, IonCard, IonContent, IonSelect, IonSelectOption, CommonModule, FormsModule, HeaderComponent, IonButton, MusicPlayerYoutubeComponent, MusicPlayerSoundcloudComponent, MusicPlayerLocalComponent]
 })
 export class UploadPage {
   //#region Constants
   public static readonly MUSICEDIT_STORAGE_KEY = (musicId: string) => `MUSICEDIT_${musicId}`;
-  MusicPlayerCommon = MusicPlayerCommon;
+  pickMusicPlayer = MusicPlayerCommon.pickMusicPlayer;
   MusicOrigin = MusicOrigin;
   readonly DanceTypeList = Object.values(DanceType);
   readonly NoteDifficultyList = Object.values(NoteDifficulty);
@@ -47,7 +50,7 @@ export class UploadPage {
   isLoading = false;
 
   constructor(private modalController: ModalController, private route: ActivatedRoute, private fireStoreService: MusicFirestoreService, private userService: UserFirestoreService, private cd: ChangeDetectorRef, private location: Location, private router: Router) {
-    addIcons({ trashOutline, removeOutline, addOutline, checkmarkCircle, closeCircle });
+    addIcons({ logoYoutube, logoSoundcloud, folder, trashOutline, removeOutline, addOutline, checkmarkCircle, closeCircle });
 
   }
 
@@ -132,6 +135,57 @@ export class UploadPage {
     }
   }
 
+
+  async onPickLocalMusic() {
+    const file = await this.pickLocalMusic();
+    const uri = await this.saveLocalMusic(file, this.musicData.id);
+
+    this.musicData.music = "local:" + uri;
+    this.saveChanges();
+    this.cd.markForCheck()
+
+    AppComponent.presentOkToast("Music file saved successfully!");
+  }
+
+  pickLocalMusic() {
+    return new Promise<File>((resolve, reject) => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'audio/*';
+
+      input.onchange = () => {
+        const file = input.files?.[0];
+        if (file) resolve(file);
+        else reject('No file selected');
+      };
+
+      input.click();
+    });
+  }
+
+  async saveLocalMusic(file: File, musicId: string): Promise<string> {
+    const extension = file.name.split('.').pop() || 'audio';
+    const fileName = `${musicId}.${extension}`;
+    const path = `music/${fileName}`;
+
+    // Lire le fichier en ArrayBuffer
+    const arrayBuffer = await file.arrayBuffer();
+    const blob = new Blob([arrayBuffer], { type: file.type });
+
+    // Écrire le fichier en Blob
+    const result = await Filesystem.writeFile({
+      path,
+      data: blob,
+      directory: Directory.Documents,
+      recursive: true
+    });
+
+    console.log("File saved to local filesystem:", result);
+    return result.uri;
+  }
+
+
+
   onStartEdit() {
     this.musicData = this.musicDataDb!.deepClone();
     this.isEditLocal = true;
@@ -194,12 +248,14 @@ export class UploadPage {
   //#region Delete
   deleteFile() {
     if (this.musicData === null) return;
-    localStorage.removeItem(UploadPage.MUSICEDIT_STORAGE_KEY(this.musicData.id));
-    BrowseUploadPage.removeFromEditRegistry(this.musicData.id);
+    const musicId = this.musicData.id;
+    localStorage.removeItem(UploadPage.MUSICEDIT_STORAGE_KEY(musicId));
+    BrowseUploadPage.removeFromEditRegistry(musicId);
     this.musicData = new MusicDto();
     this.isEditLocal = false;
 
     if (!this.isEditDB) {
+      this.deleteLocalMusicFile(musicId);
       this.location.back();
       AppComponent.presentOkToast("Music has been discarded");
     } else {
@@ -231,6 +287,28 @@ export class UploadPage {
       this.saveChanges();
     }
 
+  }
+
+  async deleteLocalMusicFile(musicId: string) {
+    try {
+      const list = await Filesystem.readdir({
+        path: 'music',
+        directory: Directory.Data
+      });
+
+      const toDelete = list.files.filter(f => f.name.startsWith(musicId));
+
+      for (const file of toDelete) {
+        await Filesystem.deleteFile({
+          path: `music/${file.name}`,
+          directory: Directory.Data
+        });
+        console.log("Deleted local: ", file.name);
+      }
+
+    } catch (err) {
+      console.warn("Error while deleting local music files:", err);
+    }
   }
   //#endregion
 

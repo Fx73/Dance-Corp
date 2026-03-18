@@ -57,7 +57,11 @@
 
 							<music-editable-field label="CD Title" [(value)]="musicData.cdTitle" [valueDb]="musicDataDb?.cdTitle" (valueChange)="onEndEditing()" [isEditing]="isEditLocal"> </music-editable-field>
 
-							<music-editable-field label="Music" [(value)]="musicData.music" [valueDb]="musicDataDb?.music" (valueChange)="onEndEditing()" [isEditing]="isEditLocal"> </music-editable-field>
+							<music-editable-field label="Music" [(value)]="musicData.music" [valueDb]="musicDataDb?.music" (valueChange)="onEndEditing()" [isEditing]="isEditLocal && !isEditDB">
+								<ion-icon name="logo-youtube" style="margin-right: 4px;" slot="start" />
+								<ion-icon name="logo-soundcloud" style="margin-right: 4px;" slot="start" />
+								<ion-icon name="folder" slot="start" (click)="onPickLocalMusic()" />
+							</music-editable-field>
 
 							<music-editable-field label="Beat 0 Offset (seconds)" type="number" [(value)]="musicData.offset" [valueDb]="musicDataDb?.offset" (valueChange)="onEndEditing()" [isEditing]="isEditLocal && !isEditDB"> </music-editable-field>
 
@@ -139,13 +143,19 @@
 						<ion-card-title>Music preview</ion-card-title>
 					</ion-card-header>
 					<ion-card-content style="max-width: 30vw;">
-						@switch (MusicPlayerCommon.pickMusicPlayer((isEditLocal ? musicData : musicDataDb)?.music ?? "")) {
+						@switch (pickMusicPlayer((isEditLocal ? musicData : musicDataDb)?.music ?? "")) {
 						@case (MusicOrigin.Youtube){
 						<app-music-player-youtube [musicUrl]="(isEditLocal ? musicData : musicDataDb)?.music!" [isRealSize]="true"></app-music-player-youtube>
 						}
 						@case (MusicOrigin.Soundcloud){
-						<app-music-player-soundcloud [musicUrl]="(isEditLocal ? musicData : musicDataDb)?.music!" [isRealSize]="true"></app-music-player-soundcloud> }
+						<app-music-player-soundcloud [musicUrl]="(isEditLocal ? musicData : musicDataDb)?.music!" [isRealSize]="true"></app-music-player-soundcloud>
 						}
+						@case (MusicOrigin.Local){
+						<div>TEST</div>
+						<app-music-player-local [musicUrl]="(isEditLocal ? musicData : musicDataDb)?.music!" [isRealSize]="true"></app-music-player-local>
+						}
+						}
+
 					</ion-card-content>
 				</ion-card>
 			</ion-col>

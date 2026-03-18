@@ -1,3 +1,16 @@
-<p style="display: none;">
-  Local invisible player
-</p>
+<div>
+  HEEELLLLOOOO
+</div>
+<div class="local-player">
+  <button (click)="togglePlay()">
+    {{ isPlaying ? '⏸ Pause' : '▶️ Play' }}
+  </button>
+
+  <div class="timeline">
+    <input type="range" [value]="currentTime" [max]="duration" (input)="seek($event)" />
+  </div>
+
+  <div class="time">
+    {{ formatTime(currentTime) }} / {{ formatTime(duration) }}
+  </div>
+</div>

@@ -42,7 +42,7 @@ export class MusicFirestoreService {
     }
 
     async updateMusic(dto: MusicDto): Promise<void> {
-        const protectedFields: (keyof MusicDto)[] = ['artist', 'title', 'bpms', 'offset', 'music'];
+        const protectedFields: (keyof MusicDto)[] = ['artist', 'title', 'offset', 'music'];
         try {
             const userId = this.userFirestoreService.getUserData()?.id;
             if (!userId) throw new Error("User not authenticated");
@@ -55,6 +55,7 @@ export class MusicFirestoreService {
             const current = (await getDoc(musicRef)).data();
             if (!current) throw new Error("Music not found");
             for (const field of protectedFields) {
+                console.log(`Checking field "${field}": current="${current[field]}", new="${dto[field]}"`);
                 if (dto[field] !== current[field])
                     throw new Error(`Field "${field}" cannot be modified after upload.`);
             }
