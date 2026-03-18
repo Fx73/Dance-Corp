@@ -1,7 +1,7 @@
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { BaseDirectory, mkdir, readDir, remove, writeFile } from '@tauri-apps/plugin-fs';
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import { Directory, Filesystem } from '@capacitor/filesystem';
 import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonGrid, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonList, IonRow, IonSelect, IonSelectOption, IonSpinner, ModalController } from '@ionic/angular/standalone';
 import { Measures, MusicDto, NoteDataDto } from 'src/app/game/gameModel/music.dto';
 import { MusicOrigin, MusicPlayerCommon } from 'src/app/game/musicPlayer/IMusicPlayer';
@@ -163,27 +163,26 @@ export class UploadPage {
     });
   }
 
+
   async saveLocalMusic(file: File, musicId: string): Promise<string> {
     const extension = file.name.split('.').pop() || 'audio';
     const fileName = `${musicId}.${extension}`;
     const path = `music/${fileName}`;
 
-    // Lire le fichier en ArrayBuffer
-    const arrayBuffer = await file.arrayBuffer();
-    const blob = new Blob([arrayBuffer], { type: file.type });
-
-    // Écrire le fichier en Blob
-    const result = await Filesystem.writeFile({
-      path,
-      data: blob,
-      directory: Directory.Documents,
+    await mkdir("music", {
+      baseDir: BaseDirectory.AppData,
       recursive: true
     });
 
-    console.log("File saved to local filesystem:", result);
-    return result.uri;
-  }
+    const arrayBuffer = await file.arrayBuffer();
+    const bytes = new Uint8Array(arrayBuffer);
 
+    await writeFile(path, bytes, {
+      baseDir: BaseDirectory.AppData
+    });
+
+    return path;
+  }
 
 
   onStartEdit() {
@@ -289,27 +288,26 @@ export class UploadPage {
 
   }
 
+
   async deleteLocalMusicFile(musicId: string) {
     try {
-      const list = await Filesystem.readdir({
-        path: 'music',
-        directory: Directory.Data
+      const list = await readDir("music", {
+        baseDir: BaseDirectory.AppData
       });
-
-      const toDelete = list.files.filter(f => f.name.startsWith(musicId));
+      const toDelete = list.filter(f => f.name?.startsWith(musicId));
 
       for (const file of toDelete) {
-        await Filesystem.deleteFile({
-          path: `music/${file.name}`,
-          directory: Directory.Data
+        await remove(`music/${file.name}`, {
+          baseDir: BaseDirectory.AppData
         });
-        console.log("Deleted local: ", file.name);
+        console.log("Deleted local:", file.name);
       }
 
     } catch (err) {
       console.warn("Error while deleting local music files:", err);
     }
   }
+
   //#endregion
 
   //#region Local editing

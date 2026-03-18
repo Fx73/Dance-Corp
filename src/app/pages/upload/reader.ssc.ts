@@ -50,6 +50,9 @@ export class SccReader {
       const innerToken = match[1].trim();
       tokens.push(innerToken);
     }
+
+    console.log("Tokens:", tokens);
+
     return tokens;
   }
 
@@ -58,8 +61,6 @@ export class SccReader {
     const tokenMap: Record<string, any> = {};
     let currentNoteData: Record<string, string> | null = null;
     let noteDataIndex = 0;
-
-    //console.log("Tokens:", tokens);
 
 
     tokens.forEach(token => {
@@ -81,7 +82,7 @@ export class SccReader {
       }
     });
 
-    //console.log("Token Map:", tokenMap);
+    console.log("Token Map:", tokenMap);
 
     return tokenMap;
   }
@@ -112,6 +113,8 @@ export class SccReader {
         tokenMap[lowerKey] = value;
       }
     });
+
+    console.log("Token Map:", tokenMap);
 
     return tokenMap;
   }

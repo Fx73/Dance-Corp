@@ -10,6 +10,7 @@ import { GameManager } from './game.manager';
 import { GameOverComponent } from "./gameDisplay/game-over/game-over.component";
 import { MusicCacheService } from './../services/dataCache/music.cache.service';
 import { MusicDto } from './gameModel/music.dto';
+import { MusicPlayerLocalComponent } from "./musicPlayer/music-player-local/music-player-local.component";
 import { MusicPlayerSoundcloudComponent } from './musicPlayer/music-player-soundcloud/music-player-soundcloud.component';
 import { MusicPlayerYoutubeComponent } from "./musicPlayer/music-player-youtube/music-player-youtube.component";
 import { PlayerDisplayComponent } from "./gameDisplay/player-display.component";
@@ -23,7 +24,7 @@ import { WaitingScreenComponent } from "./gameDisplay/waiting-screen/waiting-scr
   templateUrl: './game.page.html',
   styleUrls: ['./game.page.scss'],
   standalone: true,
-  imports: [IonCard, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, PlayerDisplayComponent, GameOverComponent, WaitingScreenComponent, MusicPlayerYoutubeComponent, MusicPlayerSoundcloudComponent]
+  imports: [IonCard, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, PlayerDisplayComponent, GameOverComponent, WaitingScreenComponent, MusicPlayerYoutubeComponent, MusicPlayerSoundcloudComponent, MusicPlayerLocalComponent]
 })
 export class GamePage implements OnInit, OnDestroy, AfterViewInit {
   //#region App Constants

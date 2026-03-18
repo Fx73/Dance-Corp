@@ -1,16 +1,15 @@
-<div>
-  HEEELLLLOOOO
-</div>
-<div class="local-player">
-  <button (click)="togglePlay()">
+@if(isRealSize){
+<div class="local-player" [hidden]="!isRealSize">
+  <button (click)="isPlaying ? stop() : play()">
     {{ isPlaying ? '⏸ Pause' : '▶️ Play' }}
   </button>
 
   <div class="timeline">
-    <input type="range" [value]="currentTime" [max]="duration" (input)="seek($event)" />
+    <input type="range" [value]="currentTime()" [max]="duration()" (input)="setToTime($event)" />
   </div>
 
   <div class="time">
-    {{ formatTime(currentTime) }} / {{ formatTime(duration) }}
+    {{ formatTime(currentTime()) }} / {{ formatTime(duration()) }}
   </div>
 </div>
+}
