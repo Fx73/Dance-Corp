@@ -1,14 +1,16 @@
 import { Component, OnInit, signal } from '@angular/core';
-import { InfiniteScrollCustomEvent, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonImg, IonInfiniteScroll, IonInfiniteScrollContent, IonMenu, IonSearchbar, IonSplitPane, IonText } from '@ionic/angular/standalone';
+import { InfiniteScrollCustomEvent, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonImg, IonInfiniteScroll, IonInfiniteScrollContent, IonMenu, IonSearchbar, IonSplitPane, IonText } from '@ionic/angular/standalone';
 import { MusicDto, NoteDataDto } from 'src/app/game/gameModel/music.dto';
 
+import { BrowseUploadPage } from '../browse-upload/browse-upload.page';
 import { Color } from 'src/app/game/constants/color';
 import { CommonModule } from '@angular/common';
 import { DanceType } from 'src/app/game/constants/dance-type.enum';
 import { FormsModule } from '@angular/forms';
 import { GradeComponent } from "../../shared/component/grade/grade.component";
 import { HeaderComponent } from "src/app/shared/component/header/header.component";
-import { MusicCacheService } from './../../services/dataCache/music.cache.service';
+import { LocalMusicService } from 'src/app/services/localStorage/local.music.service';
+import { MusicCacheService } from '../../services/localStorage/music.cache.service';
 import { MusicFirestoreService } from 'src/app/services/firestore/music.firestore.service';
 import { NoteDifficulty } from 'src/app/game/constants/note-difficulty.enum';
 import { Router } from '@angular/router';
@@ -20,12 +22,13 @@ import { UserFirestoreService } from './../../services/firestore/user.firestore.
   templateUrl: './browse.page.html',
   styleUrls: ['./browse.page.scss'],
   standalone: true,
-  imports: [IonSplitPane, IonCardSubtitle, IonMenu, IonText, IonCardContent, IonCardTitle, IonInfiniteScrollContent, IonImg, IonInfiniteScroll, IonSearchbar, IonCard, IonCardHeader, IonContent, CommonModule, FormsModule, HeaderComponent, GradeComponent]
+  imports: [IonBadge, IonSplitPane, IonCardSubtitle, IonMenu, IonText, IonCardContent, IonCardTitle, IonInfiniteScrollContent, IonImg, IonInfiniteScroll, IonSearchbar, IonCard, IonCardHeader, IonContent, CommonModule, FormsModule, HeaderComponent, GradeComponent]
 })
 export class BrowsePage implements OnInit {
   readonly DanceType = DanceType;
 
   musics = signal<MusicDto[]>([]);
+  storedMusics: MusicDto[] = [];
   notes = signal<NoteDataDto[] | undefined>(undefined);
   userScores: { [key: string]: number } = {};
   selectedMusic: MusicDto | null = null;
@@ -33,10 +36,16 @@ export class BrowsePage implements OnInit {
 
   isSinglePlayer: boolean = true;
 
-  constructor(private router: Router, private fireStoreService: MusicFirestoreService, private musicCacheService: MusicCacheService, private userFirestoreService: UserFirestoreService, private userConfigService: UserConfigService) { }
+  constructor(private router: Router, private fireStoreService: MusicFirestoreService, private localMusicService: LocalMusicService, private musicCacheService: MusicCacheService, private userFirestoreService: UserFirestoreService, private userConfigService: UserConfigService) { }
 
   ngOnInit() {
-    this.fireStoreService.GetAllMusics(null).then(value => this.musics.set(value)).catch(e => console.log(e.message));
+    this.storedMusics = this.localMusicService.getAllLocalMusicsFull();
+    console.log("Stored Musics:", this.storedMusics);
+    this.fireStoreService.GetAllMusics(null).then(value => {
+      const filtered = value.filter(m => !this.storedMusics.some(s => s.id === m.id));
+      this.musics.set(filtered);
+    });
+
     this.isSinglePlayer = this.userConfigService.players.length === 1;
   }
 
@@ -61,9 +70,14 @@ export class BrowsePage implements OnInit {
       return;
     }
     this.selectedMusic = music;
-    this.musicCacheService.getMusicNotes(music.id, this.isSinglePlayer).then(n => this.notes.set(n))
-    if (this.userFirestoreService.getUserData())
-      this.userFirestoreService.getScoresForMusic(this.selectedMusic.id, this.userFirestoreService.getUserData()!.id).then(score => this.userScores = score)
+    if (this.storedMusics.some(m => m.id === music.id)) {
+      const fullmusic = this.localMusicService.getMusic(music.id);
+      this.notes.set(fullmusic?.noteData.filter(note => !this.isSinglePlayer || note.stepsType === DanceType.DanceSingle) ?? []);
+    } else {
+      this.musicCacheService.getMusicNotes(music.id, this.isSinglePlayer).then(n => this.notes.set(n))
+      if (this.userFirestoreService.getUserData())
+        this.userFirestoreService.getScoresForMusic(this.selectedMusic.id, this.userFirestoreService.getUserData()!.id).then(score => this.userScores = score)
+    }
   }
   getNoteColor(difficulty: NoteDifficulty | undefined): string {
     let color = "grey"
@@ -77,6 +91,7 @@ export class BrowsePage implements OnInit {
 
   onSearch(event: any) {
     this.searchQuery = event.target.value.toLowerCase();
+    this.storedMusics = this.localMusicService.getAllLocalMusicsFull(this.searchQuery);
     this.fireStoreService.GetAllMusicsWithSearch(null, this.searchQuery).then(value => { this.musics.set(value) });
   }
 

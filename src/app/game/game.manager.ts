@@ -123,12 +123,11 @@ export class GameManager {
 
     }
 
-    public gameDestroy() {
+    public destroyGame() {
         if (this.gameLoopId !== null) {
             cancelAnimationFrame(this.gameLoopId);
         }
         this.gameRounds = [];
-        this.musicPlayer?.stop();
     }
     //#EndRegion
 }

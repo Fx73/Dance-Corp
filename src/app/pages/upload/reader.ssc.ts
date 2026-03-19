@@ -1,6 +1,6 @@
+import { BpmChange, ITimedChange } from 'src/app/game/gameModel/timedChange';
 import { Measures, MusicDto } from "src/app/game/gameModel/music.dto";
 
-import { ITimedChange } from 'src/app/game/gameModel/timedChange';
 import { NoteEvaluator } from "./DifficultyCriteria";
 
 export class SccReader {
@@ -155,9 +155,9 @@ export class SccReader {
     }).join('');
   }
 
-  static extractBasicMetadataFromSSC(content: string): { title?: string; artist?: string; jacket?: string } {
+  static extractBasicMetadataFromSSC(content: string): { title?: string; artist?: string; jacket?: string; bpms?: BpmChange[] } {
     const tokens = SccReader.tokenizeCommon(content);
-    const result: { title?: string; artist?: string; jacket?: string } = {};
+    const result: { title?: string; artist?: string; jacket?: string, bpms?: BpmChange[] } = {};
 
     for (const token of tokens) {
       const [rawKey, rawValue] = token.split(/:(.*)/s);
@@ -167,6 +167,14 @@ export class SccReader {
       if (key === 'title' || key === 'artist' || key === 'jacket') {
         result[key] = value;
       }
+
+      if (key === 'bpms') {
+        result.bpms = value.split(',').map((v: string) => {
+          const [time, bpm] = v.split('=');
+          return { time: parseFloat(time), value: parseFloat(bpm) };
+        });
+      }
+
 
       if (result.title && result.artist && result.jacket) {
         return result;

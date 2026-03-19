@@ -60,7 +60,7 @@ export class TestNoteComponent implements OnInit {
   }
 
   ngOnDestroy(): void {
-    this.game?.gameDestroy();
+    this.game?.destroyGame();
   }
 
 }

@@ -17,6 +17,9 @@ export class MusicFirestoreService {
     readonly BATCH_SIZE = 60;
     readonly firestoreConverterMusic = new FirestoreConverter<MusicDto>(MusicDto)
     readonly firestoreConverterNotes = new FirestoreConverter<NoteDataDto>(NoteDataDto)
+
+    readonly protectedFields: (keyof MusicDto)[] = ['artist', 'title', 'offset', 'music'];
+
     //#endregion
     db: Firestore
 
@@ -42,7 +45,6 @@ export class MusicFirestoreService {
     }
 
     async updateMusic(dto: MusicDto): Promise<void> {
-        const protectedFields: (keyof MusicDto)[] = ['artist', 'title', 'offset', 'music'];
         try {
             const userId = this.userFirestoreService.getUserData()?.id;
             if (!userId) throw new Error("User not authenticated");
@@ -54,7 +56,7 @@ export class MusicFirestoreService {
             // check protected fields are not modified
             const current = (await getDoc(musicRef)).data();
             if (!current) throw new Error("Music not found");
-            for (const field of protectedFields) {
+            for (const field of this.protectedFields) {
                 console.log(`Checking field "${field}": current="${current[field]}", new="${dto[field]}"`);
                 if (dto[field] !== current[field])
                     throw new Error(`Field "${field}" cannot be modified after upload.`);
@@ -127,11 +129,6 @@ export class MusicFirestoreService {
 
 
 
-
-    async existsMusic(musicId: string): Promise<boolean> {
-        const docSnap = await getDoc(doc(this.db, this.MUSIC_COLLECTION, musicId))
-        return docSnap.exists();
-    }
 
     async getMusic(documentId: string): Promise<MusicDto | null> {
         try {

@@ -13,6 +13,7 @@ import { BrowseUploadPage } from '../browse-upload/browse-upload.page';
 import { DanceType } from './../../game/constants/dance-type.enum';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from 'src/app/shared/component/header/header.component';
+import { LocalMusicService } from 'src/app/services/localStorage/local.music.service';
 import { MusicEditableFieldComponent } from './editable-field/editable-field.component';
 import { MusicEditableListComponent } from './editable-list/editable-list.component';
 import { MusicFirestoreService } from 'src/app/services/firestore/music.firestore.service';
@@ -24,6 +25,7 @@ import { TestNoteComponent } from './test-note/test-note.component';
 import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.service';
 import { addIcons } from 'ionicons';
 import { doc } from 'firebase/firestore';
+import { isTauri } from 'src/main';
 
 @Component({
   selector: 'app-upload',
@@ -37,6 +39,7 @@ export class UploadPage {
   public static readonly MUSICEDIT_STORAGE_KEY = (musicId: string) => `MUSICEDIT_${musicId}`;
   pickMusicPlayer = MusicPlayerCommon.pickMusicPlayer;
   MusicOrigin = MusicOrigin;
+  isDesktop = isTauri();
   readonly DanceTypeList = Object.values(DanceType);
   readonly NoteDifficultyList = Object.values(NoteDifficulty);
   //#endregion
@@ -49,7 +52,7 @@ export class UploadPage {
 
   isLoading = false;
 
-  constructor(private modalController: ModalController, private route: ActivatedRoute, private fireStoreService: MusicFirestoreService, private userService: UserFirestoreService, private cd: ChangeDetectorRef, private location: Location, private router: Router) {
+  constructor(private modalController: ModalController, private route: ActivatedRoute, private fireStoreService: MusicFirestoreService, private userService: UserFirestoreService, private localMusicService: LocalMusicService, private cd: ChangeDetectorRef, private location: Location, private router: Router) {
     addIcons({ logoYoutube, logoSoundcloud, folder, trashOutline, removeOutline, addOutline, checkmarkCircle, closeCircle });
 
   }
@@ -86,9 +89,9 @@ export class UploadPage {
   }
 
   loadLocalMusic(musicId: string) {
-    const storedData = localStorage.getItem(UploadPage.MUSICEDIT_STORAGE_KEY(musicId));
-    if (storedData) {
-      this.musicData = SccReader.parseFile(`${musicId}.essc`, storedData);
+    const data = this.localMusicService.getMusic(musicId);
+    if (data) {
+      this.musicData = data;
       this.isEditLocal = true;
       this.isLoading = false;
 
@@ -120,11 +123,17 @@ export class UploadPage {
       reader.onload = async (e) => {
         const content = e.target?.result as string;
         this.musicData = SccReader.parseFile(file.name, content);
-        this.saveChanges();
+        this.localMusicService.saveMusic(this.musicData!);
         this.isEditLocal = true;
         AppComponent.presentOkToast("Music loaded successfully : " + this.musicData.id);
 
-        if (await this.fireStoreService.existsMusic(this.musicData.id)) {
+        const dbMusic = await this.fireStoreService.getMusic(this.musicData.id);
+        if (dbMusic) {
+          for (const field of this.fireStoreService.protectedFields) {
+            (this.musicData as any)[field] = (dbMusic as any)[field];
+          }
+          this.localMusicService.saveMusic(this.musicData!);
+
           AppComponent.presentWarningToast("This music already exists in the database. You are now editing the local version. Uploading will overwrite the database version.");
           this.switchToMusicPage();
         } else {
@@ -141,7 +150,8 @@ export class UploadPage {
     const uri = await this.saveLocalMusic(file, this.musicData.id);
 
     this.musicData.music = "local:" + uri;
-    this.saveChanges();
+    this.localMusicService.saveMusic(this.musicData!);
+
     this.cd.markForCheck()
 
     AppComponent.presentOkToast("Music file saved successfully!");
@@ -248,8 +258,7 @@ export class UploadPage {
   deleteFile() {
     if (this.musicData === null) return;
     const musicId = this.musicData.id;
-    localStorage.removeItem(UploadPage.MUSICEDIT_STORAGE_KEY(musicId));
-    BrowseUploadPage.removeFromEditRegistry(musicId);
+    this.localMusicService.deleteMusic(musicId);
     this.musicData = new MusicDto();
     this.isEditLocal = false;
 
@@ -283,7 +292,8 @@ export class UploadPage {
 
     } else {
       this.musicData.noteData = this.musicData.noteData.filter(n => n.chartName !== note.chartName)
-      this.saveChanges();
+      this.localMusicService.saveMusic(this.musicData!);
+
     }
 
   }
@@ -312,15 +322,9 @@ export class UploadPage {
 
   //#region Local editing
   onEndEditing() {
-    this.saveChanges()
+    this.localMusicService.saveMusic(this.musicData!);
   }
 
-  saveChanges(): void {
-    if (this.musicData) {
-      localStorage.setItem(UploadPage.MUSICEDIT_STORAGE_KEY(this.musicData.id), SccWriter.writeSscFile(this.musicData));
-      BrowseUploadPage.addToEditRegistry(this.musicData.id);
-    }
-  }
   //#endregion
 
 

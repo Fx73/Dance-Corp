@@ -60,7 +60,9 @@
 							<music-editable-field label="Music" [(value)]="musicData.music" [valueDb]="musicDataDb?.music" (valueChange)="onEndEditing()" [isEditing]="isEditLocal && !isEditDB">
 								<ion-icon name="logo-youtube" style="margin-right: 4px;" slot="start" />
 								<ion-icon name="logo-soundcloud" style="margin-right: 4px;" slot="start" />
+								@if(isDesktop){
 								<ion-icon name="folder" slot="start" (click)="onPickLocalMusic()" />
+								}
 							</music-editable-field>
 
 							<music-editable-field label="Beat 0 Offset (seconds)" type="number" [(value)]="musicData.offset" [valueDb]="musicDataDb?.offset" (valueChange)="onEndEditing()" [isEditing]="isEditLocal && !isEditDB"> </music-editable-field>

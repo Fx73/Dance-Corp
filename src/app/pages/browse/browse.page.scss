@@ -42,6 +42,12 @@
   transition: all 0.2s ease-in-out;
   background-color: var(--ion-color-primary);
 }
+.stored-card{
+  background-color: var(--ion-color-secondary);
+  ion-card-title{
+    color: var(--ion-color-dark);
+  }
+}
 
 .levelCard{
   margin: 2px;

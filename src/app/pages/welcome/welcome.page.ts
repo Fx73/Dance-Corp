@@ -1,4 +1,4 @@
-import { Component, NgZone, OnInit } from '@angular/core';
+import { Component, NgZone, OnInit, signal } from '@angular/core';
 import { IonBadge, IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonGrid, IonHeader, IonImg, IonItem, IonLabel, IonRow, IonText, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 
 import { CommonModule } from '@angular/common';
@@ -17,10 +17,10 @@ import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.
   imports: [IonCol, IonRow, IonGrid, IonBadge, IonLabel, IonItem, IonCardHeader, IonCardTitle, IonCardContent, IonCard, IonButton, IonContent, CommonModule, FormsModule, HeaderComponent, RouterModule, LoginComponent]
 })
 export class WelcomePage implements OnInit {
-  userData: UserDto | null = null;
+  userData = signal<UserDto | null>(null);
 
   constructor(userService: UserFirestoreService) {
-    userService.userData$.subscribe(userData => this.userData = userData)
+    userService.userData$.subscribe(userData => this.userData.set(userData))
   }
 
   ngOnInit() {

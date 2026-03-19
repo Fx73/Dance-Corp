@@ -1,14 +1,14 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { IMusicPlayer, MusicOrigin, MusicPlayerCommon } from './musicPlayer/IMusicPlayer';
-import { IonCard, IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { IonButton, IonButtons, IonCard, IonContent, IonHeader, IonIcon, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 
 import { AppComponent } from '../app.component';
 import { ArrowDirection } from "./constants/arrow-direction.enum";
 import { FormsModule } from '@angular/forms';
 import { GameManager } from './game.manager';
 import { GameOverComponent } from "./gameDisplay/game-over/game-over.component";
-import { MusicCacheService } from './../services/dataCache/music.cache.service';
+import { MusicCacheService } from '../services/localStorage/music.cache.service';
 import { MusicDto } from './gameModel/music.dto';
 import { MusicPlayerLocalComponent } from "./musicPlayer/music-player-local/music-player-local.component";
 import { MusicPlayerSoundcloudComponent } from './musicPlayer/music-player-soundcloud/music-player-soundcloud.component';
@@ -18,13 +18,15 @@ import { Router } from "@angular/router";
 import { UserConfigService } from "src/app/services/userconfig.service";
 import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.service';
 import { WaitingScreenComponent } from "./gameDisplay/waiting-screen/waiting-screen.component";
+import { addIcons } from 'ionicons';
+import { arrowBack } from 'ionicons/icons';
 
 @Component({
   selector: 'app-game',
   templateUrl: './game.page.html',
   styleUrls: ['./game.page.scss'],
   standalone: true,
-  imports: [IonCard, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, PlayerDisplayComponent, GameOverComponent, WaitingScreenComponent, MusicPlayerYoutubeComponent, MusicPlayerSoundcloudComponent, MusicPlayerLocalComponent]
+  imports: [IonButtons, IonIcon, IonCard, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, PlayerDisplayComponent, GameOverComponent, WaitingScreenComponent, MusicPlayerYoutubeComponent, MusicPlayerSoundcloudComponent, MusicPlayerLocalComponent, IonButton]
 })
 export class GamePage implements OnInit, OnDestroy, AfterViewInit {
   //#region App Constants
@@ -44,7 +46,9 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
   musicOrigin: MusicOrigin | null = null
   //#endregion
 
-  constructor(private cdr: ChangeDetectorRef, private userConfigService: UserConfigService, private userFirestoreService: UserFirestoreService, private musicCacheService: MusicCacheService, private router: Router, private location: Location) { }
+  constructor(private cdr: ChangeDetectorRef, private userConfigService: UserConfigService, private userFirestoreService: UserFirestoreService, private musicCacheService: MusicCacheService, private router: Router, private location: Location) {
+    addIcons({ arrowBack })
+  }
 
 
   ngOnInit() {
@@ -108,9 +112,14 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
 
 
   ngOnDestroy(): void {
-    this.musicOrigin = null;
-    this.game?.gameDestroy();
+    try {
+      this.game?.musicPlayer.stop();
+    } catch (e) {
+      console.warn("Error stopping music player on game destroy:", e);
+    }
+    this.game?.destroyGame();
     this.game = null;
+    console.log("Game destroyed");
   }
 
 

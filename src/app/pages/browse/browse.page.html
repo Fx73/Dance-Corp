@@ -9,11 +9,9 @@
           <ion-card-subtitle> {{ selectedMusic.artist }} </ion-card-subtitle>
         </ion-card-header>
         <ion-card-content>
-          <ion-card *ngFor="let note of notes()" class="note-card" (click)="runGame(note)"
-            [style.backgroundColor]="getNoteColor(note.difficulty)">
+          <ion-card *ngFor="let note of notes()" class="note-card" (click)="runGame(note)" [style.backgroundColor]="getNoteColor(note.difficulty)">
             <ion-card-content>
-              <ion-img *ngIf="!isSinglePlayer" class="player-number-icon"
-                [src]="note.stepsType === DanceType.DanceSingle ? 'assets/Icons/SingleDance.png' : 'assets/Icons/DoubleDance.png'"></ion-img>
+              <ion-img *ngIf="!isSinglePlayer" class="player-number-icon" [src]="note.stepsType === DanceType.DanceSingle ? 'assets/Icons/SingleDance.png' : 'assets/Icons/DoubleDance.png'"></ion-img>
               <div class="difficulty">
                 {{ note.difficulty }}
               </div>
@@ -27,14 +25,26 @@
       }
     </ion-menu>
     <div id="music-list">
-      <ion-searchbar [debounce]="1000" (ionInput)="onSearch($event)" show-clear-button="focus"
-        style="background-color:white"></ion-searchbar>
+      <ion-searchbar [debounce]="1000" (ionInput)="onSearch($event)" show-clear-button="focus" style="background-color:white"></ion-searchbar>
       <div style="height: 95%;overflow-y: scroll;">
         <div class="cardList">
+          <!-- Edited music -->
+          @for (music of storedMusics; track $index) {
+          <ion-card (click)="showLevels(music)" class="basicCard stored-card" [ngClass]="selectedMusic?.id === music.id ? 'selectedCard' : ''">
+            <ion-img [src]="'https://'+music.jacket" [style.max-height.%]="80"></ion-img>
+            <ion-card-header>
+              <ion-card-title>{{ music.title }}</ion-card-title>
+              <ion-card-subtitle>{{ music.artist }}</ion-card-subtitle>
+            </ion-card-header>
+            <ion-card-content class="basicCardContent">
+              <ion-text>BPM :{{ music.bpms[0].value }}</ion-text>
+            </ion-card-content>
+          </ion-card>
+          }
+
           <!-- Music cards -->
           @for (music of musics(); track $index) {
-          <ion-card (click)="showLevels(music)" class="basicCard"
-            [ngClass]="selectedMusic?.id === music.id ? 'selectedCard' : ''">
+          <ion-card (click)="showLevels(music)" class="basicCard" [ngClass]="selectedMusic?.id === music.id ? 'selectedCard' : ''">
             <ion-img [src]="'https://'+music.jacket" [style.max-height.%]="80"></ion-img>
             <ion-card-header>
               <ion-card-title>{{ music.title }}</ion-card-title>

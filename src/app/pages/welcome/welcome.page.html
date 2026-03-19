@@ -10,16 +10,13 @@
 						</ion-card-title>
 					</ion-card-header>
 					<ion-card-content>
-						<ion-card class="base-card start-card welcome-start-card"
-							[routerLink]="['/play/player-selection']" style="height: 200px;">
+						<ion-card class="base-card start-card welcome-start-card" [routerLink]="['/play/player-selection']" style="height: 200px;">
 
 						</ion-card>
-						<ion-button [routerLink]="['/browse-upload']" [disabled]="!isUserLoggedIn()" expand="block"
-							size="large" class="home-content">
+						<ion-button [routerLink]="['/browse-upload']" [disabled]="!isUserLoggedIn()" expand="block" size="large" class="home-content">
 							Music browser
 						</ion-button>
-						<ion-button [routerLink]="['/user-profile']" [disabled]="!isUserLoggedIn()" expand="block"
-							size="large" class="home-content">
+						<ion-button [routerLink]="['/user-profile']" [disabled]="!isUserLoggedIn()" expand="block" size="large" class="home-content">
 							My Profile
 						</ion-button>
 						<ion-button [routerLink]="['/options']" expand="block" size="large" class="home-content">
@@ -32,19 +29,22 @@
 				</ion-card>
 			</ion-col>
 			<ion-col size="4">
-				<ion-card *ngIf="userData" class="base-card">
+				@if(userData()){
+				<ion-card class="base-card">
 					<ion-card-header>
-						<ion-card-title>{{ userData.name }}</ion-card-title>
+						<ion-card-title>{{ userData()!.name }}</ion-card-title>
 					</ion-card-header>
 
 					<ion-card-content>
 						<ion-item>
 							<ion-label>Level:</ion-label>
-							<ion-badge color="primary">{{ userData.level }}</ion-badge>
+							<ion-badge color="primary">{{ userData()!.level }}</ion-badge>
 						</ion-item>
 					</ion-card-content>
 				</ion-card>
-				<ion-card *ngIf="userData === null" class="base-card">
+				}
+				@if(!userData()){
+				<ion-card class="base-card">
 					<ion-card-header>
 						<ion-card-title>Anonymous player</ion-card-title>
 					</ion-card-header>
@@ -52,7 +52,8 @@
 						<ion-label>Log in to save stats and data</ion-label>
 					</ion-card-content>
 				</ion-card>
-				<app-login *ngIf="userData === null" [isSmall]="false"></app-login>
+				<app-login [isSmall]="false"></app-login>
+				}
 			</ion-col>
 		</ion-row>
 	</ion-grid>
