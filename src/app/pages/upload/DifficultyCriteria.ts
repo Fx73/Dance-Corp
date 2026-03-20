@@ -1,4 +1,4 @@
-import { ITimedChange } from "src/app/game/gameModel/timedChange";
+import { ITimedChange } from "src/app/game/gameModel/timeManagement/timedChange";
 import { Measures } from "src/app/game/gameModel/music.dto";
 
 export class DifficultyCriteria {

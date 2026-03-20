@@ -1,3 +1,4 @@
+import { BeatManager } from './gameModel/timeManagement/beatManager';
 import { CONFIG } from "./constants/game-config";
 import { GameRound } from "./gameModel/gameRound";
 import { IMusicPlayer } from "./musicPlayer/IMusicPlayer";
@@ -18,25 +19,15 @@ export class GameManager {
             this.gameRounds.push(new GameRound(this.music.noteData[0], player, this.isTrainingMode))
         }
 
-        let cumulatedTimeStart = 0;
-        for (let i = 0; i < this.music.bpms.length; i++) {
-            const bps = this.music.bpms[i].value / 60; // Convert BPM to BPS
-            const beatStart = this.music.bpms[i].time;
-            const timeStart = cumulatedTimeStart;
-            this.bpmSections.push(new BPMSection(timeStart, beatStart, bps));
-            if (this.music.bpms[i + 1]) {
-                cumulatedTimeStart += (this.music.bpms[i + 1].time - this.music.bpms[i].time) / bps;
-            }
-        }
+        this.beatManager = new BeatManager(this.music);
     }
 
     public gameRounds: GameRound[] = [];
     musicPlayer!: IMusicPlayer;
     playerDisplays: PlayerDisplayComponent[] = [];
 
+    private beatManager: BeatManager;
 
-    private currentBPMIndex = 0;
-    private bpmSections: BPMSection[] = [];
     private currentBackgroundIndex = 0;
     private zeroTimeStamp: number = 0;
 
@@ -68,23 +59,14 @@ export class GameManager {
         const roundedTimestamp = Math.round(currentTimestamp)
         const elapsedTime = (roundedTimestamp - this.zeroTimeStamp) / 1000; // In seconds
 
-        const section = this.bpmSections[this.currentBPMIndex];
-        const timeInSection = elapsedTime - section.timeStart;
-        const beatInSection = timeInSection * section.bps;
-        const currentBeat = section.beatStart + beatInSection;
-
-
-
-        if (this.bpmSections[this.currentBPMIndex + 1] && elapsedTime >= this.bpmSections[this.currentBPMIndex + 1].timeStart) {
-            this.currentBPMIndex++;
-        }
+        const { beat: currentBeat, bps: currentBps } = this.beatManager.getBeatAndBpsAtTime(elapsedTime);
 
         if (this.music!.bgChanges && this.music!.bgChanges[this.currentBackgroundIndex + 1] && elapsedTime >= this.music!.bgChanges[this.currentBackgroundIndex + 1].time) {
             this.currentBackgroundIndex++;
         }
 
         for (const gameRound of this.gameRounds)
-            gameRound.gameLoop(currentBeat, CONFIG.GAME.TOLERANCE_WINDOW * this.bpmSections[this.currentBPMIndex].bps)
+            gameRound.gameLoop(currentBeat, CONFIG.GAME.TOLERANCE_WINDOW * currentBps)
 
         /*for (const playerDiplay of this.playerDisplays)
             playerDiplay.Update(currentBeat)*/

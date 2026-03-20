@@ -73,23 +73,19 @@
 
 							<music-editable-list label="Bpms" [(value)]="musicData.bpms" [valueDb]="musicDataDb?.bpms" valueType="number" (valueChange)="onEndEditing()" [isEditing]="isEditLocal && !isEditDB"> </music-editable-list>
 
+							<music-editable-list label="Stops" [(value)]="musicData.stops" [valueDb]="musicDataDb?.stops" valueType="number" (valueChange)="onEndEditing()" [isEditing]="isEditLocal && !isEditDB"> </music-editable-list>
+
+							<music-editable-list label="Warps" [(value)]="musicData.warps" [valueDb]="musicDataDb?.warps" valueType="number" (valueChange)="onEndEditing()" [isEditing]="isEditLocal && !isEditDB"> </music-editable-list>
+
+							<music-editable-list label="Speeds" [(value)]="musicData.speeds" [valueDb]="musicDataDb?.speeds" valueType="number" (valueChange)="onEndEditing()" [isEditing]="isEditLocal && !isEditDB"> </music-editable-list>
+
+							<music-editable-list label="Scrolls" [(value)]="musicData.scrolls" [valueDb]="musicDataDb?.scrolls" valueType="number" (valueChange)="onEndEditing()" [isEditing]="isEditLocal && !isEditDB"> </music-editable-list>
+
 							<music-editable-list label="Backgrounds" [(value)]="musicData.bgChanges " [valueDb]="musicDataDb?.bgChanges" valueType="string" (valueChange)="onEndEditing()" [isEditing]="isEditLocal"> </music-editable-list>
 
 							<music-editable-list label="Labels" [(value)]="musicData.labels" [valueDb]="musicDataDb?.labels" valueType="string" (valueChange)="onEndEditing()" [isEditing]="isEditLocal"> </music-editable-list>
-						</ion-list>
 
-						<p>
-							<strong>Stops:</strong>
-							{{ musicData.stops }}
-						</p>
-						<p>
-							<strong>Delays:</strong>
-							{{ musicData.delays }}
-						</p>
-						<p>
-							<strong>Warps:</strong>
-							{{ musicData.warps }}
-						</p>
+						</ion-list>
 					</ion-card-content>
 				</ion-card>
 				<ion-card class="base-card">

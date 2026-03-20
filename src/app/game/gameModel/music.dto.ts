@@ -1,4 +1,4 @@
-import { BpmChange, TextChange } from "./timedChange";
+import { BackgroundChange, BpmChange, LabelChange, ScrollChange, SpeedChange, StopChange, WarpChange } from "./timeManagement/timedChange";
 
 import { DanceType } from "../constants/dance-type.enum";
 import { DifficultyCriteria } from "src/app/pages/upload/DifficultyCriteria";
@@ -21,11 +21,12 @@ export class MusicDto {
   sampleStart?: number;
   sampleLength?: number;
   bpms: BpmChange[] = [];
-  stops?: string;
-  delays?: string;
-  warps?: string;
-  bgChanges: TextChange[] = [];
-  labels: TextChange[] = [];
+  stops: StopChange[] = [];
+  warps: WarpChange[] = [];
+  speeds: SpeedChange[] = [];
+  scrolls: ScrollChange[] = [];
+  bgChanges: BackgroundChange[] = [];
+  labels: LabelChange[] = [];
   noteData: NoteDataDto[] = [];
   additionalFields?: Record<string, string>;
 
@@ -69,21 +70,23 @@ export class MusicDto {
     delete tokenMap["samplestart"];
     this.sampleLength = parseFloat(tokenMap["samplelength"]);
     delete tokenMap["samplelength"];
-    this.stops = tokenMap["stops"];
+    this.stops = this.parseChanges<StopChange>(tokenMap["stops"], v => parseFloat(v))!;
     delete tokenMap["stops"];
-    this.delays = tokenMap["delays"];
+    const parsedDelays = this.parseChanges<StopChange>(tokenMap["delays"], v => parseFloat(v)) ?? [];
     delete tokenMap["delays"];
-    this.warps = tokenMap["warps"];
+    this.warps = this.parseChanges<WarpChange>(tokenMap["warps"], v => parseFloat(v))!;
     delete tokenMap["warps"];
+    this.speeds = this.parseChanges<SpeedChange>(tokenMap["speeds"], v => parseFloat(v))!;
+    delete tokenMap["speeds"];
+    this.scrolls = this.parseChanges<ScrollChange>(tokenMap["scrolls"], v => parseFloat(v))!;
+    delete tokenMap["scrolls"];
     this.bpms = this.parseChanges<BpmChange>(tokenMap["bpms"], v => parseFloat(v))!;
     delete tokenMap["bpms"];
-    this.bgChanges = this.parseChanges<TextChange>(tokenMap["bgchanges"], v => v) ?? [];
-    if (tokenMap["background"] && !this.bgChanges) {
-      this.bgChanges = [new TextChange(0, tokenMap["background"])];
-    }
+
+    this.bgChanges = this.parseChanges<BackgroundChange>(tokenMap["bgchanges"], v => v) ?? [new BackgroundChange(0, tokenMap["background"])];
     delete tokenMap["background"];
     delete tokenMap["bgchanges"];
-    this.labels = this.parseChanges<TextChange>(tokenMap["labels"], v => v) ?? [];
+    this.labels = this.parseChanges<LabelChange>(tokenMap["labels"], v => v) ?? [];
     delete tokenMap["labels"];
 
     Object.keys(tokenMap).forEach(key => {
@@ -93,6 +96,11 @@ export class MusicDto {
       }
     });
     this.noteData.sort((a, b) => (a.meter || 0) - (b.meter || 0));
+
+    if (parsedDelays.length > 0) {
+      this.stops.push(...parsedDelays);
+      this.stops.sort((a, b) => a.time - b.time);
+    }
 
     this.additionalFields = { ...tokenMap };
   }

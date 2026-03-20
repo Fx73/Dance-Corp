@@ -1,4 +1,4 @@
-import { BpmChange, ITimedChange } from 'src/app/game/gameModel/timedChange';
+import { BpmChange, ITimedChange } from 'src/app/game/gameModel/timeManagement/timedChange';
 import { Measures, MusicDto } from "src/app/game/gameModel/music.dto";
 
 import { NoteEvaluator } from "./DifficultyCriteria";

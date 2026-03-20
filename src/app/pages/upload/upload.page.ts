@@ -24,8 +24,7 @@ import { NoteDifficulty } from './../../game/constants/note-difficulty.enum';
 import { TestNoteComponent } from './test-note/test-note.component';
 import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.service';
 import { addIcons } from 'ionicons';
-import { doc } from 'firebase/firestore';
-import { isTauri } from 'src/main';
+import isTauri from 'src/app/shared/utils/tauri';
 
 @Component({
   selector: 'app-upload',
@@ -39,7 +38,7 @@ export class UploadPage {
   public static readonly MUSICEDIT_STORAGE_KEY = (musicId: string) => `MUSICEDIT_${musicId}`;
   pickMusicPlayer = MusicPlayerCommon.pickMusicPlayer;
   MusicOrigin = MusicOrigin;
-  isDesktop = isTauri();
+  isDesktop = isTauri;
   readonly DanceTypeList = Object.values(DanceType);
   readonly NoteDifficultyList = Object.values(NoteDifficulty);
   //#endregion
