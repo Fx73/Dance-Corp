@@ -97,7 +97,7 @@
 
 
   </div>
-  <ion-modal [isOpen]="showPlayerDisplay" (didPresent)="this.playerDisplay?.Update(0)">
+  <ion-modal [isOpen]="showPlayerDisplay" (didDismiss)="showPlayerDisplay = false" style="--width: auto; --height: auto">
     <ng-template>
       <app-player-display [gameRound]="getFakeGameRound()"></app-player-display>
     </ng-template>

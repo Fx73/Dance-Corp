@@ -49,6 +49,7 @@ export class OptionsPage {
   }
 
   verifyDisplay(): void {
+    console.log("Updating player display with current config...", this.showPlayerDisplay);
     this.showPlayerDisplay = true;
     this.playerDisplay?.Update(0)
   }
@@ -66,9 +67,21 @@ export class OptionsPage {
       player: this.userConfigService.players[0],
       dancepad: { lastExposedState: [0, 0, 0, 0] },
       arrowMap: arrowMap,
-      currentBeat: 0
+      currentBeat: 0,
+      precisionMessage: [] as Arrow[]
     } as unknown as GameRound;
   }
+  getModalStyle() {
+    const w = this.getConfigValue('canvasWidth');
+    const h = this.getConfigValue('canvasHeight');
+
+    return {
+      'width': `${w}px`,
+      'height': `${h}px`
+    };
+  }
+
+
 
   resetAll(): void {
     this.userConfigService.resetToDefault();
