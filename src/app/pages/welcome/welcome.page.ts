@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from "src/app/shared/component/header/header.component";
 import { LoginComponent } from "../../shared/user/login/login.component";
+import { PresenceService } from '../../services/thirdpartyapp/presence.service';
 import { RouterModule } from '@angular/router';
 import { UserDto } from '../user-profile/user.dto';
 import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.service';
@@ -19,12 +20,12 @@ import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.
 export class WelcomePage implements OnInit {
   userData = signal<UserDto | null>(null);
 
-  constructor(userService: UserFirestoreService) {
+  constructor(userService: UserFirestoreService, private discordRpcService: PresenceService) {
     userService.userData$.subscribe(userData => this.userData.set(userData))
   }
 
   ngOnInit() {
-
+    this.discordRpcService.update("Let's dance")
   }
 
 

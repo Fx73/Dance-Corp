@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 
+import { PresenceService } from './services/thirdpartyapp/presence.service';
 import { ToastController } from '@ionic/angular';
 
 @Component({
@@ -12,11 +13,12 @@ import { ToastController } from '@ionic/angular';
 export class AppComponent implements OnInit {
   static appInstance: AppComponent;
 
-  constructor(private toastController: ToastController) {
+  constructor(private toastController: ToastController, private discordRpcService: PresenceService) {
     AppComponent.appInstance = this;
   }
 
   ngOnInit() {
+    this.discordRpcService.init()
   }
 
 

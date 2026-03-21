@@ -14,6 +14,7 @@ import { MusicPlayerLocalComponent } from "./musicPlayer/music-player-local/musi
 import { MusicPlayerSoundcloudComponent } from './musicPlayer/music-player-soundcloud/music-player-soundcloud.component';
 import { MusicPlayerYoutubeComponent } from "./musicPlayer/music-player-youtube/music-player-youtube.component";
 import { PlayerDisplayComponent } from "./gameDisplay/player-display.component";
+import { PresenceService } from '../services/thirdpartyapp/presence.service';
 import { Router } from "@angular/router";
 import { UserConfigService } from "src/app/services/userconfig.service";
 import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.service';
@@ -46,7 +47,7 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
   musicOrigin: MusicOrigin | null = null
   //#endregion
 
-  constructor(private cdr: ChangeDetectorRef, private userConfigService: UserConfigService, private userFirestoreService: UserFirestoreService, private musicCacheService: MusicCacheService, private router: Router, private location: Location) {
+  constructor(private cdr: ChangeDetectorRef, private userConfigService: UserConfigService, private userFirestoreService: UserFirestoreService, private musicCacheService: MusicCacheService, private router: Router, private location: Location, private discordRpcService: PresenceService) {
     addIcons({ arrowBack });
   }
 
@@ -74,6 +75,8 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
     const players = this.userConfigService.players;
     const isTrainingMode: boolean = this.userConfigService.getConfig()["trainingMode"] ?? false
     this.game = new GameManager(this.music!, players, isTrainingMode, this.userFirestoreService);
+
+    this.discordRpcService.update("Dancing on lvl " + this.music.noteData[0].meter, this.music.title + " - " + this.music.artist)
   }
 
   @ViewChildren(PlayerDisplayComponent) playerDisplaysQuery!: QueryList<PlayerDisplayComponent>;

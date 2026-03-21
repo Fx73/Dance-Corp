@@ -13,6 +13,7 @@ import { LocalMusicService } from 'src/app/services/localStorage/local.music.ser
 import { MusicCacheService } from '../../services/localStorage/music.cache.service';
 import { MusicFirestoreService } from 'src/app/services/firestore/music.firestore.service';
 import { NoteDifficulty } from 'src/app/game/constants/note-difficulty.enum';
+import { PresenceService } from '../../services/thirdpartyapp/presence.service';
 import { Router } from '@angular/router';
 import { UserConfigService } from 'src/app/services/userconfig.service';
 import { UserFirestoreService } from './../../services/firestore/user.firestore.service';
@@ -36,7 +37,7 @@ export class BrowsePage implements OnInit {
 
   isSinglePlayer: boolean = true;
 
-  constructor(private router: Router, private fireStoreService: MusicFirestoreService, private localMusicService: LocalMusicService, private musicCacheService: MusicCacheService, private userFirestoreService: UserFirestoreService, private userConfigService: UserConfigService) { }
+  constructor(private router: Router, private fireStoreService: MusicFirestoreService, private localMusicService: LocalMusicService, private musicCacheService: MusicCacheService, private userFirestoreService: UserFirestoreService, private userConfigService: UserConfigService, private discordRpcService: PresenceService) { }
 
   ngOnInit() {
     this.storedMusics = this.localMusicService.getAllLocalMusicsFull();
@@ -47,6 +48,9 @@ export class BrowsePage implements OnInit {
     });
 
     this.isSinglePlayer = this.userConfigService.players.length === 1;
+
+    this.discordRpcService.update("Browsing")
+
   }
 
 

@@ -7,6 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from "src/app/shared/component/header/header.component";
 import { LocalMusicService } from 'src/app/services/localStorage/local.music.service';
 import { MusicFirestoreService } from 'src/app/services/firestore/music.firestore.service';
+import { PresenceService } from 'src/app/services/thirdpartyapp/presence.service';
 import { Router } from '@angular/router';
 import { UserFirestoreService } from '../../services/firestore/user.firestore.service';
 import { addCircleOutline } from 'ionicons/icons';
@@ -27,7 +28,7 @@ export class BrowseUploadPage implements OnInit {
   userScores: { [key: string]: number } = {};
   searchQuery: string = '';
 
-  constructor(private router: Router, private fireStoreService: MusicFirestoreService, private localMusicService: LocalMusicService, private userFirestoreService: UserFirestoreService) {
+  constructor(private router: Router, private fireStoreService: MusicFirestoreService, private localMusicService: LocalMusicService, private userFirestoreService: UserFirestoreService, private discordRpcService: PresenceService) {
     addIcons({ addCircleOutline });
   }
 
@@ -39,6 +40,7 @@ export class BrowseUploadPage implements OnInit {
       this.musics.set(filtered);
     });
 
+    this.discordRpcService.update("Editing")
   }
 
 
