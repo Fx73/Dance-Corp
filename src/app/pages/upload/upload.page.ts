@@ -193,6 +193,10 @@ export class UploadPage {
     return path;
   }
 
+  isLocalMusic(): boolean {
+    return this.musicData?.music !== undefined && this.musicData.music.startsWith("local:");
+  }
+
 
   onStartEdit() {
     this.musicData = this.musicDataDb!.deepClone();

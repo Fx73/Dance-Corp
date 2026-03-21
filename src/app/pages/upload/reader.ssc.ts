@@ -51,7 +51,7 @@ export class SccReader {
       tokens.push(innerToken);
     }
 
-    console.log("Tokens:", tokens);
+    //console.log("Tokens:", tokens);
 
     return tokens;
   }

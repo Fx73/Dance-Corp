@@ -31,7 +31,7 @@
           <!-- Edited music -->
           @for (music of storedMusics; track $index) {
           <ion-card (click)="showLevels(music)" class="basicCard stored-card" [ngClass]="selectedMusic?.id === music.id ? 'selectedCard' : ''">
-            <ion-img [src]="'https://'+music.jacket" [style.max-height.%]="80"></ion-img>
+            <ion-img [src]="'https://'+music.jacket"></ion-img>
             <ion-card-header>
               <ion-card-title>{{ music.title }}</ion-card-title>
               <ion-card-subtitle>{{ music.artist }}</ion-card-subtitle>
@@ -45,7 +45,7 @@
           <!-- Music cards -->
           @for (music of musics(); track $index) {
           <ion-card (click)="showLevels(music)" class="basicCard" [ngClass]="selectedMusic?.id === music.id ? 'selectedCard' : ''">
-            <ion-img [src]="'https://'+music.jacket" [style.max-height.%]="80"></ion-img>
+            <ion-img [src]="'https://'+music.jacket"></ion-img>
             <ion-card-header>
               <ion-card-title>{{ music.title }}</ion-card-title>
               <ion-card-subtitle>{{ music.artist }}</ion-card-subtitle>

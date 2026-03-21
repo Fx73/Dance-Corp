@@ -70,24 +70,24 @@ export class MusicDto {
     delete tokenMap["samplestart"];
     this.sampleLength = parseFloat(tokenMap["samplelength"]);
     delete tokenMap["samplelength"];
-    this.stops = this.parseChanges<StopChange>(tokenMap["stops"], v => parseFloat(v))!;
+    this.stops = this.parseChanges<StopChange>(tokenMap["stops"], v => parseFloat(v)) ?? [];
     delete tokenMap["stops"];
-    const parsedDelays = this.parseChanges<StopChange>(tokenMap["delays"], v => parseFloat(v)) ?? [];
-    delete tokenMap["delays"];
-    this.warps = this.parseChanges<WarpChange>(tokenMap["warps"], v => parseFloat(v))!;
+    this.warps = this.parseChanges<WarpChange>(tokenMap["warps"], v => parseFloat(v)) ?? [];
     delete tokenMap["warps"];
-    this.speeds = this.parseChanges<SpeedChange>(tokenMap["speeds"], v => parseFloat(v))!;
+    this.speeds = this.parseChanges<SpeedChange>(tokenMap["speeds"], v => parseFloat(v)) ?? [];
     delete tokenMap["speeds"];
-    this.scrolls = this.parseChanges<ScrollChange>(tokenMap["scrolls"], v => parseFloat(v))!;
+    this.scrolls = this.parseChanges<ScrollChange>(tokenMap["scrolls"], v => parseFloat(v)) ?? [];
     delete tokenMap["scrolls"];
     this.bpms = this.parseChanges<BpmChange>(tokenMap["bpms"], v => parseFloat(v))!;
     delete tokenMap["bpms"];
-
     this.bgChanges = this.parseChanges<BackgroundChange>(tokenMap["bgchanges"], v => v) ?? [new BackgroundChange(0, tokenMap["background"])];
     delete tokenMap["background"];
     delete tokenMap["bgchanges"];
     this.labels = this.parseChanges<LabelChange>(tokenMap["labels"], v => v) ?? [];
     delete tokenMap["labels"];
+
+    const parsedDelays = this.parseChanges<StopChange>(tokenMap["delays"], v => parseFloat(v)) ?? [];
+    delete tokenMap["delays"];
 
     Object.keys(tokenMap).forEach(key => {
       if (key.startsWith('notedata')) {

@@ -47,7 +47,7 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
   //#endregion
 
   constructor(private cdr: ChangeDetectorRef, private userConfigService: UserConfigService, private userFirestoreService: UserFirestoreService, private musicCacheService: MusicCacheService, private router: Router, private location: Location) {
-    addIcons({ arrowBack })
+    addIcons({ arrowBack });
   }
 
 
@@ -126,5 +126,6 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
   goBack(): void {
     this.location.back();
   }
+
 }
 

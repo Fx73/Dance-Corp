@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { UserGuard } from './shared/guard/user.guard';
+import { gameGuard } from './shared/guard/game.guard';
 
 export const routes: Routes = [
   {
@@ -13,7 +14,8 @@ export const routes: Routes = [
   },
   {
     path: 'game',
-    loadComponent: () => import('./game/game.page').then(m => m.GamePage)
+    loadComponent: () => import('./game/game.page').then(m => m.GamePage),
+    canActivate: [gameGuard]
   },
   {
     path: 'browse-upload',

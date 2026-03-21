@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, OnInit, ViewChild, signal } from '@angular/core';
 import { ArrowColor, ArrowImageManager } from './arrowImageManager';
 
 import { Arrow } from '../gameModel/arrow';
@@ -20,7 +20,8 @@ import { UserConfigService } from 'src/app/services/userconfig.service';
 export class PlayerDisplayComponent implements AfterViewInit {
   //#region App Constants
   readonly ArrowDirection = ArrowDirection;
-  readonly ARROW_SIZE = ArrowImageManager.ARROW_SIZE //px
+  ARROW_SIZE = ArrowImageManager.ARROW_SIZE //px
+  ARROW_CORRECTED_SIZE = signal<number>(ArrowImageManager.ARROW_SIZE / Math.sqrt(2)) //px
   //#endregion
 
   @Input() gameRound!: GameRound;
@@ -47,6 +48,9 @@ export class PlayerDisplayComponent implements AfterViewInit {
     const canvas = this.canvasRef.nativeElement;
     canvas.width = this.userConfigService.getConfig()['canvasWidth']
     canvas.height = this.userConfigService.getConfig()['canvasHeight']
+    this.ARROW_SIZE = this.userConfigService.getConfig()['canvasArrowSize']
+    this.ARROW_CORRECTED_SIZE.set(this.ARROW_SIZE * 1.1 / Math.sqrt(2));
+
     const container = canvas.parentElement;
     if (container) {
       container.style.width = `${canvas.width}px`;
@@ -62,10 +66,6 @@ export class PlayerDisplayComponent implements AfterViewInit {
     this.comboTextElement = document.getElementById('combo-text')!;
 
     this.loopUpdate();
-  }
-
-  get arrowCorrectedSize(): number {
-    return this.ARROW_SIZE / Math.sqrt(2);
   }
 
   getPerformanceColor(): string {
@@ -197,15 +197,28 @@ export class PlayerDisplayComponent implements AfterViewInit {
   }
 
   private DrawHold(arrow: Arrow, x: number, y: number, yend: number) {
+    if (arrow.isMissed) {
+      this.ctx.filter = 'brightness(20%)'; // Darken the arrow
+      this.ctx.shadowColor = 'white'; // White glow for contrast
+      this.ctx.shadowBlur = 10; // Add a soft glow effect
+    }
+
     const holdCenterImage = ArrowImageManager.getHoldForDistance(yend - y);
     this.ctx.globalAlpha = arrow.isPressed ? 1 : 0.5;
     this.ctx.drawImage(holdCenterImage, x - holdCenterImage.width / 2, y);
     this.ctx.globalAlpha = 1;
+
+    // Reset shadow and filter settings
+    if (arrow.isMissed) {
+      this.ctx.filter = 'none';
+      this.ctx.shadowColor = 'transparent';
+      this.ctx.shadowBlur = 0;
+    }
   }
 
   private DrawArrow(arrow: Arrow, x: number, y: number): void {
     if (arrow.isMissed) {
-      this.ctx.filter = 'brightness(50%)'; // Darken the arrow
+      this.ctx.filter = 'brightness(20%)'; // Darken the arrow
       this.ctx.shadowColor = 'white'; // White glow for contrast
       this.ctx.shadowBlur = 10; // Add a soft glow effect
     }

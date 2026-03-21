@@ -1,4 +1,4 @@
-import { Directive, EventEmitter, Input } from "@angular/core";
+import { Directive, EventEmitter, Input, OnInit } from "@angular/core";
 
 export interface IMusicPlayer {
     musicUrl: string; // Unique identifier for the music track
@@ -15,19 +15,10 @@ export interface IMusicPlayer {
 
 @Directive()
 export class MusicPlayerCommon {
+
     @Input()
-    isRealSize: boolean = false;
+    size: { width: number | string; height: number | string } = { width: '1', height: '1' };
 
-    size: { width: number | string; height: number | string } = {
-        width: 1,
-        height: 1
-    };
-
-    constructor() {
-        if (this.isRealSize)
-            this.size = { width: '100%', height: '100%' };
-
-    }
 
     public static pickMusicPlayer(uri: string): MusicOrigin | null {
         if (!uri) return null;

@@ -6,7 +6,7 @@ export const CONFIG = {
     },
     GAME: {
         BEAT_PER_MEASURE: 4,
-        MAX_MISSED_FRAME_HOLD: 2,
+        MAX_MISSED_FRAME_HOLD: 8,
         TOLERANCE_WINDOW: 0.15 //In seconds
 
 

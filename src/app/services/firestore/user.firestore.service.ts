@@ -64,7 +64,7 @@ export class UserFirestoreService {
 
 
     public async updateUserStatsFromRound(musicId: string, noteId: string, gameRound: GameRound): Promise<void> {
-        const score = gameRound.score
+        const score = Math.round(gameRound.score)
         const userId = gameRound.player.userId
 
         if (userId === null)

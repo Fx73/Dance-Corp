@@ -1,5 +1,5 @@
-@if(isRealSize){
-<div class="local-player" [hidden]="!isRealSize">
+@if(size.height ==1 && size.width ==1){
+<div class="local-player">
   <button (click)="isPlaying ? stop() : play()">
     {{ isPlaying ? '⏸ Pause' : '▶️ Play' }}
   </button>

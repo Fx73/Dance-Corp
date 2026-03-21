@@ -102,9 +102,62 @@ ion-col{
   transform: scale(0.95);
 }
 
+.basicCard {
+  cursor: pointer;
+  text-align: center;
+  align-items: center;
+  width: 28vw;
+  height: 50vh;
+  ion-img{
+    min-height: 86%;
+    max-height: 86%;
+    overflow-y: hidden;
+    background-color: black;
+  }
+  ion-card-header{
+    margin-top: 6px;
+    padding: 1px;
+    ion-card-title{
+      margin: 0px;
+    }
+  }
+  ion-card-content{
+    padding: 2px;
+    color: lightgray;
+    height: stretch;
+    ion-item{
+     --background:transparent;
+     --border-color: transparent;
+    }
+    ion-text{
+      display: flex;
+      font-size:smaller;
+      line-height: 1.1;
+      margin-bottom: 1px;
+    }
+  }
+}
+.basicCard:hover {
+  box-shadow: 0 5px 5px -3px rgba(241, 234, 234, 0.2),
+    0 8px 10px 1px rgba(219, 218, 218, 0.14),
+    0 3px 14px 2px rgba(216, 211, 211, 0.12);
+}
+
+.basicCardContent{
+  display: flex;
+  flex-direction: row;
+}
+
+.stored-card{
+  background-color: var(--ion-color-secondary);
+  ion-card-title{
+    color: var(--ion-color-dark);
+  }
+}
 
 .large-modal {
   --width: 40vw;
   --height: 90vh;
   --border-radius: 12px;
 }
+

@@ -12,6 +12,7 @@ export class UserConfigService {
     private readonly CONFIG_STORAGE_KEY = "userConfig"
     private readonly PLAYERS_STORAGE_KEY = (index: number) => `playersConfig${index}`;
     //#endregion
+    public isReady = false;
 
     private configSubject: BehaviorSubject<UserConfig> = new BehaviorSubject<UserConfig>(new UserConfig());
     config$ = this.configSubject.asObservable();
@@ -40,6 +41,7 @@ export class UserConfigService {
         })
 
         ArrowImageManager.Set_ARROW_SIZE(this.configSubject.value.canvasWidth / 4);
+        this.isReady = true
     }
     instanciatePlayer(index: number): Player {
         const storedPlayer = localStorage.getItem(this.PLAYERS_STORAGE_KEY(index));
@@ -129,7 +131,7 @@ class UserConfig {
 
     // Display
     showBars = true
-    canvasWidth = 400
-    canvasHeight = 600
-
+    canvasWidth = 500
+    canvasHeight = 1200
+    canvasArrowSize = 120
 }

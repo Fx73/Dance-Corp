@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core';
 import { IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonIcon, IonItem, IonLabel, IonList } from "@ionic/angular/standalone";
 import { checkmarkCircleOutline, closeCircleOutline, medalOutline, starOutline } from 'ionicons/icons';
 
@@ -19,14 +19,14 @@ export class GameOverComponent implements OnInit {
   @Input() gameRound!: GameRound;
   @Output() mainMenu = new EventEmitter<void>();
 
-  readonly precisionCounts: { [key in Precision]: number } = {
+  readonly precisionCounts = signal<{ [key in Precision]: number }>({
     [Precision.Good]: 0,
     [Precision.Almost]: 0,
     [Precision.Perfect]: 0,
     [Precision.Great]: 0,
     [Precision.Missed]: 0,
     [Precision.Ok]: 0,
-  };
+  });
 
   constructor() {
     addIcons({
@@ -41,16 +41,22 @@ export class GameOverComponent implements OnInit {
     this.getPrecisionCounts()
   }
 
-  getPrecisionCounts(): { [key in Precision]: number } {
+  getScore() {
+    return Math.round(this.gameRound.score)
+  }
+
+  getPrecisionCounts() {
+    const counts = { ...this.precisionCounts() };
+
     for (const arrow of this.gameRound.arrowMap.values()) {
-      if (arrow.precision! in this.precisionCounts) {
-        if (arrow.precision)
-          this.precisionCounts[arrow.precision]++;
+      if (arrow.precision) {
+        counts[arrow.precision]++;
       }
     }
 
-    return this.precisionCounts;
+    this.precisionCounts.set(counts);
   }
+
 
   getPrecisionColor(precision: Precision): string {
     return Color.precisionGradient(precision)

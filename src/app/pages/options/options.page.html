@@ -50,6 +50,10 @@
           </ion-input>
         </ion-item>
         <ion-item>
+          <ion-input label="Arrow size" type="number" [value]="this.getConfigValue('canvasArrowSize')" (ionChange)="updateConfigValue('canvasArrowSize', $event.detail.value)">
+          </ion-input>
+        </ion-item>
+        <ion-item>
           <ion-button expand="full" (click)="verifyDisplay()">Verify display</ion-button>
         </ion-item>
       </ion-card-content>

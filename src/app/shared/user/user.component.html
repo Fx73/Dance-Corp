@@ -1,8 +1,11 @@
-<span *ngIf="user">
-	{{ user!.displayName }}
+@if(user()){
+<span>
+	{{ user()!.displayName }}
 </span>
+}
+
 <ion-button (click)="presentPopover($event)" class="user-icon">
-	<ion-icon [color]="user?'success':''" slot="icon-only" name="person">
+	<ion-icon [color]="user()?'success':''" slot="icon-only" name="person">
 	</ion-icon>
 </ion-button>
 
@@ -12,7 +15,7 @@
 		<ion-content class="ion-padding">
 			<ion-item lines="none">
 				<ion-label>
-					{{ user?.displayName }}
+					{{ user()?.displayName }}
 				</ion-label>
 			</ion-item>
 			<ion-item lines="none">

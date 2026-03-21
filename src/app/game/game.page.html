@@ -9,21 +9,20 @@
 
 <ion-content [fullscreen]="true" [style]="'--background: url(' + backgroundUrl + ')'">
 
-	<app-waiting-screen *ngIf="loadingMusic" [title]="music!.title" [artist]="music!.artist" [coverUrl]="music!.jacket" (onCountdownFinished)="handleCountdownFinished()"></app-waiting-screen>
+	@if(loadingMusic){
+	<app-waiting-screen [title]="music!.title" [artist]="music!.artist" [coverUrl]="music!.jacket" (onCountdownFinished)="handleCountdownFinished()"></app-waiting-screen>
+	}
 
-	<ng-container *ngIf="game">
-		<ng-container *ngIf="game.isGameOver;then gameOverContent else gameContent"></ng-container>
-
-		<ng-template #gameOverContent>
-			<app-game-over *ngFor="let gameRound of game.gameRounds" [gameRound]="gameRound"></app-game-over>
-			<ion-card class="base-card start-card" style="height: 15vh;" (click)="goBack()"> Back to music list
-			</ion-card>
-		</ng-template>
-
-		<ng-template #gameContent>
-			<app-player-display *ngFor="let gameRound of game.gameRounds" [gameRound]="gameRound"></app-player-display>
-		</ng-template>
-	</ng-container>
+	@if(game){
+	@if(game.isGameOver){
+	<app-game-over *ngFor="let gameRound of game.gameRounds" [gameRound]="gameRound"></app-game-over>
+	<ion-card class="base-card start-card" style="height: 15vh;" (click)="goBack()"> Back to music list
+	</ion-card>
+	}
+	@else {
+	<app-player-display *ngFor="let gameRound of game.gameRounds" [gameRound]="gameRound"></app-player-display>
+	}
+	}
 
 	<!-- Music Player -->
 	@switch (musicOrigin) {
