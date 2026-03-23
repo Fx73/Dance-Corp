@@ -16,7 +16,14 @@ impl SteamState {
 pub fn init_steam(state: tauri::State<Mutex<SteamState>>) -> Result<(), String> {
     let mut lock = state.lock().unwrap();
 
-    let client = Client::init().unwrap();
+    let client = match Client::init() {
+        Ok(c) => c,
+        Err(e) => {
+            println!("[STEAM] Steam init failed: {:?}", e);
+            lock.client = None;
+            return Ok(());
+        }
+    };
     println!("[STEAM] Steam initialized");
 
     let utils = client.utils();

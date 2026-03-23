@@ -21,6 +21,7 @@ import { MusicPlayerLocalComponent } from "src/app/game/musicPlayer/music-player
 import { MusicPlayerSoundcloudComponent } from "../../game/musicPlayer/music-player-soundcloud/music-player-soundcloud.component";
 import { MusicPlayerYoutubeComponent } from "../../game/musicPlayer/music-player-youtube/music-player-youtube.component";
 import { NoteDifficulty } from './../../game/constants/note-difficulty.enum';
+import { RadarScoreComponent } from "src/app/shared/component/radar-score/radar-score.component";
 import { TestNoteComponent } from './test-note/test-note.component';
 import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.service';
 import { addIcons } from 'ionicons';
@@ -31,7 +32,7 @@ import isTauri from 'src/app/shared/utils/tauri';
   templateUrl: './upload.page.html',
   styleUrls: ['./upload.page.scss'],
   standalone: true,
-  imports: [IonSpinner, MusicEditableFieldComponent, MusicEditableListComponent, IonCardSubtitle, IonImg, IonCol, IonRow, IonGrid, IonInput, IonItem, IonLabel, IonList, FormsModule, IonIcon, IonButton, IonCardTitle, IonCardContent, IonCardHeader, IonCard, IonContent, IonSelect, IonSelectOption, CommonModule, FormsModule, HeaderComponent, IonButton, MusicPlayerYoutubeComponent, MusicPlayerSoundcloudComponent, MusicPlayerLocalComponent]
+  imports: [IonSpinner, MusicEditableFieldComponent, MusicEditableListComponent, IonCardSubtitle, IonImg, IonCol, IonRow, IonGrid, IonInput, IonItem, IonLabel, IonList, FormsModule, IonIcon, IonButton, IonCardTitle, IonCardContent, IonCardHeader, IonCard, IonContent, IonSelect, IonSelectOption, CommonModule, FormsModule, HeaderComponent, IonButton, MusicPlayerYoutubeComponent, MusicPlayerSoundcloudComponent, MusicPlayerLocalComponent, RadarScoreComponent]
 })
 export class UploadPage {
   //#region Constants

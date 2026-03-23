@@ -1,5 +1,7 @@
 import { SccReader, SccWriter } from "src/app/pages/upload/reader.ssc";
+import { readDir, remove } from "@tauri-apps/plugin-fs";
 
+import { BaseDirectory } from "@tauri-apps/api/path";
 import { Injectable } from "@angular/core";
 import { MusicDto } from "src/app/game/gameModel/music.dto";
 
@@ -31,7 +33,7 @@ export class LocalMusicService {
         }
     }
 
-    public clearAllLocalMusics() {
+    public async clearAllLocalMusics() {
         this.LocalMusicRegistry = JSON.parse(localStorage.getItem(this.MUSICEDIT_REGISTRY_KEY) ?? '[]')
 
         for (const musicId of this.LocalMusicRegistry) {
@@ -42,6 +44,27 @@ export class LocalMusicService {
         // Clear internal state
         this.LocalMusicRegistry = [];
         localStorage.removeItem(this.MUSICEDIT_REGISTRY_KEY);
+
+        this.clearMusicFolder();
+    }
+    private async clearMusicFolder() {
+        try {
+            const list = await readDir("music", {
+                baseDir: BaseDirectory.AppData
+            });
+
+            for (const file of list) {
+                if (file.name) {
+                    await remove(`music/${file.name}`, {
+                        baseDir: BaseDirectory.AppData
+                    });
+                    console.log("Deleted:", file.name);
+                }
+            }
+
+        } catch (err) {
+            console.error("Error clearing music folder:", err);
+        }
     }
 
     //#endregion

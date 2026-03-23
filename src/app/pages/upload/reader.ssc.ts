@@ -21,14 +21,19 @@ export class SccReader {
     const musicData = new MusicDto(tokenMap);
     console.log("Parsed Music Data:", musicData);
 
+    const tsvLines = []
     for (const noteData of musicData.noteData) {
       if (!noteData.difficultyCriterias) {
         const evaluator = new NoteEvaluator(musicData.bpms, noteData.stepChart);
         evaluator.evaluateCriterias();
         noteData.difficultyCriterias = evaluator.criterias;
+        console.log(noteData.meter, evaluator.criterias, evaluator.getLevelFromCriterias())
+        tsvLines.push(evaluator.generateTsvLine(musicData.title ?? "", noteData.meter ?? 0));
+
       }
     }
-
+    console.log("Analysis: title | targetScore | totalSteps | doubleSteps | chainedDoubleSteps | avgBpm | maxBpm | stepWithHoldCount | sameArrowRepeatCount | offBeatStepCount | tripleStepCount | mineCount | burstVariation ", tsvLines);
+    console.log(tsvLines.join('\n'))
     return musicData;
   }
 

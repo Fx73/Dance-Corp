@@ -1,7 +1,10 @@
-import { ITimedChange } from "src/app/game/gameModel/timeManagement/timedChange";
+import { BpmChange, ITimedChange } from "src/app/game/gameModel/timeManagement/timedChange";
+
 import { Measures } from "src/app/game/gameModel/music.dto";
 
 export class DifficultyCriteria {
+  [key: string]: number | any;
+
   endurance: number = 0;  //measures sustained effort
   speed: number = 0; //measures speed of notes
   technical: number = 0;   //measure variety of steps and patterns
@@ -21,21 +24,11 @@ export class DifficultyCriteria {
       const numericValue = parseFloat(value);
 
       switch (key.trim()) {
-        case 'e':
-          criteria.endurance = numericValue;
-          break;
-        case 's':
-          criteria.speed = numericValue;
-          break;
-        case 't':
-          criteria.technical = numericValue;
-          break;
-        case 'b':
-          criteria.burst = numericValue;
-          break;
-        case 'c':
-          criteria.chaos = numericValue;
-          break;
+        case 'e': criteria.endurance = numericValue; break;
+        case 's': criteria.speed = numericValue; break;
+        case 't': criteria.technical = numericValue; break;
+        case 'b': criteria.burst = numericValue; break;
+        case 'c': criteria.chaos = numericValue; break;
       }
     }
 
@@ -44,13 +37,40 @@ export class DifficultyCriteria {
 }
 
 export class NoteEvaluator {
-  bpms: ITimedChange[];
+  bpms: BpmChange[];
   stepChart: Measures[]
   criterias: DifficultyCriteria = new DifficultyCriteria();
 
-  constructor(bpms: ITimedChange[], stepChart: Measures[]) {
+  totalSteps = 0
+  doubleSteps = 0;
+  chainedDoubleSteps = 0;
+  avgBpm = 0;
+  maxBpm = 0;
+  stepWithHoldCount = 0;
+  sameArrowRepeatCount = 0;
+  offBeatStepCount = 0;
+  tripleStepCount = 0;
+  mineCount = 0;
+  burstVariation = 0;
+
+  constructor(bpms: BpmChange[], stepChart: Measures[]) {
     this.bpms = bpms;
     this.stepChart = stepChart;
+  }
+
+  public generateTsvLine(name: string, score: number): string {
+    const tsvLine = [name, score, this.totalSteps, this.doubleSteps, this.chainedDoubleSteps, this.avgBpm, this.maxBpm, this.stepWithHoldCount, this.sameArrowRepeatCount, this.offBeatStepCount, this.tripleStepCount, this.mineCount, this.burstVariation].join('\t');
+    return tsvLine
+
+  }
+
+  getLevelFromCriterias() {
+    const W_ENDURANCE = 0.12
+    const W_SPEED = 0.01
+    const W_TECHNICAL = 0.06
+    const W_BURST = 0.05
+
+    return this.criterias.endurance * W_ENDURANCE + this.criterias.speed * W_SPEED + this.criterias.technical * W_TECHNICAL + this.criterias.burst * W_BURST
   }
 
   evaluateCriterias(): DifficultyCriteria {
@@ -65,9 +85,9 @@ export class NoteEvaluator {
   }
 
   evaluateEndurance(): number {
-    const TOTAL_STEPS_WEIGHT = 1;
-    const DOUBLE_STEP_WEIGHT = 4;
-    const CHAINED_DOUBLE_STEP_WEIGHT = 16;
+    const TOTAL_STEPS_WEIGHT = 0.2;
+    const DOUBLE_STEP_WEIGHT = 0.05;
+    const CHAINED_DOUBLE_STEP_WEIGHT = 0.1;
     let totalSteps = 0;
     let doubleSteps = 0;
     let chainedDoubleSteps = 0;
@@ -101,33 +121,78 @@ export class NoteEvaluator {
       }
     }
 
+    this.totalSteps = totalSteps
+    this.doubleSteps = doubleSteps
+    this.chainedDoubleSteps = chainedDoubleSteps
+
     const criteria = totalSteps * TOTAL_STEPS_WEIGHT + doubleSteps * DOUBLE_STEP_WEIGHT + chainedDoubleSteps * CHAINED_DOUBLE_STEP_WEIGHT;
     return criteria;
   }
 
   evaluateSpeed(): number {
-    let measureNumber = 0;
-    let averageMeasure = 0;
-    for (const measure of this.stepChart) {
-      averageMeasure += measure.steps.length;
-      measureNumber++;
+    const AVG_BPM_WEIGHT = 0.8;
+    const MAX_BPM_WEIGHT = 0.2;
+
+
+    let bpmDurations = new Map<number, number>();
+
+    for (let i = 0; i < this.bpms.length - 1; i++) {
+      const bpm = this.bpms[i];
+      const next = this.bpms[i + 1];
+      const duration = (60 / bpm.value) * (next.time - bpm.time);
+
+      bpmDurations.set(bpm.value, (bpmDurations.get(bpm.value) ?? 0) + duration);
     }
-    averageMeasure /= measureNumber;
 
-    const bpm: number = this.bpms[0].value as number;
+    const last = this.bpms[this.bpms.length - 1];
+    const totalBeats = this.stepChart.length * 4;
+    const lastDuration = (60 / last.value) * (totalBeats - last.time);
 
-    const criteria = averageMeasure * bpm;
-    return criteria;
+    bpmDurations.set(last.value, (bpmDurations.get(last.value) ?? 0) + lastDuration);
+
+
+    let weightedSum = 0;
+    let totalDuration = 0;
+
+    for (const [bpm, duration] of bpmDurations) {
+      weightedSum += bpm * duration;
+      totalDuration += duration;
+    }
+
+    const avgBpm = Math.round((weightedSum / totalDuration) * 1000) / 1000;
+
+    let maxBpm = 0;
+    let maxBpmDuration = 0;
+
+    for (const [bpm, duration] of bpmDurations) {
+      if (bpm > maxBpm) {
+        maxBpm = bpm;
+        maxBpmDuration = duration;
+      }
+    }
+    //Non linear weighting
+    const alpha = 0.3;
+    const maxWeighted = maxBpm * Math.pow(maxBpmDuration / totalDuration, alpha);
+
+    this.avgBpm = avgBpm;
+    this.maxBpm = maxWeighted;
+
+    return AVG_BPM_WEIGHT * avgBpm + MAX_BPM_WEIGHT * maxWeighted;
   }
 
+
   evaluateTechnical(): number {
-    const STEP_WITH_HOLD_WEIGHT = 4;
-    const SAME_ARROW_REPEAT_WEIGHT = 1;
-    const OFF_BEAT_STEP_WEIGHT = 2;
+    const STEP_WITH_HOLD_WEIGHT = 0.1;
+    const SAME_ARROW_REPEAT_WEIGHT = 0.001;
+    const OFF_BEAT_STEP_WEIGHT = 0.1;
+    const TRIPLE_STEP_WEIGHT = 5;
+    const MINE_WEIGHT = 0.02;
 
     let stepWithHoldCount = 0;
     let sameArrowRepeatCount = 0;
     let offBeatStepCount = 0;
+    let tripleStepCount = 0;
+    let mineCount = 0;
 
     let isHolding: boolean = false;
     let previousLine: number[] = [0, 0, 0, 0];
@@ -162,62 +227,61 @@ export class NoteEvaluator {
             offBeatStepCount++;
           }
         }
+
+        // Check for triple or quad steps
+        const activeCount = line.filter(v => v === 1 || v === 2 || v === 4).length;
+        if (activeCount === 3)
+          tripleStepCount++;
+        if (activeCount === 4)
+          tripleStepCount += 4;
+
+        mineCount += line.filter(v => v === 5).length;
       }
     }
 
+    this.stepWithHoldCount = stepWithHoldCount;
+    this.sameArrowRepeatCount = sameArrowRepeatCount;
+    this.offBeatStepCount = offBeatStepCount;
+    this.tripleStepCount = tripleStepCount;
+    this.mineCount = mineCount;
 
-    const criteria = stepWithHoldCount * STEP_WITH_HOLD_WEIGHT + sameArrowRepeatCount * SAME_ARROW_REPEAT_WEIGHT + offBeatStepCount * OFF_BEAT_STEP_WEIGHT;
+    const criteria = stepWithHoldCount * STEP_WITH_HOLD_WEIGHT + sameArrowRepeatCount * SAME_ARROW_REPEAT_WEIGHT + offBeatStepCount * OFF_BEAT_STEP_WEIGHT + tripleStepCount * TRIPLE_STEP_WEIGHT + mineCount * MINE_WEIGHT;
     return criteria;
   }
 
   evaluateBurst(): number {
-    const BURST_WEIGHT = 2;
-    const BURST_INTENSITY_WEIGHT = 1;
+    const BURST_VARIATION_WEIGHT = 1;
 
-    let burstCount = 0;
-    let burstIntensity = 0;
+    const intervals: number[] = [];
+    let previousBeat: number = 0;
 
-    let currentBurstIntensity = 0;
-    const BURST_THRESHOLD = 12; // Minimum number of steps in a burst to be considered significant
+    for (let i = 0; i < this.stepChart.length; i++) {
+      const measure = this.stepChart[i];
+      const beatDivision = measure.steps.length / 4;
 
-    for (const measure of this.stepChart) {
-      const measureLength = measure.steps.length;
+      for (let j = 0; j < measure.steps.length; j++) {
+        const line = measure.steps[j];
+        const hasNote = line.some(v => v === 1 || v === 2 || v === 4);
 
-      if (measureLength === 4) {
-        if (currentBurstIntensity > BURST_THRESHOLD) {
-          burstCount++;
-          burstIntensity += currentBurstIntensity;
-        }
-        currentBurstIntensity = 0;
-      } else {
-        let currentEmptyStreak = 0;
-
-        for (let i = 0; i < measureLength; i++) {
-          const line = measure.steps[i];
-          const isEmpty = line.every(v => v === 0);
-          if (isEmpty) {
-            currentEmptyStreak++;
-          } else {
-            currentBurstIntensity++;
-            currentEmptyStreak = 0;
+        if (hasNote) {
+          if (previousBeat !== null) {
+            intervals.push(previousBeat);
           }
-          if (currentEmptyStreak >= measureLength / 8) {
-            if (currentBurstIntensity > BURST_THRESHOLD) {
-              burstCount++;
-              burstIntensity += currentBurstIntensity;
-            }
-            currentBurstIntensity = 0;
-          }
-        }
-        if (currentBurstIntensity > BURST_THRESHOLD) {
-          burstCount++;
-          burstIntensity += currentBurstIntensity;
+          previousBeat = 0;
+        } else {
+          previousBeat += 1 / beatDivision;
         }
       }
-
     }
 
-    const criteria = burstCount * BURST_WEIGHT + burstIntensity * BURST_INTENSITY_WEIGHT;
+    const mean = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+    const variance = intervals.map(x => (x - mean) ** 2).reduce((a, b) => a + b, 0) / intervals.length;
+    const std = Math.sqrt(variance);
+    const heterogeneityScore = std / mean;
+
+    this.burstVariation = heterogeneityScore;
+
+    const criteria = heterogeneityScore * BURST_VARIATION_WEIGHT;
     return criteria;
   }
 }
