@@ -1,5 +1,6 @@
-import { AfterViewInit, Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 
+import { CONFIG } from 'src/app/game/constants/game-config';
 import { DifficultyCriteria } from 'src/app/pages/upload/DifficultyCriteria';
 
 @Component({
@@ -8,11 +9,12 @@ import { DifficultyCriteria } from 'src/app/pages/upload/DifficultyCriteria';
   styleUrls: ['./radar-score.component.scss'],
   standalone: true
 })
-export class RadarScoreComponent implements AfterViewInit {
+export class RadarScoreComponent implements AfterViewInit, OnChanges {
   readonly labels = ["Endurance", "Speed", "Technical", "Burst", "Chaos"];
   readonly normalizationFactor = [200, 300, 30, 10, 10];
 
-  @Input() scores: DifficultyCriteria = new DifficultyCriteria();
+  @Input() scores: DifficultyCriteria[] = [];
+
   @Input() size: number = 200;
 
   @ViewChild('radar') radar!: ElementRef<HTMLCanvasElement>;
@@ -20,21 +22,28 @@ export class RadarScoreComponent implements AfterViewInit {
   constructor() { }
 
   ngAfterViewInit() {
+    this.drawRadar();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['size'] || changes['scores']) {
+      this.drawRadar();
+    }
+  }
+
+  private drawRadar(): void {
+    if (!this.radar) {
+      return;
+    }
+
     const canvas = this.radar.nativeElement;
     const ctx = canvas.getContext('2d')!;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
-    const radius = 100;
+    const radius = Math.max(20, Math.min(centerX, centerY) - 20);
     const angleStep = (Math.PI * 2) / this.labels.length;
-
-    // 1) Normalize values (0 → 1)
-    const values = this.labels.map((label, index) => {
-      const rawValue = this.scores[label.toLowerCase()] ?? 0;
-      const factor = this.normalizationFactor[index] ?? 1;
-      return Math.min(Math.max(rawValue / factor, 0), 1);
-    });
 
     // 2) Draw axes
     for (let i = 0; i < this.labels.length; i++) {
@@ -115,24 +124,34 @@ export class RadarScoreComponent implements AfterViewInit {
     ctx.fill();
 
 
-    // 4) Draw the polygon of values
-    ctx.beginPath();
-    ctx.strokeStyle = "#2b6cb0";
-    ctx.fillStyle = "rgba(66, 153, 225, 0.3)";
-    ctx.lineWidth = 2;
+    // 4) Draw one polygon per score set
+    for (let scoreIndex = 0; scoreIndex < this.scores.length; scoreIndex++) {
+      const score = this.scores[scoreIndex];
+      const values = this.labels.map((label, index) => {
+        const rawValue = score[label.toLowerCase()] ?? 0;
+        const factor = this.normalizationFactor[index] ?? 1;
+        return Math.min(Math.max(rawValue / factor, 0), 1);
+      });
 
-    for (let i = 0; i < values.length; i++) {
-      const angle = i * angleStep - Math.PI / 2;
-      const r = radius * values[i];
-      const x = centerX + Math.cos(angle) * r;
-      const y = centerY + Math.sin(angle) * r;
+      const color = CONFIG.PLAYER_COLORS[scoreIndex % CONFIG.PLAYER_COLORS.length];
+      ctx.beginPath();
+      ctx.strokeStyle = color.stroke;
+      ctx.fillStyle = color.fill;
+      ctx.lineWidth = 2;
 
-      if (i === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
+      for (let i = 0; i < values.length; i++) {
+        const angle = i * angleStep - Math.PI / 2;
+        const r = radius * values[i];
+        const x = centerX + Math.cos(angle) * r;
+        const y = centerY + Math.sin(angle) * r;
+
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
     }
-
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
   }
 }

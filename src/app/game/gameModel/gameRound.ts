@@ -32,6 +32,7 @@ export class GameRound {
     public isFinished = false;
     public comboCount: number = 0;
     public grade: string = ""; // A, B, C, D, E
+    public level: number = 1;
 
     private scorePerArrow: number = 0;
     private scorePerHoldBeat: number = 0;
@@ -47,6 +48,8 @@ export class GameRound {
             this.dancepad = new DancePadKeyboard(player.keyBindingKeyboard)
         else
             this.dancepad = new DancePadGamepad(player.gamepad!.index!, player.keyBindingGamepad)
+
+        this.level = notes.meter ?? 1
         this.loadArrows(notes)
         this.calculateScore()
 

@@ -32,8 +32,11 @@ export class SccReader {
 
       }
     }
-    console.log("Analysis: title | targetScore | totalSteps | doubleSteps | chainedDoubleSteps | avgBpm | maxBpm | stepWithHoldCount | sameArrowRepeatCount | offBeatStepCount | tripleStepCount | mineCount | burstVariation ", tsvLines);
-    console.log(tsvLines.join('\n'))
+    if (tsvLines.length > 0) {
+      console.log("Analysis: title | targetScore | totalSteps | doubleSteps | chainedDoubleSteps | avgBpm | maxBpm | stepWithHoldCount | sameArrowRepeatCount | offBeatStepCount | tripleStepCount | mineCount | burstVariation ", tsvLines);
+      console.log(tsvLines.join('\n'))
+    }
+
     return musicData;
   }
 

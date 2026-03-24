@@ -1,5 +1,5 @@
 <div class="player-hud">
-  <div class="score"> {{gameRound.player.name}} : {{ getDisplayScore() }}</div>
+  <div class="score"> {{gameRound.player.name}} - Level {{ gameRound.level }} : {{ getDisplayScore() }}</div>
   <div class="performance-container">
     <div class="performance-bar" [style.width.%]="gameRound.performance" [style.backgroundColor]="getPerformanceColor()">
       <div class="performance-label" *ngIf="getConfigValue('trainingMode')"> Training Mode </div>

@@ -15,8 +15,10 @@ export class GameManager {
     constructor(music: MusicDto, players: Player[], isTrainingMode: boolean, private userFirestoreService: UserFirestoreService) {
         this.music = music
         this.isTrainingMode = isTrainingMode
-        for (const player of players) {
-            this.gameRounds.push(new GameRound(this.music.noteData[0], player, this.isTrainingMode))
+
+        for (let index = 0; index < players.length; index++) {
+            const player = players[index];
+            this.gameRounds.push(new GameRound(this.music.noteData[index], player, this.isTrainingMode))
         }
 
         this.beatManager = new BeatManager(this.music);

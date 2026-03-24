@@ -13,7 +13,7 @@ export class DancePadKeyboard implements IDancePad {
         this.currentState = new Set();
         this.previousState = new Set();
         this.keyBinding = keyBinding
-        this.lastExposedState = [0, 0, 0, 0]
+        this.lastExposedState = [0, 0, 0, 0, 0]
 
         // Listen for keyboard events
         window.addEventListener('keydown', (event) => this.handleKeyDown(event));
@@ -38,7 +38,8 @@ export class DancePadKeyboard implements IDancePad {
             this.getArrowInput(ArrowDirection.Left),
             this.getArrowInput(ArrowDirection.Down),
             this.getArrowInput(ArrowDirection.Up),
-            this.getArrowInput(ArrowDirection.Right)
+            this.getArrowInput(ArrowDirection.Right),
+            this.getArrowInput(ArrowDirection.Start)
         ] as DancePadInput;
 
         this.previousState = new Set(this.currentState);

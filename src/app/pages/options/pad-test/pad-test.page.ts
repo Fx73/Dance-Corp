@@ -23,7 +23,9 @@ export class PadTestPage {
   playerIndexSelected: number | undefined;
   playerSelected: Player | undefined;
   gampadBindings: Map<ArrowDirection, number> = new Map<ArrowDirection, number>();
+  gamepadStartBinding: number | null = null;
   keyboardBindings: Map<ArrowDirection, string> = new Map<ArrowDirection, string>();
+  keyboardStartBinding: string | null = null;
 
   waitingForInput: boolean = false;
 
@@ -115,6 +117,11 @@ export class PadTestPage {
 
   waitForKeyboardInput(arrowDirection: ArrowDirection, alert: HTMLIonAlertElement) {
     const checkKeyboardInput = (event: KeyboardEvent) => {
+
+      if (event.key === 'Enter') {
+        AppComponent.presentWarningToast(`'Enter' key is default "Start" and cannot be used for bindings.`);
+        return;
+      }
       // Bind the action to the pressed button
       this.keyboardBindings.set(arrowDirection, event.key);
       this.waitingForInput = false;

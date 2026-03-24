@@ -10,12 +10,12 @@ export class DancePadGamepad implements IDancePad {
 
     public lastExposedState: DancePadInput;
 
-    constructor(gamepadIndex: number = 0, keyBinding: Map<number, ArrowDirection>) {
+    constructor(gamepadIndex: number = 0, keyBinding: Map<number, ArrowDirection>, enterBinding: number = -1) {
         this.gamepadIndex = gamepadIndex;
         this.currentState = new Set();
         this.previousState = new Set();
         this.keyBinding = keyBinding
-        this.lastExposedState = [0, 0, 0, 0]
+        this.lastExposedState = [0, 0, 0, 0, 0]
     }
 
     // Update gamepad state
@@ -32,11 +32,13 @@ export class DancePadGamepad implements IDancePad {
                 }
             });
         }
+
         this.lastExposedState = [
             this.getArrowInput(ArrowDirection.Left),
             this.getArrowInput(ArrowDirection.Down),
             this.getArrowInput(ArrowDirection.Up),
-            this.getArrowInput(ArrowDirection.Right)
+            this.getArrowInput(ArrowDirection.Right),
+            this.getArrowInput(ArrowDirection.Start)
         ] as DancePadInput;
 
         return this.lastExposedState;
@@ -66,4 +68,5 @@ export class DancePadGamepad implements IDancePad {
     private isButtonJustReleased(buttonIndex: number): boolean {
         return !this.currentState.has(buttonIndex) && this.previousState.has(buttonIndex);
     }
+
 }
