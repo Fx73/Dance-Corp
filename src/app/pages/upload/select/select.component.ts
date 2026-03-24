@@ -1,23 +1,20 @@
-import { Component, ElementRef, EventEmitter, Input, Output } from "@angular/core";
-import { IonInput, IonItem, IonLabel } from "@ionic/angular/standalone";
+import { Component, ElementRef, EventEmitter, Input, Output } from '@angular/core';
+import { IonItem, IonLabel, IonSelect, IonSelectOption } from "@ionic/angular/standalone";
 
 @Component({
-  selector: 'music-editable-field',
-  templateUrl: './editable-field.component.html',
-  styleUrls: ['./editable-field.component.scss'],
+  selector: 'music-select',
+  templateUrl: './select.component.html',
+  styleUrls: ['./select.component.scss'],
   standalone: true,
-  imports: [IonItem, IonLabel, IonInput]
+  imports: [IonLabel, IonItem, IonSelect, IonSelectOption]
 })
-export class MusicEditableFieldComponent {
-  @Input() isEditing = false;
-
+export class MusicSelectComponent {
   @Input() label!: string;
-  @Input() type: 'string' | 'number' = 'string';
-
   @Input() value!: any;
   @Input() valueDb: any = null;
+  @Input() isEditing = false;
 
-  @Input() warningMessage: string | null = null;
+  @Input() options: any[] = [];
 
   @Output() valueChange = new EventEmitter<any>();
 
@@ -29,11 +26,10 @@ export class MusicEditableFieldComponent {
     this.isDirty = this.isEditing && this.normalize(this.value) !== this.normalize(this.valueDb);
   }
 
-  onInputChange(ev: any) {
+  onSelectChange(ev: any) {
     this.isDirty = this.isEditing && this.normalize(ev.detail.value) !== this.normalize(this.valueDb);
     this.valueChange.emit(ev.detail.value);
   }
-
 
   get isChanged(): boolean {
     return this.isEditing && this.normalize(this.value) !== this.normalize(this.valueDb);

@@ -130,7 +130,7 @@ export class RadarScoreComponent implements AfterViewInit, OnChanges {
       const values = this.labels.map((label, index) => {
         const rawValue = score[label.toLowerCase()] ?? 0;
         const factor = this.normalizationFactor[index] ?? 1;
-        return Math.min(Math.max(rawValue / factor, 0), 1);
+        return Math.max(rawValue / factor, 0);
       });
 
       const color = CONFIG.PLAYER_COLORS[scoreIndex % CONFIG.PLAYER_COLORS.length];

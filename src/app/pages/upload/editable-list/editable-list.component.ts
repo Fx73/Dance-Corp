@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, Output } from '@angular/core';
 import { IonButton, IonIcon, IonInput, IonItem, IonLabel, IonList } from "@ionic/angular/standalone";
 import { addOutline, removeOutline } from 'ionicons/icons';
 
@@ -21,13 +21,20 @@ export class MusicEditableListComponent {
   @Input() value: any[] = [];
   @Input() valueDb: any[] | undefined = [];
 
+  @Output() valueChange = new EventEmitter<any[]>();
 
-  constructor() {
+  public isDirty = false;
+
+  constructor(public elementRef: ElementRef) {
     addIcons({ removeOutline, addOutline });
   }
 
-  @Output() valueChange = new EventEmitter<any[]>();
+  ngOnChanges() {
+    this.isDirty = this.isChanged;
+  }
+
   onFieldChange() {
+    this.isDirty = this.isChanged
     this.valueChange.emit(this.value);
   }
   private normalize(v: any, type: 'string' | 'number'): string {
@@ -50,6 +57,11 @@ export class MusicEditableListComponent {
     );
   }
 
+  get isChanged(): boolean {
+    if (!this.isEditing) return false;
+    if (this.value.length !== this.valueDb?.length) return true;
+    return this.value.some((_, i) => this.isRowChanged(i));
+  }
 
 
 
@@ -58,12 +70,16 @@ export class MusicEditableListComponent {
       time: 0,
       value: this.valueType === 'number' ? 0 : ''
     });
+
+    this.isDirty = this.isChanged
     this.valueChange.emit(this.value);
   }
 
 
   removeRow(i: number) {
     this.value.splice(i, 1);
+
+    this.isDirty = this.isChanged
     this.valueChange.emit(this.value);
   }
 

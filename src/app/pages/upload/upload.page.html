@@ -12,13 +12,11 @@
 	</ion-card>
 	}
 	@else {
-	<ion-card class="base-card">
+	<ion-card class="base-card upload-card">
 		<ion-card-header>
 			<ion-card-title> Select a .sm, .ssc, or .essc File </ion-card-title>
-			<ion-card-subtitle><i> Make sure artist, title are perfect in your file, you will not be able to edit later
-					!
-					To prevent any destruction, Artist, Title, BPM, offset and music link will be locked after first
-					upload.</i> </ion-card-subtitle>
+			<ion-card-subtitle><i> Make sure <b>Artist</b> and <b>Title</b> are perfect in your file, you will not be able to edit them ! </i> </ion-card-subtitle>
+			<ion-card-subtitle> To prevent any destruction, <b>Artist</b>, <b>Title</b>, <b>BPM</b>, <b>offset</b> and <b>music link</b> will be locked after first upload.</ion-card-subtitle>
 		</ion-card-header>
 		<ion-card-content class="flex-align-horizontal">
 			<input (change)="onFileSelected($event)" type="file" accept=".sm,.ssc,.essc">
@@ -31,7 +29,7 @@
 		<ion-row>
 			<ion-col size="8">
 				<!-- Metadata Card -->
-				<ion-card class="base-card">
+				<ion-card #metadataCard class="base-card">
 					<ion-card-header>
 						<ion-card-title>File Metadata</ion-card-title>
 					</ion-card-header>
@@ -112,13 +110,15 @@
 						<p style="color: var(--ion-color-warning);"> You are currently editing a local music file. Switch to url to be able to upload </p>
 						}
 						@else{
-						<ion-button (click)="uploadMusic()" color="success" expand="block"> {{ isEditDB ? 'Update music' : 'Upload music'}} </ion-button>
+						<ion-button (click)="uploadMusic()" color="success" expand="block" [disabled]="isEditDB && !metadataDirty()"> {{ isEditDB ? 'Update music' : 'Upload music'}} </ion-button>
 						}
 						@if (isEditDB) {
-						<ion-button (click)="uploadAllNotes()" expand="block"> Upload All notes </ion-button>
+						<ion-button (click)="uploadAllNotes()" expand="block" [disabled]="!anyNoteDirty()"> Upload All notes </ion-button>
+						@if (noNotes()) {
 						<ion-button color="danger" (click)="deleteMusic()" [disabled]="!noNotes()" expand="block"> Delete Music </ion-button>
 						}
-						<ion-button color="danger" (click)="deleteFile()" size="small" expand="block"> <ion-icon name="trash-outline"></ion-icon>Discard local edit </ion-button>
+						}
+						<ion-button color="danger" (click)="deleteFile()" size="small" expand="block"> <ion-icon *ngIf="metadataDirty() || anyNoteDirty()" name="trash-outline"></ion-icon> {{metadataDirty() || anyNoteDirty() ? 'Discard local edit' : 'Cancel edition'}} </ion-button>
 						}
 						@else {
 						<ion-button (click)="onStartEdit()" expand="block"> Edit Music </ion-button>
@@ -173,7 +173,7 @@
 					<ion-card-content class="card-grid">
 						@for (note of (isEditLocal ? musicData : musicDataDb)?.noteData; track $index) {
 						@let noteDb = getDbNote(note.chartName);
-						<ion-card [disabled]="!isNoteMine(note)">
+						<ion-card #notesCard [disabled]="!isNoteMine(note)">
 							<ion-card-header>
 								<ion-card-title>
 									<ion-input [(ngModel)]="note.chartName" [disabled]="!isEditLocal || noteDb !== undefined"></ion-input>
@@ -181,26 +181,16 @@
 							</ion-card-header>
 							<ion-card-content>
 								<ion-list>
-									<ion-item [title]="noteDb?.stepsType">
-										<ion-select label="Dance Type" [(ngModel)]="note.stepsType" [disabled]="!isEditLocal">
-											<ion-select-option *ngFor="let type of DanceTypeList" [value]="type">
-												{{ type }}
-											</ion-select-option>
-										</ion-select>
-									</ion-item>
+									<music-select label="Dance Type" [(value)]="note.stepsType" [valueDb]="noteDb?.stepsType" [isEditing]="isEditLocal" (valueChange)="onEndEditing()" [options]="DanceTypeList">
+									</music-select>
 
 									<music-editable-field label="Description" [(value)]="note.description" [valueDb]="noteDb?.description" [isEditing]="isEditLocal" (valueChange)="onEndEditing()">
 									</music-editable-field>
 
-									<ion-item [title]="noteDb?.difficulty">
-										<ion-select label="Difficulty" [(ngModel)]="note.difficulty" [disabled]="!isEditLocal">
-											<ion-select-option *ngFor="let level of NoteDifficultyList" [value]="level">
-												{{ level }}
-											</ion-select-option>
-										</ion-select>
-									</ion-item>
+									<music-select label="Difficulty" [(value)]="note.difficulty" [valueDb]="noteDb?.difficulty" [isEditing]="isEditLocal" (valueChange)="onEndEditing()" [options]="NoteDifficultyList">
+									</music-select>
 
-									<music-editable-field label="Meter" [(value)]="note.meter" [valueDb]="noteDb?.meter" [isEditing]="isEditLocal" type="number" (valueChange)="onEndEditing()">
+									<music-editable-field label="Meter" [(value)]="note.meter" [valueDb]="noteDb?.meter" [isEditing]="isEditLocal" type="number" (valueChange)="onEndEditing()" [warningMessage]="'Meter has been computed on upload from criterias to match DDR level as much as possible. Change it only if you know what you are doing !'">
 									</music-editable-field>
 
 									<music-editable-field label="Credit" [(value)]="note.credit" [valueDb]="noteDb?.credit" [isEditing]="isEditLocal" (valueChange)="onEndEditing()">
@@ -240,7 +230,7 @@
 								<ion-card-content>
 									<!--ion-button (click)="TestNote(note)" color="tertiary" size="small" expand="block"> Test </ion-button-->
 									@if(musicDataDb){
-									<ion-button (click)="uploadNote(note)" size="small" [color]="noteDb?'primary':'success'" expand="block"> {{ noteDb ? 'Update notes' : 'Upload notes'}}</ion-button>
+									<ion-button (click)="uploadNote(note)" size="small" [color]="noteDb?'primary':'success'" expand="block" [disabled]="!notesDirty()[$index]"> {{ noteDb ? 'Update notes' : 'Upload notes'}}</ion-button>
 									}@else {
 									<p style="color: var(--ion-color-warning);"> Upload your music first to upload notes </p>
 									}

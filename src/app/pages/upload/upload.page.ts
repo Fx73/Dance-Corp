@@ -1,6 +1,6 @@
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren, signal } from '@angular/core';
 import { BaseDirectory, mkdir, readDir, remove, writeFile } from '@tauri-apps/plugin-fs';
-import { ChangeDetectorRef, Component } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonGrid, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonList, IonRow, IonSelect, IonSelectOption, IonSpinner, ModalController } from '@ionic/angular/standalone';
 import { Measures, MusicDto, NoteDataDto } from 'src/app/game/gameModel/music.dto';
@@ -20,6 +20,7 @@ import { MusicFirestoreService } from 'src/app/services/firestore/music.firestor
 import { MusicPlayerLocalComponent } from "src/app/game/musicPlayer/music-player-local/music-player-local.component";
 import { MusicPlayerSoundcloudComponent } from "../../game/musicPlayer/music-player-soundcloud/music-player-soundcloud.component";
 import { MusicPlayerYoutubeComponent } from "../../game/musicPlayer/music-player-youtube/music-player-youtube.component";
+import { MusicSelectComponent } from './select/select.component';
 import { NoteDifficulty } from './../../game/constants/note-difficulty.enum';
 import { RadarScoreComponent } from "src/app/shared/component/radar-score/radar-score.component";
 import { TestNoteComponent } from './test-note/test-note.component';
@@ -32,7 +33,7 @@ import isTauri from 'src/app/shared/utils/tauri';
   templateUrl: './upload.page.html',
   styleUrls: ['./upload.page.scss'],
   standalone: true,
-  imports: [IonSpinner, MusicEditableFieldComponent, MusicEditableListComponent, IonCardSubtitle, IonImg, IonCol, IonRow, IonGrid, IonInput, IonItem, IonLabel, IonList, FormsModule, IonIcon, IonButton, IonCardTitle, IonCardContent, IonCardHeader, IonCard, IonContent, IonSelect, IonSelectOption, CommonModule, FormsModule, HeaderComponent, IonButton, MusicPlayerYoutubeComponent, MusicPlayerSoundcloudComponent, MusicPlayerLocalComponent, RadarScoreComponent]
+  imports: [IonSpinner, MusicEditableFieldComponent, MusicEditableListComponent, IonCardSubtitle, IonImg, IonCol, IonRow, IonGrid, IonInput, IonItem, IonLabel, IonList, FormsModule, IonIcon, IonButton, IonCardTitle, IonCardContent, IonCardHeader, IonCard, IonContent, CommonModule, FormsModule, HeaderComponent, IonButton, MusicPlayerYoutubeComponent, MusicPlayerSoundcloudComponent, MusicPlayerLocalComponent, RadarScoreComponent, MusicSelectComponent]
 })
 export class UploadPage {
   //#region Constants
@@ -49,33 +50,89 @@ export class UploadPage {
   isEditDB = false;
   isEditLocal = false;
 
-
   isLoading = false;
+
+  @ViewChild('metadataCard', { read: ElementRef })
+  metadataCard!: ElementRef;
+  @ViewChildren('notesCard', { read: ElementRef })
+  notesCards!: QueryList<ElementRef>;
+
+  @ViewChildren(MusicEditableFieldComponent)
+  editableFields!: QueryList<MusicEditableFieldComponent>;
+  @ViewChildren(MusicEditableListComponent)
+  editableLists!: QueryList<MusicEditableListComponent>;
+  @ViewChildren(MusicSelectComponent)
+  selects!: QueryList<MusicSelectComponent>;
+
+  metadataDirty = signal(false);
+  notesDirty = signal<boolean[]>([]);
 
   constructor(private modalController: ModalController, private route: ActivatedRoute, private fireStoreService: MusicFirestoreService, private userService: UserFirestoreService, private localMusicService: LocalMusicService, private cd: ChangeDetectorRef, private location: Location, private router: Router) {
     addIcons({ logoYoutube, logoSoundcloud, folder, trashOutline, removeOutline, addOutline, checkmarkCircle, closeCircle });
 
   }
 
-  async ngOnInit() {
+  ionViewWillEnter() {
     const musicId = this.route.snapshot.queryParamMap.get('music');
+    console.log("UploadPage initialized with musicId:", musicId);
     if (musicId) {
-      this.isLoading = true;
-      this.loadLocalMusic(musicId);
-      await this.loadDbMusic(musicId);
-
-      if (!this.musicData) {
-        if (!this.musicDataDb) {
-          AppComponent.presentErrorToast("Music not found in local storage or database.");
-          return;
-        }
-        this.musicData = this.musicDataDb.deepClone();
-      }
+      this.startLoad(musicId);
     }
 
   }
 
+  //#region Dirty state management
+
+  updateGlobalDirty() {
+    const cardMetadata = [
+      ...this.editableFields.filter(f => this.metadataCard.nativeElement.contains(f.elementRef.nativeElement)),
+      ...this.editableLists.filter(l => this.metadataCard.nativeElement.contains(l.elementRef.nativeElement)),
+      ...this.selects.filter(s => this.metadataCard.nativeElement.contains(s.elementRef.nativeElement)),
+    ];
+
+    this.metadataDirty.set(
+      cardMetadata.some(c => c.isDirty)
+    );
+
+
+    const dirtyArray = new Array(this.notesCards.length).fill(false);
+    for (let index = 0; index < this.notesCards.length; index++) {
+      const card = this.notesCards.get(index);
+      if (!card) continue;
+      const cardNote = [
+        ...this.editableFields.filter(f => card.nativeElement.contains(f.elementRef.nativeElement)),
+        ...this.editableLists.filter(l => card.nativeElement.contains(l.elementRef.nativeElement)),
+        ...this.selects.filter(s => card.nativeElement.contains(s.elementRef.nativeElement)),
+      ];
+
+      dirtyArray[index] = cardNote.some(c => c.isDirty)
+    }
+
+    this.notesDirty.set(dirtyArray);
+
+    console.log("Updated dirty")
+  }
+
+  anyNoteDirty(): boolean {
+    return this.notesDirty().some(d => d);
+  }
+  //#endregion
+
   //#region Load
+  async startLoad(musicId: string) {
+    this.isLoading = true;
+    this.loadLocalMusic(musicId);
+    await this.loadDbMusic(musicId);
+
+    if (!this.musicData) {
+      if (!this.musicDataDb) {
+        AppComponent.presentErrorToast("Music not found in local storage or database.");
+        return;
+      }
+      this.musicData = this.musicDataDb.deepClone();
+    }
+  }
+
   async loadDbMusic(musicId: string) {
     const data = await this.fireStoreService.getMusicWithNotes(musicId);
     if (data) {
@@ -83,9 +140,13 @@ export class UploadPage {
       this.isEditDB = true;
       this.isLoading = false;
 
-      this.cd.markForCheck()
-    }
+      this.cd.markForCheck();
 
+      setTimeout(() => {
+        this.updateGlobalDirty();
+        this.cd.markForCheck();
+      });
+    }
   }
 
   loadLocalMusic(musicId: string) {
@@ -95,23 +156,21 @@ export class UploadPage {
       this.isEditLocal = true;
       this.isLoading = false;
 
+      if (this.musicDataDb)
+        this.updateGlobalDirty();
+
       this.cd.markForCheck()
+
     }
   }
 
-  async switchToMusicPage() {
-    this.location.back();
-
-    const sub = this.router.events.subscribe(event => {
-      if (event instanceof NavigationEnd) {
-        sub.unsubscribe();
-        this.router.navigate(['/upload'], {
-          queryParams: { music: this.musicData.id }
-        });
-      }
+  switchToDbPage() {
+    this.router.navigate(['/upload'], {
+      queryParams: { music: this.musicData.id },
+      replaceUrl: true,
     });
+    this.startLoad(this.musicData.id);
   }
-
   //#endregion
 
   //#region New Music
@@ -135,9 +194,12 @@ export class UploadPage {
           this.localMusicService.saveMusic(this.musicData!);
 
           AppComponent.presentWarningToast("This music already exists in the database. You are now editing the local version. Uploading will overwrite the database version.");
-          this.switchToMusicPage();
+          this.switchToDbPage();
         } else {
-          this.cd.detectChanges()
+          setTimeout(() => {
+            this.updateGlobalDirty();
+            this.cd.markForCheck();
+          });
         }
       };
       reader.readAsText(file);
@@ -229,15 +291,18 @@ export class UploadPage {
     if (this.musicData === null) return;
     if (this.isEditDB) {
       await this.fireStoreService.updateMusic(this.musicData)
+      AppComponent.presentOkToast("Music updated successfully!");
+
       await this.loadDbMusic(this.musicData.id);
+      if (!this.anyNoteDirty()) {
+        this.deleteFile(true)
+      }
     }
     else {
       await this.fireStoreService.uploadMusic(this.musicData)
       this.isEditDB = true
-      await this.location.back();
-      this.router.navigate(['/upload'], {
-        queryParams: { music: this.musicData.id }
-      });
+      AppComponent.presentOkToast("Music uploaded successfully!");
+      this.switchToDbPage();
     }
   }
 
@@ -247,19 +312,22 @@ export class UploadPage {
     AppComponent.presentOkToast("All notes uploaded successfully!");
 
     await this.loadDbMusic(this.musicData.id)
-
+    if (!this.metadataDirty()) {
+      this.deleteFile(true)
+    }
   }
 
-  uploadNote(note: NoteDataDto): void {
+  async uploadNote(note: NoteDataDto): Promise<void> {
     if (this.musicData === null || !this.isEditDB) return;
-    this.fireStoreService.uploadNote(this.musicData.id, note)
-    this.loadDbMusic(this.musicData.id)
+    await this.fireStoreService.uploadNote(this.musicData.id, note)
+    AppComponent.presentOkToast("Note uploaded successfully!");
+    await this.loadDbMusic(this.musicData.id)
 
   }
   //#endregion
 
   //#region Delete
-  deleteFile() {
+  deleteFile(silent = false) {
     if (this.musicData === null) return;
     const musicId = this.musicData.id;
     this.localMusicService.deleteMusic(musicId);
@@ -269,9 +337,10 @@ export class UploadPage {
     if (!this.isEditDB) {
       this.deleteLocalMusicFile(musicId);
       this.location.back();
-      AppComponent.presentOkToast("Music has been discarded");
+      if (!silent) AppComponent.presentOkToast("Music has been discarded");
+
     } else {
-      AppComponent.presentOkToast("Music changes have been removed")
+      if (!silent) AppComponent.presentOkToast("Music changes have been removed")
     }
 
   }
@@ -281,6 +350,7 @@ export class UploadPage {
     await this.fireStoreService.deleteMusic(this.musicDataDb.id);
     this.musicDataDb = null;
     this.isEditDB = false;
+    this.cd.detectChanges()
     AppComponent.presentOkToast("Music deleted successfully from database.");
   }
 
@@ -327,6 +397,7 @@ export class UploadPage {
   //#region Local editing
   onEndEditing() {
     this.localMusicService.saveMusic(this.musicData!);
+    this.updateGlobalDirty();
   }
 
   //#endregion

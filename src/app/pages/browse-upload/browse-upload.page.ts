@@ -33,14 +33,15 @@ export class BrowseUploadPage implements OnInit {
   }
 
   ngOnInit() {
-    this.storedMusics = this.localMusicService.getAllLocalMusics();
+    this.discordRpcService.update("Editing")
 
     this.fireStoreService.GetAllMusics(null).then(value => {
       const filtered = value.filter(m => !this.storedMusics.some(s => s.id === m.id));
       this.musics.set(filtered);
     });
-
-    this.discordRpcService.update("Editing")
+  }
+  ionViewWillEnter() {
+    this.storedMusics = this.localMusicService.getAllLocalMusics();
   }
 
 

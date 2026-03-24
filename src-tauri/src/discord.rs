@@ -32,7 +32,7 @@ pub fn init_discord(state: tauri::State<Mutex<DiscordState>>) -> Result<(), Stri
 
 
 #[tauri::command]
-pub fn update_discord_rpc( state: tauri::State<Mutex<DiscordState>>, details: String, state_text: String) -> Result<(), String> {
+pub fn update_discord_rpc( state: tauri::State<Mutex<DiscordState>>, details: String, status: String) -> Result<(), String> {
     let mut lock = state.lock().unwrap();
 
     if let Some(client) = lock.client.as_mut() {
@@ -42,8 +42,8 @@ pub fn update_discord_rpc( state: tauri::State<Mutex<DiscordState>>, details: St
             activity = activity.details(&details);
         }
 
-        if !state_text.is_empty() {
-            activity = activity.state(&state_text);
+        if !status.is_empty() {
+            activity = activity.state(&status);
         }
 
         client.set_activity(activity)

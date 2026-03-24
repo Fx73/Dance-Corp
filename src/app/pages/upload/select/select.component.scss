@@ -5,10 +5,10 @@ ion-item.changed {
 ion-label{
     color: var(--ion-color-primary);
 }
+ion-select::part(label){
+     color: var(--ion-color-primary);
+
+}
 ::ng-deep ion-input .label-text{
     color: var(--ion-color-primary);
-}
-
-.list-label-header{
-    max-width: 12vw;
 }

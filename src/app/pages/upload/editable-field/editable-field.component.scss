@@ -8,3 +8,9 @@ ion-label{
 ::ng-deep ion-input .label-text{
     color: var(--ion-color-primary);
 }
+
+.warning {
+  color: var(--ion-color-danger);
+  font-size: 0.8em;
+  margin-top: 4px;
+}

@@ -29,7 +29,7 @@ export class SccReader {
         noteData.difficultyCriterias = evaluator.criterias;
         console.log(noteData.meter, evaluator.criterias, evaluator.getLevelFromCriterias())
         tsvLines.push(evaluator.generateTsvLine(musicData.title ?? "", noteData.meter ?? 0));
-
+        noteData.meter = Math.round(evaluator.getLevelFromCriterias());
       }
     }
     if (tsvLines.length > 0) {

@@ -2,7 +2,9 @@
 
   @if (isEditing) {
   <ion-input [label]="label" [type]="type" [value]="value" (ionChange)="onInputChange($event)">
-    <ng-content></ng-content>
+    @if(isDirty && warningMessage) {
+    <p class="warning">{{ warningMessage }}</p>
+    }
   </ion-input>
   }
   @else {

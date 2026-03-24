@@ -1,0 +1,19 @@
+<ion-item [class.changed]="isChanged" [title]="valueDb">
+
+  @if (isEditing) {
+  <ion-select [label]="label" [value]="value" (ionChange)="onSelectChange($event)">
+    @for (opt of options; track $index) {
+    <ion-select-option [value]="opt">
+      {{ opt }}
+    </ion-select-option>
+    }
+  </ion-select>
+  }
+  @else {
+  <ion-label>
+    <strong class="primary">{{ label }}:</strong>
+    {{ valueDb ?? value ?? '—' }}
+  </ion-label>
+  }
+
+</ion-item>
