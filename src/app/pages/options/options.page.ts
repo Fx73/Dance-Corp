@@ -58,7 +58,7 @@ export class OptionsPage {
       new Arrow(0, 1, ArrowType.Hold, 1.5),
       new Arrow(1, 2, ArrowType.Tap),
       new Arrow(2, 3, ArrowType.Tap),
-      new Arrow(3, 4, ArrowType.Tap),
+      new Arrow(3, 4, ArrowType.Mine),
       new Arrow(0, 6, ArrowType.Hold, 8),
       new Arrow(2, 7, ArrowType.Tap),
     ];

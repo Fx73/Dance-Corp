@@ -33,21 +33,21 @@ export class Arrow {
     }
 
     public perfect() {
-        if (this.isTypeHold)
+        if (this.type === ArrowType.Hold)
             this.isPressed = true;
         else
             this.isValid = true
         this.precision = Precision.Perfect
     }
     public great() {
-        if (this.isTypeHold)
+        if (this.type === ArrowType.Hold)
             this.isPressed = true;
         else
             this.isValid = true
         this.precision = Precision.Great
     }
     public good() {
-        if (this.isTypeHold)
+        if (this.type === ArrowType.Hold)
             this.isPressed = true;
         else
             this.isValid = true
@@ -55,7 +55,7 @@ export class Arrow {
         this.precision = Precision.Good
     }
     public almost() {
-        if (this.isTypeHold)
+        if (this.type === ArrowType.Hold)
             this.isPressed = true;
         else
             this.isMissed = true
@@ -69,6 +69,10 @@ export class Arrow {
     public ok() {
         this.isValid = true
     }
+    public boom() {
+        this.isPressed = true
+        this.precision = Precision.Boom
+    }
 
     private static determineArrowColor(beat: number): ArrowColor {
         if (beat % 1 === 0) {
@@ -80,11 +84,6 @@ export class Arrow {
         } else {
             return ArrowColor.Violet; // Otherwise
         }
-    }
-
-
-    public get isTypeHold(): Boolean {
-        return this.type === ArrowType.Hold
     }
 
 }

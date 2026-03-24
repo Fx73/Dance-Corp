@@ -9,6 +9,7 @@ import { DancePadGamepad } from "../gameController/dancepad-gamepad";
 import { DancePadKeyboard } from './../gameController/dancepad-keyboard';
 import { Player } from "./player";
 import { Precision } from "../constants/precision.enum";
+import { SoundManager } from "../sound.manager";
 
 export class GameRound {
     //#region App Constants
@@ -22,6 +23,7 @@ export class GameRound {
     //Player Data
     public player: Player
     dancepad: IDancePad
+    private soundManager: SoundManager = new SoundManager();
 
     //Game variables
     private isTrainingMode = false;
@@ -85,6 +87,13 @@ export class GameRound {
 
                     } else if (stepValue === 3 && activeHolds[direction]) { // Continue Hold
                         activeHolds[direction]!.beatEnd = beatPosition;
+                    } else if (stepValue === 4 && activeHolds[direction]) { // Roll (treated as hold for now)
+                        const newArrow = new Arrow(direction, beatPosition, ArrowType.Hold);
+                        activeHolds[direction] = newArrow;
+                        this.arrowMap.push(newArrow);
+                    }
+                    else if (stepValue === 5) { // Mine
+                        this.arrowMap.push(new Arrow(direction, beatPosition, ArrowType.Mine));
                     }
 
                 }
@@ -94,20 +103,21 @@ export class GameRound {
 
 
     private calculateScore() {
-        const holdArrows = this.arrowMap.filter(arrow => arrow.isTypeHold)
+        const holdArrows = this.arrowMap.filter(arrow => arrow.type === ArrowType.Hold)
+        const tapArrows = this.arrowMap.filter(arrow => arrow.type === ArrowType.Tap)
 
         // Calculate total hold percentage for score
         const totalHoldTime = holdArrows.reduce((total, arrow) => total + (arrow.beatEnd!) - arrow.beatPosition, 0);
-        const totalDanceTime = this.arrowMap[this.arrowMap.length - 1].beatEnd ?? this.arrowMap[this.arrowMap.length - 1].beatPosition;
-        const holdPercentage = totalHoldTime / totalDanceTime;
+        const totalTaps = tapArrows.length;
+        const totalWeight = totalTaps + totalHoldTime;
 
         // Point attribution
-        const holdPoints = (this.MAX_SCORE / 2) * holdPercentage;
-        const arrowPoints = 1000000 - holdPoints;
+        const tapPoints = this.MAX_SCORE * (totalTaps / totalWeight);
+        const holdPoints = this.MAX_SCORE * (totalHoldTime / totalWeight);
 
-        this.scorePerArrow = arrowPoints / this.arrowMap.length;
+
+        this.scorePerArrow = tapPoints / totalTaps;
         this.scorePerHoldBeat = holdPoints / totalHoldTime;
-
 
     }
 
@@ -149,7 +159,20 @@ export class GameRound {
     }
 
     private checkArrowPress(arrow: Arrow, currentBeat: number, padArrowState: ArrowState, tolerance: number) {
-        if (arrow.isTypeHold && arrow.isPressed) {
+        if (arrow.type === ArrowType.Mine) {
+            if (!arrow.isPressed && padArrowState === ArrowState.Press) {
+                this.mineHit(arrow)
+                console.log(`Hit mine at beat ${arrow.beatPosition}.`);
+            } else {
+                if (currentBeat > arrow.beatPosition + 1) {
+                    this.minePassed(arrow)
+                    console.log(`Missed mine at beat ${arrow.beatPosition}.`);
+                }
+            }
+
+        }
+
+        if (arrow.type === ArrowType.Hold && arrow.isPressed) {
             if (arrow.beatEnd !== null && currentBeat > arrow.beatEnd) {
                 this.arrowOk(arrow)
                 return;
@@ -240,6 +263,16 @@ export class GameRound {
         this.performance = Math.min(100, this.performance + arrowLength);
         this.score += arrowLength * this.scorePerHoldBeat
         this.precisionMessage.push(arrow)
+    }
+    mineHit(arrow: Arrow) {
+        arrow.boom()
+        this.updatePerformance(-20)
+        this.comboCount = 0
+        this.precisionMessage.push(arrow)
+        this.soundManager.playMineHit();
+    }
+    minePassed(arrow: Arrow) {
+        arrow.ok()
     }
 
     updatePerformance(amount: number): void {

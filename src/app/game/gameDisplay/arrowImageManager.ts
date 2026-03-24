@@ -18,6 +18,7 @@ export class ArrowImageManager {
 
     private static arrowImages: HTMLCanvasElement[][] = [];
     private static holdImages: HTMLCanvasElement[] = [];
+    private static mineImage: HTMLCanvasElement;
 
     public static getArrowImage(color: ArrowColor, direction: ArrowDirection): HTMLCanvasElement {
         return ArrowImageManager.arrowImages[color][direction];
@@ -26,6 +27,9 @@ export class ArrowImageManager {
         const interval = CONFIG.DISPLAY.BEAT_INTERVAL / this._HOLD_PRELOAD_PRECISION;
         const closestIndex = Math.min(Math.round(distance / interval), ArrowImageManager.holdImages.length);
         return ArrowImageManager.holdImages[closestIndex]
+    }
+    public static getMineImage(): HTMLCanvasElement {
+        return ArrowImageManager.mineImage;
     }
 
 
@@ -48,9 +52,15 @@ export class ArrowImageManager {
         const holdCapImage = new Image();
         holdCapImage.src = "assets/Arrow/HoldBottomCap.png";
 
+        const mineImage = new Image();
+        mineImage.src = "assets/Arrow/Mine.png";
+        mineImage.onload = () => {
+            ArrowImageManager.mineImage = this.CreateResizedImage(mineImage);
+        }
+
         Promise.all([
             new Promise<void>((resolve) => { holdCenterImage.onload = () => resolve(); }),
-            new Promise<void>((resolve) => { holdCapImage.onload = () => resolve(); })
+            new Promise<void>((resolve) => { holdCapImage.onload = () => resolve(); }),
         ]).then(() => {
             this.PreloadHoldImages(holdCenterImage, holdCapImage);
         });
@@ -152,6 +162,15 @@ export class ArrowImageManager {
         // Put the modified image data back onto the canvas
         ctx.putImageData(imageData, 0, 0);
 
+        return canvas;
+    }
+
+    private static CreateResizedImage(image: HTMLCanvasElement | HTMLImageElement): HTMLCanvasElement {
+        const canvas = document.createElement('canvas');
+        canvas.width = this.ARROW_SIZE;
+        canvas.height = this.ARROW_SIZE;
+        const ctx = canvas.getContext('2d')!;
+        ctx.drawImage(image, 0, 0, this.ARROW_SIZE, this.ARROW_SIZE);
         return canvas;
     }
 

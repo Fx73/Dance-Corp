@@ -26,6 +26,7 @@ export class GameOverComponent implements OnInit {
     [Precision.Great]: 0,
     [Precision.Missed]: 0,
     [Precision.Ok]: 0,
+    [Precision.Boom]: 0,
   });
 
   constructor() {

@@ -187,6 +187,11 @@ export class PlayerDisplayComponent implements AfterViewInit {
       const arrowY = this.targetY + (arrow.beatPosition - currentBeat) * CONFIG.DISPLAY.BEAT_INTERVAL;
       const arrowX = canvas.width * ((arrow.direction + 0.5) * 0.25)
 
+      if (arrow.type === ArrowType.Mine) {
+        this.DrawMine(arrow, arrowX, arrowY)
+        continue;
+      }
+
       if (arrow.type === ArrowType.Hold) {
         const arrowEndY = this.targetY + (arrow.beatEnd! - currentBeat) * CONFIG.DISPLAY.BEAT_INTERVAL;
         this.DrawHold(arrow, arrowX, arrowY, arrowEndY)
@@ -233,6 +238,12 @@ export class PlayerDisplayComponent implements AfterViewInit {
       this.ctx.shadowColor = 'transparent';
       this.ctx.shadowBlur = 0;
     }
+  }
+
+  private DrawMine(arrow: Arrow, x: number, y: number) {
+    // Draw the arrow
+    const mineImage = ArrowImageManager.getMineImage();
+    this.ctx.drawImage(mineImage, x - mineImage.width / 2, y - mineImage.height / 2);
   }
 
   //#region 

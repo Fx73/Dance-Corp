@@ -1,7 +1,8 @@
 export enum ArrowType {
     Tap = 1,
     Hold = 2,
-    Roll = 4
+    Roll = 4,
+    Mine = 5,
 }
 
 /**

@@ -1,5 +1,4 @@
-@if(size.height ==1 && size.width ==1){
-<div class="local-player">
+<div class="local-player" [style.height.px]="size.height" [style.width.px]="size.width">
   <button (click)="isPlaying ? stop() : play()">
     {{ isPlaying ? '⏸ Pause' : '▶️ Play' }}
   </button>
@@ -12,4 +11,3 @@
     {{ formatTime(currentTime()) }} / {{ formatTime(duration()) }}
   </div>
 </div>
-}

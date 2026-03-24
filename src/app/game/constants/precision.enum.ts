@@ -4,5 +4,6 @@ export enum Precision {
     Good = 'Good',
     Almost = 'Almost',
     Missed = 'Missed',
-    Ok = "OK"
+    Ok = "OK",
+    Boom = "Boom",
 }
