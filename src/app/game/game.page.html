@@ -7,7 +7,7 @@
 	</ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" [style]="'--background: url(' + backgroundUrl + ')'">
+<ion-content [fullscreen]="true" [style.--background]="'url(' + game?.getCurrentBackground() + ') center/cover no-repeat'">
 
 	@if(loadingMusic){
 	<app-waiting-screen [title]="music!.title" [artist]="music!.artist" [coverUrl]="music!.jacket" (onCountdownFinished)="handleCountdownFinished()"></app-waiting-screen>

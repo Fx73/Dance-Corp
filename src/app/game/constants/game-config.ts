@@ -7,8 +7,8 @@ export const CONFIG = {
     GAME: {
         BEAT_PER_MEASURE: 4,
         MAX_MISSED_FRAME_HOLD: 8,
-        TOLERANCE_WINDOW: 0.15 //In seconds
-
+        TOLERANCE_WINDOW: 0.15, //In seconds
+        DEFAULT_BACKGROUND: "assets/Splash/Texture.png"
 
     },
     DISPLAY: {

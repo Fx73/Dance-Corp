@@ -33,9 +33,8 @@ export class GameManager {
     private currentBackgroundIndex = 0;
     private zeroTimeStamp: number = 0;
 
-    public registerExternalComponents(musicPlayer: IMusicPlayer/*, playerDisplays: PlayerDisplayComponent[]*/) {
+    public registerExternalComponents(musicPlayer: IMusicPlayer) {
         this.musicPlayer = musicPlayer;
-        // this.playerDisplays = playerDisplays;
     }
 
     public async startGame() {
@@ -70,9 +69,6 @@ export class GameManager {
         for (const gameRound of this.gameRounds)
             gameRound.gameLoop(currentBeat, CONFIG.GAME.TOLERANCE_WINDOW * currentBps)
 
-        /*for (const playerDiplay of this.playerDisplays)
-            playerDiplay.Update(currentBeat)*/
-
 
         if (this.gameRounds.every(gameRound => gameRound.isFailed || gameRound.isFinished)) {
             this.gameOver()
@@ -86,6 +82,13 @@ export class GameManager {
         this.gameLoopId = requestAnimationFrame(this.gameGlobalLoop.bind(this));
     }
 
+
+    public getCurrentBackground(): string {
+        if (!this.music.bgChanges || this.music.bgChanges.length === 0) {
+            return CONFIG.GAME.DEFAULT_BACKGROUND;
+        }
+        return "https://" + this.music.bgChanges[this.currentBackgroundIndex].value;
+    }
 
     //#Region Game Over
     private _isGameOver: boolean = false;

@@ -33,7 +33,6 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
   //#region App Constants
   readonly ArrowDirection = ArrowDirection;
   readonly MusicOrigin = MusicOrigin;
-  readonly backgroundUrl: string = "assets/Splash/Texture.png";
   //#endregion
 
   //#region Loading
