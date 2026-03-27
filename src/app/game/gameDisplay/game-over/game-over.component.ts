@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core';
-import { IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonIcon, IonItem, IonLabel, IonList } from "@ionic/angular/standalone";
+import { IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonIcon, IonItem, IonLabel, IonList } from "@ionic/angular/standalone";
 import { checkmarkCircleOutline, closeCircleOutline, medalOutline, starOutline } from 'ionicons/icons';
 
 import { Color } from 'src/app/game/constants/color';
@@ -12,12 +12,16 @@ import { addIcons } from 'ionicons';
   selector: 'app-game-over',
   templateUrl: './game-over.component.html',
   styleUrls: ['./game-over.component.scss'],
-  imports: [IonList, IonCardSubtitle, IonIcon, IonLabel, IonCardContent, IonCardTitle, IonCardHeader, IonBadge, IonCard, IonItem, CommonModule]
+  imports: [IonList, IonCardSubtitle, IonIcon, IonLabel, IonCardContent, IonCardHeader, IonBadge, IonCard, IonItem, CommonModule]
 })
 export class GameOverComponent implements OnInit {
   readonly Precision = Precision;
   @Input() gameRound!: GameRound;
   @Output() mainMenu = new EventEmitter<void>();
+
+  grade: { grade: string; color: string; } = { grade: '', color: '' };
+
+  personalGrades: { title: string; description: string; color: string }[] = [];
 
   readonly precisionCounts = signal<{ [key in Precision]: number }>({
     [Precision.Good]: 0,
@@ -40,11 +44,19 @@ export class GameOverComponent implements OnInit {
 
   ngOnInit() {
     this.getPrecisionCounts()
+    this.grade = Color.gradeFromScore(this.gameRound.isFailed ? 0 : this.getScore())
+
   }
 
   getScore() {
     return Math.round(this.gameRound.score)
   }
+  getScoreFormatted() {
+    return this.getScore()
+      .toLocaleString('fr-FR')
+      .replace(/\u202F/g, '\u202F\u202F');
+  }
+
 
   getPrecisionCounts() {
     const counts = { ...this.precisionCounts() };
@@ -64,6 +76,6 @@ export class GameOverComponent implements OnInit {
   }
 
   goToMainMenu(): void {
-    this.mainMenu.emit(); // Notifie le parent pour aller au menu principal
+    this.mainMenu.emit();
   }
 }

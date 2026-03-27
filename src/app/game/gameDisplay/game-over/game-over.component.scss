@@ -1,23 +1,85 @@
 .game-over-card {
   margin: 15px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  
+  border: 8px solid ;
   border-radius: 12px;
-  background-color: var(--ion-color-light);
+  max-width: 60em;
+}
+.game-over-card.success {
+  border-color: var(--ion-color-success);
+  color: rgb(0, 0, 0);
+}
+.game-over-card.failed {
+  border-color: var(--ion-color-danger);
+  color: rgb(0, 0, 0);
 }
 
-ion-badge {
-  padding: 6px 10px;
-  border-radius: 6px;
+.score-main{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background-color: rgb(0, 0, 0, 0.8);
+
+
+
+    .score-submain{
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+    margin-left: 4em ;
+    margin-right: 4em ;
+    ion-card-subtitle{
+      font-size: 2rem;
+      text-align: end;
+    }
+    ion-label{
+      font-size: 4vw;
+      font-weight: 500;
+      text-align: left;
+    }
+  }
 }
 
-ion-card-title, ion-card-subtitle {
-  text-align: center;
+.big-grade{
+  font-family: "RocketBrush", system-ui;
+  font-size: 11vw;
+  font-weight: 40;
+  text-transform: uppercase;
+  margin:  2px;
+  border-radius: 1vw;
+  width: 60%;
+  min-width: 10vw;
+  max-height: 10vw;
+  
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.7) 0%, transparent 60%);
+  border: 0.2vw solid rgba(255,255,255,0.6);
+  box-shadow:
+    inset 0 0 0.5vw rgba(255,255,255,0.4),
+    0 0 1vw rgba(0,0,0,0.4);
+    div{        
+      transform:  translate(-0.04em,0.08em);    
+    }
+  animation: pulse 9s infinite ease-in-out;
 }
 
-
-ion-card-subtitle {
-  font-size: 16px;
-  color: var(--ion-color-medium);
+@keyframes pulse {
+  0% {
+    background-position: 20% 20%;
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    background-position: 80% 80%;
+    transform: scale(1.01);
+    opacity: 0.9;
+  }
+  100%{
+    background-position: 120% 120%;
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .precision-badge{
@@ -25,20 +87,36 @@ ion-card-subtitle {
   font-size: 20px;
 }
 
-.succes-title {
-  font-size: 40px;
-  font-weight: bold;
-  text-transform: uppercase;
-  margin: 8px 0;
-  padding: 8px;
+.score-digit span {
+  display: inline-block;
+  animation: digit-spin 9s ease-in-out infinite;
+  transform-origin: center;
+}
+
+/* Décalage pour un effet plus vivant */
+.score-digit span:nth-child(0) { animation-delay: 0s; }
+.score-digit span:nth-child(1) { animation-delay: 0.1s; }
+.score-digit span:nth-child(2) { animation-delay: 0.2s; }
+.score-digit span:nth-child(3) { animation-delay: 0.3s; }
+.score-digit span:nth-child(4) { animation-delay: 0.4s; }
+.score-digit span:nth-child(5) { animation-delay: 0.5s; }
+.score-digit span:nth-child(6) { animation-delay: 0.6s; }
+.score-digit span:nth-child(7) { animation-delay: 0.7s; }
+.score-digit span:nth-child(8) { animation-delay: 0.8s; }
+.score-digit span:nth-child(9) { animation-delay: 0.9s; }
+.score-digit span:nth-child(10) { animation-delay: 1s; }
+
+@keyframes digit-spin {
+  0%   { transform: rotateY(0deg); }
+  20%  { transform: rotateY(360deg); }
+  100% { transform: rotateY(360deg); }
+}
+
+.personal-grade-badge{
+  font-size: 30px;
+  margin: 4px;
+  padding: 8px 12px;
   border-radius: 8px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-}
-.succes-title.success {
-  background-color: var(--ion-color-success);
   color: rgb(0, 0, 0);
-}
-.succes-title.failed {
-  background-color: var(--ion-color-danger);
-  color: rgb(0, 0, 0);
+
 }

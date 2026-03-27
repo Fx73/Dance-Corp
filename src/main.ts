@@ -9,6 +9,8 @@ import { environment } from './environments/environment';
 import { firebaseConfig } from './app.config';
 import { getAnalytics } from 'firebase/analytics';
 import { initializeApp } from 'firebase/app';
+import localeFr from '@angular/common/locales/fr';
+import { registerLocaleData } from '@angular/common';
 import { routes } from './app/app.routes';
 
 if (environment.production) {
@@ -20,6 +22,8 @@ const analytics = getAnalytics(firebaseApp);
 initializeFirestore(firebaseApp, { ignoreUndefinedProperties: true });
 const db = getFirestore(firebaseApp);
 
+
+registerLocaleData(localeFr);
 
 bootstrapApplication(AppComponent, {
   providers: [

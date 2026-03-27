@@ -14,13 +14,15 @@
 	}
 
 	@if(game){
+	@for (gameRound of game.gameRounds; track $index){
 	@if(game.isGameOver){
-	<app-game-over *ngFor="let gameRound of game.gameRounds" [gameRound]="gameRound"></app-game-over>
-	<ion-card class="base-card start-card" style="height: 15vh;" (click)="goBack()"> Back to music list
-	</ion-card>
+	<app-game-over [gameRound]="gameRound" class="gameOver"></app-game-over>
+	}@else{
+	<app-player-display [gameRound]="gameRound"></app-player-display>
 	}
-	@else {
-	<app-player-display *ngFor="let gameRound of game.gameRounds" [gameRound]="gameRound"></app-player-display>
+	}
+	@if(game.isGameOver){
+	<ion-card class="base-card start-card" style="height: 15vh;" (click)="goBack()"> Back to music list </ion-card>
 	}
 	}
 

@@ -33,7 +33,6 @@ export class GameRound {
     public isFailed = false;
     public isFinished = false;
     public comboCount: number = 0;
-    public grade: string = ""; // A, B, C, D, E
     public level: number = 1;
 
     private scorePerArrow: number = 0;
@@ -293,7 +292,7 @@ export class GameRound {
         this.performance = 1
     }
     EndVictory() {
+        if (this.isFailed) return
         this.isFinished = true;
-        this.grade = "B"
     }
 }

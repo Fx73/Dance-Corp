@@ -1,28 +1,23 @@
-<ion-card class="game-over-card">
-  <ion-card-header>
-    <!-- Statut et nom du joueur -->
-    <ion-card-title class="succes-title" [ngClass]="gameRound.isFailed ? 'failed' : 'success'">
-      {{ gameRound.isFailed ? 'Failed' : 'Cleared' }}
-    </ion-card-title>
-    <ion-card-subtitle>{{ gameRound.player.name }}</ion-card-subtitle>
+<ion-card class="game-over-card" [ngClass]="gameRound.isFailed ? 'failed' : 'success'">
+  <ion-card-header class="score-main">
+    <!-- Note (A, B, C, D, E) -->
+    <ion-badge [style.backgroundColor]="grade.color" class="big-grade">
+      <div>{{ grade.grade }}</div>
+    </ion-badge>
+
+    <!-- Score -->
+    <div class="score-submain">
+      <ion-card-subtitle>{{ gameRound.player.name }}</ion-card-subtitle>
+      <ion-label color="primary" class="score-digit">
+        @for (scoreNumber of getScoreFormatted(); track $index) {
+        <span>{{ scoreNumber }}</span>
+        }
+      </ion-label>
+
+    </div>
   </ion-card-header>
 
   <ion-card-content>
-    <!-- Score -->
-    <ion-item lines="inset">
-      <ion-icon slot="start" name="star-outline" color="warning"></ion-icon>
-      <ion-label>Score:</ion-label>
-      <ion-label slot="end" color="primary" style="font-size: 32px">{{ getScore() }}
-      </ion-label>
-    </ion-item>
-
-    <!-- Note (A, B, C, D, E) -->
-    <ion-item lines="inset">
-      <ion-icon slot="start" name="medal-outline" color="primary"></ion-icon>
-      <ion-label>Grade:</ion-label>
-      <ion-badge slot="end" color="secondary">{{ gameRound.grade }}</ion-badge>
-    </ion-item>
-
     <ion-item lines="none">
       <ion-list lines="none">
         <!-- Perfect -->
@@ -59,7 +54,17 @@
           <ion-label>Missed:</ion-label>
           <ion-badge slot="end" [style.backgroundColor]="getPrecisionColor(Precision.Missed)" class="precision-badge">{{ precisionCounts().Missed }}</ion-badge>
         </ion-item>
+
+        <!-- Personal titles -->
+        <ion-item>
+
+        </ion-item>
+        @for (grade of personalGrades; track $index) {
+        <ion-badge slot="start" [style.backgroundColor]="grade.color" class="personal-grade-badge" [title]="grade.description">{{ grade.title }}</ion-badge>
+
+        }
       </ion-list>
+
     </ion-item>
   </ion-card-content>
 </ion-card>

@@ -103,6 +103,16 @@
 }
 
 
+// Fonts
+@import url('https://fonts.googleapis.com/css2?family=Coiny&display=swap');
+@font-face {
+  font-family: 'RocketBrush';
+  src: url('assets/Rocket Brush.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
 body {
   margin: 0;
   padding: 0;
