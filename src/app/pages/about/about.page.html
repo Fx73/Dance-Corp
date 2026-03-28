@@ -1,20 +1,35 @@
-<app-header title="About this web app"></app-header>
+<app-header title="About Dance Corp."></app-header>
 
 <ion-content [fullscreen]="false">
   <ion-card class="base-card">
     <ion-card-content class="ion-padding">
-      <h1> 🌟 About this app </h1>
-      <p>This web app is a project aiming to recreate the Step Mania experience in a web browser.</p>
-      <p>For more information, visit the project sources: <a href="https://dev.azure.com/CochonCorp/Dance-Corp">Azure
-          Devops</a></p>
-      <ion-icon name="logo-angular"></ion-icon>
-      <ion-icon name="logo-html5"></ion-icon>
-      <ion-icon name="logo-css3"></ion-icon>
-      <ion-icon name="logo-ionic"></ion-icon>
+      <h2><b>This web app is a project aiming to recreate the Step Mania / DDR experience in a web browser.</b></h2>
+      <p> All assets are made personally or sourced from free-to-use resources. </p>
+      <p> Songs are not hosted and only streamed from external sources : <ion-icon name="logo-youtube" /> <ion-icon name="logo-soundcloud" /></p>
+      @if(isDesktop){
+      <p> This desktop version allow to add song locally. Those songs are not uploaded and only accessible on your device.</p>
+      }
+      <br>
+      <p>
+        <ion-icon name="logo-html5" />
+        <ion-icon name="logo-css3" />
+        <ion-icon name="logo-angular" />
+        <ion-icon name="logo-ionic" />
+      </p>
+      <p>For more information, visit the project sources: <a href="https://github.com/Fx73/Dance-Corp">GitHub</a></p>
+      <p> If you have any issue or suggestion, please <a href="https://github.com/Fx73/Dance-Corp/issues">open an issue</a> on the project page or <a href="mailto:fx73000@yahoo.fr?subject=DanceCorp - Issue/Suggestion">Send me an email</a></p>
+      <br>
+      <ion-badge color="primary"> Dance Corp. {{ version }} </ion-badge>
+      @if(isDesktop){
+      <ion-badge color="secondary" style="margin-left: 4px;"> Desktop </ion-badge>
+      }
+    </ion-card-content>
+  </ion-card>
 
-
+  <ion-card class="base-card">
+    <ion-card-content class="ion-padding">
       <h1> 📁 File Reader </h1>
-      <p> Reader accepts stepmania files, SM and SSC.</p>
+      <p><b> Reader accepts stepmania files, SM and SSC.</b></p>
       <p> It create an Essc file (extended scc) which is actually an scc with unused field remove and one change : all
         special
         notes are converted to integer as following</p>
@@ -28,17 +43,15 @@
       <p> 7 = Fake<i>(was F)</i></p>
       <p> 8 = Hidden<i>(was H)</i></p>
 
+    </ion-card-content>
+  </ion-card>
+  <ion-card class="base-card">
+    <ion-card-content class="ion-padding">
+      <h1> 🎮 Gameplay </h1>
 
-      <h1> Score calculation</h1>
-      <p> The score is calculated based on a perfect score of 1 000 000. It is divided between tap and hold based on
-        hold duration (100% time hold would mean 50% score in hold). Then each note is a subdivision of the score and
-        each hold is following the hold time to get its score</p>
+      <h2> Score calculation</h2>
+      <p> The score is calculated based on a perfect score of 1 000 000. It is divided between tap and hold. Mines does not count on score.</p>
 
-
-      <h1> Issue and suggestions </h1>
-      <p> If you have any issue or suggestion, please open an issue on the project page or send me a mail</p>
-      <p> <a href="https://dev.azure.com/CochonCorp/Dance-Corp">Azure Devops</a></p>
-      <a href="mailto:fx73000@yahoo.fr?subject=DanceCorp - Issue/Suggestion">Send email</a>
     </ion-card-content>
   </ion-card>
 </ion-content>
