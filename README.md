@@ -18,7 +18,7 @@ With the possibility of web development may come new features as leaderboard, ea
 ✅ Tap notes
 ✅ Hold notes
 ❌ Roll notes
-❌ Mines
+✅ Mines
 ❌ Fake
 ❌ Hidden
 
@@ -31,15 +31,17 @@ With the possibility of web development may come new features as leaderboard, ea
 ✅ Bar display
 ✅ Hud display
 
+❌ Speed
+❌ Scroll
+❌ Warp
 
 ### Score
 ✅ Dynamic scoring system → Guarantees 1,000,000 points, accurately distributed across notes.
 ✅ Combo tracking →  rewarding consistent performance
 ❌ Combo does count in score
 
-### Stats tracking
-✅ Single player stats
-❌ Multi Player stats
+❌ Score tracking & leaderboard
+❌ Titles & badges
 
 ### Options 
 ✅ Gamepad assignation & keybinding
@@ -54,16 +56,20 @@ It is built using Angular and Ionic Framework. It has been divided into the foll
 
 ### Game 
  MVC pattern : 
-  - gameModel with gameRound as main game loop
-  - gameDisplay with a gameModel associated
-  - gameController associated to a gameModel
-  - and musicPlayer
+  - gameModel with gameRound as main game loop, one per player
+  - gameDisplay with a gameModel associated, one per player
+  - gameController associated to a gameModel, one per player
+  - and one musicPlayer
 
 ### Pages 
 Well ... the different app pages
 
 ### Services 
- Hold the services for the differents part of the app, mainly the database.
+Hold the services for the differents part of the app, mainly the database.
 
 ### Shared
- Shared component : the header, the guard ...
+Shared component : the header, the guard ...
+
+ ### Tauri src
+ Tauri is handling local file explorer, link with discord and link with Steam
+
