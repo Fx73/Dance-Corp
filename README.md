@@ -3,7 +3,7 @@
 # Dance Corp
 
 ![IM2AG](https://img.shields.io/badge/IM2AG-Seal%20of%20Quality-blue)
-[![Azure last commit](https://img.shields.io/github/last-commit/fx73/DanceCorp)](https://dev.azure.com/CochonCorp/_git/DanceCorp)
+[![Azure last commit](https://img.shields.io/github/last-commit/fx73/Dance-Corp)](https://github.com/Fx73/Dance-Corp)
 [![DeepScan grade](https://deepscan.io/api/teams/17167/projects/27278/branches/870516/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=17167&pid=27278&bid=870516)
 [![Website](https://img.shields.io/website?down_message=down&up_message=dance-corp.web.app&url=https://dance-corp.web.app)](https://dance-corp.web.app)
 
@@ -18,7 +18,7 @@ With the possibility of web development may come new features as leaderboard, ea
 ✅ Tap notes
 ✅ Hold notes
 ❌ Roll notes
-❌ Mines
+✅ Mines
 ❌ Fake
 ❌ Hidden
 
@@ -31,15 +31,17 @@ With the possibility of web development may come new features as leaderboard, ea
 ✅ Bar display
 ✅ Hud display
 
+❌ Speed
+❌ Scroll
+❌ Warp
 
 ### Score
 ✅ Dynamic scoring system → Guarantees 1,000,000 points, accurately distributed across notes.
 ✅ Combo tracking →  rewarding consistent performance
 ❌ Combo does count in score
 
-### Stats tracking
-✅ Single player stats
-❌ Multi Player stats
+❌ Score tracking & leaderboard
+❌ Titles & badges
 
 ### Options 
 ✅ Gamepad assignation & keybinding
@@ -54,16 +56,20 @@ It is built using Angular and Ionic Framework. It has been divided into the foll
 
 ### Game 
  MVC pattern : 
-  - gameModel with gameRound as main game loop
-  - gameDisplay with a gameModel associated
-  - gameController associated to a gameModel
-  - and musicPlayer
+  - gameModel with gameRound as main game loop, one per player
+  - gameDisplay with a gameModel associated, one per player
+  - gameController associated to a gameModel, one per player
+  - and one musicPlayer
 
 ### Pages 
 Well ... the different app pages
 
 ### Services 
- Hold the services for the differents part of the app, mainly the database.
+Hold the services for the differents part of the app, mainly the database.
 
 ### Shared
- Shared component : the header, the guard ...
+Shared component : the header, the guard ...
+
+ ### Tauri src
+ Tauri is handling local file explorer, link with discord and link with Steam
+
