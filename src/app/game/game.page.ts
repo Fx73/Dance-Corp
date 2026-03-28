@@ -97,7 +97,6 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
 
   private hasGameBeenInitialized = false;
   initGame() {
-    console.log("Initializing game with music:", this.music?.music);
     if (this.hasGameBeenInitialized) return;
     this.hasGameBeenInitialized = true;
 

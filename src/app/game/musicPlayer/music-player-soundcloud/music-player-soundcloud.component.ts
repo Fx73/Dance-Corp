@@ -4,6 +4,7 @@ import {
   ElementRef,
   EventEmitter,
   Input,
+  OnDestroy,
   OnInit,
   Output,
   ViewChild,
@@ -21,7 +22,7 @@ declare var SC: any;
   standalone: true,
 })
 export class MusicPlayerSoundcloudComponent extends MusicPlayerCommon
-  implements IMusicPlayer, OnInit, AfterViewInit {
+  implements IMusicPlayer, OnInit, AfterViewInit, OnDestroy {
 
   @Input()
   musicUrl!: string;
@@ -35,7 +36,6 @@ export class MusicPlayerSoundcloudComponent extends MusicPlayerCommon
 
 
   async ngOnInit(): Promise<void> {
-
     const iframe = document.getElementById('sc-player') as HTMLIFrameElement;
     this.widgetSC = SC.Widget(iframe);
     this.widgetSC.load(this.musicUrl);
@@ -50,7 +50,9 @@ export class MusicPlayerSoundcloudComponent extends MusicPlayerCommon
   }
 
   stop() {
-    this.widgetSC.pause();
+    try {
+      this.widgetSC.pause();
+    } catch (e) { }
     this.stopPolling();
   }
 
@@ -78,5 +80,9 @@ export class MusicPlayerSoundcloudComponent extends MusicPlayerCommon
 
   setToTime(time: number): void {
     this.widgetSC.seekTo(time * 1000);
+  }
+
+  ngOnDestroy() {
+    this.stopPolling();
   }
 }

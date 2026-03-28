@@ -30,9 +30,6 @@ export class BeatManager {
         const bpms = [...music.bpms].sort((a, b) => a.time - b.time);
         const stops = [...music.stops].sort((a, b) => a.time - b.time);
 
-        console.log("Init BeatManager with BPMs:", bpms);
-        console.log("Init BeatManager with Stops:", stops);
-
         let timeline: TimeSection[] = [];
 
         let bpmIndex = 0;
@@ -86,7 +83,6 @@ export class BeatManager {
         );
 
         this.timeline = timeline;
-        console.log("Constructed Beat Timeline:", this.timeline);
     }
 
 
