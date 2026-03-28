@@ -1,5 +1,7 @@
+import { version } from 'package.json';
+
 export const AppConfig = {
-  version: '1.0.0',
+  version: version,
 };
 
 export const firebaseConfig = {

@@ -1,0 +1,30 @@
+name: Build  Desktop
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "master"
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Npm setup
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - run: npm ci
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Npm Build with Tauri
+        run: npx tauri build
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: website
+          path: website/

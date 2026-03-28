@@ -7,7 +7,6 @@ import { ArrowType } from '../constants/arrow-type.enum';
 import { CONFIG } from '../constants/game-config';
 import { Color } from '../constants/color';
 import { CommonModule } from '@angular/common';
-import { GameOverComponent } from "./game-over/game-over.component";
 import { GameRound } from '../gameModel/gameRound';
 import { Precision } from '../constants/precision.enum';
 import { UserConfigService } from 'src/app/services/userconfig.service';
@@ -16,7 +15,7 @@ import { UserConfigService } from 'src/app/services/userconfig.service';
   selector: 'app-player-display',
   templateUrl: './player-display.component.html',
   styleUrls: ['./player-display.component.scss'],
-  imports: [CommonModule, GameOverComponent]
+  imports: [CommonModule]
 })
 export class PlayerDisplayComponent implements AfterViewInit {
   //#region App Constants

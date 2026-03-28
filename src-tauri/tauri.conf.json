@@ -1,10 +1,10 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "DanceCorp",
-  "version": "0.1.0",
-  "identifier": "com.tauri.dev",
+  "version": "../package.json",
+  "identifier": "com.dancecorp.webapp",
   "build": {
-    "frontendDist": "website/www",
+    "frontendDist": "../website/www",
     "devUrl": "http://localhost:8100",
     "beforeDevCommand": "ionic serve",
     "beforeBuildCommand": "npm run build"

@@ -1,0 +1,48 @@
+name: Build & Deploy Web
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "master"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Npm setup
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - run: npm ci
+
+      - name: Npm Install Ionic
+        run: npm install -g ionic
+
+      - name: Npm Build with Ionic
+        run: npm run ionic-build-prod
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: website
+          path: website/
+          include-hidden-files: true
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: website
+      - name: Display structure of downloaded files
+        run: ls -R
+
+      - name: Npm install Firebase
+        run: npm install -g firebase-tools
+
+      - name: Firebase deploy
+        run: firebase deploy --token "${{ secrets.Firebase_Token }}"

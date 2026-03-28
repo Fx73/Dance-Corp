@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, HostListener, OnInit, signal } from '@angular/core';
-import { InfiniteScrollCustomEvent, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonImg, IonInfiniteScroll, IonInfiniteScrollContent, IonItem, IonMenu, IonSearchbar, IonSplitPane, IonText } from '@ionic/angular/standalone';
+import { InfiniteScrollCustomEvent, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonImg, IonInfiniteScroll, IonInfiniteScrollContent, IonMenu, IonSearchbar, IonSplitPane, IonText } from '@ionic/angular/standalone';
 import { MusicDto, NoteDataDto } from 'src/app/game/gameModel/music.dto';
 import { NgClass, NgStyle, } from '@angular/common';
 
@@ -29,7 +29,7 @@ import { UserFirestoreService } from './../../services/firestore/user.firestore.
   templateUrl: './browse.page.html',
   styleUrls: ['./browse.page.scss'],
   standalone: true,
-  imports: [IonItem, IonBadge, IonSplitPane, IonCardSubtitle, IonMenu, IonText, IonCardContent, IonCardTitle, IonInfiniteScrollContent, IonImg, IonInfiniteScroll, IonSearchbar, IonCard, IonCardHeader, IonContent, NgStyle, NgClass, FormsModule, HeaderComponent, GradeComponent, RadarScoreComponent]
+  imports: [IonBadge, IonSplitPane, IonCardSubtitle, IonMenu, IonText, IonCardContent, IonCardTitle, IonInfiniteScrollContent, IonImg, IonInfiniteScroll, IonSearchbar, IonCard, IonCardHeader, IonContent, NgStyle, NgClass, FormsModule, HeaderComponent, GradeComponent, RadarScoreComponent]
 })
 export class BrowsePage implements OnInit {
   readonly DanceType = DanceType;

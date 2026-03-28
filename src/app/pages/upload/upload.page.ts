@@ -1,15 +1,14 @@
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren, signal } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { BaseDirectory, mkdir, readDir, remove, writeFile } from '@tauri-apps/plugin-fs';
+import { ChangeDetectorRef, Component, ElementRef, QueryList, ViewChild, ViewChildren, signal } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonGrid, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonList, IonRow, IonSelect, IonSelectOption, IonSpinner, ModalController } from '@ionic/angular/standalone';
+import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonGrid, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonList, IonRow, IonSpinner, ModalController } from '@ionic/angular/standalone';
 import { Measures, MusicDto, NoteDataDto } from 'src/app/game/gameModel/music.dto';
 import { MusicOrigin, MusicPlayerCommon } from 'src/app/game/musicPlayer/IMusicPlayer';
 import { SccReader, SccWriter } from './reader.ssc';
 import { addOutline, checkmarkCircle, closeCircle, folder, logoSoundcloud, logoYoutube, removeOutline, trashOutline } from 'ionicons/icons';
 
 import { AppComponent } from 'src/app/app.component';
-import { BrowseUploadPage } from '../browse-upload/browse-upload.page';
 import { DanceType } from './../../game/constants/dance-type.enum';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from 'src/app/shared/component/header/header.component';
