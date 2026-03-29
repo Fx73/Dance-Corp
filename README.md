@@ -6,6 +6,7 @@
 [![Azure last commit](https://img.shields.io/github/last-commit/fx73/Dance-Corp)](https://github.com/Fx73/Dance-Corp)
 [![DeepScan grade](https://deepscan.io/api/teams/17167/projects/27278/branches/870516/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=17167&pid=27278&bid=870516)
 [![Website](https://img.shields.io/website?down_message=down&up_message=dance-corp.web.app&url=https://dance-corp.web.app)](https://dance-corp.web.app)
+![version](https://img.shields.io/github/package-json/v/fx73/Dance-Corp)
 
 # 🎵 Summary
 
