@@ -71,17 +71,21 @@ export class BrowsePage implements OnInit {
     this.listenInput();
   }
 
-
+  ionViewWillEnter() {
+    window.addEventListener('keydown', this.keyHandler);
+  }
+  ionViewWillLeave() {
+    window.removeEventListener('keydown', this.keyHandler);
+  }
   readonly blockedKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'Spacebar', 'Enter'];
-  @HostListener('window:keydown', ['$event'])
-  preventScroll(event: KeyboardEvent) {
+  private keyHandler = (event: KeyboardEvent) => {
     if (this.blockedKeys.includes(event.key)) {
       event.preventDefault();
     }
     if (event.key === 'Enter') {
       this.runGame();
     }
-  }
+  };
 
   listenInput() {
     for (let index = 0; index < this.dancepad.length; index++) {

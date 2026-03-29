@@ -30,7 +30,7 @@ export class WelcomePage implements OnInit {
 
 
   isUserLoggedIn() {
-    return this.userData !== null
+    return this.userData() !== null
   }
 
 }

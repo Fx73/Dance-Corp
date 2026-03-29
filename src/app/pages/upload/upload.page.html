@@ -45,6 +45,8 @@
 
 							<music-editable-field label="Artist" [value]="musicData.artist" [valueDb]="musicDataDb?.artist " (valueChange)="onEndEditing()" [isEditing]="false"> </music-editable-field>
 
+							<music-editable-field label="Artist (Translit)" [(value)]="musicData.artisttranslit" [valueDb]="musicDataDb?.artisttranslit" (valueChange)="onEndEditing()" [isEditing]="isEditLocal"> </music-editable-field>
+
 							<music-editable-field label="Genre" [(value)]="musicData.genre" [valueDb]="musicDataDb?.genre" (valueChange)="onEndEditing()" [isEditing]="isEditLocal"> </music-editable-field>
 
 							<music-editable-field label="Credit" [(value)]="musicData.credit" [valueDb]="musicDataDb?.credit" (valueChange)="onEndEditing()" [isEditing]="isEditLocal"> </music-editable-field>

@@ -72,12 +72,14 @@ export class UploadPage {
   }
 
   ionViewWillEnter() {
+    this.musicData = new MusicDto();
+    this.musicDataDb = null;
+
     const musicId = this.route.snapshot.queryParamMap.get('music');
     console.log("UploadPage initialized with musicId:", musicId);
     if (musicId) {
       this.startLoad(musicId);
     }
-
   }
 
   //#region Dirty state management
@@ -268,8 +270,15 @@ export class UploadPage {
   }
 
   exportEssc(): void {
-    const esscContent = SccWriter.writeSscFile(this.musicData!);
-    const filename = `${this.musicData?.artist}_${this.musicData?.title}.essc`;
+    const esscContent = SccWriter.writeSscFile(this.isEditLocal ? this.musicData! : this.musicDataDb!);
+    function pick(translit?: string | null, normal?: string | null): string {
+      const t = translit?.trim();
+      return t ? t : (normal?.trim() ?? "");
+    }
+
+    const artist = pick(this.isEditLocal ? this.musicData.artisttranslit : this.musicDataDb?.artisttranslit, this.isEditLocal ? this.musicData.artist : this.musicDataDb?.artist);
+    const title = pick(this.isEditLocal ? this.musicData.titletranslit : this.musicDataDb?.titletranslit, this.isEditLocal ? this.musicData.title : this.musicDataDb?.title);
+    const filename = `${artist}_${title}.essc`;
 
     const blob = new Blob([esscContent], { type: "text/plain" });
     const url = URL.createObjectURL(blob);

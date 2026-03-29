@@ -30,8 +30,11 @@ export class MusicEditableFieldComponent {
   }
 
   onInputChange(ev: any) {
-    this.isDirty = this.isEditing && this.normalize(ev.detail.value) !== this.normalize(this.valueDb);
-    this.valueChange.emit(ev.detail.value);
+    let newValue = ev.detail.value;
+    newValue = this.sanitizeInput(newValue);
+
+    this.isDirty = this.isEditing && this.normalize(newValue) !== this.normalize(this.valueDb);
+    this.valueChange.emit(newValue);
   }
 
 
@@ -42,6 +45,16 @@ export class MusicEditableFieldComponent {
   private normalize(v: any): string {
     if (v === undefined || v === null) return "";
     return String(v).trim();
+  }
+
+  private sanitizeInput(v: string): string {
+    if (!v) return "";
+    // Remove http:// or https://
+    v = v.replace(/^https?:\/\//i, "");
+    // Remove all remaining // in the string
+    v = v.replace(/\/{2,}/g, "/");
+
+    return v;
   }
 
 }

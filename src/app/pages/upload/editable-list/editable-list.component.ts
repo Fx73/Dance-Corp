@@ -35,6 +35,13 @@ export class MusicEditableListComponent {
 
   onFieldChange() {
     this.isDirty = this.isChanged
+    this.value = this.value.map(row => ({
+      ...row,
+      value: this.valueType === 'string'
+        ? this.sanitizeInput(String(row.value ?? ""))
+        : row.value
+    }));
+
     this.valueChange.emit(this.value);
   }
   private normalize(v: any, type: 'string' | 'number'): string {
@@ -90,4 +97,13 @@ export class MusicEditableListComponent {
       .join(' | ');
   }
 
+  private sanitizeInput(v: string): string {
+    if (!v) return "";
+    // Remove http:// or https://
+    v = v.replace(/^https?:\/\//i, "");
+    // Remove all remaining // in the string
+    v = v.replace(/\/{2,}/g, "/");
+
+    return v;
+  }
 }
