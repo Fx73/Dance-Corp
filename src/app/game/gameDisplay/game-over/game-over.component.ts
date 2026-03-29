@@ -61,7 +61,7 @@ export class GameOverComponent implements OnInit {
   getPrecisionCounts() {
     const counts = { ...this.precisionCounts() };
 
-    for (const arrow of this.gameRound.arrowMap.values()) {
+    for (const arrow of this.gameRound.arrowManager.arrowMap.values()) {
       if (arrow.precision) {
         counts[arrow.precision]++;
       }

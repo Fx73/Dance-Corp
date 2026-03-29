@@ -44,7 +44,7 @@ export class GameManager {
         await new Promise<void>(resolve => { const check = () => { const t = this.musicPlayer.getCurrentTime(); if (t > 0) { resolve(); } else { requestAnimationFrame(check); } }; check(); });
 
         const musicCurrentTime = this.musicPlayer.getCurrentTime();
-        this.zeroTimeStamp = Math.round(performance.now()) - (musicCurrentTime * 1000) - (this.music!.offset * 1000);
+        this.zeroTimeStamp = Math.round(performance.now()) - (musicCurrentTime * 1000);
 
 
         this.gameGlobalLoop(this.zeroTimeStamp);

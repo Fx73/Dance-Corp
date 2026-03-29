@@ -3,6 +3,7 @@ import { MusicDto, NoteDataDto } from "./music.dto";
 
 import { Arrow } from "./arrowManagement/arrow";
 import { ArrowDirection } from 'src/app/game/constants/arrow-direction.enum';
+import { ArrowManager } from './arrowManagement/arrowManager';
 import { ArrowType } from "../constants/arrow-type.enum";
 import { CONFIG } from './../constants/game-config';
 import { DancePadGamepad } from "../gameController/dancepad-gamepad";
@@ -18,7 +19,7 @@ export class GameRound {
     //#endregion
 
     //Game Data
-    arrowMap: Arrow[] = []; // Map of the complete game
+    arrowManager: ArrowManager;
 
     //Player Data
     public player: Player
@@ -51,7 +52,8 @@ export class GameRound {
             this.dancepad = new DancePadGamepad(player.gamepad!.index!, player.keyBindingGamepad)
 
         this.level = notes.meter ?? 1
-        this.loadArrows(notes)
+        this.arrowManager = new ArrowManager(notes);
+
         this.calculateScore()
 
         if (isTrainingMode) {
@@ -62,48 +64,11 @@ export class GameRound {
     }
 
 
-    private loadArrows(notes: NoteDataDto): void {
-        const activeHolds: (Arrow | null)[] = Array(Object.values(ArrowDirection).length).fill(null);
-
-        for (let measureIndex = 0; measureIndex < notes.stepChart.length; measureIndex++) {
-            const measure = notes.stepChart[measureIndex];
-            const beatPrecision = measure.steps.length / CONFIG.GAME.BEAT_PER_MEASURE;
-
-            for (let stepIndex = 0; stepIndex < measure.steps.length; stepIndex++) {
-                const stepRow = measure.steps[stepIndex];
-                const beatPosition = (measureIndex * CONFIG.GAME.BEAT_PER_MEASURE) + (stepIndex / beatPrecision);
-
-                for (let direction = 0; direction < stepRow.length; direction++) {
-                    const stepValue = stepRow[direction];
-
-                    if (stepValue === 1) { // Tap
-                        this.arrowMap.push(new Arrow(direction, beatPosition));
-
-                    } else if (stepValue === 2) { // Hold
-                        const newArrow = new Arrow(direction, beatPosition, ArrowType.Hold);
-                        activeHolds[direction] = newArrow;
-                        this.arrowMap.push(newArrow);
-
-                    } else if (stepValue === 3 && activeHolds[direction]) { // Continue Hold
-                        activeHolds[direction]!.beatEnd = beatPosition;
-                    } else if (stepValue === 4 && activeHolds[direction]) { // Roll (treated as hold for now)
-                        const newArrow = new Arrow(direction, beatPosition, ArrowType.Hold);
-                        activeHolds[direction] = newArrow;
-                        this.arrowMap.push(newArrow);
-                    }
-                    else if (stepValue === 5) { // Mine
-                        this.arrowMap.push(new Arrow(direction, beatPosition, ArrowType.Mine));
-                    }
-
-                }
-            }
-        }
-    }
-
 
     private calculateScore() {
-        const holdArrows = this.arrowMap.filter(arrow => arrow.type === ArrowType.Hold)
-        const tapArrows = this.arrowMap.filter(arrow => arrow.type === ArrowType.Tap)
+        const arrowMap = this.arrowManager.arrowMap
+        const holdArrows = arrowMap.filter(arrow => arrow.type === ArrowType.Hold)
+        const tapArrows = arrowMap.filter(arrow => arrow.type === ArrowType.Tap)
 
         // Calculate total hold percentage for score
         const totalHoldTime = holdArrows.reduce((total, arrow) => total + (arrow.beatEnd!) - arrow.beatPosition, 0);
@@ -122,6 +87,7 @@ export class GameRound {
 
 
     public gameLoop(currentBeat: number, tolerance: number): void {
+        const arrowMap = this.arrowManager.arrowMap
         this.currentBeat = currentBeat;
 
         // Get DancePad state
@@ -132,8 +98,8 @@ export class GameRound {
 
         // Check arrows
         let currentArrowCheck = this.currentArrowIndex
-        while (currentArrowCheck < this.arrowMap.length && this.arrowMap[currentArrowCheck].beatPosition < currentBeat + tolerance) {
-            const arrow = this.arrowMap[currentArrowCheck];
+        while (currentArrowCheck < arrowMap.length && arrowMap[currentArrowCheck].beatPosition < currentBeat + tolerance) {
+            const arrow = arrowMap[currentArrowCheck];
             if (!arrow.isOut) {
                 this.checkArrowPress(arrow, currentBeat, padstate[arrow.direction], tolerance);
             }
@@ -142,9 +108,9 @@ export class GameRound {
 
 
         // Pass out arrows
-        while (this.arrowMap[this.currentArrowIndex].isOut) {
+        while (arrowMap[this.currentArrowIndex].isOut) {
             this.currentArrowIndex++
-            if (this.currentArrowIndex >= this.arrowMap.length) {
+            if (this.currentArrowIndex >= arrowMap.length) {
                 this.EndVictory()
                 return
             }

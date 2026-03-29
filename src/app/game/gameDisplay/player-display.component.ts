@@ -174,7 +174,7 @@ export class PlayerDisplayComponent implements AfterViewInit {
 
 
     // Add new arrows to the queue if they fall within the visible window [currentBeat, currentBeat + 8]
-    const arrowMap = this.gameRound.arrowMap;
+    const arrowMap = this.gameRound.arrowManager.arrowMap;
     while (this.currentArrowVisibleIndex < arrowMap.length && arrowMap[this.currentArrowVisibleIndex].beatPosition <= currentBeat + 8) {
       const arrow = arrowMap[this.currentArrowVisibleIndex];
       this.currentVisibleArrows.push(arrow);
@@ -207,7 +207,6 @@ export class PlayerDisplayComponent implements AfterViewInit {
       this.ctx.shadowColor = 'white'; // White glow for contrast
       this.ctx.shadowBlur = 10; // Add a soft glow effect
     }
-
     const holdCenterImage = ArrowImageManager.getHoldForDistance(yend - y);
     this.ctx.globalAlpha = arrow.isPressed ? 1 : 0.5;
     this.ctx.drawImage(holdCenterImage, x - holdCenterImage.width / 2, y);

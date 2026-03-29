@@ -105,7 +105,16 @@ export class MusicDto {
       this.stops.sort((a, b) => a.time - b.time);
     }
 
-    this.additionalFields = { ...tokenMap };
+    const toRemoveTokens = ['selectable', 'tickcounts']
+    const leftTokens = Object.fromEntries(
+      Object.entries(tokenMap).filter(([key, value]) =>
+        !toRemoveTokens.includes(key) &&
+        value !== null &&
+        value !== undefined &&
+        !(typeof value === "string" && value.trim() === "")
+      )
+    );
+    this.additionalFields = { ...leftTokens };
   }
 
   private parseChanges<ITimedChange>(token: string, parsefun: (value: string) => any): ITimedChange[] | undefined {

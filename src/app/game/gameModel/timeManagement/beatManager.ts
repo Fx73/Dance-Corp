@@ -82,6 +82,38 @@ export class BeatManager {
             new BPMSection(currentTime, currentBeat, Infinity, currentBps)
         );
 
+
+        // --- APPLY OFFSET ---
+        const offset = music.offset ?? 0;
+
+        if (offset < 0) {
+            const first = timeline[0];
+            const bps = first.bps;
+
+            const offsetSection = new BPMSection(0, offset * bps, -offset, bps);
+
+            for (const s of timeline) {
+                s.timeStart += -offset;
+            }
+
+            timeline.unshift(offsetSection);
+        }
+        if (offset > 0) {
+            for (const s of timeline) {
+                s.timeStart -= offset;
+            }
+
+            timeline = timeline.filter(s => s.timeStart + s.duration > 0);
+
+            const first = timeline[0];
+            if (first.timeStart < 0) {
+                const delta = -first.timeStart;
+                first.timeStart = 0;
+                first.beatStart += delta * first.bps;
+                first.duration -= delta;
+            }
+        }
+
         this.timeline = timeline;
     }
 
@@ -89,6 +121,10 @@ export class BeatManager {
     private findTimeSection(elapsedTime: number): TimeSection {
         let low = 0;
         let high = this.timeline.length - 1;
+
+        if (elapsedTime <= this.timeline[0].timeStart) {
+            return this.timeline[0];
+        }
 
         while (low <= high) {
             const mid = (low + high) >> 1;
@@ -124,7 +160,6 @@ export class BeatManager {
 
     getBeatAndBpsAtTime(elapsedTime: number): { beat: number; bps: number } {
         const section = this.findTimeSection(elapsedTime);
-
         if (section instanceof StopSection) {
             return {
                 beat: section.beatStart,

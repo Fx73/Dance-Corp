@@ -18,13 +18,12 @@ export class MusicPlayerYoutubeComponent extends MusicPlayerCommon implements IM
     controls: 0,
     mute: 0,
     autoplay: 1,
-    start: 18
   };
 
   @Input()
   musicUrl!: string;
   @Input()
-  startOffset?: number;
+  startOffset?: number = 0;
 
   @Output()
   onReady: EventEmitter<IMusicPlayer> = new EventEmitter<IMusicPlayer>();
@@ -36,10 +35,19 @@ export class MusicPlayerYoutubeComponent extends MusicPlayerCommon implements IM
   }
 
   onReadyInternal(event: any): void {
-    console.log('YouTube Player is ready');
+    console.log('YouTube Player is ready, video will start at :', this.startOffset);
     this.player.stopVideo();
-    this.onReady.emit(this);
+    this.player.stopVideo();
+    this.player.stopVideo();
+    this.player.stopVideo();
+    this.player.stopVideo();
+    this.player.stopVideo();
+    this.player.stopVideo();
+    this.player.stopVideo();
+    this.player.stopVideo();
+    this.player.stopVideo();
 
+    this.onReady.emit(this);
   }
 
 
