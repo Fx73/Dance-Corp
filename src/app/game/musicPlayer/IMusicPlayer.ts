@@ -2,6 +2,7 @@ import { Directive, EventEmitter, Input, OnInit } from "@angular/core";
 
 export interface IMusicPlayer {
     musicUrl: string; // Unique identifier for the music track
+    startOffset?: number; // Optional start offset in seconds
 
     play(): void; // Start playback
     stop(): void; // Stop playback and reset

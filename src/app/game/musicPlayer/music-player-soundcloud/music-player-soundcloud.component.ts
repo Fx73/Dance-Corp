@@ -26,10 +26,10 @@ export class MusicPlayerSoundcloudComponent extends MusicPlayerCommon
 
   @Input()
   musicUrl!: string;
+  @Input()
+  startOffset?: number;
   @Output()
   onReady: EventEmitter<IMusicPlayer> = new EventEmitter<IMusicPlayer>();
-
-  //readonly soundcloud = new Soundcloud();
 
   widgetSC: any;
 
@@ -39,7 +39,14 @@ export class MusicPlayerSoundcloudComponent extends MusicPlayerCommon
     const iframe = document.getElementById('sc-player') as HTMLIFrameElement;
     this.widgetSC = SC.Widget(iframe);
     this.widgetSC.load(this.musicUrl);
-    this.widgetSC.bind(SC.Widget.Events.READY, () => this.onReady.emit(this));
+    if (this.startOffset !== undefined) {
+      this.widgetSC.seekTo(this.startOffset * 1000);
+    }
+    this.widgetSC.bind(SC.Widget.Events.READY, () => {
+      if (this.startOffset !== undefined)
+        this.widgetSC.seekTo(this.startOffset * 1000);
+      this.onReady.emit(this);
+    });
   }
 
   ngAfterViewInit() { }
@@ -73,13 +80,13 @@ export class MusicPlayerSoundcloudComponent extends MusicPlayerCommon
 
 
   getCurrentTime(): number {
-    return this.lastKnownTime;
+    return this.lastKnownTime - (this.startOffset ?? 0);
   }
   //#endregion
 
 
   setToTime(time: number): void {
-    this.widgetSC.seekTo(time * 1000);
+    this.widgetSC.seekTo((time + (this.startOffset ?? 0)) * 1000);
   }
 
   ngOnDestroy() {

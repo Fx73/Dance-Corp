@@ -46,7 +46,7 @@
         <div class="cardList">
           <!-- Edited music -->
           @for (music of storedMusics; track $index) {
-          <ion-card (click)="onSelectMusic($index)" class="basicCard stored-card" [ngClass]="selectedMusic?.id === music.id ? 'selectedCard' : ''">
+          <ion-card #musicCard (click)="onSelectMusic($index)" class="basicCard stored-card" [ngClass]="selectedMusic?.id === music.id ? 'selectedCard' : ''">
             <ion-img [src]="'https://'+music.jacket"></ion-img>
             <ion-card-header>
               <ion-card-title>{{ music.title }}</ion-card-title>
@@ -60,7 +60,7 @@
 
           <!-- Music cards -->
           @for (music of musics(); track $index) {
-          <ion-card (click)="onSelectMusic($index + storedMusics.length)" class="basicCard" [ngClass]="selectedMusic?.id === music.id ? 'selectedCard' : ''">
+          <ion-card #musicCard (click)="onSelectMusic($index + storedMusics.length)" class="basicCard" [ngClass]="selectedMusic?.id === music.id ? 'selectedCard' : ''">
             <ion-img [src]="'https://'+music.jacket"></ion-img>
             <ion-card-header>
               <ion-card-title>{{ music.title }}</ion-card-title>

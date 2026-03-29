@@ -3,6 +3,7 @@ import { IonButton, IonIcon, IonInput, IonItem, IonLabel, IonList } from "@ionic
 import { addOutline, removeOutline } from 'ionicons/icons';
 
 import { FormsModule } from '@angular/forms';
+import { SanitizeSscInput } from '../reader.ssc';
 import { addIcons } from 'ionicons';
 
 @Component({
@@ -38,7 +39,7 @@ export class MusicEditableListComponent {
     this.value = this.value.map(row => ({
       ...row,
       value: this.valueType === 'string'
-        ? this.sanitizeInput(String(row.value ?? ""))
+        ? SanitizeSscInput(String(row.value ?? ""))
         : row.value
     }));
 
@@ -97,13 +98,4 @@ export class MusicEditableListComponent {
       .join(' | ');
   }
 
-  private sanitizeInput(v: string): string {
-    if (!v) return "";
-    // Remove http:// or https://
-    v = v.replace(/^https?:\/\//i, "");
-    // Remove all remaining // in the string
-    v = v.replace(/\/{2,}/g, "/");
-
-    return v;
-  }
 }

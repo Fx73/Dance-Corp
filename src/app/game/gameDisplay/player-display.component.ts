@@ -1,7 +1,7 @@
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, OnInit, ViewChild, signal } from '@angular/core';
 import { ArrowColor, ArrowImageManager } from './arrowImageManager';
 
-import { Arrow } from '../gameModel/arrow';
+import { Arrow } from '../gameModel/arrowManagement/arrow';
 import { ArrowDirection } from 'src/app/game/constants/arrow-direction.enum';
 import { ArrowType } from '../constants/arrow-type.enum';
 import { CONFIG } from '../constants/game-config';

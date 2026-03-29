@@ -1,8 +1,8 @@
-import { ArrowColor } from "../gameDisplay/arrowImageManager";
+import { ArrowColor } from "../../gameDisplay/arrowImageManager";
 import { ArrowDirection } from "src/app/game/constants/arrow-direction.enum";
-import { ArrowType } from "../constants/arrow-type.enum";
-import { CONFIG } from "../constants/game-config";
-import { Precision } from "../constants/precision.enum";
+import { ArrowType } from "../../constants/arrow-type.enum";
+import { CONFIG } from "../../constants/game-config";
+import { Precision } from "../../constants/precision.enum";
 
 export class Arrow {
     direction: ArrowDirection;

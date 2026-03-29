@@ -62,6 +62,7 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
       this.router.navigate(['/home']);
       return;
     }
+    console.log("Received music data:", this.music);
 
     // Prepare Music Player
     this.musicOrigin = MusicPlayerCommon.pickMusicPlayer(this.music!.music!)

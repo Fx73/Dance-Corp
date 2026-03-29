@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, ViewChild } from '@angular/core';
 import { IMusicPlayer, MusicPlayerCommon } from '../IMusicPlayer';
 import { YOUTUBE_PLAYER_CONFIG, YouTubePlayer } from '@angular/youtube-player';
 
@@ -18,10 +18,14 @@ export class MusicPlayerYoutubeComponent extends MusicPlayerCommon implements IM
     controls: 0,
     mute: 0,
     autoplay: 1,
+    start: 18
   };
 
   @Input()
   musicUrl!: string;
+  @Input()
+  startOffset?: number;
+
   @Output()
   onReady: EventEmitter<IMusicPlayer> = new EventEmitter<IMusicPlayer>();
 
@@ -49,11 +53,11 @@ export class MusicPlayerYoutubeComponent extends MusicPlayerCommon implements IM
   }
 
   getCurrentTime(): number {
-    return this.player.getCurrentTime();
+    return this.player.getCurrentTime() - (this.startOffset ?? 0);
   }
 
   setToTime(time: number): void {
-    this.player.seekTo(time, true);
+    this.player.seekTo(time + (this.startOffset ?? 0), true);
   }
 
   public extractVideoId(url: string): string {
@@ -62,4 +66,6 @@ export class MusicPlayerYoutubeComponent extends MusicPlayerCommon implements IM
     );
     return match ? match[1] : '';
   }
+
+
 }

@@ -1,6 +1,6 @@
 <app-header title="Upload"></app-header>
 <ion-content [fullscreen]="false">
-	@if(!isEditDB && !isEditLocal) {
+	@if(!isEditDB() && !isEditLocal()) {
 	@if(isLoading) {
 	<ion-card class="base-card">
 		<ion-card-header>
@@ -37,27 +37,27 @@
 						<ion-list lines="none">
 							<music-editable-field label="Title" [value]="musicData.title" [valueDb]="musicDataDb?.title" [isEditing]="false"></music-editable-field>
 
-							<music-editable-field label="Title (Translit)" [(value)]="musicData.titletranslit" [valueDb]="musicDataDb?.titletranslit" (valueChange)="onEndEditing()" [isEditing]="isEditLocal"> </music-editable-field>
+							<music-editable-field label="Title (Translit)" [(value)]="musicData.titletranslit" [valueDb]="musicDataDb?.titletranslit" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </music-editable-field>
 
-							<music-editable-field label="Subtitle" [(value)]="musicData.subtitle" [valueDb]="musicDataDb?.subtitle" (valueChange)="onEndEditing()" [isEditing]="isEditLocal"> </music-editable-field>
+							<music-editable-field label="Subtitle" [(value)]="musicData.subtitle" [valueDb]="musicDataDb?.subtitle" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </music-editable-field>
 
-							<music-editable-field label="Subtitle (Translit)" [(value)]="musicData.subtitletranslit" [valueDb]="musicDataDb?.subtitletranslit" (valueChange)="onEndEditing()" [isEditing]="isEditLocal"> </music-editable-field>
+							<music-editable-field label="Subtitle (Translit)" [(value)]="musicData.subtitletranslit" [valueDb]="musicDataDb?.subtitletranslit" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </music-editable-field>
 
 							<music-editable-field label="Artist" [value]="musicData.artist" [valueDb]="musicDataDb?.artist " (valueChange)="onEndEditing()" [isEditing]="false"> </music-editable-field>
 
-							<music-editable-field label="Artist (Translit)" [(value)]="musicData.artisttranslit" [valueDb]="musicDataDb?.artisttranslit" (valueChange)="onEndEditing()" [isEditing]="isEditLocal"> </music-editable-field>
+							<music-editable-field label="Artist (Translit)" [(value)]="musicData.artisttranslit" [valueDb]="musicDataDb?.artisttranslit" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </music-editable-field>
 
-							<music-editable-field label="Genre" [(value)]="musicData.genre" [valueDb]="musicDataDb?.genre" (valueChange)="onEndEditing()" [isEditing]="isEditLocal"> </music-editable-field>
+							<music-editable-field label="Genre" [(value)]="musicData.genre" [valueDb]="musicDataDb?.genre" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </music-editable-field>
 
-							<music-editable-field label="Credit" [(value)]="musicData.credit" [valueDb]="musicDataDb?.credit" (valueChange)="onEndEditing()" [isEditing]="isEditLocal"> </music-editable-field>
+							<music-editable-field label="Credit" [(value)]="musicData.credit" [valueDb]="musicDataDb?.credit" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </music-editable-field>
 
-							<music-editable-field label="Banner" [(value)]="musicData.banner" [valueDb]="musicDataDb?.banner" (valueChange)="onEndEditing()" [isEditing]="isEditLocal"> </music-editable-field>
+							<music-editable-field label="Banner" [(value)]="musicData.banner" [valueDb]="musicDataDb?.banner" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </music-editable-field>
 
-							<music-editable-field label="Jacket" [(value)]="musicData.jacket" [valueDb]="musicDataDb?.jacket" (valueChange)="onEndEditing()" [isEditing]="isEditLocal"> </music-editable-field>
+							<music-editable-field label="Jacket" [(value)]="musicData.jacket" [valueDb]="musicDataDb?.jacket" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </music-editable-field>
 
-							<music-editable-field label="CD Title" [(value)]="musicData.cdTitle" [valueDb]="musicDataDb?.cdTitle" (valueChange)="onEndEditing()" [isEditing]="isEditLocal"> </music-editable-field>
+							<music-editable-field label="CD Title" [(value)]="musicData.cdTitle" [valueDb]="musicDataDb?.cdTitle" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </music-editable-field>
 
-							<music-editable-field label="Music" [(value)]="musicData.music" [valueDb]="musicDataDb?.music" (valueChange)="onEndEditing()" [isEditing]="isEditLocal && !isEditDB">
+							<music-editable-field label="Music" [(value)]="musicData.music" [valueDb]="musicDataDb?.music" (valueChange)="verifyMusicUrl();onEndEditing()" [isEditing]="isEditLocal() && !isEditDB()">
 								<ion-icon name="logo-youtube" style="margin-right: 4px;" slot="start" />
 								<ion-icon name="logo-soundcloud" style="margin-right: 4px;" slot="start" />
 								@if(isDesktop){
@@ -65,25 +65,27 @@
 								}
 							</music-editable-field>
 
-							<music-editable-field label="Beat 0 Offset (seconds)" type="number" [(value)]="musicData.offset" [valueDb]="musicDataDb?.offset" (valueChange)="onEndEditing()" [isEditing]="isEditLocal && !isEditDB"> </music-editable-field>
+							<music-editable-field label="Beat 0 Offset (seconds)" type="number" [(value)]="musicData.offset" [valueDb]="musicDataDb?.offset" (valueChange)="onEndEditing()" [isEditing]="isEditLocal() && !isEditDB()"> </music-editable-field>
 
-							<music-editable-field label="Sample Start" type="number" [(value)]="musicData.sampleStart" [valueDb]="musicDataDb?.sampleStart" (valueChange)="onEndEditing()" [isEditing]="isEditLocal"> </music-editable-field>
+							<music-editable-field label="Music start (seconds)" type="number" [(value)]="musicData.musicoffset" [valueDb]="musicDataDb?.musicoffset" (valueChange)="onEndEditing()" [isEditing]="isEditLocal() && !isEditDB()"> </music-editable-field>
 
-							<music-editable-field label="Sample Length" type="number" [(value)]="musicData.sampleLength" [valueDb]="musicDataDb?.sampleLength" (valueChange)="onEndEditing()" [isEditing]="isEditLocal"> </music-editable-field>
+							<music-editable-field label="Sample Start" type="number" [(value)]="musicData.sampleStart" [valueDb]="musicDataDb?.sampleStart" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </music-editable-field>
 
-							<music-editable-list label="Bpms" [(value)]="musicData.bpms" [valueDb]="musicDataDb?.bpms" valueType="number" (valueChange)="onEndEditing()" [isEditing]="isEditLocal && !isEditDB"> </music-editable-list>
+							<music-editable-field label="Sample Length" type="number" [(value)]="musicData.sampleLength" [valueDb]="musicDataDb?.sampleLength" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </music-editable-field>
 
-							<music-editable-list label="Stops" [(value)]="musicData.stops" [valueDb]="musicDataDb?.stops" valueType="number" (valueChange)="onEndEditing()" [isEditing]="isEditLocal && !isEditDB"> </music-editable-list>
+							<music-editable-list label="Bpms" [(value)]="musicData.bpms" [valueDb]="musicDataDb?.bpms" valueType="number" (valueChange)="onEndEditing()" [isEditing]="isEditLocal() && !isEditDB()"> </music-editable-list>
 
-							<music-editable-list label="Warps" [(value)]="musicData.warps" [valueDb]="musicDataDb?.warps" valueType="number" (valueChange)="onEndEditing()" [isEditing]="isEditLocal && !isEditDB"> </music-editable-list>
+							<music-editable-list label="Stops" [(value)]="musicData.stops" [valueDb]="musicDataDb?.stops" valueType="number" (valueChange)="onEndEditing()" [isEditing]="isEditLocal() && !isEditDB()"> </music-editable-list>
 
-							<music-editable-list label="Speeds" [(value)]="musicData.speeds" [valueDb]="musicDataDb?.speeds" valueType="number" (valueChange)="onEndEditing()" [isEditing]="isEditLocal && !isEditDB"> </music-editable-list>
+							<music-editable-list label="Warps" [(value)]="musicData.warps" [valueDb]="musicDataDb?.warps" valueType="number" (valueChange)="onEndEditing()" [isEditing]="isEditLocal() && !isEditDB()"> </music-editable-list>
 
-							<music-editable-list label="Scrolls" [(value)]="musicData.scrolls" [valueDb]="musicDataDb?.scrolls" valueType="number" (valueChange)="onEndEditing()" [isEditing]="isEditLocal && !isEditDB"> </music-editable-list>
+							<music-editable-list label="Speeds" [(value)]="musicData.speeds" [valueDb]="musicDataDb?.speeds" valueType="number" (valueChange)="onEndEditing()" [isEditing]="isEditLocal() && !isEditDB()"> </music-editable-list>
 
-							<music-editable-list label="Backgrounds" [(value)]="musicData.bgChanges " [valueDb]="musicDataDb?.bgChanges" valueType="string" (valueChange)="onEndEditing()" [isEditing]="isEditLocal"> </music-editable-list>
+							<music-editable-list label="Scrolls" [(value)]="musicData.scrolls" [valueDb]="musicDataDb?.scrolls" valueType="number" (valueChange)="onEndEditing()" [isEditing]="isEditLocal() && !isEditDB()"> </music-editable-list>
 
-							<music-editable-list label="Labels" [(value)]="musicData.labels" [valueDb]="musicDataDb?.labels" valueType="string" (valueChange)="onEndEditing()" [isEditing]="isEditLocal"> </music-editable-list>
+							<music-editable-list label="Backgrounds" [(value)]="musicData.bgChanges " [valueDb]="musicDataDb?.bgChanges" valueType="string" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </music-editable-list>
+
+							<music-editable-list label="Labels" [(value)]="musicData.labels" [valueDb]="musicDataDb?.labels" valueType="string" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </music-editable-list>
 
 						</ion-list>
 					</ion-card-content>
@@ -93,7 +95,7 @@
 						<ion-card-title>Background previews</ion-card-title>
 					</ion-card-header>
 					<ion-card-content>
-						@for (bgChange of (isEditLocal ? musicData : musicDataDb)?.bgChanges; track $index) {
+						@for (bgChange of (isEditLocal() ? musicData : musicDataDb)?.bgChanges; track $index) {
 						<ion-item>
 							<ion-label position="stacked"> Background at {{bgChange.time}} </ion-label>
 							<ion-img [src]="'https://'+bgChange.value" class="preview-image" />
@@ -107,14 +109,14 @@
 				<!-- Buttons card-->
 				<ion-card class="base-card btn-action-card">
 					<ion-card-content>
-						@if (isEditLocal) {
+						@if (isEditLocal()) {
 						@if(isLocalMusic()){
 						<p style="color: var(--ion-color-warning);"> You are currently editing a local music file. Switch to url to be able to upload </p>
 						}
 						@else{
-						<ion-button (click)="uploadMusic()" color="success" expand="block" [disabled]="isEditDB && !metadataDirty()"> {{ isEditDB ? 'Update music' : 'Upload music'}} </ion-button>
+						<ion-button (click)="uploadMusic()" color="success" expand="block" [disabled]="isEditDB() && !metadataDirty()"> {{ isEditDB() ? 'Update music' : 'Upload music'}} </ion-button>
 						}
-						@if (isEditDB) {
+						@if (isEditDB()) {
 						<ion-button (click)="uploadAllNotes()" expand="block" [disabled]="!anyNoteDirty()"> Upload All notes </ion-button>
 						@if (noNotes()) {
 						<ion-button color="danger" (click)="deleteMusic()" [disabled]="!noNotes()" expand="block"> Delete Music </ion-button>
@@ -139,7 +141,7 @@
 					<ion-card-content>
 						<ion-item>
 							<ion-label position="stacked"> Jacket </ion-label>
-							<ion-img [src]="'https://'+(isEditLocal ? musicData : musicDataDb)?.jacket" class="preview-image" />
+							<ion-img [src]="'https://'+(isEditLocal() ? musicData : musicDataDb)?.jacket" class="preview-image" />
 						</ion-item>
 					</ion-card-content>
 				</ion-card>
@@ -148,15 +150,15 @@
 						<ion-card-title>Music preview</ion-card-title>
 					</ion-card-header>
 					<ion-card-content style="max-width: 30vw;">
-						@switch (pickMusicPlayer((isEditLocal ? musicData : musicDataDb)?.music ?? "")) {
+						@switch (pickMusicPlayer((isEditLocal() ? musicData : musicDataDb)?.music ?? "")) {
 						@case (MusicOrigin.Youtube){
-						<app-music-player-youtube [musicUrl]="(isEditLocal ? musicData : musicDataDb)?.music!" [size]="{ width: '100%', height: '100%' }"></app-music-player-youtube>
+						<app-music-player-youtube [musicUrl]="(isEditLocal() ? musicData : musicDataDb)?.music!" [size]="{ width: '100%', height: '100%' }"></app-music-player-youtube>
 						}
 						@case (MusicOrigin.Soundcloud){
-						<app-music-player-soundcloud [musicUrl]="(isEditLocal ? musicData : musicDataDb)?.music!" [size]="{ width: '100%', height: '100%' }"></app-music-player-soundcloud>
+						<app-music-player-soundcloud [musicUrl]="(isEditLocal() ? musicData : musicDataDb)?.music!" [size]="{ width: '100%', height: '100%' }"></app-music-player-soundcloud>
 						}
 						@case (MusicOrigin.Local){
-						<app-music-player-local [musicUrl]="(isEditLocal ? musicData : musicDataDb)?.music!" [size]="{ width: '100%', height: '100%' }"></app-music-player-local>
+						<app-music-player-local [musicUrl]="(isEditLocal() ? musicData : musicDataDb)?.music!" [size]="{ width: '100%', height: '100%' }"></app-music-player-local>
 						}
 						}
 
@@ -173,29 +175,29 @@
 						<ion-card-title>Notes Data</ion-card-title>
 					</ion-card-header>
 					<ion-card-content class="card-grid">
-						@for (note of (isEditLocal ? musicData : musicDataDb)?.noteData; track $index) {
+						@for (note of (isEditLocal() ? musicData : musicDataDb)?.noteData; track $index) {
 						@let noteDb = getDbNote(note.chartName);
 						<ion-card #notesCard [disabled]="!isNoteMine(note)">
 							<ion-card-header>
 								<ion-card-title>
-									<ion-input [(ngModel)]="note.chartName" [disabled]="!isEditLocal || noteDb !== undefined"></ion-input>
+									<ion-input [(ngModel)]="note.chartName" [disabled]="!isEditLocal() || noteDb !== undefined"></ion-input>
 								</ion-card-title>
 							</ion-card-header>
 							<ion-card-content>
 								<ion-list>
-									<music-select label="Dance Type" [(value)]="note.stepsType" [valueDb]="noteDb?.stepsType" [isEditing]="isEditLocal" (valueChange)="onEndEditing()" [options]="DanceTypeList">
+									<music-select label="Dance Type" [(value)]="note.stepsType" [valueDb]="noteDb?.stepsType" [isEditing]="isEditLocal()" (valueChange)="onEndEditing()" [options]="DanceTypeList">
 									</music-select>
 
-									<music-editable-field label="Description" [(value)]="note.description" [valueDb]="noteDb?.description" [isEditing]="isEditLocal" (valueChange)="onEndEditing()">
+									<music-editable-field label="Description" [(value)]="note.description" [valueDb]="noteDb?.description" [isEditing]="isEditLocal()" (valueChange)="onEndEditing()">
 									</music-editable-field>
 
-									<music-select label="Difficulty" [(value)]="note.difficulty" [valueDb]="noteDb?.difficulty" [isEditing]="isEditLocal" (valueChange)="onEndEditing()" [options]="NoteDifficultyList">
+									<music-select label="Difficulty" [(value)]="note.difficulty" [valueDb]="noteDb?.difficulty" [isEditing]="isEditLocal()" (valueChange)="onEndEditing()" [options]="NoteDifficultyList">
 									</music-select>
 
-									<music-editable-field label="Meter" [(value)]="note.meter" [valueDb]="noteDb?.meter" [isEditing]="isEditLocal" type="number" (valueChange)="onEndEditing()" [warningMessage]="'Meter has been computed on upload from criterias to match DDR level as much as possible. Change it only if you know what you are doing !'">
+									<music-editable-field label="Meter" [(value)]="note.meter" [valueDb]="noteDb?.meter" [isEditing]="isEditLocal()" type="number" (valueChange)="onEndEditing()" [warningMessage]="'Meter has been computed on upload from criterias to match DDR level as much as possible. Change it only if you know what you are doing !'">
 									</music-editable-field>
 
-									<music-editable-field label="Credit" [(value)]="note.credit" [valueDb]="noteDb?.credit" [isEditing]="isEditLocal" (valueChange)="onEndEditing()">
+									<music-editable-field label="Credit" [(value)]="note.credit" [valueDb]="noteDb?.credit" [isEditing]="isEditLocal()" (valueChange)="onEndEditing()">
 									</music-editable-field>
 
 									<ion-item [title]="noteDb?.creationDate">
@@ -227,7 +229,7 @@
 								</p>
 							</ion-card-content>
 							<!-- Notes Buttons card-->
-							@if (isNoteMine(note) && isEditLocal) {
+							@if (isNoteMine(note) && isEditLocal()) {
 							<ion-card class="base-card btn-action-card">
 								<ion-card-content>
 									<!--ion-button (click)="TestNote(note)" color="tertiary" size="small" expand="block"> Test </ion-button-->
@@ -236,7 +238,7 @@
 									}@else {
 									<p style="color: var(--ion-color-warning);"> Upload your music first to upload notes </p>
 									}
-									<ion-button (click)="deleteNote(note)" color="danger" size="small" expand="block" [disabled]="!isEditLocal"> {{ noteDb ? 'Delete from database' : 'Remove notes'}} </ion-button>
+									<ion-button (click)="deleteNote(note)" color="danger" size="small" expand="block" [disabled]="!isEditLocal()"> {{ noteDb ? 'Delete from database' : 'Remove notes'}} </ion-button>
 								</ion-card-content>
 							</ion-card>
 							}

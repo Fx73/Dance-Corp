@@ -240,3 +240,16 @@ export class SccWriter {
     return value.toString();
   }
 }
+
+export function SanitizeSscInput(input: string | null): string | null {
+  if (!input || input.trim() === "") return null;
+
+  // Remove http:// or https://
+  input = input.replace(/^https?:\/\//i, "");
+  // Remove all remaining // in the string
+  input = input.replace(/\/{2,}/g, "/");
+  // Replace ; with ,
+  input = input.replace(/;/g, ",");
+
+  return input;
+}

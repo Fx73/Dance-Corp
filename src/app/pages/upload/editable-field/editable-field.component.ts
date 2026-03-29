@@ -1,6 +1,8 @@
 import { Component, ElementRef, EventEmitter, Input, Output } from "@angular/core";
 import { IonInput, IonItem, IonLabel } from "@ionic/angular/standalone";
 
+import { SanitizeSscInput } from "../reader.ssc";
+
 @Component({
   selector: 'music-editable-field',
   templateUrl: './editable-field.component.html',
@@ -31,7 +33,7 @@ export class MusicEditableFieldComponent {
 
   onInputChange(ev: any) {
     let newValue = ev.detail.value;
-    newValue = this.sanitizeInput(newValue);
+    newValue = SanitizeSscInput(newValue);
 
     this.isDirty = this.isEditing && this.normalize(newValue) !== this.normalize(this.valueDb);
     this.valueChange.emit(newValue);
@@ -47,14 +49,5 @@ export class MusicEditableFieldComponent {
     return String(v).trim();
   }
 
-  private sanitizeInput(v: string): string {
-    if (!v) return "";
-    // Remove http:// or https://
-    v = v.replace(/^https?:\/\//i, "");
-    // Remove all remaining // in the string
-    v = v.replace(/\/{2,}/g, "/");
-
-    return v;
-  }
 
 }

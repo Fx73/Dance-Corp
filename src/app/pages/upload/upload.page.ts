@@ -46,8 +46,8 @@ export class UploadPage {
 
   musicData: MusicDto = new MusicDto();
   musicDataDb: MusicDto | null = null;
-  isEditDB = false;
-  isEditLocal = false;
+  isEditDB = signal(false);
+  isEditLocal = signal(false);
 
   isLoading = false;
 
@@ -74,6 +74,8 @@ export class UploadPage {
   ionViewWillEnter() {
     this.musicData = new MusicDto();
     this.musicDataDb = null;
+    this.isEditDB.set(false);
+    this.isEditLocal.set(false);
 
     const musicId = this.route.snapshot.queryParamMap.get('music');
     console.log("UploadPage initialized with musicId:", musicId);
@@ -138,7 +140,7 @@ export class UploadPage {
     const data = await this.fireStoreService.getMusicWithNotes(musicId);
     if (data) {
       this.musicDataDb = data;
-      this.isEditDB = true;
+      this.isEditDB.set(true);
       this.isLoading = false;
 
       this.cd.markForCheck();
@@ -154,7 +156,7 @@ export class UploadPage {
     const data = this.localMusicService.getMusic(musicId);
     if (data) {
       this.musicData = data;
-      this.isEditLocal = true;
+      this.isEditLocal.set(true);
       this.isLoading = false;
 
       if (this.musicDataDb)
@@ -184,7 +186,7 @@ export class UploadPage {
         const content = e.target?.result as string;
         this.musicData = SccReader.parseFile(file.name, content);
         this.localMusicService.saveMusic(this.musicData!);
-        this.isEditLocal = true;
+        this.isEditLocal.set(true);
         AppComponent.presentOkToast("Music loaded successfully : " + this.musicData.id);
 
         const dbMusic = await this.fireStoreService.getMusic(this.musicData.id);
@@ -264,20 +266,20 @@ export class UploadPage {
 
   onStartEdit() {
     this.musicData = this.musicDataDb!.deepClone();
-    this.isEditLocal = true;
+    this.isEditLocal.set(true);
     this.cd.detectChanges()
 
   }
 
   exportEssc(): void {
-    const esscContent = SccWriter.writeSscFile(this.isEditLocal ? this.musicData! : this.musicDataDb!);
+    const esscContent = SccWriter.writeSscFile(this.isEditLocal() ? this.musicData! : this.musicDataDb!);
     function pick(translit?: string | null, normal?: string | null): string {
       const t = translit?.trim();
       return t ? t : (normal?.trim() ?? "");
     }
 
-    const artist = pick(this.isEditLocal ? this.musicData.artisttranslit : this.musicDataDb?.artisttranslit, this.isEditLocal ? this.musicData.artist : this.musicDataDb?.artist);
-    const title = pick(this.isEditLocal ? this.musicData.titletranslit : this.musicDataDb?.titletranslit, this.isEditLocal ? this.musicData.title : this.musicDataDb?.title);
+    const artist = pick(this.isEditLocal() ? this.musicData.artisttranslit : this.musicDataDb?.artisttranslit, this.isEditLocal() ? this.musicData.artist : this.musicDataDb?.artist);
+    const title = pick(this.isEditLocal() ? this.musicData.titletranslit : this.musicDataDb?.titletranslit, this.isEditLocal() ? this.musicData.title : this.musicDataDb?.title);
     const filename = `${artist}_${title}.essc`;
 
     const blob = new Blob([esscContent], { type: "text/plain" });
@@ -297,7 +299,7 @@ export class UploadPage {
   //#region Upload
   async uploadMusic(): Promise<void> {
     if (this.musicData === null) return;
-    if (this.isEditDB) {
+    if (this.isEditDB()) {
       await this.fireStoreService.updateMusic(this.musicData)
       AppComponent.presentOkToast("Music updated successfully!");
 
@@ -308,14 +310,14 @@ export class UploadPage {
     }
     else {
       await this.fireStoreService.uploadMusic(this.musicData)
-      this.isEditDB = true
+      this.isEditDB.set(true);
       AppComponent.presentOkToast("Music uploaded successfully!");
       this.switchToDbPage();
     }
   }
 
   async uploadAllNotes(): Promise<void> {
-    if (this.musicData === null || !this.isEditDB) return;
+    if (this.musicData === null || !this.isEditDB()) return;
     await this.fireStoreService.uploadAllNotes(this.musicData.id, this.musicData.noteData)
     AppComponent.presentOkToast("All notes uploaded successfully!");
 
@@ -326,7 +328,7 @@ export class UploadPage {
   }
 
   async uploadNote(note: NoteDataDto): Promise<void> {
-    if (this.musicData === null || !this.isEditDB) return;
+    if (this.musicData === null || !this.isEditDB()) return;
     await this.fireStoreService.uploadNote(this.musicData.id, note)
     AppComponent.presentOkToast("Note uploaded successfully!");
     await this.loadDbMusic(this.musicData.id)
@@ -340,9 +342,9 @@ export class UploadPage {
     const musicId = this.musicData.id;
     this.localMusicService.deleteMusic(musicId);
     this.musicData = new MusicDto();
-    this.isEditLocal = false;
+    this.isEditLocal.set(false);
 
-    if (!this.isEditDB) {
+    if (!this.isEditDB()) {
       this.deleteLocalMusicFile(musicId);
       this.location.back();
       if (!silent) AppComponent.presentOkToast("Music has been discarded");
@@ -357,7 +359,7 @@ export class UploadPage {
     if (!this.musicDataDb) return;
     await this.fireStoreService.deleteMusic(this.musicDataDb.id);
     this.musicDataDb = null;
-    this.isEditDB = false;
+    this.isEditDB.set(false);
     this.cd.detectChanges()
     AppComponent.presentOkToast("Music deleted successfully from database.");
   }
@@ -424,6 +426,35 @@ export class UploadPage {
     });
     return count;
   }
+
+  verifyMusicUrl() {
+    let url = this.musicData.music;
+    if (!url) return
+
+    // remove https and www for easier processing, and query parameters for cleaner look
+    url = url.replace(/^https?:\/\/www\./, "");
+    url = url.split("?")[0];
+
+    // exctract start time if any
+    const startMatch = url.match(/[?&](?:t|start)=(\d+)/);
+    const start = startMatch ? Number(startMatch[1]) : null;
+    url = url.replace(/[?&](?:t|start)=(\d+)/, "");
+
+    const isYoutubeUrl = url.startsWith('youtube.com') || url.startsWith('youtu.be');
+    const isSoundcloudUrl = url.startsWith('soundcloud.com');
+
+    if (!isYoutubeUrl && !isSoundcloudUrl) {
+      AppComponent.presentWarningToast("URL is not a valid YouTube or SoundCloud link.");
+      return;
+    }
+
+    this.musicData.music = url;
+    if (start) {
+      this.musicData.musicoffset = start;
+    }
+
+  }
+
 
   checkUrl(): Promise<boolean> {
     if (!this.musicData?.music) return Promise.resolve(false);

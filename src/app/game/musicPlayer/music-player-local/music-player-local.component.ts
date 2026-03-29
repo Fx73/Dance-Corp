@@ -12,6 +12,7 @@ import { IMusicPlayer, MusicPlayerCommon } from '../IMusicPlayer';
 export class MusicPlayerLocalComponent extends MusicPlayerCommon implements IMusicPlayer, OnInit {
 
   @Input() musicUrl!: string;
+  @Input() startOffset?: number;
   @Output() onReady = new EventEmitter<IMusicPlayer>();
   private audio!: HTMLAudioElement;
 
@@ -30,6 +31,8 @@ export class MusicPlayerLocalComponent extends MusicPlayerCommon implements IMus
     this.audio = new Audio();
     this.audio.src = localUri;
     this.audio.preload = 'auto';
+    if (this.startOffset)
+      this.audio.currentTime = this.startOffset;
 
     this.audio.addEventListener('loadedmetadata', () => {
       this.duration.set(this.audio.duration);
@@ -81,16 +84,16 @@ export class MusicPlayerLocalComponent extends MusicPlayerCommon implements IMus
   }
 
   getCurrentTime(): number {
-    return this.audio?.currentTime ?? 0;
+    return (this.audio?.currentTime ?? 0) - (this.startOffset ?? 0);
   }
 
   getDuration(): number {
-    return this.audio?.duration ?? 0;
+    return (this.audio?.duration ?? 0) - (this.startOffset ?? 0);
   }
 
   setToTime(event: any): void {
     const value = event.target.value;
-    this.audio.currentTime = value;
+    this.audio.currentTime = value + (this.startOffset ?? 0);
   }
 
   formatTime(sec: number): string {

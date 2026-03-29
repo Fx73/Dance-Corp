@@ -18,6 +18,7 @@ export class MusicDto {
   cdTitle?: string;
   music?: string;
   offset: number = 0; //beat0OffsetInSeconds
+  musicoffset?: number; //musicOffsetInSeconds 
   sampleStart?: number;
   sampleLength?: number;
   bpms: BpmChange[] = [];
@@ -66,6 +67,8 @@ export class MusicDto {
     this.offset = tokenMap["offset"] ? parseFloat(tokenMap["offset"]) ?? parseFloat(tokenMap["beat0OffsetInSeconds"]) : 0;
     delete tokenMap["offset"];
     delete tokenMap["beat0OffsetInSeconds"];
+    this.musicoffset = tokenMap["musicoffset"] ? parseFloat(tokenMap["musicoffset"]) : undefined;
+    delete tokenMap["musicoffset"];
     this.sampleStart = parseFloat(tokenMap["samplestart"]);
     delete tokenMap["samplestart"];
     this.sampleLength = parseFloat(tokenMap["samplelength"]);
@@ -80,7 +83,7 @@ export class MusicDto {
     delete tokenMap["scrolls"];
     this.bpms = this.parseChanges<BpmChange>(tokenMap["bpms"], v => parseFloat(v))!;
     delete tokenMap["bpms"];
-    this.bgChanges = this.parseChanges<BackgroundChange>(tokenMap["bgchanges"], v => v) ?? [new BackgroundChange(0, tokenMap["background"])];
+    this.bgChanges = this.parseChanges<BackgroundChange>(tokenMap["bgchanges"], v => v) ?? [];
     delete tokenMap["background"];
     delete tokenMap["bgchanges"];
     this.labels = this.parseChanges<LabelChange>(tokenMap["labels"], v => v) ?? [];

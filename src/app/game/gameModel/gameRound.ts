@@ -1,7 +1,7 @@
 import { ArrowState, DancePadInput, IDancePad } from "../gameController/dancepad.interface";
 import { MusicDto, NoteDataDto } from "./music.dto";
 
-import { Arrow } from "./arrow";
+import { Arrow } from "./arrowManagement/arrow";
 import { ArrowDirection } from 'src/app/game/constants/arrow-direction.enum';
 import { ArrowType } from "../constants/arrow-type.enum";
 import { CONFIG } from './../constants/game-config';

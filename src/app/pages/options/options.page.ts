@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonInput, IonItem, IonModal, IonRange, IonToggle } from '@ionic/angular/standalone';
 
-import { Arrow } from '../../game/gameModel/arrow';
+import { Arrow } from '../../game/gameModel/arrowManagement/arrow';
 import { ArrowType } from '../../game/constants/arrow-type.enum';
 import { BrowseUploadPage } from '../browse-upload/browse-upload.page';
 import { CommonModule } from '@angular/common';

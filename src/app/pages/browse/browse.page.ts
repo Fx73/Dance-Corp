@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, HostListener, OnInit, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, QueryList, ViewChildren, signal } from '@angular/core';
 import { InfiniteScrollCustomEvent, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonImg, IonInfiniteScroll, IonInfiniteScrollContent, IonMenu, IonSearchbar, IonSplitPane, IonText } from '@ionic/angular/standalone';
 import { MusicDto, NoteDataDto } from 'src/app/game/gameModel/music.dto';
 import { NgClass, NgStyle, } from '@angular/common';
@@ -47,14 +47,29 @@ export class BrowsePage implements OnInit {
 
   isSinglePlayer: boolean = true;
 
+  @ViewChildren('musicCard', { read: ElementRef }) musicCards!: QueryList<ElementRef>;
+
   constructor(private router: Router, private cd: ChangeDetectorRef, private fireStoreService: MusicFirestoreService, private localMusicService: LocalMusicService, private musicCacheService: MusicCacheService, private userFirestoreService: UserFirestoreService, private userConfigService: UserConfigService, private discordRpcService: PresenceService) { }
 
   ngOnInit() {
+    this.searchQuery = localStorage.getItem('browseSearchQuery') ?? '';
+
     this.storedMusics = this.localMusicService.getAllLocalMusicsFull();
     console.log("Stored Musics:", this.storedMusics);
     this.fireStoreService.GetAllMusics(null).then(value => {
       const filtered = value.filter(m => !this.storedMusics.some(s => s.id === m.id));
       this.musics.set(filtered);
+
+      const lastMusicSelectedId = localStorage.getItem('lastMusicSelectedId');
+      if (lastMusicSelectedId) {
+        let index = this.storedMusics.findIndex(m => m.id === lastMusicSelectedId);
+        if (index === -1) {
+          index = this.musics().findIndex(m => m.id === lastMusicSelectedId) + this.storedMusics.length;
+        }
+        if (index !== -1) {
+          this.onSelectMusic(index);
+        }
+      }
     });
 
     this.isSinglePlayer = this.userConfigService.players.length === 1;
@@ -68,14 +83,16 @@ export class BrowsePage implements OnInit {
     }
     this.selectedNoteIndex.set(new Array(players.length).fill(0));
     this.discordRpcService.update("Browsing")
-    this.listenInput();
   }
 
   ionViewWillEnter() {
     window.addEventListener('keydown', this.keyHandler);
+    this.isListeningInput = true;
+    this.listenInput();
   }
   ionViewWillLeave() {
     window.removeEventListener('keydown', this.keyHandler);
+    this.isListeningInput = false;
   }
   readonly blockedKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'Spacebar', 'Enter'];
   private keyHandler = (event: KeyboardEvent) => {
@@ -87,6 +104,7 @@ export class BrowsePage implements OnInit {
     }
   };
 
+  isListeningInput = false;
   listenInput() {
     for (let index = 0; index < this.dancepad.length; index++) {
       const padstate = this.dancepad[index].getRefreshedState();
@@ -103,7 +121,8 @@ export class BrowsePage implements OnInit {
         this.onSelectNote(Math.max(0, (this.selectedNoteIndex()[index] ?? 0) - 1), index);
       }
     }
-    setTimeout(() => this.listenInput(), 100);
+    if (this.isListeningInput)
+      setTimeout(() => this.listenInput(), 100);
   }
 
   getSelectedMusic(): MusicDto | null {
@@ -168,6 +187,8 @@ export class BrowsePage implements OnInit {
       return;
     }
 
+    localStorage.setItem('lastMusicSelectedId', musicId);
+
     if (this.selectedMusicIndex() < this.storedMusics.length) {
       const fullmusic = this.localMusicService.getMusic(musicId);
       this.notes.set(fullmusic?.noteData.filter(note => !this.isSinglePlayer || note.stepsType === DanceType.DanceSingle) ?? []);
@@ -178,6 +199,13 @@ export class BrowsePage implements OnInit {
 
     if (this.userFirestoreService.getUserData())
       this.userFirestoreService.getScoresForMusic(musicId, this.userFirestoreService.getUserData()!.id).then(score => this.userScores = score)
+
+    setTimeout(() => {
+      const el = this.musicCards.toArray()[listIndex]?.nativeElement;
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
   }
 
 
@@ -193,6 +221,8 @@ export class BrowsePage implements OnInit {
 
   onSearch(event: any) {
     this.searchQuery = event.target.value.toLowerCase();
+    localStorage.setItem('browseSearchQuery', this.searchQuery);
+
     this.storedMusics = this.localMusicService.getAllLocalMusicsFull(this.searchQuery);
     this.fireStoreService.GetAllMusicsWithSearch(null, this.searchQuery).then(value => { this.musics.set(value) });
   }

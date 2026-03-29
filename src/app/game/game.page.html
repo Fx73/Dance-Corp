@@ -29,13 +29,13 @@
 	<!-- Music Player -->
 	@switch (musicOrigin) {
 	@case (MusicOrigin.Youtube){
-	<app-music-player-youtube [musicUrl]="music?.music!" (onReady)="onPlayerReady($event)"></app-music-player-youtube>
+	<app-music-player-youtube [musicUrl]="music?.music!" (onReady)="onPlayerReady($event)" [startOffset]="music?.musicoffset"></app-music-player-youtube>
 	}
 	@case (MusicOrigin.Soundcloud){
-	<app-music-player-soundcloud [musicUrl]="music?.music!" (onReady)="onPlayerReady($event)"></app-music-player-soundcloud>
+	<app-music-player-soundcloud [musicUrl]="music?.music!" (onReady)="onPlayerReady($event)" [startOffset]="music?.musicoffset"></app-music-player-soundcloud>
 	}
 	@case (MusicOrigin.Local){
-	<app-music-player-local [musicUrl]="music?.music!" (onReady)="onPlayerReady($event)"></app-music-player-local>
+	<app-music-player-local [musicUrl]="music?.music!" (onReady)="onPlayerReady($event)" [startOffset]="music?.musicoffset"></app-music-player-local>
 	}
 	}
 
