@@ -34,10 +34,15 @@ import { UserFirestoreService } from './../../services/firestore/user.firestore.
 export class BrowsePage implements OnInit {
   readonly DanceType = DanceType;
 
+  allStoredMusics: MusicDto[] = [];
+  allRemoteMusics: MusicDto[] = [];
+
   musics = signal<MusicDto[]>([]);
   storedMusics: MusicDto[] = [];
   notes = signal<NoteDataDto[] | undefined>(undefined);
+
   userScores: { [key: string]: number } = {};
+
   searchQuery: string = '';
 
   selectedMusicIndex = signal<number>(0);
@@ -53,38 +58,41 @@ export class BrowsePage implements OnInit {
 
   ngOnInit() {
     this.searchQuery = localStorage.getItem('browseSearchQuery') ?? '';
+    this.isSinglePlayer = this.userConfigService.players.length === 1;
+    this.selectedNoteIndex.set(new Array(this.userConfigService.players.length).fill(0));
 
-    this.storedMusics = this.localMusicService.getAllLocalMusicsFull();
-    console.log("Stored Musics:", this.storedMusics);
-    this.fireStoreService.GetAllMusics(null).then(value => {
-      const filtered = value.filter(m => !this.storedMusics.some(s => s.id === m.id));
-      this.musics.set(filtered);
+    // Load musics from local storage and Firestore
+    this.allStoredMusics = this.localMusicService.getAllLocalMusicsFull();
+    this.fireStoreService.GetAllMusics().then(value => {
+      this.allRemoteMusics = value.filter(
+        m => !this.allStoredMusics.some(s => s.id === m.id)
+      );
 
+      this.applySearchFilter();
+
+      //  Restore last selected music 
       const lastMusicSelectedId = localStorage.getItem('lastMusicSelectedId');
       if (lastMusicSelectedId) {
         let index = this.storedMusics.findIndex(m => m.id === lastMusicSelectedId);
+
         if (index === -1) {
-          index = this.musics().findIndex(m => m.id === lastMusicSelectedId) + this.storedMusics.length;
+          index = this.musics().findIndex(m => m.id === lastMusicSelectedId)
+            + this.storedMusics.length;
         }
+
         if (index !== -1) {
           this.onSelectMusic(index);
         }
       }
     });
 
-    this.isSinglePlayer = this.userConfigService.players.length === 1;
+    this.initPlayerInput();
 
-    const players = this.userConfigService.players;
-    for (const player of players) {
-      if (player.gamepad!.index! === -1)
-        this.dancepad.push(new DancePadKeyboard(player.keyBindingKeyboard))
-      else
-        this.dancepad.push(new DancePadGamepad(player.gamepad!.index!, player.keyBindingGamepad))
-    }
-    this.selectedNoteIndex.set(new Array(players.length).fill(0));
-    this.discordRpcService.update("Browsing")
+    this.discordRpcService.update("Browsing");
   }
 
+
+  //#region Input handling
   ionViewWillEnter() {
     window.addEventListener('keydown', this.keyHandler);
     this.isListeningInput = true;
@@ -94,12 +102,27 @@ export class BrowsePage implements OnInit {
     window.removeEventListener('keydown', this.keyHandler);
     this.isListeningInput = false;
   }
+
+  initPlayerInput() {
+    const players = this.userConfigService.players;
+    for (const player of players) {
+      if (player.gamepad!.index! === -1)
+        this.dancepad.push(new DancePadKeyboard(player.keyBindingKeyboard));
+      else
+        this.dancepad.push(new DancePadGamepad(player.gamepad!.index!, player.keyBindingGamepad));
+    }
+  }
+
   readonly blockedKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'Spacebar', 'Enter'];
   private keyHandler = (event: KeyboardEvent) => {
     if (this.blockedKeys.includes(event.key)) {
       event.preventDefault();
     }
     if (event.key === 'Enter') {
+      const active = document.activeElement;
+      if (active?.classList?.contains('search-input') || active?.closest('.search-input')) {
+        return;
+      }
       this.runGame();
     }
   };
@@ -124,6 +147,7 @@ export class BrowsePage implements OnInit {
     if (this.isListeningInput)
       setTimeout(() => this.listenInput(), 100);
   }
+  //#endregion
 
   getSelectedMusic(): MusicDto | null {
     if (this.selectedMusicIndex() >= 0) {
@@ -220,12 +244,28 @@ export class BrowsePage implements OnInit {
   }
 
   onSearch(event: any) {
-    this.searchQuery = event.target.value.toLowerCase();
+    this.searchQuery = (event.target.value || '').toLowerCase();
     localStorage.setItem('browseSearchQuery', this.searchQuery);
 
-    this.storedMusics = this.localMusicService.getAllLocalMusicsFull(this.searchQuery);
-    this.fireStoreService.GetAllMusicsWithSearch(null, this.searchQuery).then(value => { this.musics.set(value) });
+    this.applySearchFilter();
   }
+  applySearchFilter() {
+    const q = this.searchQuery.toLowerCase();
+
+    this.storedMusics = this.allStoredMusics.filter(m =>
+      m.title!.toLowerCase().includes(q) ||
+      m.artist!.toLowerCase().includes(q)
+    );
+
+    this.musics.set(
+      this.allRemoteMusics.filter(m =>
+        m.title!.toLowerCase().includes(q) ||
+        m.artist!.toLowerCase().includes(q)
+      )
+    );
+  }
+
+
 
   onIonInfinite(event: InfiniteScrollCustomEvent) {
     const lastMusic: MusicDto = this.musics().at(-1)!

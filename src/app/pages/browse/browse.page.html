@@ -41,12 +41,12 @@
     </ion-menu>
 
     <div id="music-list">
-      <ion-searchbar [debounce]="1000" (ionInput)="onSearch($event)" show-clear-button="focus" style="background-color:white"></ion-searchbar>
+      <ion-searchbar [value]="searchQuery" [debounce]="1000" (ionInput)="onSearch($event)" show-clear-button="focus" style="background-color:white" class="search-input"></ion-searchbar>
       <div style="height: 95%;overflow-y: scroll;">
         <div class="cardList">
           <!-- Edited music -->
           @for (music of storedMusics; track $index) {
-          <ion-card #musicCard (click)="onSelectMusic($index)" class="basicCard stored-card" [ngClass]="selectedMusic?.id === music.id ? 'selectedCard' : ''">
+          <ion-card #musicCard (click)="onSelectMusic($index)" class="basicCard music-card stored-card" [ngClass]="selectedMusic?.id === music.id ? 'selectedCard' : ''">
             <ion-img [src]="'https://'+music.jacket"></ion-img>
             <ion-card-header>
               <ion-card-title>{{ music.title }}</ion-card-title>
@@ -60,7 +60,7 @@
 
           <!-- Music cards -->
           @for (music of musics(); track $index) {
-          <ion-card #musicCard (click)="onSelectMusic($index + storedMusics.length)" class="basicCard" [ngClass]="selectedMusic?.id === music.id ? 'selectedCard' : ''">
+          <ion-card #musicCard (click)="onSelectMusic($index + storedMusics.length)" class="basicCard music-card" [ngClass]="selectedMusic?.id === music.id ? 'selectedCard' : ''">
             <ion-img [src]="'https://'+music.jacket"></ion-img>
             <ion-card-header>
               <ion-card-title>{{ music.title }}</ion-card-title>

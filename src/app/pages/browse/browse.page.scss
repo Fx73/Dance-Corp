@@ -1,3 +1,9 @@
+.music-card{
+  width: 30%!important;
+  height: auto!important;
+  aspect-ratio: 1 / 1.1;
+}
+
 .selectedCard{
   transition: all 0.2s ease-in-out;
   background-color: var(--ion-color-primary);

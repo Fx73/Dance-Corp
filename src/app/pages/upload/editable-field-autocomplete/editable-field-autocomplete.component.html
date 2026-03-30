@@ -1,0 +1,29 @@
+<ion-item [class.changed]="isChanged" [title]="valueDb" style="position:relative;overflow: visible;">
+
+  @if (isEditing) {
+  <div class="autocomplete-container">
+    @if(filteredGenres.length > 0){
+    <ul role="listbox" class="suggestions">
+      @for (g of filteredGenres; track $index) {
+      <li role="option" (click)="selectGenre(g)">
+        {{ g }}
+      </li>
+      }
+    </ul>
+    }
+
+    <ion-input [label]="label" [value]="value" (ionInput)="onInput($event)" (ionChange)="onInputChange($event)" role="combobox" [attr.aria-expanded]="filteredGenres.length > 0" aria-owns="genre-list" aria-autocomplete="list">
+      <ng-content></ng-content><!-- Child component -->
+
+    </ion-input>
+  </div>
+
+
+  }
+  @else {
+  <ion-label>
+    <strong class="primary">{{ label }}:</strong> {{ valueDb ?? value ?? '—' }}
+  </ion-label>
+  }
+
+</ion-item>

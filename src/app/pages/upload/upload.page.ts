@@ -13,6 +13,7 @@ import { DanceType } from './../../game/constants/dance-type.enum';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from 'src/app/shared/component/header/header.component';
 import { LocalMusicService } from 'src/app/services/localStorage/local.music.service';
+import { MusicEditableFieldAutocompleteComponent } from './editable-field-autocomplete/editable-field-autocomplete.component';
 import { MusicEditableFieldComponent } from './editable-field/editable-field.component';
 import { MusicEditableListComponent } from './editable-list/editable-list.component';
 import { MusicFirestoreService } from 'src/app/services/firestore/music.firestore.service';
@@ -32,7 +33,7 @@ import isTauri from 'src/app/shared/utils/tauri';
   templateUrl: './upload.page.html',
   styleUrls: ['./upload.page.scss'],
   standalone: true,
-  imports: [IonSpinner, MusicEditableFieldComponent, MusicEditableListComponent, IonCardSubtitle, IonImg, IonCol, IonRow, IonGrid, IonInput, IonItem, IonLabel, IonList, FormsModule, IonIcon, IonButton, IonCardTitle, IonCardContent, IonCardHeader, IonCard, IonContent, CommonModule, FormsModule, HeaderComponent, IonButton, MusicPlayerYoutubeComponent, MusicPlayerSoundcloudComponent, MusicPlayerLocalComponent, RadarScoreComponent, MusicSelectComponent]
+  imports: [IonSpinner, MusicEditableFieldComponent, MusicEditableFieldAutocompleteComponent, MusicEditableListComponent, IonCardSubtitle, IonImg, IonCol, IonRow, IonGrid, IonInput, IonItem, IonLabel, IonList, FormsModule, IonIcon, IonButton, IonCardTitle, IonCardContent, IonCardHeader, IonCard, IonContent, CommonModule, FormsModule, HeaderComponent, IonButton, MusicPlayerYoutubeComponent, MusicPlayerSoundcloudComponent, MusicPlayerLocalComponent, RadarScoreComponent, MusicSelectComponent]
 })
 export class UploadPage {
   //#region Constants
@@ -50,6 +51,8 @@ export class UploadPage {
   isEditLocal = signal(false);
 
   isLoading = false;
+
+  genreOptions: string[] = [];
 
   @ViewChild('metadataCard', { read: ElementRef })
   metadataCard!: ElementRef;
@@ -76,6 +79,7 @@ export class UploadPage {
     this.musicDataDb = null;
     this.isEditDB.set(false);
     this.isEditLocal.set(false);
+    this.fireStoreService.getGenres().then(genres => this.genreOptions = genres);
 
     const musicId = this.route.snapshot.queryParamMap.get('music');
     console.log("UploadPage initialized with musicId:", musicId);

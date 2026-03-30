@@ -14,6 +14,9 @@ export class MusicFirestoreService {
     //#region Constants
     readonly MUSIC_COLLECTION = "musics"
     readonly NOTE_COLLECTION = "notes"
+    readonly METADATA_COLLECTION = "metadata";
+    readonly MUSIC_METADATA_DOC = "musicdata";
+
     readonly BATCH_SIZE = 60;
     readonly firestoreConverterMusic = new FirestoreConverter<MusicDto>(MusicDto)
     readonly firestoreConverterNotes = new FirestoreConverter<NoteDataDto>(NoteDataDto)
@@ -37,6 +40,8 @@ export class MusicFirestoreService {
             const { noteData: notes, ...mainData } = dto;
             await setDoc(musicRef, mainData);
 
+            this.addGenres(dto.genre ?? "");
+
             AppComponent.presentOkToast("Music successfully uploaded!")
         } catch (error) {
             AppComponent.presentWarningToast("Error uploading music: " + error)
@@ -52,7 +57,6 @@ export class MusicFirestoreService {
             const musicRef = doc(this.db, this.MUSIC_COLLECTION, dto.id).withConverter(this.firestoreConverterMusic);
 
 
-
             // check protected fields are not modified
             const current = (await getDoc(musicRef)).data();
             if (!current) throw new Error("Music not found");
@@ -64,6 +68,8 @@ export class MusicFirestoreService {
 
             const { noteData: notes, ...mainData } = dto;
             await updateDoc(musicRef, mainData);
+
+            this.addGenres(dto.genre ?? "");
 
             AppComponent.presentOkToast("Music successfully updated!");
         } catch (error) {
@@ -148,7 +154,7 @@ export class MusicFirestoreService {
     }
 
 
-    async GetAllMusics(lastMusicId: string | null): Promise<MusicDto[]> {
+    async GetAllMusics(lastMusicId: string | null = null): Promise<MusicDto[]> {
         const musics: MusicDto[] = [];
         const musicRef = collection(this.db, this.MUSIC_COLLECTION).withConverter(this.firestoreConverterMusic);;
         console.log("Query at ", lastMusicId);
@@ -281,5 +287,45 @@ export class MusicFirestoreService {
             throw error;
         }
     }
+
+    //#region Genres
+
+    async addGenres(genres: string): Promise<void> {
+        if (!genres || genres.trim().length === 0) return;
+
+        const normalized = genres.split(',').map(g => g.trim().toLowerCase()).filter(g => g.length > 0);
+        if (normalized.length === 0) return;
+
+        const ref = doc(this.db, this.METADATA_COLLECTION, this.MUSIC_METADATA_DOC);
+        const snap = await getDoc(ref);
+
+
+        const existing = snap.data()!['genres'] ?? [];
+
+        if (normalized.every((g: string) => existing.includes(g))) {
+            console.log("No new genres to add");
+            return;
+        }
+        const merged = Array.from(new Set([...existing, ...normalized]));
+
+        await updateDoc(ref, { genres: merged });
+    }
+
+    async getGenres(): Promise<string[]> {
+        const ref = doc(this.db, this.METADATA_COLLECTION, this.MUSIC_METADATA_DOC);
+        const snap = await getDoc(ref);
+
+        if (!snap.exists()) {
+            return [];
+        }
+
+        const genres = snap.data()?.['genres'] ?? [];
+
+        return genres
+            .filter((g: string) => g.length > 0)
+            .map((g: string) => g.charAt(0).toUpperCase() + g.slice(1));
+    }
+
+    //#endregion
 }
 
