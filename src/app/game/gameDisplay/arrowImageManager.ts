@@ -69,7 +69,7 @@ export class ArrowImageManager {
 
     public static PreloadHoldImages(centerImage: HTMLImageElement, capImage: HTMLImageElement) {
         const interval = CONFIG.DISPLAY.BEAT_INTERVAL / ArrowImageManager._HOLD_PRELOAD_PRECISION;
-        const maxMultiplier = ArrowImageManager._HOLD_PRELOAD_PRECISION * 10;
+        const maxMultiplier = ArrowImageManager._HOLD_PRELOAD_PRECISION * 20; // Preload up to 20 beats of hold images
         for (let multiplier = 0; multiplier <= maxMultiplier; multiplier++) {
             const img = ArrowImageManager.PreloadHoldImage(centerImage, capImage, multiplier * interval)
             this.holdImages.push(img)

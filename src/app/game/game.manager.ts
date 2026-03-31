@@ -62,7 +62,7 @@ export class GameManager {
 
         const { beat: currentBeat, bps: currentBps } = this.beatManager.getBeatAndBpsAtTime(elapsedTime);
 
-        if (this.music!.bgChanges && this.music!.bgChanges[this.currentBackgroundIndex + 1] && elapsedTime >= this.music!.bgChanges[this.currentBackgroundIndex + 1].time) {
+        if (this.music!.bgChanges && this.music!.bgChanges[this.currentBackgroundIndex + 1] && currentBeat >= this.music!.bgChanges[this.currentBackgroundIndex + 1].time) {
             this.currentBackgroundIndex++;
         }
 

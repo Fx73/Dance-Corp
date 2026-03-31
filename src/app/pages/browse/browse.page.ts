@@ -263,6 +263,8 @@ export class BrowsePage implements OnInit {
         m.artist!.toLowerCase().includes(q)
       )
     );
+
+    this.notes.set([]);
   }
 
 

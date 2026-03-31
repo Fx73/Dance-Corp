@@ -12,7 +12,7 @@
     </ul>
     }
 
-    <ion-input [label]="label" [value]="value" (ionInput)="onInput($event)" (ionChange)="onInputChange($event)" role="combobox" [attr.aria-expanded]="filteredGenres.length > 0" aria-owns="genre-list" aria-autocomplete="list">
+    <ion-input [label]="label" [value]="value" (ionInput)="onInput($event)" (ionChange)="onInputChange($event)" (ionFocus)="onFocus()" (ionBlur)="onBlur()" role="combobox" [attr.aria-expanded]="filteredGenres.length > 0" aria-owns="genre-list" aria-autocomplete="list">
       <ng-content></ng-content><!-- Child component -->
 
     </ion-input>

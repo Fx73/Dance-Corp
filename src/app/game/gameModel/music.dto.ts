@@ -31,7 +31,15 @@ export class MusicDto {
   noteData: NoteDataDto[] = [];
   additionalFields?: Record<string, string>;
 
-  get id(): string { return `${this.artist}-${this.title}` }
+  get id(): string {
+    function sanitize(s: string) {
+      return s.trim().toLowerCase()
+        .replace(/\//g, '\\')   // replace slash with backslash
+        .replace(/\s+/g, '_');  // replace spaces with underscores
+    }
+
+    return `${sanitize(this.artist!)}-${sanitize(this.title!)}`;
+  }
 
   constructor(tokenMap?: Record<string, any>) {
     if (tokenMap === undefined) return

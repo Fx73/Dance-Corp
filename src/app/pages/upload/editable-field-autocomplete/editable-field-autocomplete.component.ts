@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, Input, Output } from "@angular/core";
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from "@angular/core";
 import { IonInput, IonItem, IonLabel } from "@ionic/angular/standalone";
 
 import { SanitizeSscInput } from "../reader.ssc";
@@ -24,6 +24,9 @@ export class MusicEditableFieldAutocompleteComponent {
   @Input() suggestions: string[] = [];
 
   @Output() valueChange = new EventEmitter<any>();
+
+  @ViewChild(IonInput) genreInput!: IonInput;
+
 
   public isDirty = false;
 
@@ -72,11 +75,33 @@ export class MusicEditableFieldAutocompleteComponent {
 
   selectGenre(g: string) {
     const current = this.value || '';
+    console.log(' value   genre:', g);
 
     const parts = current.split(',');
     parts[parts.length - 1] = ' ' + g;
     this.value = parts.join(',').trim();
 
     this.filteredGenres = [];
+
+    setTimeout(() => {
+      this.genreInput.setFocus();
+    }, 0);
   }
+
+  onFocus() {
+    if (!this.value) return;
+    if (!this.value.trim().endsWith(',')) {
+      this.value = this.value.trim() + ', ';
+    }
+  }
+
+  onBlur() {
+    setTimeout(() => {
+      this.filteredGenres = [];
+
+      if (!this.value) return;
+      this.value = this.value.trim().replace(/[, ]+$/, '').trim();
+    }, 150);
+  }
+
 }
