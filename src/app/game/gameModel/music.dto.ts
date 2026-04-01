@@ -27,6 +27,7 @@ export class MusicDto {
   speeds: SpeedChange[] = [];
   scrolls: ScrollChange[] = [];
   bgChanges: BackgroundChange[] = [];
+  fgChanges: BackgroundChange[] = [];
   labels: LabelChange[] = [];
   noteData: NoteDataDto[] = [];
   additionalFields?: Record<string, string>;
@@ -91,9 +92,16 @@ export class MusicDto {
     delete tokenMap["scrolls"];
     this.bpms = this.parseChanges<BpmChange>(tokenMap["bpms"], v => parseFloat(v))!;
     delete tokenMap["bpms"];
+    const bgChange0 = tokenMap["background"];
     this.bgChanges = this.parseChanges<BackgroundChange>(tokenMap["bgchanges"], v => v) ?? [];
+    this.bgChanges.unshift(...this.parseChanges<BackgroundChange>(bgChange0, v => v) ?? []);
     delete tokenMap["background"];
     delete tokenMap["bgchanges"];
+    const fgChange0 = tokenMap["foreground"];
+    this.fgChanges = this.parseChanges<BackgroundChange>(tokenMap["fgchanges"], v => v) ?? [];
+    this.fgChanges.unshift(...this.parseChanges<BackgroundChange>(fgChange0, v => v) ?? []);
+    delete tokenMap["foreground"];
+    delete tokenMap["fgchanges"];
     this.labels = this.parseChanges<LabelChange>(tokenMap["labels"], v => v) ?? [];
     delete tokenMap["labels"];
 
