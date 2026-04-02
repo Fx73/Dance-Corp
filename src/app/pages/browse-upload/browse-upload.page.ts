@@ -5,13 +5,14 @@ import { MusicDto, NoteDataDto } from 'src/app/game/gameModel/music.dto';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from "src/app/shared/component/header/header.component";
-import { LocalMusicService } from 'src/app/services/localStorage/local.music.service';
+import { MusicCacheService } from 'src/app/services/localStorage/music.cache.service';
 import { MusicFirestoreService } from 'src/app/services/firestore/music.firestore.service';
 import { PresenceService } from 'src/app/services/thirdpartyapp/presence.service';
 import { Router } from '@angular/router';
 import { UserFirestoreService } from '../../services/firestore/user.firestore.service';
 import { addCircleOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
+import { musicLocalService } from 'src/app/services/localStorage/local.music.service';
 
 @Component({
   selector: 'app-browse-upload',
@@ -22,26 +23,42 @@ import { addIcons } from 'ionicons';
 })
 export class BrowseUploadPage implements OnInit {
 
-  storedMusics: MusicDto[] = [];
-  musics = signal<MusicDto[]>([]);
-  notes = signal<NoteDataDto[] | undefined>(undefined);
-  userScores: { [key: string]: number } = {};
+  dbMusics = signal<MusicDto[]>([]);
+  storedMusics = signal<MusicDto[]>([]);
+
   searchQuery: string = '';
 
-  constructor(private router: Router, private fireStoreService: MusicFirestoreService, private localMusicService: LocalMusicService, private userFirestoreService: UserFirestoreService, private discordRpcService: PresenceService) {
+  constructor(private router: Router, private musicCacheService: MusicCacheService, private localMusicService: musicLocalService, private discordRpcService: PresenceService) {
     addIcons({ addCircleOutline });
   }
 
   ngOnInit() {
-    this.discordRpcService.update("Editing")
+    this.initIonInfinite();
 
-    this.fireStoreService.GetAllMusics(null).then(value => {
-      const filtered = value.filter(m => !this.storedMusics.some(s => s.id === m.id));
-      this.musics.set(filtered);
-    });
+    this.discordRpcService.update("Editing")
   }
-  ionViewWillEnter() {
-    this.storedMusics = this.localMusicService.getAllLocalMusics();
+
+  initIonInfinite() {
+    const q = this.searchQuery.toLowerCase();
+
+    let updateDbMusics = this.musicCacheService.allRemoteMusics;
+    let updateLocalMusics = this.localMusicService.allLocalMusics;
+
+    if (q) {
+      updateLocalMusics =
+        this.localMusicService.allLocalMusics.filter(m =>
+          m.title!.toLowerCase().includes(q) ||
+          m.artist!.toLowerCase().includes(q)
+        )
+      updateDbMusics =
+        this.musicCacheService.allRemoteMusics.filter(m =>
+          m.title!.toLowerCase().includes(q) ||
+          m.artist!.toLowerCase().includes(q)
+        )
+    }
+
+    this.storedMusics.set(updateLocalMusics);
+    this.dbMusics.set(updateDbMusics);
   }
 
 
@@ -55,16 +72,12 @@ export class BrowseUploadPage implements OnInit {
   }
 
   onSearch(event: any) {
-    this.searchQuery = event.target.value.toLowerCase();
-    this.storedMusics = this.localMusicService.getAllLocalMusics(this.searchQuery);
-    this.fireStoreService.GetAllMusicsWithSearch(null, this.searchQuery).then(value => this.musics.set(value));
+    this.searchQuery = (event.target.value || '').toLowerCase();
+    this.initIonInfinite();
   }
 
   onIonInfinite(event: InfiniteScrollCustomEvent) {
-    const lastMusic: MusicDto = this.musics().at(-1)!
-    if (this.searchQuery === '')
-      this.fireStoreService.GetAllMusics(lastMusic?.id ?? null).then(value => this.musics.set([...this.musics(), ...value])).catch((e) => { console.log(e.message); event.target.complete() });
-    else
-      this.fireStoreService.GetAllMusicsWithSearch(lastMusic?.id ?? null, this.searchQuery).then(value => this.musics.set([...this.musics(), ...value])).catch((e) => { console.log(e.message); event.target.complete() });
+    console.info("Congratz, you found the infinite scroll ! But there is no more music to load :)");
+    event.target.complete();
   }
 }

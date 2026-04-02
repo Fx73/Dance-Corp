@@ -78,23 +78,24 @@
       <ion-card-header>
         <ion-card-title>Music Storage</ion-card-title>
         <ion-card-subtitle>
-          Manage local storage of song data. Disabling can reduce storage but may cause slower loading and prevent
-          you from accessing the app offline.
+          Manage local storage of song data.
         </ion-card-subtitle>
       </ion-card-header>
 
       <!-- Music Cache Options -->
       <ion-card-content>
-        <ion-item>
-          <ion-toggle [checked]="this.getConfigValue('allowCache')" (ionChange)="updateConfigValue('allowCache', $event.detail.checked)" helperText="Disabling will not clear existing cache">
-            Enable Cache
-          </ion-toggle>
+
+        <ion-item> <ion-label>Cache is used to store song data for offline access and faster loading. Clear cache to ensure you have the latest data.</ion-label>
         </ion-item>
         <ion-button expand="block" color="danger" (click)="clearMusicCache()">
           Clear All Cached Game Songs
         </ion-button>
+
+        <ion-item>
+          <ion-label>Editor cache stores songs you've edited. Clearing it will remove all your unsaved edits. WARNING: THIS IS A DESTRUCTIVE ACTION AND CANNOT BE UNDONE!</ion-label>
+        </ion-item>
         <ion-button expand="block" color="danger" (click)="clearMusicEditCache()">
-          Clear All Editor Songs
+          Clear All Edited Songs
         </ion-button>
       </ion-card-content>
     </ion-card>

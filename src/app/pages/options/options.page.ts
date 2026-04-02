@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonInput, IonItem, IonModal, IonRange, IonToggle } from '@ionic/angular/standalone';
+import { IonAccordion, IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonInput, IonItem, IonLabel, IonModal, IonRange, IonToggle } from '@ionic/angular/standalone';
 
 import { Arrow } from '../../game/gameModel/arrowManagement/arrow';
 import { ArrowType } from '../../game/constants/arrow-type.enum';
@@ -8,24 +8,24 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GameRound } from '../../game/gameModel/gameRound';
 import { HeaderComponent } from "src/app/shared/component/header/header.component";
-import { LocalMusicService } from 'src/app/services/localStorage/local.music.service';
 import { MusicCacheService } from '../../services/localStorage/music.cache.service';
 import { PlayerDisplayComponent } from '../../game/gameDisplay/player-display.component';
 import { RouterModule } from '@angular/router';
 import { UserConfigService } from 'src/app/services/userconfig.service';
+import { musicLocalService } from 'src/app/services/localStorage/local.music.service';
 
 @Component({
   selector: 'app-options',
   templateUrl: './options.page.html',
   styleUrls: ['./options.page.scss'],
   standalone: true,
-  imports: [IonRange, IonModal, IonInput, IonToggle, IonCardSubtitle, IonButton, IonItem, IonCardContent, IonCardHeader, IonCardTitle, IonCard, IonModal, IonContent, CommonModule, FormsModule, HeaderComponent, RouterModule, PlayerDisplayComponent]
+  imports: [IonRange, IonModal, IonLabel, IonInput, IonToggle, IonCardSubtitle, IonButton, IonItem, IonCardContent, IonCardHeader, IonCardTitle, IonCard, IonModal, IonContent, CommonModule, FormsModule, HeaderComponent, RouterModule, PlayerDisplayComponent]
 })
 export class OptionsPage {
   @ViewChild(PlayerDisplayComponent) playerDisplay?: PlayerDisplayComponent;
   showPlayerDisplay = false;
 
-  constructor(private userConfigService: UserConfigService, private localMusicService: LocalMusicService, private musicCacheService: MusicCacheService) {
+  constructor(private userConfigService: UserConfigService, private localMusicService: musicLocalService, private musicCacheService: MusicCacheService) {
     // Initialize player display if needed
     if (this.userConfigService.getConfig()['showPlayerDisplay']) {
       this.showPlayerDisplay = true;

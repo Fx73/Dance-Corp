@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 
+import { MusicCacheService } from './services/localStorage/music.cache.service';
 import { PresenceService } from './services/thirdpartyapp/presence.service';
 import { ToastController } from '@ionic/angular';
 
@@ -13,12 +14,13 @@ import { ToastController } from '@ionic/angular';
 export class AppComponent implements OnInit {
   static appInstance: AppComponent;
 
-  constructor(private toastController: ToastController, private discordRpcService: PresenceService) {
+  constructor(private toastController: ToastController, private presenceService: PresenceService, private musicCacheService: MusicCacheService) {
     AppComponent.appInstance = this;
   }
 
   ngOnInit() {
-    this.discordRpcService.init()
+    this.musicCacheService.updateCache()
+    this.presenceService.init()
   }
 
 

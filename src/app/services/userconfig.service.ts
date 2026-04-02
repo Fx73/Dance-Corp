@@ -123,7 +123,7 @@ export class UserConfigService {
 
 class UserConfig {
     // General
-    allowCache = true
+
 
     // Gameplay
     playerNumber = 1

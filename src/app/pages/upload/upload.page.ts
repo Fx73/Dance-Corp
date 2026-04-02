@@ -12,7 +12,7 @@ import { AppComponent } from 'src/app/app.component';
 import { DanceType } from './../../game/constants/dance-type.enum';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from 'src/app/shared/component/header/header.component';
-import { LocalMusicService } from 'src/app/services/localStorage/local.music.service';
+import { MusicCacheService } from 'src/app/services/localStorage/music.cache.service';
 import { MusicEditableFieldAutocompleteComponent } from './editable-field-autocomplete/editable-field-autocomplete.component';
 import { MusicEditableFieldComponent } from './editable-field/editable-field.component';
 import { MusicEditableListComponent } from './editable-list/editable-list.component';
@@ -27,6 +27,7 @@ import { TestNoteComponent } from './test-note/test-note.component';
 import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.service';
 import { addIcons } from 'ionicons';
 import isTauri from 'src/app/shared/utils/tauri';
+import { musicLocalService } from 'src/app/services/localStorage/local.music.service';
 
 @Component({
   selector: 'app-upload',
@@ -69,7 +70,7 @@ export class UploadPage {
   metadataDirty = signal(false);
   notesDirty = signal<boolean[]>([]);
 
-  constructor(private modalController: ModalController, private route: ActivatedRoute, private fireStoreService: MusicFirestoreService, private userService: UserFirestoreService, private localMusicService: LocalMusicService, private cd: ChangeDetectorRef, private location: Location, private router: Router) {
+  constructor(private modalController: ModalController, private route: ActivatedRoute, private fireStoreService: MusicFirestoreService, private userService: UserFirestoreService, private localMusicService: musicLocalService, private musicCacheService: MusicCacheService, private cd: ChangeDetectorRef, private location: Location, private router: Router) {
     addIcons({ logoYoutube, logoSoundcloud, folder, trashOutline, removeOutline, addOutline, checkmarkCircle, closeCircle });
 
   }
@@ -141,7 +142,7 @@ export class UploadPage {
   }
 
   async loadDbMusic(musicId: string) {
-    const data = await this.fireStoreService.getMusicWithNotes(musicId);
+    const data = await this.musicCacheService.getMusic(musicId);
     if (data) {
       this.musicDataDb = data;
       this.isEditDB.set(true);
@@ -189,16 +190,16 @@ export class UploadPage {
       reader.onload = async (e) => {
         const content = e.target?.result as string;
         this.musicData = SccReader.parseFile(file.name, content);
-        this.localMusicService.saveMusic(this.musicData!);
+        this.localMusicService.updateMusic(this.musicData!);
         this.isEditLocal.set(true);
         AppComponent.presentOkToast("Music loaded successfully : " + this.musicData.id);
 
-        const dbMusic = await this.fireStoreService.getMusic(this.musicData.id);
+        const dbMusic = await this.musicCacheService.getMusic(this.musicData.id);
         if (dbMusic) {
           for (const field of this.fireStoreService.protectedFields) {
             (this.musicData as any)[field] = (dbMusic as any)[field];
           }
-          this.localMusicService.saveMusic(this.musicData!);
+          this.localMusicService.updateMusic(this.musicData!);
 
           AppComponent.presentWarningToast("This music already exists in the database. You are now editing the local version. Uploading will overwrite the database version.");
           this.switchToDbPage();
@@ -219,7 +220,7 @@ export class UploadPage {
     const uri = await this.saveLocalMusic(file, this.musicData.id);
 
     this.musicData.music = "local:" + uri;
-    this.localMusicService.saveMusic(this.musicData!);
+    this.localMusicService.updateMusic(this.musicData!);
 
     this.cd.markForCheck()
 
@@ -322,7 +323,7 @@ export class UploadPage {
 
   async uploadAllNotes(): Promise<void> {
     if (this.musicData === null || !this.isEditDB()) return;
-    await this.fireStoreService.uploadAllNotes(this.musicData.id, this.musicData.noteData)
+    await this.fireStoreService.uploadNotes(this.musicData.id, this.musicData.noteData)
     AppComponent.presentOkToast("All notes uploaded successfully!");
 
     await this.loadDbMusic(this.musicData.id)
@@ -333,7 +334,7 @@ export class UploadPage {
 
   async uploadNote(note: NoteDataDto): Promise<void> {
     if (this.musicData === null || !this.isEditDB()) return;
-    await this.fireStoreService.uploadNote(this.musicData.id, note)
+    await this.fireStoreService.uploadNotes(this.musicData.id, [note])
     AppComponent.presentOkToast("Note uploaded successfully!");
     await this.loadDbMusic(this.musicData.id)
 
@@ -380,7 +381,7 @@ export class UploadPage {
 
     } else {
       this.musicData.noteData = this.musicData.noteData.filter(n => n.chartName !== note.chartName)
-      this.localMusicService.saveMusic(this.musicData!);
+      this.localMusicService.updateMusic(this.musicData!);
 
     }
 
@@ -410,7 +411,7 @@ export class UploadPage {
 
   //#region Local editing
   onEndEditing() {
-    this.localMusicService.saveMusic(this.musicData!);
+    this.localMusicService.updateMusic(this.musicData!);
     this.updateGlobalDirty();
   }
 

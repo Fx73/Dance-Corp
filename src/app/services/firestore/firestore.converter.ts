@@ -4,9 +4,11 @@ export class FirestoreConverter<T extends object> {
     readonly IGNORE_UNDEFINED: boolean = true
     readonly IGNORED_FIELDS: Set<string> = new Set(["additionalFields"])
     readonly type;
+    readonly subtypes: Record<string, new () => any> = {};
 
-    constructor(type: { new(): T; }) {
+    constructor(type: { new(): T; }, subtypes: Record<string, new () => any> = {}) {
         this.type = type
+        this.subtypes = subtypes
     }
 
     toFirestore(dto: T): DocumentData {
@@ -46,28 +48,31 @@ export class FirestoreConverter<T extends object> {
         Object.keys(data as object).forEach((key) => {
             let value = data[key]
             if (Array.isArray(value))
-                value = this.mapArrayRecurse(value)
+                value = this.mapArrayRecurse(value, key);
             else if (value instanceof Timestamp)
                 value = value.toDate()
-            else if (Object(value) === value)
-                value = this.fromFirestoreRecurse(value)
+            else if (Object(value) === value) {
+                const subtype = this.subtypes[key];
+                value = this.fromFirestoreRecurse(value, subtype ? new subtype() : undefined);
+            }
 
             Reflect.set(dto, key, value)
         });
         return dto;
     }
 
-    mapArrayRecurse(array: any[]): any[] {
+    mapArrayRecurse(array: any[], arrayName: string): any[] {
         // Is empty or primitive
         if (array.length === 0 || Object(array[0]) !== array[0])
             return array
 
         // Is poorly Converted Array
-        if (Object.keys(array[0]).every((x, index) => Number(x) === index))
-            return array.map(x => this.mapArrayRecurse(Object.values(x)))
-
+        if (Object.keys(array[0]).every((x, index) => Number(x) === index)) {
+            return array.map(x => this.mapArrayRecurse(Object.values(x), arrayName))
+        }
         // Is Object
-        return array.map(x => this.fromFirestoreRecurse(x))
+        const subtype = this.subtypes[arrayName];
+        return array.map(x => this.fromFirestoreRecurse(x, subtype ? new subtype() : undefined));
     }
 
 }

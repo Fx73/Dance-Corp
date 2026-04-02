@@ -12,13 +12,13 @@ export class GameManager {
     music: MusicDto
     isTrainingMode: boolean = false;
 
-    constructor(music: MusicDto, players: Player[], isTrainingMode: boolean, private userFirestoreService: UserFirestoreService) {
+    constructor(music: MusicDto, players: Player[], noteSelected: number[], isTrainingMode: boolean, private userFirestoreService: UserFirestoreService) {
         this.music = music
         this.isTrainingMode = isTrainingMode
 
         for (let index = 0; index < players.length; index++) {
             const player = players[index];
-            this.gameRounds.push(new GameRound(this.music.noteData[index], player, this.isTrainingMode))
+            this.gameRounds.push(new GameRound(this.music.noteData[noteSelected[index]], player, this.isTrainingMode))
         }
 
         this.beatManager = new BeatManager(this.music);

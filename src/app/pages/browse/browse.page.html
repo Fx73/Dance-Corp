@@ -1,7 +1,7 @@
 <app-header title="Browse Musics"></app-header>
 <ion-content fullscreen="false">
   <ion-split-pane when="xs" contentId="music-list">
-    @let selectedMusic = getSelectedMusic();
+    @let selectedMusic = getSelectedMusic(selectedMusicIndex());
 
     <ion-menu contentId="music-list">
       @if (selectedMusic) {
@@ -11,7 +11,7 @@
           <ion-card-subtitle> {{ selectedMusic.artist }} </ion-card-subtitle>
         </ion-card-header>
         <ion-card-content>
-          @for (note of notes(); track $index) {
+          @for (note of musicNotes(); track $index) {
           <ion-card class="note-card" (mouseenter)="onSelectNote($index)" (click)="runGame()" [style.backgroundColor]="getNoteColor(note.difficulty)">
             <ion-card-content>
               <ion-img class="player-number-icon" [src]="note.stepsType === DanceType.DanceSingle ? 'assets/Icons/SingleDance.png' : 'assets/Icons/DoubleDance.png'"></ion-img>
@@ -42,10 +42,10 @@
 
     <div id="music-list">
       <ion-searchbar [value]="searchQuery" [debounce]="1000" (ionInput)="onSearch($event)" show-clear-button="focus" style="background-color:white" class="search-input"></ion-searchbar>
-      <div style="height: 95%;overflow-y: scroll;">
+      <div style="height: 95%;overflow-y: scroll;" class="ion-content-scroll-host">
         <div class="cardList">
           <!-- Edited music -->
-          @for (music of storedMusics; track $index) {
+          @for (music of storedMusics(); track $index) {
           <ion-card #musicCard (click)="onSelectMusic($index)" class="basicCard music-card stored-card" [ngClass]="selectedMusic?.id === music.id ? 'selectedCard' : ''">
             <ion-img [src]="'https://'+music.jacket"></ion-img>
             <ion-card-header>
@@ -59,7 +59,7 @@
           }
 
           <!-- Music cards -->
-          @for (music of musics(); track $index) {
+          @for (music of dbMusics(); track $index) {
           <ion-card #musicCard (click)="onSelectMusic($index + storedMusics.length)" class="basicCard music-card" [ngClass]="selectedMusic?.id === music.id ? 'selectedCard' : ''">
             <ion-img [src]="'https://'+music.jacket"></ion-img>
             <ion-card-header>

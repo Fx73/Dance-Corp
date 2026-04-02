@@ -94,12 +94,14 @@ export class MusicDto {
     delete tokenMap["bpms"];
     const bgChange0 = tokenMap["background"];
     this.bgChanges = this.parseChanges<BackgroundChange>(tokenMap["bgchanges"], v => v) ?? [];
-    this.bgChanges.unshift(...this.parseChanges<BackgroundChange>(bgChange0, v => v) ?? []);
+    if (bgChange0)
+      this.bgChanges.unshift(new BackgroundChange(0, bgChange0));
     delete tokenMap["background"];
     delete tokenMap["bgchanges"];
     const fgChange0 = tokenMap["foreground"];
     this.fgChanges = this.parseChanges<BackgroundChange>(tokenMap["fgchanges"], v => v) ?? [];
-    this.fgChanges.unshift(...this.parseChanges<BackgroundChange>(fgChange0, v => v) ?? []);
+    if (fgChange0)
+      this.fgChanges.unshift(new BackgroundChange(0, fgChange0));
     delete tokenMap["foreground"];
     delete tokenMap["fgchanges"];
     this.labels = this.parseChanges<LabelChange>(tokenMap["labels"], v => v) ?? [];
@@ -163,11 +165,11 @@ export class MusicDto {
 
 export class NoteDataDto {
   chartName: string = "NoChartNameError";
-  stepsType?: DanceType;
+  stepsType: DanceType = DanceType.DanceSingle;
   description?: string;
   chartStyle?: string;
-  difficulty?: NoteDifficulty;
-  meter?: number;
+  difficulty: NoteDifficulty = NoteDifficulty.Challenge;
+  meter: number = 0;
   difficultyCriterias?: DifficultyCriteria;
   credit?: string;
   creatorId?: string;

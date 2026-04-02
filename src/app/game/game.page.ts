@@ -54,10 +54,13 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
   ngOnInit() {
     // Get Data
     const navigation = this.router.getCurrentNavigation();
+    let selectedNotes: number[] = [];
     if (navigation?.extras?.state) {
       this.music = navigation.extras.state['music'];
+      selectedNotes = navigation.extras.state['selectedNotes'] ?? [];
     }
-    if (this.music === null || this.music.music === undefined || this.music.noteData.length === 0) {
+    console.log("Navigation state:", navigation?.extras?.state);
+    if (this.music === null || this.music.music === undefined || this.music.noteData.length === 0 || selectedNotes.length === 0) {
       console.error("Music data is missing or incomplete.");
       this.router.navigate(['/home']);
       return;
@@ -74,7 +77,7 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
 
     const players = this.userConfigService.players;
     const isTrainingMode: boolean = this.userConfigService.getConfig()["trainingMode"] ?? false
-    this.game = new GameManager(this.music!, players, isTrainingMode, this.userFirestoreService);
+    this.game = new GameManager(this.music!, players, selectedNotes, isTrainingMode, this.userFirestoreService);
 
     this.discordRpcService.update("Dancing on lvl " + this.music.noteData[0].meter, this.music.title + " - " + this.music.artist)
   }

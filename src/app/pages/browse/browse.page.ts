@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, QueryList, ViewChildren, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren, signal } from '@angular/core';
 import { InfiniteScrollCustomEvent, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonImg, IonInfiniteScroll, IonInfiniteScrollContent, IonMenu, IonSearchbar, IonSplitPane, IonText } from '@ionic/angular/standalone';
 import { MusicDto, NoteDataDto } from 'src/app/game/gameModel/music.dto';
 import { NgClass, NgStyle, } from '@angular/common';
@@ -14,15 +14,14 @@ import { FormsModule } from '@angular/forms';
 import { GradeComponent } from "../../shared/component/grade/grade.component";
 import { HeaderComponent } from "src/app/shared/component/header/header.component";
 import { IDancePad } from 'src/app/game/gameController/dancepad.interface';
-import { LocalMusicService } from 'src/app/services/localStorage/local.music.service';
 import { MusicCacheService } from '../../services/localStorage/music.cache.service';
-import { MusicFirestoreService } from 'src/app/services/firestore/music.firestore.service';
 import { NoteDifficulty } from 'src/app/game/constants/note-difficulty.enum';
 import { PresenceService } from '../../services/thirdpartyapp/presence.service';
 import { RadarScoreComponent } from "src/app/shared/component/radar-score/radar-score.component";
 import { Router } from '@angular/router';
 import { UserConfigService } from 'src/app/services/userconfig.service';
 import { UserFirestoreService } from './../../services/firestore/user.firestore.service';
+import { musicLocalService } from 'src/app/services/localStorage/local.music.service';
 
 @Component({
   selector: 'app-browse',
@@ -34,62 +33,34 @@ import { UserFirestoreService } from './../../services/firestore/user.firestore.
 export class BrowsePage implements OnInit {
   readonly DanceType = DanceType;
 
-  allStoredMusics: MusicDto[] = [];
-  allRemoteMusics: MusicDto[] = [];
+  dbMusics = signal<MusicDto[]>([]);
+  storedMusics = signal<MusicDto[]>([]);
 
-  musics = signal<MusicDto[]>([]);
-  storedMusics: MusicDto[] = [];
-  notes = signal<NoteDataDto[] | undefined>(undefined);
+  musicNotes = signal<NoteDataDto[]>([]);
 
   userScores: { [key: string]: number } = {};
 
   searchQuery: string = '';
 
   selectedMusicIndex = signal<number>(0);
-  selectedNoteIndex = signal<number[]>([]);
+  selectedNotesIndex = signal<number[]>([]);
 
   dancepad: IDancePad[] = []
 
-  isSinglePlayer: boolean = true;
-
   @ViewChildren('musicCard', { read: ElementRef }) musicCards!: QueryList<ElementRef>;
 
-  constructor(private router: Router, private cd: ChangeDetectorRef, private fireStoreService: MusicFirestoreService, private localMusicService: LocalMusicService, private musicCacheService: MusicCacheService, private userFirestoreService: UserFirestoreService, private userConfigService: UserConfigService, private discordRpcService: PresenceService) { }
+  constructor(private router: Router, private cd: ChangeDetectorRef, private localMusicService: musicLocalService, private musicCacheService: MusicCacheService, private userFirestoreService: UserFirestoreService, private userConfigService: UserConfigService, private discordRpcService: PresenceService) { }
 
   ngOnInit() {
     this.searchQuery = localStorage.getItem('browseSearchQuery') ?? '';
-    this.isSinglePlayer = this.userConfigService.players.length === 1;
-    this.selectedNoteIndex.set(new Array(this.userConfigService.players.length).fill(0));
+    this.selectedNotesIndex.set(new Array(this.userConfigService.players.length).fill(0));
 
-    // Load musics from local storage and Firestore
-    this.allStoredMusics = this.localMusicService.getAllLocalMusicsFull();
-    this.fireStoreService.GetAllMusics().then(value => {
-      this.allRemoteMusics = value.filter(
-        m => !this.allStoredMusics.some(s => s.id === m.id)
-      );
-
-      this.applySearchFilter();
-
-      //  Restore last selected music 
-      const lastMusicSelectedId = localStorage.getItem('lastMusicSelectedId');
-      if (lastMusicSelectedId) {
-        let index = this.storedMusics.findIndex(m => m.id === lastMusicSelectedId);
-
-        if (index === -1) {
-          index = this.musics().findIndex(m => m.id === lastMusicSelectedId)
-            + this.storedMusics.length;
-        }
-
-        if (index !== -1) {
-          this.onSelectMusic(index);
-        }
-      }
-    });
+    this.initIonInfinite();
 
     this.initPlayerInput();
-
     this.discordRpcService.update("Browsing");
   }
+
 
 
   //#region Input handling
@@ -135,13 +106,14 @@ export class BrowsePage implements OnInit {
         this.onSelectMusic(Math.max(0, this.selectedMusicIndex() - 1));
       }
       if (padstate[ArrowDirection.Right]) {
-        this.onSelectMusic(Math.min(this.storedMusics.length + this.musics().length - 1, this.selectedMusicIndex() + 1));
+        this.onSelectMusic(Math.min(this.storedMusics().length + this.dbMusics().length - 1, this.selectedMusicIndex() + 1));
       }
       if (padstate[ArrowDirection.Down]) {
-        this.onSelectNote(Math.min((this.notes() ?? []).length - 1, (this.selectedNoteIndex()[index] ?? 0) + 1), index);
+        const notesLength = this.musicNotes().length;
+        this.onSelectNote(Math.min(notesLength - 1, (this.selectedNotesIndex()[index] ?? 0) + 1), index);
       }
       if (padstate[ArrowDirection.Up]) {
-        this.onSelectNote(Math.max(0, (this.selectedNoteIndex()[index] ?? 0) - 1), index);
+        this.onSelectNote(Math.max(0, (this.selectedNotesIndex()[index] ?? 0) - 1), index);
       }
     }
     if (this.isListeningInput)
@@ -149,80 +121,49 @@ export class BrowsePage implements OnInit {
   }
   //#endregion
 
-  getSelectedMusic(): MusicDto | null {
-    if (this.selectedMusicIndex() >= 0) {
-      if (this.selectedMusicIndex() < this.storedMusics.length)
-        return this.storedMusics[this.selectedMusicIndex()];
+  getSelectedMusic(index: number): MusicDto | null {
+    if (index >= 0) {
+      if (index < this.storedMusics().length)
+        return this.storedMusics()[index];
       else
-        return this.musics()[this.selectedMusicIndex() - this.storedMusics.length];
+        return this.dbMusics()[index - this.storedMusics().length];
     }
     return null;
   }
 
-  getSelectedNotes(): NoteDataDto[] {
-    const notes = []
-    for (let i = 0; i < this.selectedNoteIndex().length; i++) {
-      const noteIndex = this.selectedNoteIndex()[i] ?? 0;
-      if (this.notes() && noteIndex >= 0 && noteIndex < this.notes()!.length) {
-        notes.push(this.notes()![noteIndex]);
-      }
+  trySetSelectedMusicById(musicId: string) {
+    let index = this.storedMusics().findIndex((m: { id: string; }) => m.id === musicId);
+
+    if (index === -1) {
+      index = this.dbMusics().findIndex((m: { id: string; }) => m.id === musicId) + this.storedMusics().length;
     }
 
-    return notes;
-  }
-  getSelectedNotesDifficulty(): DifficultyCriteria[] {
-    return this.getSelectedNotes().map(note => note.difficultyCriterias).filter((d): d is DifficultyCriteria => d !== undefined);
-  }
-  getPlayersForNote(noteIndex: number): number[] {
-    const playerIndexes = this.selectedNoteIndex()
-      .map((picked, player) => picked === noteIndex ? player : null)
-      .filter((v): v is number => v !== null)
-    return playerIndexes;
-  }
-  getPlayerColor(playerIndex: number): string {
-    return CONFIG.PLAYER_COLORS[playerIndex % CONFIG.PLAYER_COLORS.length].stroke;
+    if (index === -1) {
+      this.onSelectMusic(0);
+    }
+    else {
+      this.onSelectMusic(index);
+    }
   }
 
-
-  runGame(): void {
-    const selectedMusic = this.getSelectedMusic();
-    if (!selectedMusic) return;
-
-    selectedMusic.noteData = this.getSelectedNotes();
-    this.router.navigate(['/game'], {
-      state: {
-        music: selectedMusic,
-      }
-    });
-  }
-
-  onSelectNote(noteIndex: number, playerIndex: number = 0) {
-    this.selectedNoteIndex()[playerIndex] = noteIndex;
-    this.cd.markForCheck();
-  }
 
   onSelectMusic(listIndex: number) {
-    this.selectedMusicIndex.set(listIndex);
-
-    const musicId = this.getSelectedMusic()?.id;
-
-    if (!musicId) {
-      this.notes.set([]);
+    const music = this.getSelectedMusic(listIndex);
+    if (!music) {
+      this.musicNotes.set([]);
       return;
     }
 
-    localStorage.setItem('lastMusicSelectedId', musicId);
+    const isSinglePlayer = this.userConfigService.players.length === 1;
+    const filteredNotes = music.noteData.filter(note => !isSinglePlayer || note.stepsType === DanceType.DanceSingle) ?? [];
 
-    if (this.selectedMusicIndex() < this.storedMusics.length) {
-      const fullmusic = this.localMusicService.getMusic(musicId);
-      this.notes.set(fullmusic?.noteData.filter(note => !this.isSinglePlayer || note.stepsType === DanceType.DanceSingle) ?? []);
-    }
-    else if (this.selectedMusicIndex() - this.storedMusics.length < this.musics().length) {
-      this.musicCacheService.getMusicNotes(musicId, this.isSinglePlayer).then(n => this.notes.set(n))
-    }
+    this.musicNotes.set(filteredNotes);
+
+    this.selectedMusicIndex.set(listIndex);
+    localStorage.setItem('lastMusicSelectedId', music.id);
 
     if (this.userFirestoreService.getUserData())
-      this.userFirestoreService.getScoresForMusic(musicId, this.userFirestoreService.getUserData()!.id).then(score => this.userScores = score)
+      this.userFirestoreService.getScoresForMusic(music.id, this.userFirestoreService.getUserData()!.id).then(score => this.userScores = score)
 
     setTimeout(() => {
       const el = this.musicCards.toArray()[listIndex]?.nativeElement;
@@ -231,50 +172,86 @@ export class BrowsePage implements OnInit {
       }
     });
   }
-
-
-  getNoteColor(difficulty: NoteDifficulty | undefined): string {
-    let color = "grey"
-    if (difficulty)
-      color = Color.noteDifficultyColor(difficulty)
-    return color
-  }
-  getGrade(score: number): string {
-    return "A"
+  onSelectNote(noteIdx: number, playerIndex: number = 0) {
+    this.selectedNotesIndex()[playerIndex] = noteIdx;
+    this.cd.markForCheck();
   }
 
   onSearch(event: any) {
     this.searchQuery = (event.target.value || '').toLowerCase();
     localStorage.setItem('browseSearchQuery', this.searchQuery);
 
-    this.applySearchFilter();
+    this.initIonInfinite();
   }
-  applySearchFilter() {
+
+  initIonInfinite() {
     const q = this.searchQuery.toLowerCase();
 
-    this.storedMusics = this.allStoredMusics.filter(m =>
-      m.title!.toLowerCase().includes(q) ||
-      m.artist!.toLowerCase().includes(q)
-    );
+    let updateDbMusics = this.musicCacheService.allRemoteMusics;
+    let updateLocalMusics = this.localMusicService.allLocalMusics;
 
-    this.musics.set(
-      this.allRemoteMusics.filter(m =>
-        m.title!.toLowerCase().includes(q) ||
-        m.artist!.toLowerCase().includes(q)
-      )
-    );
+    if (q) {
+      updateLocalMusics =
+        this.localMusicService.allLocalMusics.filter(m =>
+          m.title!.toLowerCase().includes(q) ||
+          m.artist!.toLowerCase().includes(q)
+        )
+      updateDbMusics =
+        this.musicCacheService.allRemoteMusics.filter(m =>
+          m.title!.toLowerCase().includes(q) ||
+          m.artist!.toLowerCase().includes(q)
+        )
+    }
 
-    this.notes.set([]);
+    this.storedMusics.set(updateLocalMusics);
+    this.dbMusics.set(updateDbMusics);
+
+    const lastId = localStorage.getItem('lastMusicSelectedId');
+    const localIndex = lastId ? updateLocalMusics.findIndex(m => m.id === lastId) : -1;
+    const remoteIndex = lastId ? updateDbMusics.findIndex(m => m.id === lastId) : -1;
+
+    let newIndex = localIndex !== -1 ? localIndex : (remoteIndex !== -1 ? remoteIndex + updateLocalMusics.length : 0);
+    this.onSelectMusic(newIndex);
   }
-
-
 
   onIonInfinite(event: InfiniteScrollCustomEvent) {
-    const lastMusic: MusicDto = this.musics().at(-1)!
-    if (this.searchQuery === '')
-      this.fireStoreService.GetAllMusics(lastMusic?.id ?? null).then(value => this.musics.update(prev => [...prev, ...value])).catch((e) => { console.log(e.message); event.target.complete() });
-    else
-      this.fireStoreService.GetAllMusicsWithSearch(lastMusic?.id ?? null, this.searchQuery).then(value => this.musics.update(prev => [...prev, ...value])).catch((e) => { console.log(e.message); event.target.complete() });
+    console.info("Congratz, you found the infinite scroll ! But there is no more music to load :)");
+    event.target.complete();
   }
 
+
+  runGame(): void {
+    const selectedMusic = this.getSelectedMusic(this.selectedMusicIndex());
+    if (!selectedMusic) return;
+
+    this.router.navigate(['/game'], {
+      state: {
+        music: selectedMusic,
+        selectedNotes: this.selectedNotesIndex(),
+      }
+    });
+  }
+
+  //#region Utils
+
+  getSelectedNotesDifficulty(): DifficultyCriteria[] {
+    const notes = this.musicNotes().filter((note, index) => this.selectedNotesIndex().includes(index));
+    return notes.map(note => note.difficultyCriterias).filter((d): d is DifficultyCriteria => d !== undefined);
+  }
+  getPlayersForNote(noteIndex: number): number[] {
+    return this.selectedNotesIndex()
+      .map((selectedIdx, player) => selectedIdx === noteIndex ? player : null)
+      .filter((v): v is number => v !== null);
+  }
+
+  getPlayerColor(playerIndex: number): string {
+    return CONFIG.PLAYER_COLORS[playerIndex % CONFIG.PLAYER_COLORS.length].stroke;
+  }
+  getNoteColor(difficulty: NoteDifficulty): string {
+    return Color.noteDifficultyColor(difficulty)
+  }
+  getGrade(score: number): string {
+    return "A"
+  }
+  //#endregion
 }
