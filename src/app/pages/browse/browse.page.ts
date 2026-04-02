@@ -2,6 +2,7 @@ import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildr
 import { InfiniteScrollCustomEvent, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonImg, IonInfiniteScroll, IonInfiniteScrollContent, IonMenu, IonSearchbar, IonSplitPane, IonText } from '@ionic/angular/standalone';
 import { MusicDto, NoteDataDto } from 'src/app/game/gameModel/music.dto';
 import { NgClass, NgStyle, } from '@angular/common';
+import { UserMusicDto, UserNoteDto } from '../user-profile/user.dto';
 
 import { ArrowDirection } from 'src/app/game/constants/arrow-direction.enum';
 import { CONFIG } from 'src/app/game/constants/game-config';
@@ -19,6 +20,7 @@ import { NoteDifficulty } from 'src/app/game/constants/note-difficulty.enum';
 import { PresenceService } from '../../services/thirdpartyapp/presence.service';
 import { RadarScoreComponent } from "src/app/shared/component/radar-score/radar-score.component";
 import { Router } from '@angular/router';
+import { UserCacheService } from 'src/app/services/localStorage/user.cache.service';
 import { UserConfigService } from 'src/app/services/userconfig.service';
 import { UserFirestoreService } from './../../services/firestore/user.firestore.service';
 import { musicLocalService } from 'src/app/services/localStorage/local.music.service';
@@ -37,6 +39,7 @@ export class BrowsePage implements OnInit {
   storedMusics = signal<MusicDto[]>([]);
 
   musicNotes = signal<NoteDataDto[]>([]);
+  musicUserScore = signal<UserMusicDto | null>(null);
 
   userScores: { [key: string]: number } = {};
 
@@ -49,7 +52,7 @@ export class BrowsePage implements OnInit {
 
   @ViewChildren('musicCard', { read: ElementRef }) musicCards!: QueryList<ElementRef>;
 
-  constructor(private router: Router, private cd: ChangeDetectorRef, private localMusicService: musicLocalService, private musicCacheService: MusicCacheService, private userFirestoreService: UserFirestoreService, private userConfigService: UserConfigService, private discordRpcService: PresenceService) { }
+  constructor(private router: Router, private cd: ChangeDetectorRef, private localMusicService: musicLocalService, private musicCacheService: MusicCacheService, private userFirestoreService: UserFirestoreService, private userConfigService: UserConfigService, private userCacheService: UserCacheService, private discordRpcService: PresenceService) { }
 
   ngOnInit() {
     this.searchQuery = localStorage.getItem('browseSearchQuery') ?? '';
@@ -162,8 +165,7 @@ export class BrowsePage implements OnInit {
     this.selectedMusicIndex.set(listIndex);
     localStorage.setItem('lastMusicSelectedId', music.id);
 
-    if (this.userFirestoreService.getUserData())
-      this.userFirestoreService.getScoresForMusic(music.id, this.userFirestoreService.getUserData()!.id).then(score => this.userScores = score)
+    this.musicUserScore.set(this.userCacheService.getMusicStats(music.id));
 
     setTimeout(() => {
       const el = this.musicCards.toArray()[listIndex]?.nativeElement;
@@ -223,11 +225,11 @@ export class BrowsePage implements OnInit {
   runGame(): void {
     const selectedMusic = this.getSelectedMusic(this.selectedMusicIndex());
     if (!selectedMusic) return;
+    console.log("Selected music for game:", selectedMusic, "with notes:", this.musicNotes());
 
-    this.router.navigate(['/game'], {
-      state: {
-        music: selectedMusic,
-        selectedNotes: this.selectedNotesIndex(),
+    this.router.navigate(['/game', selectedMusic.id], {
+      queryParams: {
+        notes: this.selectedNotesIndex(),
       }
     });
   }
@@ -252,6 +254,9 @@ export class BrowsePage implements OnInit {
   }
   getGrade(score: number): string {
     return "A"
+  }
+  getUserNote(chartname: string): UserNoteDto | null {
+    return this.musicUserScore()?.notes.find(n => n.id === chartname) ?? null;
   }
   //#endregion
 }

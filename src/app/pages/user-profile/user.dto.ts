@@ -20,6 +20,7 @@ export class UserDto {
 export class UserMusicDto {
     id: string;
     timesPlayed: number = 0;
+    notes: UserNoteDto[] = [];
 
     constructor(id?: string) {
         this.id = id ?? '';
@@ -28,6 +29,7 @@ export class UserMusicDto {
 
 export class UserNoteDto {
     id: string;
+    passed: boolean = false;
     timesPlayed: number = 0;
     highScore: number = 0;
     highScoreGamepad: string = "";

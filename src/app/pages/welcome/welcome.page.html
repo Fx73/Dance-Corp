@@ -12,10 +12,10 @@
 					<ion-card-content>
 						<ion-card class="base-card start-card welcome-start-card" [routerLink]="['/play/player-selection']" style="height: 200px;" tabindex="-1">
 						</ion-card>
-						<ion-button [routerLink]="['/browse-upload']" [disabled]="!isUserLoggedIn()" expand="block" size="large" class="home-content">
+						<ion-button [routerLink]="['/browse-upload']" [disabled]="!user" expand="block" size="large" class="home-content">
 							Music browser
 						</ion-button>
-						<ion-button [routerLink]="['/user-profile']" [disabled]="!isUserLoggedIn()" expand="block" size="large" class="home-content">
+						<ion-button [routerLink]="['/user-profile']" [disabled]="!user" expand="block" size="large" class="home-content">
 							My Profile
 						</ion-button>
 						<ion-button [routerLink]="['/options']" expand="block" size="large" class="home-content">
@@ -28,21 +28,21 @@
 				</ion-card>
 			</ion-col>
 			<ion-col size="4">
-				@if(userData()){
+				@if(user()){
 				<ion-card class="base-card">
 					<ion-card-header>
-						<ion-card-title>{{ userData()!.name }}</ion-card-title>
+						<ion-card-title>{{ user()!.name }}</ion-card-title>
 					</ion-card-header>
 
 					<ion-card-content>
 						<ion-item>
 							<ion-label>Level:</ion-label>
-							<ion-badge color="primary">{{ userData()!.level }}</ion-badge>
+							<ion-badge color="primary">{{ user()!.level }}</ion-badge>
 						</ion-item>
 					</ion-card-content>
 				</ion-card>
 				}
-				@if(!userData()){
+				@if(!user()){
 				<ion-card class="base-card">
 					<ion-card-header>
 						<ion-card-title>Anonymous player</ion-card-title>

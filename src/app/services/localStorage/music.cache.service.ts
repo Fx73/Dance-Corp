@@ -91,7 +91,21 @@ export class MusicCacheService {
     }
 
 
-    async getMusic(musicId: string): Promise<MusicDto | null> {
+    getMusic(musicId: string): MusicDto | null {
+        const cacheKey = this.MUSIC_STORAGE_KEY(musicId);
+
+        const raw = localStorage.getItem(cacheKey);
+        if (raw) {
+            try {
+                return MusicDto.fromJSON(JSON.parse(raw));
+            } catch { }
+        }
+
+        console.error(`Music ${musicId} not found in cache`);
+        return null;
+    }
+
+    async getMusicEnsure(musicId: string): Promise<MusicDto | null> {
         const cacheKey = this.MUSIC_STORAGE_KEY(musicId);
 
         const raw = localStorage.getItem(cacheKey);

@@ -1,11 +1,10 @@
-import { BehaviorSubject, Observable } from 'rxjs';
-import { DocumentData, Firestore, FirestoreDataConverter, QueryDocumentSnapshot, collection, doc, getDoc, getDocs, getFirestore, setDoc, updateDoc } from 'firebase/firestore';
+import { DocumentData, Firestore, FirestoreDataConverter, QueryDocumentSnapshot, collection, doc, getDoc, getDocs, getFirestore, increment, setDoc, updateDoc } from 'firebase/firestore';
+import { Injectable, signal } from '@angular/core';
 import { UserDto, UserMusicDto, UserNoteDto } from 'src/app/pages/user-profile/user.dto';
 
+import { FirestoreConverter } from './firestore.converter';
 import { GameRound } from 'src/app/game/gameModel/gameRound';
-import { Injectable } from '@angular/core';
 import { LoginFireauthService } from 'src/app/services/firestore/login.fireauth.service';
-import { SimpleFirestoreConverter } from './firestore.converter';
 import { User } from 'firebase/auth';
 
 @Injectable({
@@ -14,34 +13,28 @@ import { User } from 'firebase/auth';
 export class UserFirestoreService {
     //#region Constants
     private readonly USER_COLLECTION = "users"
-    private readonly USER_MUSIC_COLLECTION = "userMusics"
-    private readonly USER_NOTES_COLLECTION = "userNotes"
-    private readonly firestoreConverterUserMusic = new SimpleFirestoreConverter<UserMusicDto>(UserMusicDto)
-    private readonly firestoreConverterUserNote = new SimpleFirestoreConverter<UserNoteDto>(UserNoteDto)
-
+    private readonly USER_MUSIC_COLLECTION = "user_musics"
+    private readonly firestoreConverterUserMusic = new FirestoreConverter<UserMusicDto>(UserMusicDto, { "notes:": UserNoteDto });
     //#endregion
 
     private db: Firestore
-    private user: UserDto | null = null;
-    private userDataSubject = new BehaviorSubject<UserDto | null>(null);
-    get userData$(): Observable<UserDto | null> {
-        return this.userDataSubject.asObservable();
+    private _userData = signal<UserDto | null>(null);
+    public readonly userData = this._userData.asReadonly();
+    public get user(): UserDto | null {
+        return this._userData();
     }
-    public getUserData(): UserDto | null {
-        return this.user;
-    }
+
+
 
     constructor(loginFireauthService: LoginFireauthService) {
         this.db = getFirestore()
         loginFireauthService.listenForUserChanges(firebaseUser => {
             if (firebaseUser) {
                 this.getUserFromFirestore(firebaseUser).then(user => {
-                    this.user = user
-                    this.userDataSubject.next(user);
+                    this._userData.set(user);
                 })
             } else {
-                this.user = null;
-                this.userDataSubject.next(null);
+                this._userData.set(null);
             }
         })
     }
@@ -62,71 +55,56 @@ export class UserFirestoreService {
         }
     }
 
+    public async getAllUserMusics(userId: string): Promise<UserMusicDto[]> {
+        if (!userId) return [];
 
-    public async updateUserStatsFromRound(musicId: string, noteId: string, gameRound: GameRound): Promise<void> {
-        const score = Math.round(gameRound.score)
-        const userId = gameRound.player.userId
+        const collectionRef = collection(this.db, this.USER_COLLECTION, userId, this.USER_MUSIC_COLLECTION).withConverter(this.firestoreConverterUserMusic);
+        const snap = await getDocs(collectionRef);
 
-        if (userId === null)
-            return
+        if (snap.empty) return [];
+        const musics: UserMusicDto[] = [];
 
-        const userRef = doc(this.db, this.USER_COLLECTION, userId).withConverter(this.userConverter);
-        const musicRef = doc(this.db, this.USER_COLLECTION, userId, this.USER_MUSIC_COLLECTION, musicId).withConverter(this.firestoreConverterUserMusic);
-        const noteRef = doc(this.db, this.USER_COLLECTION, userId, this.USER_MUSIC_COLLECTION, musicId, this.USER_NOTES_COLLECTION, noteId).withConverter(this.firestoreConverterUserNote);
+        snap.forEach(doc => { musics.push(doc.data()); });
 
-        const userSnapshot = await getDoc(userRef);
-        if (userSnapshot.exists() && userSnapshot.data()) {
-            await updateDoc(userRef, {
-                musicPlayed: (userSnapshot.data()['musicPlayed'] || 0) + 1,
-                musicCleared: gameRound.isFinished ? userSnapshot.data()['musicCleared'] + 1 : userSnapshot.data()['musicCleared']
-            });
-        }
-
-        const musicSnapshot = await getDoc(musicRef);
-        if (!musicSnapshot.exists() || !musicSnapshot.data()) {
-            const newMusic = new UserMusicDto(musicId)
-            newMusic.timesPlayed += 1
-            await setDoc(musicRef, newMusic);
-        } else {
-            await updateDoc(musicRef, {
-                timesPlayed: (musicSnapshot.data().timesPlayed || 0) + 1
-            });
-        }
-
-        const noteSnapshot = await getDoc(noteRef);
-        const gamepadUsed = gameRound.player.gamepad?.id ?? "Unknown gamepad"
-        if (!noteSnapshot.exists() || !noteSnapshot.data()) {
-            const newNotes = new UserNoteDto(noteId)
-            newNotes.timesPlayed += 1
-            newNotes.highScore = score
-            newNotes.highScoreGamepad = gamepadUsed
-            await setDoc(noteRef, newNotes);
-        } else {
-            const currentMaxScore = noteSnapshot.data().highScore || 0;
-            await updateDoc(noteRef, {
-                timesPlayed: noteSnapshot.data()['timesPlayed'] + 1,
-                maxScore: score > currentMaxScore ? score : currentMaxScore,
-                usedGamepad: score > currentMaxScore ? gamepadUsed : noteSnapshot.data().highScoreGamepad
-            });
-
-        }
-
+        return musics;
     }
 
 
-    public async getScoresForMusic(musicId: string, userId: string): Promise<{ [noteId: string]: number; }> {
-        const musicRef = doc(this.db, this.USER_COLLECTION, userId, this.USER_MUSIC_COLLECTION, musicId);
-        const notesCollection = collection(musicRef, this.USER_NOTES_COLLECTION);
-        const querySnapshot = await getDocs(notesCollection);
+    public async updateUserStatsFromRound(music: UserMusicDto, gameRound: GameRound): Promise<void> {
+        const userId = gameRound.player.userId;
+        if (!userId) return;
+
+        const userRef = doc(this.db, this.USER_COLLECTION, userId);
+        const musicRef = doc(userRef, this.USER_MUSIC_COLLECTION, music.id).withConverter(this.firestoreConverterUserMusic);
+
+        // 1. Update global stats (increment)
+        await updateDoc(userRef, {
+            musicPlayed: increment(1),
+            musicCleared: gameRound.isFinished ? increment(1) : increment(0)
+        });
+
+        // 2. Persist the updated music object
+        await setDoc(musicRef, music, { merge: true });
+    }
+
+
+    public async getScoresForMusic(musicId: string, userId: string): Promise<{ [noteId: string]: number }> {
+        const musicRef = doc(this.db, this.USER_COLLECTION, userId, this.USER_MUSIC_COLLECTION, musicId).withConverter(this.firestoreConverterUserMusic);
+
+        const snap = await getDoc(musicRef);
+        if (!snap.exists()) return {};
+
+        const music = snap.data();
 
         const scores: { [noteId: string]: number } = {};
-        querySnapshot.forEach(doc => {
-            const data = doc.data();
-            scores[doc.id] = data['highScore']; // Stocke chaque note avec son high score
-        });
+        for (const note of music.notes) {
+            scores[note.id] = note.highScore ?? 0;
+        }
 
         return scores;
     }
+
+
 
     readonly userConverter: FirestoreDataConverter<UserDto> = {
         toFirestore(user: UserDto): DocumentData {

@@ -12,10 +12,11 @@
         </ion-card-header>
         <ion-card-content>
           @for (note of musicNotes(); track $index) {
+          @let userNote = getUserNote(note.chartName);
           <ion-card class="note-card" (mouseenter)="onSelectNote($index)" (click)="runGame()" [style.backgroundColor]="getNoteColor(note.difficulty)">
             <ion-card-content>
               <ion-img class="player-number-icon" [src]="note.stepsType === DanceType.DanceSingle ? 'assets/Icons/SingleDance.png' : 'assets/Icons/DoubleDance.png'"></ion-img>
-              <div class="badge-container">
+              <div class="badge-container" [style.--badge-left]="'4vw'">
                 @for (playerIndex of getPlayersForNote($index); track playerIndex) {
                 <ion-badge slot="end" class="player-badge" [style.backgroundColor]="getPlayerColor(playerIndex)">{{ playerIndex + 1 }}</ion-badge>
                 }
@@ -23,8 +24,10 @@
               <div class="difficulty">
                 {{ note.difficulty }}
               </div>
-              @if(userScores[note.chartName]){
-              <app-grade [score]="userScores[note.chartName]" class="score" />
+              @if(userNote){
+              <div class="badge-container" [style.--badge-right]="'4vw'">
+                <app-grade [score]="userNote.highScore" [failed]="!userNote.passed" class="score" />
+              </div>
               }
               <ion-card color="light" class="meter">{{ note.meter }}</ion-card>
             </ion-card-content>

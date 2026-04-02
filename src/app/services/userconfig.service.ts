@@ -1,6 +1,7 @@
+import { Injectable, effect } from '@angular/core';
+
 import { ArrowImageManager } from '../game/gameDisplay/arrowImageManager';
 import { BehaviorSubject } from 'rxjs';
-import { Injectable } from '@angular/core';
 import { Player } from '../game/gameModel/player';
 import { UserFirestoreService } from './firestore/user.firestore.service';
 
@@ -30,15 +31,17 @@ export class UserConfigService {
         }
 
         // Set logged user to player 0
-        userFirestoreService.userData$.subscribe(user => {
+        effect(() => {
+            const user = this.userFirestoreService.userData();
+
             if (user) {
-                this.players[0].userId = user?.id
-                this.players[0].name = user.name
+                this.players[0].userId = user.id;
+                this.players[0].name = user.name;
             } else {
-                this.players[0].userId = null
-                this.players[0].name = "Player 0"
+                this.players[0].userId = null;
+                this.players[0].name = "Player 0";
             }
-        })
+        });
 
         ArrowImageManager.Set_ARROW_SIZE(this.configSubject.value.canvasWidth / 4);
         this.isReady = true

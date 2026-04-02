@@ -7,6 +7,7 @@ import { HeaderComponent } from "src/app/shared/component/header/header.componen
 import { LoginComponent } from "../../shared/user/login/login.component";
 import { PresenceService } from '../../services/thirdpartyapp/presence.service';
 import { RouterModule } from '@angular/router';
+import { UserCacheService } from './../../services/localStorage/user.cache.service';
 import { UserDto } from '../user-profile/user.dto';
 import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.service';
 
@@ -18,19 +19,13 @@ import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.
   imports: [IonCol, IonRow, IonGrid, IonBadge, IonLabel, IonItem, IonCardHeader, IonCardTitle, IonCardContent, IonCard, IonButton, IonContent, CommonModule, FormsModule, HeaderComponent, RouterModule, LoginComponent]
 })
 export class WelcomePage implements OnInit {
-  userData = signal<UserDto | null>(null);
+  user = this.userService.userData;
 
-  constructor(userService: UserFirestoreService, private discordRpcService: PresenceService) {
-    userService.userData$.subscribe(userData => this.userData.set(userData))
+  constructor(private userService: UserFirestoreService, private userCacheService: UserCacheService, private discordRpcService: PresenceService) {
   }
 
   ngOnInit() {
     this.discordRpcService.update("Let's dance")
-  }
-
-
-  isUserLoggedIn() {
-    return this.userData() !== null
   }
 
 }

@@ -5,14 +5,14 @@ import { IMusicPlayer } from "./musicPlayer/IMusicPlayer";
 import { MusicDto } from "./gameModel/music.dto";
 import { Player } from "./gameModel/player";
 import { PlayerDisplayComponent } from "./gameDisplay/player-display.component";
-import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.service';
+import { UserCacheService } from './../services/localStorage/user.cache.service';
 
 export class GameManager {
 
     music: MusicDto
     isTrainingMode: boolean = false;
 
-    constructor(music: MusicDto, players: Player[], noteSelected: number[], isTrainingMode: boolean, private userFirestoreService: UserFirestoreService) {
+    constructor(music: MusicDto, players: Player[], noteSelected: number[], isTrainingMode: boolean, private userCacheService: UserCacheService) {
         this.music = music
         this.isTrainingMode = isTrainingMode
 
@@ -101,11 +101,11 @@ export class GameManager {
     }
     gameOver() {
         console.log('Game Over: All game rounds have failed or finished.');
-
+        console.log(this.music, this.music!.id)
         this.isGameOver = true;
         if (!this.isTrainingMode) {
             for (const gameRound of this.gameRounds)
-                this.userFirestoreService.updateUserStatsFromRound(this.music!.id, this.music?.noteData[0].chartName!, gameRound)
+                this.userCacheService.updateUserStatsFromRound(this.music!.id, this.music?.noteData[0].chartName!, gameRound)
         }
 
     }

@@ -115,9 +115,11 @@
   align-items: center;
 
 }
+
 .badge-container{
   position: absolute;
   top: 6px;
-  left: 4vw;
+  left: var(--badge-left, auto);
+  right: var(--badge-right, auto);
   z-index: 10;
 }

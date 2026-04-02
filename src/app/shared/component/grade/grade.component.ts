@@ -13,13 +13,16 @@ export class GradeComponent implements OnInit {
   @Input()
   score!: number
 
+  @Input()
+  failed: boolean = false
+
   grade: string = 'F'
   color: string = '#000000'
 
   constructor() { }
 
   ngOnInit() {
-    ({ grade: this.grade, color: this.color } = Color.gradeFromScore(this.score));
+    ({ grade: this.grade, color: this.color } = Color.gradeFromScore(this.score, this.failed));
   }
 
 }

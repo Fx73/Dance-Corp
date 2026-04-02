@@ -23,7 +23,7 @@ export class UserProfilePage implements OnInit {
 
   constructor(authService: LoginFireauthService, userService: UserFirestoreService) {
     this.userAuth = authService.getAuthUser()!
-    this.userData = userService.getUserData()!
+    this.userData = userService.user!
   }
 
   ngOnInit() {

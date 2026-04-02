@@ -13,7 +13,7 @@ export class UserGuard {
     constructor(private loginFireauthService: LoginFireauthService, private userFirestoreService: UserFirestoreService, private router: Router) { }
 
     async canActivate(): Promise<boolean> {
-        if (this.loginFireauthService.getAuthUser() && this.userFirestoreService.getUserData())
+        if (this.loginFireauthService.getAuthUser() && this.userFirestoreService.user)
             return true
         try {
             const isLogged = await this.guardWaitForAuth();
@@ -58,16 +58,12 @@ export class UserGuard {
         let timeoutId: NodeJS.Timeout;
 
         return new Promise<boolean>((resolve) => {
-            const subscription = this.userFirestoreService.userData$.subscribe(user => {
-                if (user) {
-                    clearTimeout(timeoutId);
-                    subscription.unsubscribe();
-                    resolve(true);
-                }
-            });
+            if (this.userFirestoreService.user) {
+                clearTimeout(timeoutId);
+                resolve(true);
+            }
 
             timeoutId = setTimeout(() => {
-                subscription.unsubscribe();
                 resolve(false);
             }, timeout);
         });

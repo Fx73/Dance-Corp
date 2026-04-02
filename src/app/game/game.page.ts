@@ -1,3 +1,4 @@
+import { ActivatedRoute, Router } from "@angular/router";
 import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { IMusicPlayer, MusicOrigin, MusicPlayerCommon } from './musicPlayer/IMusicPlayer';
@@ -15,7 +16,7 @@ import { MusicPlayerSoundcloudComponent } from './musicPlayer/music-player-sound
 import { MusicPlayerYoutubeComponent } from "./musicPlayer/music-player-youtube/music-player-youtube.component";
 import { PlayerDisplayComponent } from "./gameDisplay/player-display.component";
 import { PresenceService } from '../services/thirdpartyapp/presence.service';
-import { Router } from "@angular/router";
+import { UserCacheService } from './../services/localStorage/user.cache.service';
 import { UserConfigService } from "src/app/services/userconfig.service";
 import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.service';
 import { WaitingScreenComponent } from "./gameDisplay/waiting-screen/waiting-screen.component";
@@ -46,26 +47,29 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
   musicOrigin: MusicOrigin | null = null
   //#endregion
 
-  constructor(private cdr: ChangeDetectorRef, private userConfigService: UserConfigService, private userFirestoreService: UserFirestoreService, private musicCacheService: MusicCacheService, private router: Router, private location: Location, private discordRpcService: PresenceService) {
+  constructor(private cdr: ChangeDetectorRef, private route: ActivatedRoute, private userConfigService: UserConfigService, private userCacheService: UserCacheService, private musicCacheService: MusicCacheService, private router: Router, private location: Location, private discordRpcService: PresenceService) {
     addIcons({ arrowBack });
   }
 
 
   ngOnInit() {
     // Get Data
-    const navigation = this.router.getCurrentNavigation();
-    let selectedNotes: number[] = [];
-    if (navigation?.extras?.state) {
-      this.music = navigation.extras.state['music'];
-      selectedNotes = navigation.extras.state['selectedNotes'] ?? [];
-    }
-    console.log("Navigation state:", navigation?.extras?.state);
-    if (this.music === null || this.music.music === undefined || this.music.noteData.length === 0 || selectedNotes.length === 0) {
+    const musicId = this.route.snapshot.paramMap.get('musicId');
+    const selectedNotes = this.route.snapshot.queryParamMap.get('notes')?.split(',').map(n => +n);
+
+    if (!musicId || !selectedNotes || selectedNotes.length === 0) {
       console.error("Music data is missing or incomplete.");
       this.router.navigate(['/home']);
       return;
     }
-    console.log("Received music data:", this.music);
+
+    const music = this.musicCacheService.getMusic(musicId);
+    if (!music) {
+      console.error(`Music with ID ${musicId} not found. Your cache might be corrupted.`);
+      this.router.navigate(['/home']);
+      return;
+    }
+    this.music = music;
 
     // Prepare Music Player
     this.musicOrigin = MusicPlayerCommon.pickMusicPlayer(this.music!.music!)
@@ -77,7 +81,7 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
 
     const players = this.userConfigService.players;
     const isTrainingMode: boolean = this.userConfigService.getConfig()["trainingMode"] ?? false
-    this.game = new GameManager(this.music!, players, selectedNotes, isTrainingMode, this.userFirestoreService);
+    this.game = new GameManager(this.music!, players, selectedNotes, isTrainingMode, this.userCacheService);
 
     this.discordRpcService.update("Dancing on lvl " + this.music.noteData[0].meter, this.music.title + " - " + this.music.artist)
   }

@@ -30,14 +30,16 @@ export class Color {
         }
     }
 
-    static gradeFromScore(score: number): { grade: string, color: string } {
-        if (score >= 1000000) return { grade: 'S', color: '#FFFAAA' };
-        if (score >= 980000) return { grade: 'AAA', color: '#89adf6' };
-        if (score >= 950000) return { grade: 'AA', color: '#2a6aea' };
-        if (score >= 900000) return { grade: 'A', color: '#2037f8' };
-        if (score >= 800000) return { grade: 'B', color: '#32CD32' };
-        if (score >= 700000) return { grade: 'C', color: '#FFA500' };
-        if (score >= 600000) return { grade: 'D', color: '#FF0000' };
+    static gradeFromScore(score: number, failed: boolean): { grade: string, color: string } {
+        if (!failed) {
+            if (score >= 1000000) return { grade: 'S', color: '#FFFAAA' };
+            if (score >= 980000) return { grade: 'AAA', color: '#89adf6' };
+            if (score >= 950000) return { grade: 'AA', color: '#2a6aea' };
+            if (score >= 900000) return { grade: 'A', color: '#2037f8' };
+            if (score >= 800000) return { grade: 'B', color: '#32CD32' };
+            if (score >= 700000) return { grade: 'C', color: '#FFA500' };
+            if (score >= 600000) return { grade: 'D', color: '#FF0000' };
+        }
         return { grade: 'E', color: '#808080' };
     }
 

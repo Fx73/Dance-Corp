@@ -35,8 +35,7 @@ export class MusicFirestoreService {
 
     async uploadMusic(dto: MusicDto): Promise<void> {
         try {
-            const userId = this.userFirestoreService.getUserData()?.id;
-            if (!userId) throw new Error("User not authenticated");
+            if (!this.userFirestoreService.user) throw new Error("User not authenticated");
 
             const musicRef = doc(this.db, this.MUSIC_COLLECTION, dto.id).withConverter(this.firestoreConverterMusic);
 
@@ -55,8 +54,7 @@ export class MusicFirestoreService {
 
     async updateMusic(dto: MusicDto): Promise<void> {
         try {
-            const userId = this.userFirestoreService.getUserData()?.id;
-            if (!userId) throw new Error("User not authenticated");
+            if (!this.userFirestoreService.user) throw new Error("User not authenticated");
 
             const musicRef = doc(this.db, this.MUSIC_COLLECTION, dto.id).withConverter(this.firestoreConverterMusic);
 
@@ -85,8 +83,8 @@ export class MusicFirestoreService {
 
     async uploadNotes(musicId: string, notes: NoteDataDto[]): Promise<void> {
         try {
-            const userId = this.userFirestoreService.getUserData()?.id;
-            if (!userId) throw new Error("User not authenticated");
+            const user = this.userFirestoreService.user;
+            if (!user) throw new Error("User not authenticated");
 
             const musicRef = doc(this.db, this.MUSIC_COLLECTION, musicId)
                 .withConverter(this.firestoreConverterMusic);
@@ -101,11 +99,11 @@ export class MusicFirestoreService {
             for (const note of notes) {
                 // Only allow updates if the user is the creator OR it's a new note
                 if (!note.creatorId) {
-                    note.creatorId = userId;
-                    note.credit = note.credit ?? this.userFirestoreService.getUserData()?.name;
+                    note.creatorId = user.id;
+                    note.credit = note.credit ?? user.name;
                 }
 
-                if (note.creatorId !== userId) {
+                if (note.creatorId !== user.id) {
                     console.log(`Skipping update for note ${note.chartName} - Not the creator`);
                     continue;
                 }
@@ -202,7 +200,7 @@ export class MusicFirestoreService {
 
     async deleteNote(musicId: string, note: NoteDataDto): Promise<void> {
         try {
-            const userId = this.userFirestoreService.getUserData()?.id;
+            const userId = this.userFirestoreService.user?.id;
             if (!userId) throw new Error("User not authenticated");
 
             const musicRef = doc(this.db, this.MUSIC_COLLECTION, musicId).withConverter(this.firestoreConverterMusic);

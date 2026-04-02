@@ -496,7 +496,7 @@ export class UploadPage {
   }
   isNoteMine(note: NoteDataDto): boolean {
     if (!note.creatorId || note.creatorId.trim() === "") return true;
-    return note.creatorId === this.userService.getUserData()?.id;
+    return note.creatorId === this.userService.user?.id;
   }
   getDbNote(chartName: string): NoteDataDto | undefined {
     return this.musicDataDb?.noteData.find(n => n.chartName === chartName);

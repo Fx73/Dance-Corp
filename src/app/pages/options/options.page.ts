@@ -11,6 +11,7 @@ import { HeaderComponent } from "src/app/shared/component/header/header.componen
 import { MusicCacheService } from '../../services/localStorage/music.cache.service';
 import { PlayerDisplayComponent } from '../../game/gameDisplay/player-display.component';
 import { RouterModule } from '@angular/router';
+import { UserCacheService } from './../../services/localStorage/user.cache.service';
 import { UserConfigService } from 'src/app/services/userconfig.service';
 import { musicLocalService } from 'src/app/services/localStorage/local.music.service';
 
@@ -25,7 +26,7 @@ export class OptionsPage {
   @ViewChild(PlayerDisplayComponent) playerDisplay?: PlayerDisplayComponent;
   showPlayerDisplay = false;
 
-  constructor(private userConfigService: UserConfigService, private localMusicService: musicLocalService, private musicCacheService: MusicCacheService) {
+  constructor(private userConfigService: UserConfigService, private localMusicService: musicLocalService, private musicCacheService: MusicCacheService, private userCacheService: UserCacheService) {
     // Initialize player display if needed
     if (this.userConfigService.getConfig()['showPlayerDisplay']) {
       this.showPlayerDisplay = true;
@@ -89,6 +90,7 @@ export class OptionsPage {
   }
   clearMusicCache() {
     this.musicCacheService.clearCache();
+    this.userCacheService.clearCache();
   }
   clearMusicEditCache() {
     this.localMusicService.clearAllLocalMusics()

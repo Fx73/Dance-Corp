@@ -44,7 +44,7 @@ export class GameOverComponent implements OnInit {
 
   ngOnInit() {
     this.getPrecisionCounts()
-    this.grade = Color.gradeFromScore(this.gameRound.isFailed ? 0 : this.getScore())
+    this.grade = Color.gradeFromScore(this.getScore(), this.gameRound.isFailed)
 
   }
 
