@@ -10,7 +10,7 @@ import { DancePadGamepad } from "../gameController/dancepad-gamepad";
 import { DancePadKeyboard } from './../gameController/dancepad-keyboard';
 import { Player } from "./player";
 import { Precision } from "../constants/precision.enum";
-import { SoundManager } from "../sound.manager";
+import { SoundManager } from "../../shared/utils/sound.manager";
 
 export class GameRound {
     //#region App Constants
@@ -18,13 +18,17 @@ export class GameRound {
     readonly MAX_SCORE = 1000000;
     //#endregion
 
+    // Sound
+    private mineHitSound = new Audio('assets/Sounds/gameFx/player_mine.mp3');
+
+
     //Game Data
     arrowManager: ArrowManager;
 
     //Player Data
     public player: Player
     dancepad: IDancePad
-    private soundManager: SoundManager = new SoundManager();
+
 
     //Game variables
     private isTrainingMode = false;
@@ -234,7 +238,9 @@ export class GameRound {
         this.updatePerformance(-20)
         this.comboCount = 0
         this.precisionMessage.push(arrow)
-        this.soundManager.playMineHit();
+
+        this.mineHitSound.currentTime = 0;
+        this.mineHitSound.play();
     }
     minePassed(arrow: Arrow) {
         arrow.ok()

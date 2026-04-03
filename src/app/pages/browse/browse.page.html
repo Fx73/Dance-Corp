@@ -5,6 +5,17 @@
 
     <ion-menu contentId="music-list">
       @if (selectedMusic) {
+      @switch (pickMusicPlayer(selectedMusic.music!)) {
+      @case (MusicOrigin.Youtube){
+      <app-music-player-youtube [musicUrl]="selectedMusic.music!" (onReady)="onPlayerReady($event)" [startOffset]="selectedMusic?.musicoffset"></app-music-player-youtube>
+      }
+      @case (MusicOrigin.Soundcloud){
+      <app-music-player-soundcloud [musicUrl]="selectedMusic?.music!" (onReady)="onPlayerReady($event)" [startOffset]="selectedMusic?.musicoffset"></app-music-player-soundcloud>
+      }
+      @case (MusicOrigin.Local){
+      <app-music-player-local [musicUrl]="selectedMusic?.music!" (onReady)="onPlayerReady($event)" [startOffset]="selectedMusic?.musicoffset"></app-music-player-local>
+      }
+      }
       <ion-card class="levelCard" [ngStyle]="{'background-image': 'url(https://' + selectedMusic.jacket + ')'}">
         <ion-card-header>
           <ion-card-title> {{ selectedMusic.title }} </ion-card-title>

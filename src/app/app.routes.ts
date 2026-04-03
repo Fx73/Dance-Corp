@@ -13,7 +13,7 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/welcome/welcome.page').then(m => m.WelcomePage)
   },
   {
-    path: 'game/:musicId',
+    path: 'play/game/:musicId',
     loadComponent: () => import('./game/game.page').then(m => m.GamePage),
     canActivate: [gameGuard]
   },

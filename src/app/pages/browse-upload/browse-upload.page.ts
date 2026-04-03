@@ -2,6 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { InfiniteScrollCustomEvent, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonIcon, IonImg, IonInfiniteScroll, IonInfiniteScrollContent, IonSearchbar, IonText } from '@ionic/angular/standalone';
 import { MusicDto, NoteDataDto } from 'src/app/game/gameModel/music.dto';
 
+import { AppComponent } from 'src/app/app.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from "src/app/shared/component/header/header.component";
@@ -68,7 +69,6 @@ export class BrowseUploadPage implements OnInit {
       this.router.navigate(['/upload'], { queryParams: { music: music.id } });
     else
       this.router.navigate(['/upload']);
-
   }
 
   onSearch(event: any) {

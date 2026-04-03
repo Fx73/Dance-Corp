@@ -1,4 +1,5 @@
 import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren, signal } from '@angular/core';
+import { IMusicPlayer, MusicOrigin, MusicPlayerCommon } from 'src/app/game/musicPlayer/IMusicPlayer';
 import { InfiniteScrollCustomEvent, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonImg, IonInfiniteScroll, IonInfiniteScrollContent, IonMenu, IonSearchbar, IonSplitPane, IonText } from '@ionic/angular/standalone';
 import { MusicDto, NoteDataDto } from 'src/app/game/gameModel/music.dto';
 import { NgClass, NgStyle, } from '@angular/common';
@@ -16,10 +17,14 @@ import { GradeComponent } from "../../shared/component/grade/grade.component";
 import { HeaderComponent } from "src/app/shared/component/header/header.component";
 import { IDancePad } from 'src/app/game/gameController/dancepad.interface';
 import { MusicCacheService } from '../../services/localStorage/music.cache.service';
+import { MusicPlayerLocalComponent } from "src/app/game/musicPlayer/music-player-local/music-player-local.component";
+import { MusicPlayerSoundcloudComponent } from "src/app/game/musicPlayer/music-player-soundcloud/music-player-soundcloud.component";
+import { MusicPlayerYoutubeComponent } from "src/app/game/musicPlayer/music-player-youtube/music-player-youtube.component";
 import { NoteDifficulty } from 'src/app/game/constants/note-difficulty.enum';
 import { PresenceService } from '../../services/thirdpartyapp/presence.service';
 import { RadarScoreComponent } from "src/app/shared/component/radar-score/radar-score.component";
 import { Router } from '@angular/router';
+import { SoundManager } from '../../shared/utils/sound.manager';
 import { UserCacheService } from 'src/app/services/localStorage/user.cache.service';
 import { UserConfigService } from 'src/app/services/userconfig.service';
 import { UserFirestoreService } from './../../services/firestore/user.firestore.service';
@@ -30,10 +35,15 @@ import { musicLocalService } from 'src/app/services/localStorage/local.music.ser
   templateUrl: './browse.page.html',
   styleUrls: ['./browse.page.scss'],
   standalone: true,
-  imports: [IonBadge, IonSplitPane, IonCardSubtitle, IonMenu, IonText, IonCardContent, IonCardTitle, IonInfiniteScrollContent, IonImg, IonInfiniteScroll, IonSearchbar, IonCard, IonCardHeader, IonContent, NgStyle, NgClass, FormsModule, HeaderComponent, GradeComponent, RadarScoreComponent]
+  imports: [IonBadge, IonSplitPane, IonCardSubtitle, IonMenu, IonText, IonCardContent, IonCardTitle, IonInfiniteScrollContent, IonImg, IonInfiniteScroll, IonSearchbar, IonCard, IonCardHeader, IonContent, NgStyle, NgClass, FormsModule, HeaderComponent, GradeComponent, RadarScoreComponent, MusicPlayerYoutubeComponent, MusicPlayerLocalComponent, MusicPlayerSoundcloudComponent]
 })
 export class BrowsePage implements OnInit {
+  readonly SOUND_ARROW_UP = new Audio('assets/Sounds/menuFx/arrow_up.ogg');
+  readonly SOUND_ARROW_DOWN = new Audio('assets/Sounds/menuFx/arrow_down.ogg');
+
+  readonly MusicOrigin = MusicOrigin;
   readonly DanceType = DanceType;
+  pickMusicPlayer = MusicPlayerCommon.pickMusicPlayer;
 
   dbMusics = signal<MusicDto[]>([]);
   storedMusics = signal<MusicDto[]>([]);
@@ -49,6 +59,8 @@ export class BrowsePage implements OnInit {
   selectedNotesIndex = signal<number[]>([]);
 
   dancepad: IDancePad[] = []
+
+  private sampleLoopActive = false;
 
   @ViewChildren('musicCard', { read: ElementRef }) musicCards!: QueryList<ElementRef>;
 
@@ -75,6 +87,7 @@ export class BrowsePage implements OnInit {
   ionViewWillLeave() {
     window.removeEventListener('keydown', this.keyHandler);
     this.isListeningInput = false;
+    this.sampleLoopActive = false;
   }
 
   initPlayerInput() {
@@ -167,6 +180,9 @@ export class BrowsePage implements OnInit {
 
     this.musicUserScore.set(this.userCacheService.getMusicStats(music.id));
 
+    this.SOUND_ARROW_UP.currentTime = 0;
+    this.SOUND_ARROW_UP.play();
+
     setTimeout(() => {
       const el = this.musicCards.toArray()[listIndex]?.nativeElement;
       if (el) {
@@ -176,6 +192,8 @@ export class BrowsePage implements OnInit {
   }
   onSelectNote(noteIdx: number, playerIndex: number = 0) {
     this.selectedNotesIndex()[playerIndex] = noteIdx;
+    this.SOUND_ARROW_DOWN.currentTime = 0;
+    this.SOUND_ARROW_DOWN.play();
     this.cd.markForCheck();
   }
 
@@ -220,6 +238,40 @@ export class BrowsePage implements OnInit {
     console.info("Congratz, you found the infinite scroll ! But there is no more music to load :)");
     event.target.complete();
   }
+  onPlayerReady(mPlayer: IMusicPlayer) {
+    const music = this.getSelectedMusic(this.selectedMusicIndex());
+    if (!music) return;
+
+    const start = music.sampleStart ?? 0;
+    const length = music.sampleLength ?? 5;
+
+    this.sampleLoopActive = true;
+    this.startSampleLoop(mPlayer, start, length);
+  }
+  private async startSampleLoop(player: IMusicPlayer, start: number, length: number, delay: number = 2) {
+    function sleep(ms: number) {
+      return new Promise(res => setTimeout(res, ms));
+    }
+    while (this.sampleLoopActive) {
+      player.setToTime(start);
+      player.play();
+
+      const endTime = start + length;
+
+      while (this.sampleLoopActive && player.getCurrentTime() < endTime) {
+        await sleep(100);
+      }
+      player.stop();
+
+      let waited = 0;
+      while (this.sampleLoopActive && waited < delay * 1000) {
+        await sleep(100);
+        waited += 100;
+      }
+    }
+  }
+
+
 
 
   runGame(): void {
@@ -227,7 +279,7 @@ export class BrowsePage implements OnInit {
     if (!selectedMusic) return;
     console.log("Selected music for game:", selectedMusic, "with notes:", this.musicNotes());
 
-    this.router.navigate(['/game', selectedMusic.id], {
+    this.router.navigate(['/play/game', selectedMusic.id], {
       queryParams: {
         notes: this.selectedNotesIndex(),
       }
