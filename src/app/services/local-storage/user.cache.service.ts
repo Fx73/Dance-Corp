@@ -1,7 +1,7 @@
 import { Injectable, effect } from "@angular/core";
 import { UserDto, UserMusicDto, UserNoteDto } from 'src/app/pages/user-profile/user.dto';
 
-import { GameRound } from "src/app/game/gameModel/gameRound";
+import { GameRound } from "src/app/game/game-model/gameRound";
 import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.service';
 
 @Injectable({ providedIn: 'root' })

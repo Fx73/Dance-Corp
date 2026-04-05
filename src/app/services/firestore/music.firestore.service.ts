@@ -1,10 +1,10 @@
 import { Firestore, collection, deleteDoc, doc, documentId, getDoc, getDocs, getFirestore, orderBy, query, setDoc, updateDoc, where } from 'firebase/firestore';
-import { MusicDto, NoteDataDto } from '../../game/gameModel/music.dto';
+import { MusicDto, NoteDataDto } from '../../game/game-model/music.dto';
 
-import { Injectable } from '@angular/core';
 import { AppComponent } from 'src/app/app.component';
 import { DifficultyCriteria } from 'src/app/pages/upload/DifficultyCriteria';
 import { FirestoreConverter } from './firestore.converter';
+import { Injectable } from '@angular/core';
 import { UserFirestoreService } from './user.firestore.service';
 
 @Injectable({

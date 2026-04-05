@@ -1,13 +1,13 @@
-import { ArrowState, IDancePad } from "../gameController/dancepad.interface";
+import { ArrowState, IDancePad } from "../game-controller/dancepad.interface";
 
-import { ArrowDirection } from 'src/app/game/constants/arrow-direction.enum';
 import { AnnouncerService } from 'src/app/services/gameplay/announcer.service';
+import { Arrow } from "./arrows/arrow";
+import { ArrowDirection } from 'src/app/game/constants/arrow-direction.enum';
+import { ArrowManager } from './arrows/arrowManager';
 import { ArrowType } from "../constants/arrow-type.enum";
-import { DancePadGamepad } from "../gameController/dancepad-gamepad";
 import { CONFIG } from './../constants/game-config';
-import { DancePadKeyboard } from './../gameController/dancepad-keyboard';
-import { Arrow } from "./arrowManagement/arrow";
-import { ArrowManager } from './arrowManagement/arrowManager';
+import { DancePadGamepad } from "../game-controller/dancepad-gamepad";
+import { DancePadKeyboard } from '../game-controller/dancepad-keyboard';
 import { NoteDataDto } from "./music.dto";
 import { Player } from "./player";
 
@@ -58,7 +58,7 @@ export class GameRound {
         this.arrowManager = new ArrowManager(notes);
 
         this.calculateScore()
-    
+
         if (isTrainingMode) {
             this.isTrainingMode = true
             this.performance = 100
@@ -206,7 +206,7 @@ export class GameRound {
         this.comboCount++
         this.precisionMessage.push(arrow)
 
-        if(this.comboCount >= 10)
+        if (this.comboCount >= 10)
             this.announcerService.changeSatisfaction(2, 2);
         else
             this.announcerService.changeSatisfaction(1, 4);
@@ -218,7 +218,7 @@ export class GameRound {
         this.comboCount++
         this.precisionMessage.push(arrow)
 
-        if(this.comboCount >= 20)
+        if (this.comboCount >= 20)
             this.announcerService.changeSatisfaction(2, 1);
         else
             this.announcerService.changeSatisfaction(1, 2);
@@ -247,7 +247,7 @@ export class GameRound {
         this.score += arrowLength * this.scorePerHoldBeat
         this.precisionMessage.push(arrow)
 
-        if(this.comboCount >= 10)
+        if (this.comboCount >= 10)
             this.announcerService.changeSatisfaction(2, 1);
         else
             this.announcerService.changeSatisfaction(1, 2);

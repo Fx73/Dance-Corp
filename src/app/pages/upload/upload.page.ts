@@ -3,8 +3,8 @@ import { BaseDirectory, mkdir, readDir, remove, writeFile } from '@tauri-apps/pl
 import { ChangeDetectorRef, Component, ElementRef, QueryList, ViewChild, ViewChildren, signal } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonGrid, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonList, IonRow, IonSpinner, ModalController } from '@ionic/angular/standalone';
-import { Measures, MusicDto, NoteDataDto } from 'src/app/game/gameModel/music.dto';
-import { MusicOrigin, MusicPlayerCommon } from 'src/app/game/musicPlayer/IMusicPlayer';
+import { Measures, MusicDto, NoteDataDto } from 'src/app/game/game-model/music.dto';
+import { MusicOrigin, MusicPlayerCommon } from 'src/app/game/music-player/IMusicPlayer';
 import { SccReader, SccWriter } from './reader.ssc';
 import { addOutline, checkmarkCircle, closeCircle, folder, logoSoundcloud, logoYoutube, removeOutline, trashOutline } from 'ionicons/icons';
 
@@ -12,14 +12,14 @@ import { AppComponent } from 'src/app/app.component';
 import { DanceType } from './../../game/constants/dance-type.enum';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from 'src/app/shared/component/header/header.component';
-import { MusicCacheService } from 'src/app/services/localstorage/music.cache.service';
+import { MusicCacheService } from 'src/app/services/local-storage/music.cache.service';
 import { MusicEditableFieldAutocompleteComponent } from './editable-field-autocomplete/editable-field-autocomplete.component';
 import { MusicEditableFieldComponent } from './editable-field/editable-field.component';
 import { MusicEditableListComponent } from './editable-list/editable-list.component';
 import { MusicFirestoreService } from 'src/app/services/firestore/music.firestore.service';
-import { MusicPlayerLocalComponent } from "src/app/game/musicPlayer/music-player-local/music-player-local.component";
-import { MusicPlayerSoundcloudComponent } from "../../game/musicPlayer/music-player-soundcloud/music-player-soundcloud.component";
-import { MusicPlayerYoutubeComponent } from "../../game/musicPlayer/music-player-youtube/music-player-youtube.component";
+import { MusicPlayerLocalComponent } from "src/app/game/music-player/music-player-local/music-player-local.component";
+import { MusicPlayerSoundcloudComponent } from "../../game/music-player/music-player-soundcloud/music-player-soundcloud.component";
+import { MusicPlayerYoutubeComponent } from "../../game/music-player/music-player-youtube/music-player-youtube.component";
 import { MusicSelectComponent } from './select/select.component';
 import { NoteDifficulty } from './../../game/constants/note-difficulty.enum';
 import { RadarScoreComponent } from "src/app/shared/component/radar-score/radar-score.component";
@@ -27,7 +27,7 @@ import { TestNoteComponent } from './test-note/test-note.component';
 import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.service';
 import { addIcons } from 'ionicons';
 import isTauri from 'src/app/shared/utils/tauri';
-import { musicLocalService } from 'src/app/services/localstorage/local.music.service';
+import { musicLocalService } from 'src/app/services/local-storage/local.music.service';
 
 @Component({
   selector: 'app-upload',

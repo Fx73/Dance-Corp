@@ -1,12 +1,12 @@
 import { AnnouncerService } from '../services/gameplay/announcer.service';
-import { BeatManager } from './gameModel/timeManagement/beatManager';
+import { BeatManager } from './game-model/timeline/beatManager';
 import { CONFIG } from "./constants/game-config";
-import { GameRound } from "./gameModel/gameRound";
-import { IMusicPlayer } from "./musicPlayer/IMusicPlayer";
-import { MusicDto } from "./gameModel/music.dto";
-import { Player } from "./gameModel/player";
-import { PlayerDisplayComponent } from "./gameDisplay/player-display.component";
-import { UserCacheService } from 'src/app/services/localstorage/user.cache.service';
+import { GameRound } from './game-model/gameRound';
+import { IMusicPlayer } from "./music-player/IMusicPlayer";
+import { MusicDto } from './game-model/music.dto';
+import { Player } from './game-model/player';
+import { PlayerDisplayComponent } from "./game-display/player-display.component";
+import { UserCacheService } from 'src/app/services/local-storage/user.cache.service';
 import { UserNoteDto } from '../pages/user-profile/user.dto';
 
 export class GameManager {

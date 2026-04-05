@@ -4,7 +4,7 @@ import { checkmarkCircleOutline, closeCircleOutline, medalOutline, starOutline }
 
 import { Color } from 'src/app/game/constants/color';
 import { CommonModule } from '@angular/common';
-import { GameRound } from 'src/app/game/gameModel/gameRound';
+import { GameRound } from 'src/app/game/game-model/gameRound';
 import { Precision } from 'src/app/game/constants/precision.enum';
 import { addIcons } from 'ionicons';
 

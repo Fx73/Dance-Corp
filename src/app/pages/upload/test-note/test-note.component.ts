@@ -1,17 +1,16 @@
-import { Component, Input, OnInit, Query, ViewChild, ViewChildren } from '@angular/core';
-import { IMusicPlayer, MusicOrigin, MusicPlayerCommon } from 'src/app/game/musicPlayer/IMusicPlayer';
-import { MusicDto, NoteDataDto } from 'src/app/game/gameModel/music.dto';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { IMusicPlayer, MusicOrigin, MusicPlayerCommon } from 'src/app/game/music-player/IMusicPlayer';
+import { MusicDto, NoteDataDto } from 'src/app/game/game-model/music.dto';
 
 import { ArrowDirection } from 'src/app/game/constants/arrow-direction.enum';
 import { GameManager } from 'src/app/game/game.manager';
-import { GameRound } from 'src/app/game/gameModel/gameRound';
 import { IonicModule } from '@ionic/angular';
 import { ModalController } from '@ionic/angular/standalone';
-import { MusicPlayerSoundcloudComponent } from "../../../game/musicPlayer/music-player-soundcloud/music-player-soundcloud.component";
-import { MusicPlayerYoutubeComponent } from "../../../game/musicPlayer/music-player-youtube/music-player-youtube.component";
+import { MusicPlayerSoundcloudComponent } from "../../../game/music-player/music-player-soundcloud/music-player-soundcloud.component";
+import { MusicPlayerYoutubeComponent } from "../../../game/music-player/music-player-youtube/music-player-youtube.component";
 import { NgIf } from '@angular/common';
-import { Player } from 'src/app/game/gameModel/player';
-import { PlayerDisplayComponent } from "../../../game/gameDisplay/player-display.component";
+import { Player } from 'src/app/game/game-model/player';
+import { PlayerDisplayComponent } from "../../../game/game-display/player-display.component";
 import { UserConfigService } from 'src/app/services/userconfig.service';
 
 @Component({

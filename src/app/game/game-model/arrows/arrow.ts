@@ -1,4 +1,4 @@
-import { ArrowColor } from "../../gameDisplay/arrowImageManager";
+import { ArrowColor } from "../../game-display/arrowImageManager";
 import { ArrowDirection } from "src/app/game/constants/arrow-direction.enum";
 import { ArrowType } from "../../constants/arrow-type.enum";
 import { CONFIG } from "../../constants/game-config";

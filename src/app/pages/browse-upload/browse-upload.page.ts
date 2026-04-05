@@ -1,19 +1,16 @@
 import { Component, OnInit, signal } from '@angular/core';
-import { InfiniteScrollCustomEvent, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonIcon, IonImg, IonInfiniteScroll, IonInfiniteScrollContent, IonSearchbar, IonText } from '@ionic/angular/standalone';
-import { MusicDto, NoteDataDto } from 'src/app/game/gameModel/music.dto';
+import { InfiniteScrollCustomEvent, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonIcon, IonImg, IonInfiniteScroll, IonInfiniteScrollContent, IonSearchbar } from '@ionic/angular/standalone';
 
-import { AppComponent } from 'src/app/app.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from "src/app/shared/component/header/header.component";
-import { MusicCacheService } from 'src/app/services/localstorage/music.cache.service';
-import { MusicFirestoreService } from 'src/app/services/firestore/music.firestore.service';
+import { MusicCacheService } from 'src/app/services/local-storage/music.cache.service';
+import { MusicDto } from 'src/app/game/game-model/music.dto';
 import { PresenceService } from 'src/app/services/thirdpartyapp/presence.service';
 import { Router } from '@angular/router';
-import { UserFirestoreService } from '../../services/firestore/user.firestore.service';
 import { addCircleOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
-import { musicLocalService } from 'src/app/services/localstorage/local.music.service';
+import { musicLocalService } from 'src/app/services/local-storage/local.music.service';
 
 @Component({
   selector: 'app-browse-upload',

@@ -3,7 +3,7 @@ import { Injectable, signal } from '@angular/core';
 import { UserDto, UserMusicDto, UserNoteDto } from 'src/app/pages/user-profile/user.dto';
 
 import { FirestoreConverter } from './firestore.converter';
-import { GameRound } from 'src/app/game/gameModel/gameRound';
+import { GameRound } from 'src/app/game/game-model/gameRound';
 import { LoginFireauthService } from 'src/app/services/firestore/login.fireauth.service';
 import { User } from 'firebase/auth';
 

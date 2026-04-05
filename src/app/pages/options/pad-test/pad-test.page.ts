@@ -1,13 +1,13 @@
-import { AlertController, IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonHeader, IonItem, IonLabel, IonSelect, IonSelectOption, IonTitle, IonToolbar } from '@ionic/angular/standalone';
-import { Component, NgZone, OnInit } from '@angular/core';
+import { AlertController, IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonItem, IonLabel, IonSelect, IonSelectOption } from '@ionic/angular/standalone';
 
 import { AppComponent } from 'src/app/app.component';
 import { ArrowDirection } from 'src/app/game/constants/arrow-direction.enum';
 import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { GamepadService } from 'src/app/services/gameplay/gamepad.service';
 import { HeaderComponent } from "src/app/shared/component/header/header.component";
-import { Player } from 'src/app/game/gameModel/player';
+import { Player } from 'src/app/game/game-model/player';
 import { UserConfigService } from 'src/app/services/userconfig.service';
 
 @Component({

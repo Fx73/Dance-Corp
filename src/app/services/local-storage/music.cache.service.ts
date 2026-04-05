@@ -1,8 +1,8 @@
 import { AppComponent } from "src/app/app.component";
 import { Injectable } from "@angular/core";
-import { MusicDto } from "src/app/game/gameModel/music.dto";
+import { MusicDto } from "src/app/game/game-model/music.dto";
 import { MusicFirestoreService } from "../firestore/music.firestore.service";
-import { musicLocalService } from 'src/app/services/localstorage/local.music.service';
+import { musicLocalService } from 'src/app/services/local-storage/local.music.service';
 
 @Injectable({ providedIn: 'root' })
 export class MusicCacheService {

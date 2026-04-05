@@ -1,21 +1,20 @@
 import { Component, ViewChild } from '@angular/core';
-import { IonAccordion, IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonInput, IonItem, IonLabel, IonModal, IonRange, IonToggle } from '@ionic/angular/standalone';
+import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonInput, IonItem, IonLabel, IonModal, IonRange, IonToggle } from '@ionic/angular/standalone';
 
 import { AnnouncerService } from 'src/app/services/gameplay/announcer.service';
-import { Arrow } from '../../game/gameModel/arrowManagement/arrow';
+import { Arrow } from '../../game/game-model/arrows/arrow';
 import { ArrowType } from '../../game/constants/arrow-type.enum';
-import { BrowseUploadPage } from '../browse-upload/browse-upload.page';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { GameRound } from '../../game/gameModel/gameRound';
+import { GameRound } from '../../game/game-model/gameRound';
 import { HeaderComponent } from "src/app/shared/component/header/header.component";
-import { MusicCacheService } from '../../services/localstorage/music.cache.service';
-import { PlayerDisplayComponent } from '../../game/gameDisplay/player-display.component';
+import { MusicCacheService } from '../../services/local-storage/music.cache.service';
+import { PlayerDisplayComponent } from '../../game/game-display/player-display.component';
 import { RouterModule } from '@angular/router';
 import { SoundManager } from './../../services/gameplay/sound.service';
-import { UserCacheService } from '../../services/localstorage/user.cache.service';
+import { UserCacheService } from '../../services/local-storage/user.cache.service';
 import { UserConfigService } from 'src/app/services/userconfig.service';
-import { musicLocalService } from 'src/app/services/localstorage/local.music.service';
+import { musicLocalService } from 'src/app/services/local-storage/local.music.service';
 
 @Component({
   selector: 'app-options',
@@ -67,10 +66,10 @@ export class OptionsPage {
         this.announcerService.testAnnouncerSound();
         break;
       case 'sfxVolume':
-          const SOUND_ARROW_UP = new Audio('assets/Sounds/menuFx/arrow_up.ogg');
-          SOUND_ARROW_UP.volume = volume;
-          SOUND_ARROW_UP.play();
-          break;
+        const SOUND_ARROW_UP = new Audio('assets/Sounds/menuFx/arrow_up.ogg');
+        SOUND_ARROW_UP.volume = volume;
+        SOUND_ARROW_UP.play();
+        break;
     }
 
   }

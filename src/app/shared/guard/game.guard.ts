@@ -1,6 +1,5 @@
 import { CanActivateFn, Router } from '@angular/router';
 
-import { ArrowImageManager } from 'src/app/game/gameDisplay/arrowImageManager';
 import { UserConfigService } from 'src/app/services/userconfig.service';
 import { inject } from '@angular/core';
 

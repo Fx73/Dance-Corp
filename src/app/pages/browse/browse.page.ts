@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren, signal } from '@angular/core';
-import { IMusicPlayer, MusicOrigin, MusicPlayerCommon } from 'src/app/game/musicPlayer/IMusicPlayer';
+import { IMusicPlayer, MusicOrigin, MusicPlayerCommon } from 'src/app/game/music-player/IMusicPlayer';
 import { InfiniteScrollCustomEvent, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonImg, IonInfiniteScroll, IonInfiniteScrollContent, IonMenu, IonSearchbar, IonSplitPane, IonText } from '@ionic/angular/standalone';
-import { MusicDto, NoteDataDto } from 'src/app/game/gameModel/music.dto';
+import { MusicDto, NoteDataDto } from 'src/app/game/game-model/music.dto';
 import { NgClass, NgStyle, } from '@angular/common';
 import { UserMusicDto, UserNoteDto } from '../user-profile/user.dto';
 
@@ -9,27 +9,27 @@ import { AnnouncerService } from 'src/app/services/gameplay/announcer.service';
 import { ArrowDirection } from 'src/app/game/constants/arrow-direction.enum';
 import { CONFIG } from 'src/app/game/constants/game-config';
 import { Color } from 'src/app/game/constants/color';
-import { DancePadGamepad } from 'src/app/game/gameController/dancepad-gamepad';
-import { DancePadKeyboard } from 'src/app/game/gameController/dancepad-keyboard';
+import { DancePadGamepad } from 'src/app/game/game-controller/dancepad-gamepad';
+import { DancePadKeyboard } from 'src/app/game/game-controller/dancepad-keyboard';
 import { DanceType } from 'src/app/game/constants/dance-type.enum';
 import { DifficultyCriteria } from '../upload/DifficultyCriteria';
 import { FormsModule } from '@angular/forms';
 import { GradeComponent } from "../../shared/component/grade/grade.component";
 import { HeaderComponent } from "src/app/shared/component/header/header.component";
-import { IDancePad } from 'src/app/game/gameController/dancepad.interface';
-import { MusicCacheService } from '../../services/localstorage/music.cache.service';
-import { MusicPlayerLocalComponent } from "src/app/game/musicPlayer/music-player-local/music-player-local.component";
-import { MusicPlayerSoundcloudComponent } from "src/app/game/musicPlayer/music-player-soundcloud/music-player-soundcloud.component";
-import { MusicPlayerYoutubeComponent } from "src/app/game/musicPlayer/music-player-youtube/music-player-youtube.component";
+import { IDancePad } from 'src/app/game/game-controller/dancepad.interface';
+import { MusicCacheService } from '../../services/local-storage/music.cache.service';
+import { MusicPlayerLocalComponent } from "src/app/game/music-player/music-player-local/music-player-local.component";
+import { MusicPlayerSoundcloudComponent } from "src/app/game/music-player/music-player-soundcloud/music-player-soundcloud.component";
+import { MusicPlayerYoutubeComponent } from "src/app/game/music-player/music-player-youtube/music-player-youtube.component";
 import { NoteDifficulty } from 'src/app/game/constants/note-difficulty.enum';
 import { PresenceService } from '../../services/thirdpartyapp/presence.service';
 import { RadarScoreComponent } from "src/app/shared/component/radar-score/radar-score.component";
 import { Router } from '@angular/router';
 import { SoundManager } from './../../services/gameplay/sound.service';
-import { UserCacheService } from 'src/app/services/localstorage/user.cache.service';
+import { UserCacheService } from 'src/app/services/local-storage/user.cache.service';
 import { UserConfigService } from 'src/app/services/userconfig.service';
 import { UserFirestoreService } from './../../services/firestore/user.firestore.service';
-import { musicLocalService } from 'src/app/services/localstorage/local.music.service';
+import { musicLocalService } from 'src/app/services/local-storage/local.music.service';
 
 @Component({
   selector: 'app-browse',
@@ -60,7 +60,7 @@ export class BrowsePage implements OnInit {
   selectedNotesIndex = signal<number[]>([]);
 
   dancepad: IDancePad[] = []
-  
+
   lastDifficultyPlayed: NoteDifficulty[] = [];
 
   private sampleLoopActive = false;
@@ -281,7 +281,7 @@ export class BrowsePage implements OnInit {
     console.log("Selected music for game:", selectedMusic, "with notes:", this.musicNotes());
 
     for (let i = 0; i < this.selectedNotesIndex().length; i++) {
-      const newDifficulty : NoteDifficulty = this.musicNotes()[this.selectedNotesIndex()[i]]?.difficulty;
+      const newDifficulty: NoteDifficulty = this.musicNotes()[this.selectedNotesIndex()[i]]?.difficulty;
       const lastDifficulty = this.lastDifficultyPlayed[i];
       if (newDifficulty && newDifficulty !== lastDifficulty) {
         this.lastDifficultyPlayed[i] = newDifficulty;

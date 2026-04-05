@@ -1,8 +1,8 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 
 import { AnnouncerService } from './services/gameplay/announcer.service';
-import { MusicCacheService } from './services/localstorage/music.cache.service';
+import { MusicCacheService } from './services/local-storage/music.cache.service';
 import { PresenceService } from './services/thirdpartyapp/presence.service';
 import { SoundManager } from './services/gameplay/sound.service';
 import { ToastController } from '@ionic/angular';
@@ -16,11 +16,7 @@ import { ToastController } from '@ionic/angular';
 export class AppComponent implements OnInit {
   static appInstance: AppComponent;
 
-  private toastController: ToastController = inject(ToastController);
-  private presenceService: PresenceService = inject(PresenceService);
-  private musicCacheService: MusicCacheService = inject(MusicCacheService);
-
-  constructor(announcerService: AnnouncerService, soundManager: SoundManager) {
+  constructor(announcerService: AnnouncerService, soundManager: SoundManager, private toastController: ToastController, private presenceService: PresenceService, private musicCacheService: MusicCacheService) {
     AppComponent.appInstance = this;
     announcerService.init();
 

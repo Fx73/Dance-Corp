@@ -1,4 +1,4 @@
-import { BackgroundChange, BpmChange, LabelChange, ScrollChange, SpeedChange, StopChange, WarpChange } from "./timeManagement/timedChange";
+import { BackgroundChange, BpmChange, LabelChange, ScrollChange, SpeedChange, StopChange, WarpChange } from "./timeline/timedChange";
 import { NoteDifficulty, difficultyMap } from "../constants/note-difficulty.enum";
 
 import { DanceType } from "../constants/dance-type.enum";
@@ -210,7 +210,7 @@ export class NoteDataDto {
     return instance;
   }
 
-  
+
 }
 
 export class Measures {

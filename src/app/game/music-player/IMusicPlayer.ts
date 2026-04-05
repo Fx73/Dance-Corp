@@ -1,4 +1,4 @@
-import { Directive, EventEmitter, Input, OnInit, inject } from "@angular/core";
+import { Directive, EventEmitter, Input, inject } from "@angular/core";
 
 import { UserConfigService } from "src/app/services/userconfig.service";
 
@@ -19,7 +19,7 @@ export interface IMusicPlayer {
 @Directive()
 export class MusicPlayerCommon {
     protected userConfig = inject(UserConfigService);
-  
+
     @Input()
     size: { width: number | string; height: number | string } = { width: '1', height: '1' };
 

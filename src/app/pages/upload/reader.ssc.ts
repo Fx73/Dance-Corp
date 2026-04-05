@@ -1,5 +1,5 @@
-import { BpmChange, ITimedChange } from 'src/app/game/gameModel/timeManagement/timedChange';
-import { Measures, MusicDto } from "src/app/game/gameModel/music.dto";
+import { BpmChange, ITimedChange } from "src/app/game/game-model/timeline/timedChange";
+import { Measures, MusicDto } from "src/app/game/game-model/music.dto";
 
 import { NoteEvaluator } from "./DifficultyCriteria";
 
@@ -21,7 +21,7 @@ export class SccReader {
     const musicData = new MusicDto(tokenMap);
     console.log("Parsed Music Data:", musicData);
 
-    const tsvLines = []
+    const tsvLines: string[] = []
     for (const noteData of musicData.noteData) {
       if (!noteData.difficultyCriterias) {
         const evaluator = new NoteEvaluator(musicData.bpms, noteData.stepChart);

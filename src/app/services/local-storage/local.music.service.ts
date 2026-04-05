@@ -2,7 +2,7 @@ import { readDir, remove } from "@tauri-apps/plugin-fs";
 
 import { BaseDirectory } from "@tauri-apps/api/path";
 import { Injectable } from "@angular/core";
-import { MusicDto } from "src/app/game/gameModel/music.dto";
+import { MusicDto } from "src/app/game/game-model/music.dto";
 
 @Injectable({ providedIn: 'root' })
 export class musicLocalService {

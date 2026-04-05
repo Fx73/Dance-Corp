@@ -1,4 +1,3 @@
-import { ArrowImageManager } from "../gameDisplay/arrowImageManager";
 
 export const CONFIG = {
     APP: {

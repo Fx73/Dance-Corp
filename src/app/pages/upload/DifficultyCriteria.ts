@@ -1,6 +1,5 @@
-import { BpmChange, ITimedChange } from "src/app/game/gameModel/timeManagement/timedChange";
-
-import { Measures } from "src/app/game/gameModel/music.dto";
+import { BpmChange } from "src/app/game/game-model/timeline/timedChange";
+import { Measures } from "src/app/game/game-model/music.dto";
 
 export class DifficultyCriteria {
   [key: string]: number | any;

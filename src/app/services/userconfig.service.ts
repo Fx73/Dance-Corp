@@ -1,8 +1,8 @@
 import { Injectable, effect } from '@angular/core';
 
+import { ArrowImageManager } from '../game/game-display/arrowImageManager';
 import { BehaviorSubject } from 'rxjs';
-import { ArrowImageManager } from '../game/gameDisplay/arrowImageManager';
-import { Player } from '../game/gameModel/player';
+import { Player } from '../game/game-model/player';
 import { UserFirestoreService } from './firestore/user.firestore.service';
 
 @Injectable({
