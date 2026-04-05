@@ -1,12 +1,10 @@
-import { Firestore, addDoc, collection, deleteDoc, doc, documentId, getDoc, getDocs, getFirestore, limit, orderBy, query, setDoc, startAfter, updateDoc, where } from 'firebase/firestore';
+import { Firestore, collection, deleteDoc, doc, documentId, getDoc, getDocs, getFirestore, orderBy, query, setDoc, updateDoc, where } from 'firebase/firestore';
 import { MusicDto, NoteDataDto } from '../../game/gameModel/music.dto';
 
+import { Injectable } from '@angular/core';
 import { AppComponent } from 'src/app/app.component';
-import { DanceType } from 'src/app/game/constants/dance-type.enum';
 import { DifficultyCriteria } from 'src/app/pages/upload/DifficultyCriteria';
 import { FirestoreConverter } from './firestore.converter';
-import { Injectable } from '@angular/core';
-import { NoteDifficulty } from 'src/app/game/constants/note-difficulty.enum';
 import { UserFirestoreService } from './user.firestore.service';
 
 @Injectable({
@@ -375,65 +373,6 @@ export class MusicFirestoreService {
 
     //#endregion
 
-
-    // Migrate function to replace all Notes difficulty with the new ones (Beginner, Easy, Advanced, Expert, Challenge)
-async migrateDifficulty() {
-    const musicRef = collection(this.db, this.MUSIC_COLLECTION)
-        .withConverter(this.firestoreConverterMusic);
-
-    const q = query(musicRef, orderBy(documentId()));
-    const querySnapshot = await getDocs(q);
-
-    if (querySnapshot.empty)
-        throw new Error("No musics to fetch in database");
-
-    const difficultyMap: Record<string, NoteDifficulty> = {
-        // Beginner
-        "beginner": NoteDifficulty.Beginner,
-        "novice": NoteDifficulty.Beginner,
-
-        // Basic / Easy
-        "easy": NoteDifficulty.Basic,
-        "light": NoteDifficulty.Basic,
-
-        // Difficult / Advanced
-        "medium": NoteDifficulty.Difficult,
-        "advanced": NoteDifficulty.Difficult,
-        "difficult": NoteDifficulty.Difficult,
-
-        // Expert
-        "expert": NoteDifficulty.Expert,
-        "hard": NoteDifficulty.Expert,
-
-        // Challenge
-        "challenge": NoteDifficulty.Challenge,
-        "edit": NoteDifficulty.Challenge
-    };
-
-    for (const docSnap of querySnapshot.docs) {
-        const music = docSnap.data();
-        let updated = false;
-
-        for (const note of music.noteData) {
-            const raw = note.difficulty?.toLowerCase().trim();
-            const mapped = difficultyMap[raw];
-
-            if (mapped && mapped !== note.difficulty) {
-                console.log(
-                    `Migrating ${docSnap.id} : ${note.difficulty} → ${mapped}`
-                );
-                note.difficulty = mapped;
-                updated = true;
-            }
-        }
-
-        if (updated) {
-            await setDoc(docSnap.ref, music);
-        }
-    }
-
-    console.log("Migration complete");
-}
 
 
 }

@@ -1,6 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
-import { NavigationEnd, Router } from '@angular/router';
 
 import { AnnouncerService } from './services/gameplay/announcer.service';
 import { MusicCacheService } from './services/localstorage/music.cache.service';

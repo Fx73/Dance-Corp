@@ -1,17 +1,15 @@
 import { ArrowState, IDancePad } from "../gameController/dancepad.interface";
 
-import { AnnouncerService } from 'src/app/services/gameplay/announcer.service';
-import { Arrow } from "./arrowManagement/arrow";
 import { ArrowDirection } from 'src/app/game/constants/arrow-direction.enum';
-import { ArrowManager } from './arrowManagement/arrowManager';
+import { AnnouncerService } from 'src/app/services/gameplay/announcer.service';
 import { ArrowType } from "../constants/arrow-type.enum";
-import { CONFIG } from './../constants/game-config';
 import { DancePadGamepad } from "../gameController/dancepad-gamepad";
+import { CONFIG } from './../constants/game-config';
 import { DancePadKeyboard } from './../gameController/dancepad-keyboard';
+import { Arrow } from "./arrowManagement/arrow";
+import { ArrowManager } from './arrowManagement/arrowManager';
 import { NoteDataDto } from "./music.dto";
 import { Player } from "./player";
-import { Precision } from "../constants/precision.enum";
-import { SoundManager } from "../../services/gameplay/sound.service";
 
 export class GameRound {
     //#region App Constants

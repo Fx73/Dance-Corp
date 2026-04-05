@@ -1,13 +1,11 @@
 import {
   AfterViewInit,
   Component,
-  ElementRef,
   EventEmitter,
   Input,
   OnDestroy,
   OnInit,
-  Output,
-  ViewChild,
+  Output
 } from '@angular/core';
 import { IMusicPlayer, MusicPlayerCommon } from '../IMusicPlayer';
 

@@ -1,13 +1,13 @@
+import { UserCacheService } from 'src/app/services/localstorage/user.cache.service';
+import { UserNoteDto } from '../pages/user-profile/user.dto';
 import { AnnouncerService } from '../services/gameplay/announcer.service';
-import { BeatManager } from './gameModel/timeManagement/beatManager';
 import { CONFIG } from "./constants/game-config";
+import { PlayerDisplayComponent } from "./gameDisplay/player-display.component";
 import { GameRound } from "./gameModel/gameRound";
-import { IMusicPlayer } from "./musicPlayer/IMusicPlayer";
 import { MusicDto } from "./gameModel/music.dto";
 import { Player } from "./gameModel/player";
-import { PlayerDisplayComponent } from "./gameDisplay/player-display.component";
-import { UserCacheService } from '../services/localstorage/user.cache.service';
-import { UserNoteDto } from '../pages/user-profile/user.dto';
+import { BeatManager } from './gameModel/timeManagement/beatManager';
+import { IMusicPlayer } from "./musicPlayer/IMusicPlayer";
 
 export class GameManager {
 
@@ -109,17 +109,17 @@ export class GameManager {
         this.isGameOver = true;
 
         // At least one player finished and has a score of MAX_SCORE
-        if(this.gameRounds.some(gr => gr.isFinished && gr.score >= gr.MAX_SCORE)) {
+        if (this.gameRounds.some(gr => gr.isFinished && gr.score >= gr.MAX_SCORE)) {
             this.announcerService.playAnnouncer("victory");
             this.announcerService.playCrowdOneShot("special");
         }
         // At least one player finished and has a score of A
-        else if(this.gameRounds.some(gr => gr.isFinished && gr.score >= gr.MAX_SCORE * 0.9)) {
+        else if (this.gameRounds.some(gr => gr.isFinished && gr.score >= gr.MAX_SCORE * 0.9)) {
             this.announcerService.playAnnouncer("victory");
             this.announcerService.playCrowdOneShot("applause_heavy");
         }
         // At least one player finished
-        else if(this.gameRounds.some(gr => gr.isFinished)) {
+        else if (this.gameRounds.some(gr => gr.isFinished)) {
             this.announcerService.playAnnouncer("victory_small");
             this.announcerService.playCrowdOneShot("applause_light");
         }
@@ -129,7 +129,7 @@ export class GameManager {
             this.announcerService.playCrowdOneShot("boo");
         }
         // Main Player get new highscore
-        if(this.gameRounds[0].isFinished && this.mainUserStats && this.gameRounds[0].score > this.mainUserStats.highScore) {
+        if (this.gameRounds[0].isFinished && this.mainUserStats && this.gameRounds[0].score > this.mainUserStats.highScore) {
             this.announcerService.playAnnouncer("high_score");
         }
 

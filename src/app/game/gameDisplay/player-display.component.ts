@@ -1,15 +1,15 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, OnInit, ViewChild, signal } from '@angular/core';
-import { ArrowColor, ArrowImageManager } from './arrowImageManager';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, ViewChild, signal } from '@angular/core';
 
-import { Arrow } from '../gameModel/arrowManagement/arrow';
-import { ArrowDirection } from 'src/app/game/constants/arrow-direction.enum';
-import { ArrowType } from '../constants/arrow-type.enum';
-import { CONFIG } from '../constants/game-config';
-import { Color } from '../constants/color';
 import { CommonModule } from '@angular/common';
-import { GameRound } from '../gameModel/gameRound';
-import { Precision } from '../constants/precision.enum';
+import { ArrowDirection } from 'src/app/game/constants/arrow-direction.enum';
 import { UserConfigService } from 'src/app/services/userconfig.service';
+import { ArrowType } from '../constants/arrow-type.enum';
+import { Color } from '../constants/color';
+import { CONFIG } from '../constants/game-config';
+import { Precision } from '../constants/precision.enum';
+import { Arrow } from '../gameModel/arrowManagement/arrow';
+import { GameRound } from '../gameModel/gameRound';
+import { ArrowImageManager } from './arrowImageManager';
 
 @Component({
   selector: 'app-player-display',
