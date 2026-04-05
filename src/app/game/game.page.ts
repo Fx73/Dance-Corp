@@ -2,7 +2,7 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { IMusicPlayer, MusicOrigin, MusicPlayerCommon } from './musicPlayer/IMusicPlayer';
-import { IonButton, IonButtons, IonCard, IonContent, IonHeader, IonIcon, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { IonButton, IonCard, IonContent, IonHeader, IonIcon, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 
 import { AnnouncerService } from 'src/app/services/gameplay/announcer.service';
 import { AppComponent } from '../app.component';
@@ -72,7 +72,7 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
     this.music = music;
 
     // Prepare Music Player
-    this.musicOrigin = MusicPlayerCommon.pickMusicPlayer(this.music!.music!)
+    this.musicOrigin = MusicPlayerCommon.pickMusicPlayer(this.music.music!)
     if (this.musicOrigin == null) {
       AppComponent.presentWarningToast("Error loading music in player !")
       this.router.navigate(['/home']);
@@ -81,7 +81,7 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
 
     const players = this.userConfigService.players;
     const isTrainingMode: boolean = this.userConfigService.getConfig()["trainingMode"] ?? false
-    this.game = new GameManager(this.music!, players, selectedNotes, isTrainingMode, this.userCacheService, this.announcerService);
+    this.game = new GameManager(this.music, players, selectedNotes, isTrainingMode, this.userCacheService, this.announcerService);
     this.announcerService.pickPreferredAnnouncer()
 
     this.discordRpcService.update("Dancing on lvl " + this.music.noteData[0].meter, this.music.title + " - " + this.music.artist)

@@ -1,13 +1,13 @@
-import { UserCacheService } from 'src/app/services/localstorage/user.cache.service';
-import { UserNoteDto } from '../pages/user-profile/user.dto';
 import { AnnouncerService } from '../services/gameplay/announcer.service';
+import { BeatManager } from './gameModel/timeManagement/beatManager';
 import { CONFIG } from "./constants/game-config";
-import { PlayerDisplayComponent } from "./gameDisplay/player-display.component";
 import { GameRound } from "./gameModel/gameRound";
+import { IMusicPlayer } from "./musicPlayer/IMusicPlayer";
 import { MusicDto } from "./gameModel/music.dto";
 import { Player } from "./gameModel/player";
-import { BeatManager } from './gameModel/timeManagement/beatManager';
-import { IMusicPlayer } from "./musicPlayer/IMusicPlayer";
+import { PlayerDisplayComponent } from "./gameDisplay/player-display.component";
+import { UserCacheService } from 'src/app/services/localstorage/user.cache.service';
+import { UserNoteDto } from '../pages/user-profile/user.dto';
 
 export class GameManager {
 
@@ -25,7 +25,7 @@ export class GameManager {
         }
 
         this.beatManager = new BeatManager(this.music);
-        this.mainUserStats = this.userCacheService.getMusicStats(this.music.id).notes.find(n => n.id === this.music.noteData[noteSelected[0]].chartName) ?? null;
+        this.mainUserStats = this.userCacheService.getMusicStats(this.music.id).notes.find((n: UserNoteDto) => n.id === this.music.noteData[noteSelected[0]].chartName) ?? null;
     }
 
     public gameRounds: GameRound[] = [];
