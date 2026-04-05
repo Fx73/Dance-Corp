@@ -1,4 +1,6 @@
-import { Directive, EventEmitter, Input, OnInit } from "@angular/core";
+import { Directive, EventEmitter, Input, OnInit, inject } from "@angular/core";
+
+import { UserConfigService } from "src/app/services/userconfig.service";
 
 export interface IMusicPlayer {
     musicUrl: string; // Unique identifier for the music track
@@ -16,7 +18,8 @@ export interface IMusicPlayer {
 
 @Directive()
 export class MusicPlayerCommon {
-
+    protected userConfig = inject(UserConfigService);
+  
     @Input()
     size: { width: number | string; height: number | string } = { width: '1', height: '1' };
 
@@ -45,6 +48,10 @@ export class MusicPlayerCommon {
             default:
                 return false;
         }
+    }
+
+    public getVolume(): number {
+        return this.userConfig.getConfig()["musicVolume"] ?? 1;
     }
 }
 

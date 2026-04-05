@@ -1,6 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { IonAccordion, IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonInput, IonItem, IonLabel, IonModal, IonRange, IonToggle } from '@ionic/angular/standalone';
 
+import { AnnouncerService } from 'src/app/services/gameplay/announcer.service';
 import { Arrow } from '../../game/gameModel/arrowManagement/arrow';
 import { ArrowType } from '../../game/constants/arrow-type.enum';
 import { BrowseUploadPage } from '../browse-upload/browse-upload.page';
@@ -8,12 +9,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GameRound } from '../../game/gameModel/gameRound';
 import { HeaderComponent } from "src/app/shared/component/header/header.component";
-import { MusicCacheService } from '../../services/localStorage/music.cache.service';
+import { MusicCacheService } from '../../services/localstorage/music.cache.service';
 import { PlayerDisplayComponent } from '../../game/gameDisplay/player-display.component';
 import { RouterModule } from '@angular/router';
-import { UserCacheService } from './../../services/localStorage/user.cache.service';
+import { SoundManager } from './../../services/gameplay/sound.service';
+import { UserCacheService } from '../../services/localstorage/user.cache.service';
 import { UserConfigService } from 'src/app/services/userconfig.service';
-import { musicLocalService } from 'src/app/services/localStorage/local.music.service';
+import { musicLocalService } from 'src/app/services/localstorage/local.music.service';
 
 @Component({
   selector: 'app-options',
@@ -26,7 +28,7 @@ export class OptionsPage {
   @ViewChild(PlayerDisplayComponent) playerDisplay?: PlayerDisplayComponent;
   showPlayerDisplay = false;
 
-  constructor(private userConfigService: UserConfigService, private localMusicService: musicLocalService, private musicCacheService: MusicCacheService, private userCacheService: UserCacheService) {
+  constructor(private userConfigService: UserConfigService, private localMusicService: musicLocalService, private musicCacheService: MusicCacheService, private userCacheService: UserCacheService, private soundManager: SoundManager, private announcerService: AnnouncerService) {
     // Initialize player display if needed
     if (this.userConfigService.getConfig()['showPlayerDisplay']) {
       this.showPlayerDisplay = true;
@@ -36,6 +38,10 @@ export class OptionsPage {
   pinFormatter(value: number) {
     return `${value}`;
   }
+  pinFormatterVolume(value: number) {
+    return (value * 100).toFixed(0) + '%';
+  }
+
 
   getConfigValue<T>(key: any): T {
     return this.userConfigService.getConfig()[key] as T;
@@ -47,6 +53,26 @@ export class OptionsPage {
 
   updatePlayerNumber(value: any): void {
     this.userConfigService.updatePlayerCount(value);
+  }
+
+
+  verifySoundVolume(source: string): void {
+    const volume = this.getConfigValue<number>(source);
+    console.log(`Testing volume for ${source} at ${volume}`);
+    switch (source) {
+      case 'menuMusicVolume':
+        this.soundManager.refreshMusicVolume();
+        break;
+      case 'announcersVolume':
+        this.announcerService.testAnnouncerSound();
+        break;
+      case 'sfxVolume':
+          const SOUND_ARROW_UP = new Audio('assets/Sounds/menuFx/arrow_up.ogg');
+          SOUND_ARROW_UP.volume = volume;
+          SOUND_ARROW_UP.play();
+          break;
+    }
+
   }
 
   verifyDisplay(): void {

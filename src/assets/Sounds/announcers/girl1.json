@@ -1,0 +1,45 @@
+{
+  "type": "announcer",
+  "name": "girl1",
+  "lines": {
+    "menu_select": [
+      "mode_select",
+      "select_a_course"
+    ],
+    "difficulty": [
+      "beginner",
+      "advanced",
+      "expert"
+    ],
+    "countdown": [
+      "three",
+      "two",
+      "one",
+      "go"
+    ],
+    "ready": [
+      "go"
+    ],
+    "timer": [
+      "hurry_up",
+      "time_extended",
+      "time_over"
+    ],
+    "continue": [
+      "continue"
+    ],
+    "game_over": [
+      "game_over",
+      "retire"
+    ],
+    "high_score": [
+      "new_record"
+    ],
+    "victory": [
+      "winner"
+    ],
+    "misc": [
+      "checkpoint"
+    ]
+  }
+}

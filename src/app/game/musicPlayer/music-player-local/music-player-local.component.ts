@@ -30,7 +30,9 @@ export class MusicPlayerLocalComponent extends MusicPlayerCommon implements IMus
     console.log("Created local music URI:", localUri);
     this.audio = new Audio();
     this.audio.src = localUri;
+    this.audio.volume = this.getVolume();
     this.audio.preload = 'auto';
+    
     if (this.startOffset)
       this.audio.currentTime = this.startOffset;
 

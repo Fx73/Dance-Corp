@@ -6,14 +6,14 @@ import { AppComponent } from 'src/app/app.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from "src/app/shared/component/header/header.component";
-import { MusicCacheService } from 'src/app/services/localStorage/music.cache.service';
+import { MusicCacheService } from 'src/app/services/localstorage/music.cache.service';
 import { MusicFirestoreService } from 'src/app/services/firestore/music.firestore.service';
 import { PresenceService } from 'src/app/services/thirdpartyapp/presence.service';
 import { Router } from '@angular/router';
 import { UserFirestoreService } from '../../services/firestore/user.firestore.service';
 import { addCircleOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
-import { musicLocalService } from 'src/app/services/localStorage/local.music.service';
+import { musicLocalService } from 'src/app/services/localstorage/local.music.service';
 
 @Component({
   selector: 'app-browse-upload',

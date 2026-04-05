@@ -59,6 +59,28 @@
       </ion-card-content>
     </ion-card>
 
+    <!-- Volumes Card -->
+    <ion-card class="base-card">
+      <ion-card-header>
+        <ion-card-title>Volumes</ion-card-title>
+      </ion-card-header>  
+      <ion-card-content>
+        <ion-item>
+          <ion-range label="Music Volume" aria-label="Music Volume" label-placement="fixed"  [min]="0" [max]="1" [step]="0.01" [pinFormatter]="pinFormatterVolume" [pin]="true" [value]="this.getConfigValue('musicVolume')" (ionChange)="updateConfigValue('musicVolume',$event.detail.value); verifySoundVolume('musicVolume')"></ion-range>
+        </ion-item>
+        <ion-item>
+          <ion-range label="Menu Music Volume" aria-label="Menu Music Volume" label-placement="fixed"  [min]="0" [max]="1" [step]="0.01" [pinFormatter]="pinFormatterVolume" [pin]="true" [value]="this.getConfigValue('menuMusicVolume')" (ionChange)="updateConfigValue('menuMusicVolume',$event.detail.value); verifySoundVolume('menuMusicVolume')"></ion-range>
+        </ion-item>
+        <ion-item>
+          <ion-range label="Announcers Volume" aria-label="Announcers Volume" label-placement="fixed"  [min]="0" [max]="1" [step]="0.01" [pinFormatter]="pinFormatterVolume" [pin]="true" [value]="this.getConfigValue('announcersVolume')" (ionChange)="updateConfigValue('announcersVolume',$event.detail.value); verifySoundVolume('announcersVolume')"></ion-range>
+        </ion-item>
+        <ion-item>
+          <ion-range label="SFX Volume" aria-label="SFX Volume" label-placement="fixed" [ticks]="true"  [min]="0" [max]="1" [step]="0.01" [pinFormatter]="pinFormatterVolume" [pin]="true" [value]="this.getConfigValue('sfxVolume')" (ionChange)="updateConfigValue('sfxVolume',$event.detail.value); verifySoundVolume('sfxVolume')"></ion-range>
+        </ion-item>
+
+      </ion-card-content>
+    </ion-card>
+
     <!-- Reset Card-->
     <ion-card class="base-card danger-card">
       <ion-card-header>

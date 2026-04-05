@@ -5,7 +5,7 @@ import { AppComponent } from 'src/app/app.component';
 import { ArrowDirection } from 'src/app/game/constants/arrow-direction.enum';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { GamepadService } from 'src/app/services/gamepad.service';
+import { GamepadService } from 'src/app/services/gameplay/gamepad.service';
 import { HeaderComponent } from "src/app/shared/component/header/header.component";
 import { Player } from 'src/app/game/gameModel/player';
 import { UserConfigService } from 'src/app/services/userconfig.service';

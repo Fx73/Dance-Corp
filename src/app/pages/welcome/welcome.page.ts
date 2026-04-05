@@ -7,7 +7,7 @@ import { HeaderComponent } from "src/app/shared/component/header/header.componen
 import { LoginComponent } from "../../shared/user/login/login.component";
 import { PresenceService } from '../../services/thirdpartyapp/presence.service';
 import { RouterModule } from '@angular/router';
-import { UserCacheService } from './../../services/localStorage/user.cache.service';
+import { UserCacheService } from '../../services/localstorage/user.cache.service';
 import { UserDto } from '../user-profile/user.dto';
 import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.service';
 

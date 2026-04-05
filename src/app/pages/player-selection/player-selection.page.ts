@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonList, IonSelect, IonSelectOption, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 
+import { AnnouncerService } from 'src/app/services/gameplay/announcer.service';
 import { AppComponent } from 'src/app/app.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { GamepadService } from 'src/app/services/gamepad.service';
+import { GamepadService } from 'src/app/services/gameplay/gamepad.service';
 import { HeaderComponent } from "src/app/shared/component/header/header.component";
 import { Player } from 'src/app/game/gameModel/player';
 import { RouterModule } from '@angular/router';
@@ -23,7 +24,7 @@ export class PlayerSelectionPage implements OnInit {
 
   userList: { id: string | null, name: string }[] = []
 
-  constructor(public userConfigService: UserConfigService, public gamepadService: GamepadService) {
+  constructor(public userConfigService: UserConfigService, public gamepadService: GamepadService, private announcerService : AnnouncerService) {
     addIcons({ addCircle });
   }
 
@@ -88,5 +89,8 @@ export class PlayerSelectionPage implements OnInit {
     return statusMessage || "🔍 Waiting for configuration...";
   }
 
+  onStartClick() {
+    this.announcerService.playAnnouncer("ready");
+}
 
 }

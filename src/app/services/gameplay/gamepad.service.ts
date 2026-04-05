@@ -1,7 +1,7 @@
 import { Injectable, NgZone } from '@angular/core';
 
-import { AppComponent } from '../app.component';
-import { UserConfigService } from './userconfig.service';
+import { AppComponent } from 'src/app/app.component';
+import { UserConfigService } from '../userconfig.service';
 
 @Injectable({
     providedIn: 'root',

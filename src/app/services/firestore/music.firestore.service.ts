@@ -6,6 +6,7 @@ import { DanceType } from 'src/app/game/constants/dance-type.enum';
 import { DifficultyCriteria } from 'src/app/pages/upload/DifficultyCriteria';
 import { FirestoreConverter } from './firestore.converter';
 import { Injectable } from '@angular/core';
+import { NoteDifficulty } from 'src/app/game/constants/note-difficulty.enum';
 import { UserFirestoreService } from './user.firestore.service';
 
 @Injectable({
@@ -374,57 +375,66 @@ export class MusicFirestoreService {
 
     //#endregion
 
-    async migrateNotesToEmbedded(): Promise<void> {
-        console.log("Starting migration of notes → embedded…");
 
-        const musicsRef = collection(this.db, this.MUSIC_COLLECTION)
-            .withConverter(this.firestoreConverterMusic);
+    // Migrate function to replace all Notes difficulty with the new ones (Beginner, Easy, Advanced, Expert, Challenge)
+async migrateDifficulty() {
+    const musicRef = collection(this.db, this.MUSIC_COLLECTION)
+        .withConverter(this.firestoreConverterMusic);
 
-        const musicsSnap = await getDocs(musicsRef);
+    const q = query(musicRef, orderBy(documentId()));
+    const querySnapshot = await getDocs(q);
 
-        for (const musicDoc of musicsSnap.docs) {
-            const musicId = musicDoc.id;
-            const music = musicDoc.data();
+    if (querySnapshot.empty)
+        throw new Error("No musics to fetch in database");
 
-            console.log(`Checking music: ${musicId}`);
+    const difficultyMap: Record<string, NoteDifficulty> = {
+        // Beginner
+        "beginner": NoteDifficulty.Beginner,
+        "novice": NoteDifficulty.Beginner,
 
-            // 1. Vérifier s'il existe une sous-collection notes
-            const notesCollectionRef = collection(
-                this.db,
-                `${this.MUSIC_COLLECTION}/${musicId}/${"notes"}`
-            ).withConverter(this.firestoreConverterNote);
+        // Basic / Easy
+        "easy": NoteDifficulty.Basic,
+        "light": NoteDifficulty.Basic,
 
-            const notesSnap = await getDocs(notesCollectionRef);
+        // Difficult / Advanced
+        "medium": NoteDifficulty.Difficult,
+        "advanced": NoteDifficulty.Difficult,
+        "difficult": NoteDifficulty.Difficult,
 
-            if (notesSnap.empty) {
-                console.log(`→ No notes subcollection for ${musicId}, skipping.`);
-                continue;
+        // Expert
+        "expert": NoteDifficulty.Expert,
+        "hard": NoteDifficulty.Expert,
+
+        // Challenge
+        "challenge": NoteDifficulty.Challenge,
+        "edit": NoteDifficulty.Challenge
+    };
+
+    for (const docSnap of querySnapshot.docs) {
+        const music = docSnap.data();
+        let updated = false;
+
+        for (const note of music.noteData) {
+            const raw = note.difficulty?.toLowerCase().trim();
+            const mapped = difficultyMap[raw];
+
+            if (mapped && mapped !== note.difficulty) {
+                console.log(
+                    `Migrating ${docSnap.id} : ${note.difficulty} → ${mapped}`
+                );
+                note.difficulty = mapped;
+                updated = true;
             }
-
-            console.log(`→ Found ${notesSnap.size} notes for ${musicId}`);
-
-            // 2. Charger toutes les notes existantes
-            const embeddedNotes: NoteDataDto[] = [];
-
-            notesSnap.forEach(noteDoc => {
-                const note = noteDoc.data();
-                embeddedNotes.push(note);
-            });
-
-            // 3. Injecter dans noteData
-            music.noteData = embeddedNotes;
-
-            // 4. Réécrire la musique complète (avec converter)
-            const musicRef = doc(this.db, this.MUSIC_COLLECTION, musicId)
-                .withConverter(this.firestoreConverterMusic);
-
-            await setDoc(musicRef, music);
-
-            console.log(`→ Music ${musicId} updated with embedded notes.`);
         }
 
-        console.log("Migration completed!");
+        if (updated) {
+            await setDoc(docSnap.ref, music);
+        }
     }
+
+    console.log("Migration complete");
+}
+
 
 }
 

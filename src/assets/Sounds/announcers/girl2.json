@@ -1,0 +1,43 @@
+{
+  "type": "announcer",
+  "name": "girl2",
+  "lines": {
+    "menu_select": [
+      "arcade",
+      "adventure",
+      "puzzle",
+      "options",
+      "credits"
+    ],
+    "ready": [
+      "ready",
+      "go"
+    ],
+    "continue": [
+      "continue",
+      "try_again"
+    ],
+    "game_over": [
+      "game_over",
+      "you_lose",
+      "fail"
+    ],
+    "victory_small": [
+      "clear"
+    ],
+    "victory": [
+      "you_win",
+      "congratulations"
+    ],
+    "high_score": [
+      "new_high_score",
+      "level_up"
+    ],
+    "timer": [
+      "time_up"
+    ],
+    "misc": [
+      "draw"
+    ]
+  }
+}

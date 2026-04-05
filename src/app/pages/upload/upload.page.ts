@@ -12,7 +12,7 @@ import { AppComponent } from 'src/app/app.component';
 import { DanceType } from './../../game/constants/dance-type.enum';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from 'src/app/shared/component/header/header.component';
-import { MusicCacheService } from 'src/app/services/localStorage/music.cache.service';
+import { MusicCacheService } from 'src/app/services/localstorage/music.cache.service';
 import { MusicEditableFieldAutocompleteComponent } from './editable-field-autocomplete/editable-field-autocomplete.component';
 import { MusicEditableFieldComponent } from './editable-field/editable-field.component';
 import { MusicEditableListComponent } from './editable-list/editable-list.component';
@@ -27,7 +27,7 @@ import { TestNoteComponent } from './test-note/test-note.component';
 import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.service';
 import { addIcons } from 'ionicons';
 import isTauri from 'src/app/shared/utils/tauri';
-import { musicLocalService } from 'src/app/services/localStorage/local.music.service';
+import { musicLocalService } from 'src/app/services/localstorage/local.music.service';
 
 @Component({
   selector: 'app-upload',

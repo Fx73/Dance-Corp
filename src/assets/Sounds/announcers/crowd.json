@@ -1,0 +1,23 @@
+{
+    "type": "crowd",
+    "name": "default_crowd",
+    "lines": {
+        "applause_light": [
+            "group-light-applause",
+            "group-light-clapping",
+            "group-clapping"
+        ],
+        "applause_heavy": [
+            "crowd-applause",
+            "crowd-heavy-cheering",
+            "crowd-light-cheering-whistle"
+        ],
+        "boo": [
+            "man-clapping",
+            "crowd-long-boo"
+        ],
+        "special": [
+            "crowd-applause-fireworks"
+        ]
+    }
+}

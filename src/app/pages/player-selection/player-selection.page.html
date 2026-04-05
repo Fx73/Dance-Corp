@@ -13,41 +13,44 @@
           </ion-card-header>
           <ion-card-content>
             <ion-item lines="none">
-              <ion-select *ngIf="index !== 0" label="Dancer" labelPlacement="stacked" placeholder="Select a user"
-                [value]="player.userId" (ionChange)="updateUser(index, $event.detail.value)">
+            @if(index !== 0) {
+              <ion-select  label="Dancer" labelPlacement="stacked" placeholder="Select a user" [value]="player.userId" (ionChange)="updateUser(index, $event.detail.value)">
                 <ion-select-option *ngFor="let user of userList" [value]="user.id">
                   {{ user.name }}
                 </ion-select-option>
                 <ion-select-option [value]="null"> Anonymous </ion-select-option>
               </ion-select>
-              <ion-input *ngIf="index === 0" disabled label="Dancer" labelPlacement="stacked"
-                [value]="player.userId ? player.name : 'Anonymous'">
-              </ion-input>
+            }@else {
+              <ion-input disabled label="Dancer" labelPlacement="stacked" [value]="player.userId ? player.name : 'Anonymous'"> </ion-input>
+            }
             </ion-item>
             <ion-item lines="none">
-              <ion-select label="Gamepad" labelPlacement="stacked" placeholder="Select a gamepad"
-                [value]="player.gamepad?.id" (ionChange)="updateGamepad(index, $event.detail.value)">
+              <ion-select label="Gamepad" labelPlacement="stacked" placeholder="Select a gamepad" [value]="player.gamepad?.id" (ionChange)="updateGamepad(index, $event.detail.value)">
                 <ion-select-option *ngFor="let gamepad of this.gamepadService.getGamepads()" [value]="gamepad.id">
                   {{ gamepad.id }}
                 </ion-select-option>
               </ion-select>
             </ion-item>
-            <ion-button *ngIf="index !== 0" color="primary" expand="block" size="small" (click)="removePlayer(index)"
-              style="margin-top: 10px;">
+            @if(index !== 0) {
+            <ion-button  color="primary" expand="block" size="small" (click)="removePlayer(index)" style="margin-top: 10px;">
               Remove
             </ion-button>
-            <ion-button *ngIf="index === 0" style="visibility: hidden;"></ion-button>
+            }@else{
+            <ion-button style="visibility: hidden;"></ion-button>
+            }
           </ion-card-content>
         </ion-card>
-        <ion-card *ngIf="this.userConfigService.players.length < 4" class="add-player-card" (click)="addPlayer()">
-          <ion-card-header>
-            <ion-card-subtitle>Add player</ion-card-subtitle>
-          </ion-card-header>
-          <ion-card-content>
-            <ion-icon name="add-circle" size="large"></ion-icon>
-          </ion-card-content>
-        </ion-card>
-      </div>
+        @if (this.userConfigService.players.length < 4) { 
+          <ion-card class="add-player-card" (click)="addPlayer()">
+            <ion-card-header>
+              <ion-card-subtitle>Add player</ion-card-subtitle>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-icon name="add-circle" size="large"></ion-icon>
+            </ion-card-content>
+          </ion-card>
+        }
+    </div>
       <ion-card class="base-card">
         <ion-card-header>
           <ion-card-subtitle>{{ GetPlayerStatus()}}</ion-card-subtitle>
@@ -55,8 +58,7 @@
       </ion-card>
     </ion-card-content>
   </ion-card>
-  <ion-card class="base-card start-card" style="height: 15vh;" [disabled]="!allPlayersReady"
-    [routerLink]="['/play/browse']">
+  <ion-card class="base-card start-card" style="height: 15vh;" [disabled]="!allPlayersReady" [routerLink]="['/play/browse']" (click)="onStartClick()">
     Start
   </ion-card>
 

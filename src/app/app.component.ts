@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 import { NavigationEnd, Router } from '@angular/router';
 
-import { MusicCacheService } from './services/localStorage/music.cache.service';
+import { AnnouncerService } from './services/gameplay/announcer.service';
+import { MusicCacheService } from './services/localstorage/music.cache.service';
 import { PresenceService } from './services/thirdpartyapp/presence.service';
-import { SoundManager } from './shared/utils/sound.manager';
+import { SoundManager } from './services/gameplay/sound.service';
 import { ToastController } from '@ionic/angular';
 
 @Component({
@@ -16,14 +17,15 @@ import { ToastController } from '@ionic/angular';
 export class AppComponent implements OnInit {
   static appInstance: AppComponent;
 
-  constructor(private toastController: ToastController, private presenceService: PresenceService, private musicCacheService: MusicCacheService, private router: Router) {
+  private toastController: ToastController = inject(ToastController);
+  private presenceService: PresenceService = inject(PresenceService);
+  private musicCacheService: MusicCacheService = inject(MusicCacheService);
+
+  constructor(announcerService: AnnouncerService, soundManager: SoundManager) {
     AppComponent.appInstance = this;
-    SoundManager.InitBackgroundMusic();
-    this.router.events.subscribe(event => {
-      if (event instanceof NavigationEnd) {
-        this.handleRouteChange(event.urlAfterRedirects);
-      }
-    });
+    announcerService.init();
+
+    document.addEventListener('click', () => soundManager.InitBackgroundMusic(), { once: true });
   }
 
   ngOnInit() {
@@ -31,18 +33,6 @@ export class AppComponent implements OnInit {
     this.presenceService.init()
   }
 
-  private handleRouteChange(url: string) {
-    console.log("Route changed to:", url);
-    const shouldMute =
-      url.startsWith('/play/browse') ||
-      url.startsWith('/play/game');
-
-    if (shouldMute) {
-      SoundManager.PauseBackgroundMusic();
-    } else {
-      SoundManager.StartBackgroundMusic();
-    }
-  }
 
 
   //#region Toasts

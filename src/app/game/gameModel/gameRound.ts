@@ -1,6 +1,6 @@
-import { ArrowState, DancePadInput, IDancePad } from "../gameController/dancepad.interface";
-import { MusicDto, NoteDataDto } from "./music.dto";
+import { ArrowState, IDancePad } from "../gameController/dancepad.interface";
 
+import { AnnouncerService } from 'src/app/services/gameplay/announcer.service';
 import { Arrow } from "./arrowManagement/arrow";
 import { ArrowDirection } from 'src/app/game/constants/arrow-direction.enum';
 import { ArrowManager } from './arrowManagement/arrowManager';
@@ -8,9 +8,10 @@ import { ArrowType } from "../constants/arrow-type.enum";
 import { CONFIG } from './../constants/game-config';
 import { DancePadGamepad } from "../gameController/dancepad-gamepad";
 import { DancePadKeyboard } from './../gameController/dancepad-keyboard';
+import { NoteDataDto } from "./music.dto";
 import { Player } from "./player";
 import { Precision } from "../constants/precision.enum";
-import { SoundManager } from "../../shared/utils/sound.manager";
+import { SoundManager } from "../../services/gameplay/sound.service";
 
 export class GameRound {
     //#region App Constants
@@ -47,7 +48,7 @@ export class GameRound {
     precisionMessage: Arrow[] = []; // Message to display on the screen
     currentBeat: number = 0; // Current beat in the game to display
 
-    constructor(notes: NoteDataDto, player: Player, isTrainingMode = false) {
+    constructor(notes: NoteDataDto, player: Player, isTrainingMode = false, private announcerService: AnnouncerService) {
         this.player = player
 
         if (player.gamepad!.index! === -1)
@@ -59,12 +60,11 @@ export class GameRound {
         this.arrowManager = new ArrowManager(notes);
 
         this.calculateScore()
-
+    
         if (isTrainingMode) {
             this.isTrainingMode = true
             this.performance = 100
         }
-
     }
 
 
@@ -198,6 +198,8 @@ export class GameRound {
         this.score += this.scorePerArrow
         this.comboCount++
         this.precisionMessage.push(arrow)
+
+        this.announcerService.changeSatisfaction(2, 4);
     }
     arrowGreat(arrow: Arrow) {
         arrow.great()
@@ -205,6 +207,11 @@ export class GameRound {
         this.score += this.scorePerArrow * 0.8
         this.comboCount++
         this.precisionMessage.push(arrow)
+
+        if(this.comboCount >= 10)
+            this.announcerService.changeSatisfaction(2, 2);
+        else
+            this.announcerService.changeSatisfaction(1, 4);
     }
     arrowGood(arrow: Arrow) {
         arrow.good()
@@ -212,6 +219,11 @@ export class GameRound {
         this.score += this.scorePerArrow * 0.6
         this.comboCount++
         this.precisionMessage.push(arrow)
+
+        if(this.comboCount >= 20)
+            this.announcerService.changeSatisfaction(2, 1);
+        else
+            this.announcerService.changeSatisfaction(1, 2);
     }
     arrowAlmost(arrow: Arrow) {
         arrow.almost()
@@ -219,12 +231,16 @@ export class GameRound {
         this.score += this.scorePerArrow * 0.2
         this.comboCount = 0
         this.precisionMessage.push(arrow)
+
+        this.announcerService.changeSatisfaction(0, 1);
     }
     arrowMissed(arrow: Arrow) {
         arrow.missed()
         this.updatePerformance(-4)
         this.comboCount = 0
         this.precisionMessage.push(arrow)
+
+        this.announcerService.changeSatisfaction(0, 4);
     }
     arrowOk(arrow: Arrow) {
         arrow.ok();
@@ -232,6 +248,11 @@ export class GameRound {
         this.performance = Math.min(100, this.performance + arrowLength);
         this.score += arrowLength * this.scorePerHoldBeat
         this.precisionMessage.push(arrow)
+
+        if(this.comboCount >= 10)
+            this.announcerService.changeSatisfaction(2, 1);
+        else
+            this.announcerService.changeSatisfaction(1, 2);
     }
     mineHit(arrow: Arrow) {
         arrow.boom()
@@ -241,6 +262,8 @@ export class GameRound {
 
         this.mineHitSound.currentTime = 0;
         this.mineHitSound.play();
+
+        this.announcerService.changeSatisfaction(0, 10);
     }
     minePassed(arrow: Arrow) {
         arrow.ok()

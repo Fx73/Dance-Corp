@@ -137,4 +137,10 @@ class UserConfig {
     canvasWidth = 500
     canvasHeight = 1200
     canvasArrowSize = 120
+
+    // Sound
+    announcersVolume = 1
+    musicVolume = 1
+    menuMusicVolume = 0.1
+    sfxVolume = 0.5
 }

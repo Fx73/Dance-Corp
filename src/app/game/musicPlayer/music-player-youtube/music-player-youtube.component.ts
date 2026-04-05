@@ -35,17 +35,8 @@ export class MusicPlayerYoutubeComponent extends MusicPlayerCommon implements IM
   }
 
   onReadyInternal(event: any): void {
-    console.log('YouTube Player is ready, video will start at :', this.startOffset);
     this.player.stopVideo();
-    this.player.stopVideo();
-    this.player.stopVideo();
-    this.player.stopVideo();
-    this.player.stopVideo();
-    this.player.stopVideo();
-    this.player.stopVideo();
-    this.player.stopVideo();
-    this.player.stopVideo();
-    this.player.stopVideo();
+    this.player.setVolume(this.getVolume() * 100);
 
     this.onReady.emit(this);
   }

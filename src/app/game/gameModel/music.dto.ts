@@ -1,8 +1,8 @@
 import { BackgroundChange, BpmChange, LabelChange, ScrollChange, SpeedChange, StopChange, WarpChange } from "./timeManagement/timedChange";
+import { NoteDifficulty, difficultyMap } from "../constants/note-difficulty.enum";
 
 import { DanceType } from "../constants/dance-type.enum";
 import { DifficultyCriteria } from "src/app/pages/upload/DifficultyCriteria";
-import { NoteDifficulty } from "../constants/note-difficulty.enum";
 
 export class MusicDto {
   title?: string;
@@ -182,7 +182,9 @@ export class NoteDataDto {
     this.stepsType = tokenMap["stepstype"] as DanceType;
     this.description = tokenMap["description"];
     this.chartStyle = tokenMap["chartstyle"];
-    this.difficulty = tokenMap["difficulty"] as NoteDifficulty;
+    const difficulty = tokenMap["difficulty"].toLowerCase().trim();
+    this.difficulty = difficultyMap[difficulty] || NoteDifficulty.Challenge;
+
     this.meter = parseInt(tokenMap["meter"]);
     this.credit = tokenMap["credit"];
     this.creatorId = tokenMap["creatorid"];
@@ -207,6 +209,8 @@ export class NoteDataDto {
       : [];
     return instance;
   }
+
+  
 }
 
 export class Measures {

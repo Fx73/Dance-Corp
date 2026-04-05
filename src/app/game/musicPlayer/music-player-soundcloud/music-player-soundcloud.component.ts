@@ -43,6 +43,7 @@ export class MusicPlayerSoundcloudComponent extends MusicPlayerCommon
       this.widgetSC.seekTo(this.startOffset * 1000);
     }
     this.widgetSC.bind(SC.Widget.Events.READY, () => {
+      this.widgetSC.setVolume(this.getVolume() * 100);
       if (this.startOffset !== undefined)
         this.widgetSC.seekTo(this.startOffset * 1000);
       this.onReady.emit(this);

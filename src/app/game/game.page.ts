@@ -4,21 +4,21 @@ import { CommonModule, Location } from '@angular/common';
 import { IMusicPlayer, MusicOrigin, MusicPlayerCommon } from './musicPlayer/IMusicPlayer';
 import { IonButton, IonButtons, IonCard, IonContent, IonHeader, IonIcon, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 
+import { AnnouncerService } from 'src/app/services/gameplay/announcer.service';
 import { AppComponent } from '../app.component';
 import { ArrowDirection } from "./constants/arrow-direction.enum";
 import { FormsModule } from '@angular/forms';
 import { GameManager } from './game.manager';
 import { GameOverComponent } from "./gameDisplay/game-over/game-over.component";
-import { MusicCacheService } from '../services/localStorage/music.cache.service';
+import { MusicCacheService } from '../services/localstorage/music.cache.service';
 import { MusicDto } from './gameModel/music.dto';
 import { MusicPlayerLocalComponent } from "./musicPlayer/music-player-local/music-player-local.component";
 import { MusicPlayerSoundcloudComponent } from './musicPlayer/music-player-soundcloud/music-player-soundcloud.component';
 import { MusicPlayerYoutubeComponent } from "./musicPlayer/music-player-youtube/music-player-youtube.component";
 import { PlayerDisplayComponent } from "./gameDisplay/player-display.component";
 import { PresenceService } from '../services/thirdpartyapp/presence.service';
-import { UserCacheService } from './../services/localStorage/user.cache.service';
+import { UserCacheService } from '../services/localstorage/user.cache.service';
 import { UserConfigService } from "src/app/services/userconfig.service";
-import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.service';
 import { WaitingScreenComponent } from "./gameDisplay/waiting-screen/waiting-screen.component";
 import { addIcons } from 'ionicons';
 import { arrowBack } from 'ionicons/icons';
@@ -47,7 +47,7 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
   musicOrigin: MusicOrigin | null = null
   //#endregion
 
-  constructor(private cdr: ChangeDetectorRef, private route: ActivatedRoute, private userConfigService: UserConfigService, private userCacheService: UserCacheService, private musicCacheService: MusicCacheService, private router: Router, private location: Location, private discordRpcService: PresenceService) {
+  constructor(private cdr: ChangeDetectorRef, private route: ActivatedRoute, private userConfigService: UserConfigService, private userCacheService: UserCacheService, private musicCacheService: MusicCacheService, private router: Router, private location: Location, private announcerService: AnnouncerService, private discordRpcService: PresenceService) {
     addIcons({ arrowBack });
   }
 
@@ -81,7 +81,8 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
 
     const players = this.userConfigService.players;
     const isTrainingMode: boolean = this.userConfigService.getConfig()["trainingMode"] ?? false
-    this.game = new GameManager(this.music!, players, selectedNotes, isTrainingMode, this.userCacheService);
+    this.game = new GameManager(this.music!, players, selectedNotes, isTrainingMode, this.userCacheService, this.announcerService);
+    this.announcerService.pickPreferredAnnouncer()
 
     this.discordRpcService.update("Dancing on lvl " + this.music.noteData[0].meter, this.music.title + " - " + this.music.artist)
   }
@@ -111,6 +112,8 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
     this.game!.registerExternalComponents(this.musicPlayer, /*this.playerDisplays*/);
 
     this.waitingScreen.startCountdown();
+    this.announcerService.playCountdownFromAnnouncer()
+
     this.cdr.detectChanges();
   }
 

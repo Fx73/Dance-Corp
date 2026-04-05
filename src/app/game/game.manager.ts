@@ -1,3 +1,4 @@
+import { AnnouncerService } from '../services/gameplay/announcer.service';
 import { BeatManager } from './gameModel/timeManagement/beatManager';
 import { CONFIG } from "./constants/game-config";
 import { GameRound } from "./gameModel/gameRound";
@@ -5,23 +6,26 @@ import { IMusicPlayer } from "./musicPlayer/IMusicPlayer";
 import { MusicDto } from "./gameModel/music.dto";
 import { Player } from "./gameModel/player";
 import { PlayerDisplayComponent } from "./gameDisplay/player-display.component";
-import { UserCacheService } from './../services/localStorage/user.cache.service';
+import { UserCacheService } from '../services/localstorage/user.cache.service';
+import { UserNoteDto } from '../pages/user-profile/user.dto';
 
 export class GameManager {
 
     music: MusicDto
     isTrainingMode: boolean = false;
+    mainUserStats: UserNoteDto | null = null;
 
-    constructor(music: MusicDto, players: Player[], noteSelected: number[], isTrainingMode: boolean, private userCacheService: UserCacheService) {
+    constructor(music: MusicDto, players: Player[], noteSelected: number[], isTrainingMode: boolean, private userCacheService: UserCacheService, private announcerService: AnnouncerService) {
         this.music = music
         this.isTrainingMode = isTrainingMode
 
         for (let index = 0; index < players.length; index++) {
             const player = players[index];
-            this.gameRounds.push(new GameRound(this.music.noteData[noteSelected[index]], player, this.isTrainingMode))
+            this.gameRounds.push(new GameRound(this.music.noteData[noteSelected[index]], player, this.isTrainingMode, announcerService))
         }
 
         this.beatManager = new BeatManager(this.music);
+        this.mainUserStats = this.userCacheService.getMusicStats(this.music.id).notes.find(n => n.id === this.music.noteData[noteSelected[0]].chartName) ?? null;
     }
 
     public gameRounds: GameRound[] = [];
@@ -103,6 +107,32 @@ export class GameManager {
         console.log('Game Over: All game rounds have failed or finished.');
         console.log(this.music, this.music!.id)
         this.isGameOver = true;
+
+        // At least one player finished and has a score of MAX_SCORE
+        if(this.gameRounds.some(gr => gr.isFinished && gr.score >= gr.MAX_SCORE)) {
+            this.announcerService.playAnnouncer("victory");
+            this.announcerService.playCrowdOneShot("special");
+        }
+        // At least one player finished and has a score of A
+        else if(this.gameRounds.some(gr => gr.isFinished && gr.score >= gr.MAX_SCORE * 0.9)) {
+            this.announcerService.playAnnouncer("victory");
+            this.announcerService.playCrowdOneShot("applause_heavy");
+        }
+        // At least one player finished
+        else if(this.gameRounds.some(gr => gr.isFinished)) {
+            this.announcerService.playAnnouncer("victory_small");
+            this.announcerService.playCrowdOneShot("applause_light");
+        }
+        // All players failed
+        else {
+            this.announcerService.playAnnouncer("game_over");
+            this.announcerService.playCrowdOneShot("boo");
+        }
+        // Main Player get new highscore
+        if(this.gameRounds[0].isFinished && this.mainUserStats && this.gameRounds[0].score > this.mainUserStats.highScore) {
+            this.announcerService.playAnnouncer("high_score");
+        }
+
         if (!this.isTrainingMode) {
             for (const gameRound of this.gameRounds)
                 this.userCacheService.updateUserStatsFromRound(this.music!.id, this.music?.noteData[0].chartName!, gameRound)

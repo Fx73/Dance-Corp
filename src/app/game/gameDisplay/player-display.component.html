@@ -1,11 +1,13 @@
-<div class="player-hud">
+<div style="display: flex; justify-content: center;">
+<div class="player-hud" [style.width.px]="getConfigValue('canvasWidth')">
   <div class="score"> {{gameRound.player.name}} - Level {{ gameRound.level }} : {{ getDisplayScore() }}</div>
-  <div class="performance-container">
+  <div class="performance-container" >
     <div class="performance-bar" [style.width.%]="gameRound.performance" [style.backgroundColor]="getPerformanceColor()">
       <div class="performance-label" *ngIf="getConfigValue('trainingMode')"> Training Mode </div>
       <div class="performance-label" *ngIf="gameRound.isFailed"> Failed </div>
     </div>
   </div>
+</div>
 </div>
 <div style="display: flex; justify-content: center;">
   <div class="canvas-container">

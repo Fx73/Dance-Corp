@@ -1,0 +1,57 @@
+{
+  "type": "announcer",
+  "name": "boy",
+  "lines": {
+    "combo_good": [
+      "01._totally_crushin_it",
+      "02._no_way",
+      "03._real_finesse",
+      "05._so_sick",
+      "07._far_out",
+      "08._whoa",
+      "09._oh_man",
+      "11._dude_nice",
+      "12._totally_righteous",
+      "13._awesome",
+      "17._gnarly",
+      "19._so_epic",
+      "20._radical_maneuvers",
+      "34._youre_doing_the_thing"
+    ],
+    "combo_perfect": [
+      "04._youre_the_chosen_one_probably",
+      "06._stellar_performance",
+      "10._next_level_stuff",
+      "15._the_ultimate_gamer",
+      "16._unstoppable_man"
+    ],
+    "combo_fail": [
+      "22._are_you_ok",
+      "23._i_think_youre_dying",
+      "24._calm_down_man",
+      "25._you_dont_look_so_good",
+      "26._relax",
+      "28._did_you_die",
+      "30._vibe_killer",
+      "31._this_is_bringin_me_down",
+      "35._how_are_you_still_standing",
+      "36._are_you_for_real"
+    ],
+    "victory_small": [
+      "27._more_but_less",
+      "29._i_think_you_won"
+    ],
+    "victory": [
+      "18._thats_how_legends_are_made",
+      "32._congratulations"
+    ],
+    "game_over": [
+      "14._bummer_man",
+      "21._thats_too_bad_man",
+      "37._game_over"
+    ],
+    "misc": [
+      "33._simulation"
+    ]
+  }
+}

@@ -40,14 +40,19 @@ export class PlayerDisplayComponent implements AfterViewInit {
   private currentVisibleArrows: Arrow[] = []; // Currently visible arrows
   private currentArrowVisibleIndex: number = 0; // Index of the next not arrow in arrowMap
   targetY = CONFIG.DISPLAY.TARGET_PERCENT;
+  canvasWidth = 0;
+  canvasHeight = 0;
 
   constructor(private userConfigService: UserConfigService, private cd: ChangeDetectorRef) {
   }
 
   ngAfterViewInit(): void {
+    this.canvasHeight = this.userConfigService.getConfig()['canvasHeight']
+    this.canvasWidth = this.userConfigService.getConfig()['canvasWidth']
+
     const canvas = this.canvasRef.nativeElement;
-    canvas.width = this.userConfigService.getConfig()['canvasWidth']
-    canvas.height = this.userConfigService.getConfig()['canvasHeight']
+    canvas.width = this.canvasWidth;
+    canvas.height = this.canvasHeight;
     this.ARROW_SIZE = this.userConfigService.getConfig()['canvasArrowSize']
     this.ARROW_CORRECTED_SIZE.set(this.ARROW_SIZE * 1.1 / Math.sqrt(2));
 

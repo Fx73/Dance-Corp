@@ -5,6 +5,7 @@ import { MusicDto, NoteDataDto } from 'src/app/game/gameModel/music.dto';
 import { NgClass, NgStyle, } from '@angular/common';
 import { UserMusicDto, UserNoteDto } from '../user-profile/user.dto';
 
+import { AnnouncerService } from 'src/app/services/gameplay/announcer.service';
 import { ArrowDirection } from 'src/app/game/constants/arrow-direction.enum';
 import { CONFIG } from 'src/app/game/constants/game-config';
 import { Color } from 'src/app/game/constants/color';
@@ -16,7 +17,7 @@ import { FormsModule } from '@angular/forms';
 import { GradeComponent } from "../../shared/component/grade/grade.component";
 import { HeaderComponent } from "src/app/shared/component/header/header.component";
 import { IDancePad } from 'src/app/game/gameController/dancepad.interface';
-import { MusicCacheService } from '../../services/localStorage/music.cache.service';
+import { MusicCacheService } from '../../services/localstorage/music.cache.service';
 import { MusicPlayerLocalComponent } from "src/app/game/musicPlayer/music-player-local/music-player-local.component";
 import { MusicPlayerSoundcloudComponent } from "src/app/game/musicPlayer/music-player-soundcloud/music-player-soundcloud.component";
 import { MusicPlayerYoutubeComponent } from "src/app/game/musicPlayer/music-player-youtube/music-player-youtube.component";
@@ -24,11 +25,11 @@ import { NoteDifficulty } from 'src/app/game/constants/note-difficulty.enum';
 import { PresenceService } from '../../services/thirdpartyapp/presence.service';
 import { RadarScoreComponent } from "src/app/shared/component/radar-score/radar-score.component";
 import { Router } from '@angular/router';
-import { SoundManager } from '../../shared/utils/sound.manager';
-import { UserCacheService } from 'src/app/services/localStorage/user.cache.service';
+import { SoundManager } from './../../services/gameplay/sound.service';
+import { UserCacheService } from 'src/app/services/localstorage/user.cache.service';
 import { UserConfigService } from 'src/app/services/userconfig.service';
 import { UserFirestoreService } from './../../services/firestore/user.firestore.service';
-import { musicLocalService } from 'src/app/services/localStorage/local.music.service';
+import { musicLocalService } from 'src/app/services/localstorage/local.music.service';
 
 @Component({
   selector: 'app-browse',
@@ -59,12 +60,14 @@ export class BrowsePage implements OnInit {
   selectedNotesIndex = signal<number[]>([]);
 
   dancepad: IDancePad[] = []
+  
+  lastDifficultyPlayed: NoteDifficulty[] = [];
 
   private sampleLoopActive = false;
 
   @ViewChildren('musicCard', { read: ElementRef }) musicCards!: QueryList<ElementRef>;
 
-  constructor(private router: Router, private cd: ChangeDetectorRef, private localMusicService: musicLocalService, private musicCacheService: MusicCacheService, private userFirestoreService: UserFirestoreService, private userConfigService: UserConfigService, private userCacheService: UserCacheService, private discordRpcService: PresenceService) { }
+  constructor(private router: Router, private cd: ChangeDetectorRef, private localMusicService: musicLocalService, private musicCacheService: MusicCacheService, private userFirestoreService: UserFirestoreService, private userConfigService: UserConfigService, private userCacheService: UserCacheService, private announcerService: AnnouncerService, private discordRpcService: PresenceService, private soundManager: SoundManager) { }
 
   ngOnInit() {
     this.searchQuery = localStorage.getItem('browseSearchQuery') ?? '';
@@ -171,7 +174,7 @@ export class BrowsePage implements OnInit {
     }
 
     const isSinglePlayer = this.userConfigService.players.length === 1;
-    const filteredNotes = music.noteData.filter(note => !isSinglePlayer || note.stepsType === DanceType.DanceSingle) ?? [];
+    const filteredNotes = music.noteData.filter(note => !isSinglePlayer || note.stepsType === DanceType.DanceSingle).sort((a, b) => a.meter - b.meter) ?? [];
 
     this.musicNotes.set(filteredNotes);
 
@@ -180,8 +183,7 @@ export class BrowsePage implements OnInit {
 
     this.musicUserScore.set(this.userCacheService.getMusicStats(music.id));
 
-    this.SOUND_ARROW_UP.currentTime = 0;
-    this.SOUND_ARROW_UP.play();
+    this.soundManager.playSfx(this.SOUND_ARROW_UP);
 
     setTimeout(() => {
       const el = this.musicCards.toArray()[listIndex]?.nativeElement;
@@ -192,8 +194,7 @@ export class BrowsePage implements OnInit {
   }
   onSelectNote(noteIdx: number, playerIndex: number = 0) {
     this.selectedNotesIndex()[playerIndex] = noteIdx;
-    this.SOUND_ARROW_DOWN.currentTime = 0;
-    this.SOUND_ARROW_DOWN.play();
+    this.soundManager.playSfx(this.SOUND_ARROW_DOWN);
     this.cd.markForCheck();
   }
 
@@ -278,6 +279,15 @@ export class BrowsePage implements OnInit {
     const selectedMusic = this.getSelectedMusic(this.selectedMusicIndex());
     if (!selectedMusic) return;
     console.log("Selected music for game:", selectedMusic, "with notes:", this.musicNotes());
+
+    for (let i = 0; i < this.selectedNotesIndex().length; i++) {
+      const newDifficulty : NoteDifficulty = this.musicNotes()[this.selectedNotesIndex()[i]]?.difficulty;
+      const lastDifficulty = this.lastDifficultyPlayed[i];
+      if (newDifficulty && newDifficulty !== lastDifficulty) {
+        this.lastDifficultyPlayed[i] = newDifficulty;
+        this.announcerService.playAnnouncerLine("difficulty", newDifficulty.toLowerCase());
+      }
+    }
 
     this.router.navigate(['/play/game', selectedMusic.id], {
       queryParams: {
