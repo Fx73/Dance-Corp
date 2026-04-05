@@ -112,24 +112,24 @@
 				<ion-card class="base-card btn-action-card">
 					<ion-card-content>
 						@if (isEditLocal()) {
-						@if(isLocalMusic()){
-						<p style="color: var(--ion-color-warning);"> You are currently editing a local music file. Switch to url to be able to upload </p>
-						}
-						@else{
-						<ion-button (click)="uploadMusic()" color="success" expand="block" [disabled]="isEditDB() && !metadataDirty()"> {{ isEditDB() ? 'Update music' : 'Upload music'}} </ion-button>
-						}
-						@if (isEditDB()) {
-						<ion-button (click)="uploadAllNotes()" expand="block" [disabled]="!anyNoteDirty()"> Upload All notes </ion-button>
-						@if (noNotes()) {
-						<ion-button color="danger" (click)="deleteMusic()" [disabled]="!noNotes()" expand="block"> Delete Music </ion-button>
-						}
-						}
-						<ion-button color="danger" (click)="deleteFile()" size="small" expand="block"> <ion-icon *ngIf="metadataDirty() || anyNoteDirty()" name="trash-outline"></ion-icon> {{metadataDirty() || anyNoteDirty() ? 'Discard local edit' : 'Cancel edition'}} </ion-button>
+							@if(isLocalMusic()){
+								<p style="color: var(--ion-color-warning);"> You are currently editing a local music file. Switch to url to be able to upload </p>
+							}@else{							
+								@if (isEditDB()) {
+									<ion-button (click)="updateMusic()" color="success" expand="block" [disabled]="isEditDB() && !metadataDirty()"> Upload music </ion-button>
+									<ion-button (click)="uploadAllNotes()" expand="block" [disabled]="!anyNoteDirty()"> Upload All notes </ion-button>
+									@if (noNotes()) {
+										<ion-button color="danger" (click)="deleteMusic()" [disabled]="!noNotes()" expand="block"> Delete Music </ion-button>
+									}
+								}@else {
+									<ion-button (click)="uploadMusic()" color="success" expand="block" [disabled]="isEditDB() && !metadataDirty()"> Update music </ion-button>
+								}
+							}
+							<ion-button color="danger" (click)="deleteFile()" size="small" expand="block"> <ion-icon *ngIf="metadataDirty() || anyNoteDirty()" name="trash-outline"></ion-icon> {{metadataDirty() || anyNoteDirty() ? 'Discard local edit' : 'Cancel edition'}} </ion-button>
 						}
 						@else {
-						<ion-button (click)="onStartEdit()" expand="block"> Edit Music </ion-button>
+							<ion-button (click)="onStartEdit()" expand="block"> Edit Music </ion-button>
 						}
-
 						<ion-button (click)="exportEssc()" size="small">
 							Export Essc
 						</ion-button>

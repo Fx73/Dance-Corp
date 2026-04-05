@@ -1,10 +1,10 @@
 import { Firestore, collection, deleteDoc, doc, documentId, getDoc, getDocs, getFirestore, orderBy, query, setDoc, updateDoc, where } from 'firebase/firestore';
 import { MusicDto, NoteDataDto } from '../../game/game-model/music.dto';
 
+import { Injectable } from '@angular/core';
 import { AppComponent } from 'src/app/app.component';
 import { DifficultyCriteria } from 'src/app/pages/upload/DifficultyCriteria';
 import { FirestoreConverter } from './firestore.converter';
-import { Injectable } from '@angular/core';
 import { UserFirestoreService } from './user.firestore.service';
 
 @Injectable({
@@ -44,7 +44,7 @@ export class MusicFirestoreService {
             this.addGenres(dto.genre ?? "");
 
             this.updateMusicIndex(dto.id, false);
-            AppComponent.presentOkToast("Music successfully uploaded!")
+            AppComponent.presentOkToast("Music successfully uploaded to firebase!")
         } catch (error) {
             AppComponent.presentWarningToast("Error uploading music: " + error)
             throw error;
@@ -73,7 +73,7 @@ export class MusicFirestoreService {
             this.addGenres(dto.genre ?? "");
 
             this.updateMusicIndex(dto.id);
-            AppComponent.presentOkToast("Music successfully updated!");
+            AppComponent.presentOkToast("Music successfully updated to firebase!");
         } catch (error) {
             AppComponent.presentWarningToast("Error updating music: " + error);
             throw error;
@@ -188,7 +188,7 @@ export class MusicFirestoreService {
             await deleteDoc(musicRef);
 
             this.removeMusicFromIndex(musicId);
-            AppComponent.presentOkToast("Music successfully deleted!");
+            AppComponent.presentOkToast("Music successfully deleted from firebase !");
 
         } catch (error) {
             AppComponent.presentErrorToast("Error deleting music: " + error);
@@ -314,6 +314,8 @@ export class MusicFirestoreService {
         const toUpdateMusicIds = Object.entries(updates).filter(([_, ts]) => ts > lastUpdateTimestamp).map(([id]) => id);
 
         // 5) Find new musics and deleted musics by comparing the list of ids
+        console.log("Remote IDs:", remoteIds);
+        console.log("Known IDs:", Array.from(knownIds));
         const newMusicIds = remoteIds.filter(id => !knownIds.has(id));
         const toDeleteMusicIds = Array.from(knownIds).filter(id => !remoteIds.includes(id));
 

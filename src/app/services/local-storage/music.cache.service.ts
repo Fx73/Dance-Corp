@@ -1,8 +1,9 @@
-import { AppComponent } from "src/app/app.component";
+import { MusicDto, NoteDataDto } from "src/app/game/game-model/music.dto";
+
 import { Injectable } from "@angular/core";
-import { MusicDto } from "src/app/game/game-model/music.dto";
-import { MusicFirestoreService } from "../firestore/music.firestore.service";
+import { AppComponent } from "src/app/app.component";
 import { musicLocalService } from 'src/app/services/local-storage/local.music.service';
+import { MusicFirestoreService } from "../firestore/music.firestore.service";
 
 @Injectable({ providedIn: 'root' })
 export class MusicCacheService {
@@ -105,7 +106,18 @@ export class MusicCacheService {
         return null;
     }
 
-    async getMusicEnsure(musicId: string): Promise<MusicDto | null> {
+    async getMusicWithCheck(musicId: string): Promise<MusicDto | null> {
+        const music = this.getMusic(musicId);
+        if (music)
+            return music;
+
+        console.warn(`Music ${musicId} not found in cache, updating cache...`);
+        await this.updateCache();
+        return this.getMusic(musicId);
+
+    }
+
+    async getMusicWithDbNoUpdate(musicId: string): Promise<MusicDto | null> {
         const cacheKey = this.MUSIC_STORAGE_KEY(musicId);
 
         const raw = localStorage.getItem(cacheKey);
@@ -137,6 +149,71 @@ export class MusicCacheService {
         localStorage.removeItem(this.MUSIC_REGISTRY_TS_KEY);
     }
 
+    async createMusicInBase(music: MusicDto): Promise<void> {
+        try {
+            await this.musicFirestoreService.uploadMusic(music);
+        } catch (e) {
+            this.updateCache();
+            throw e;
+        }
+        music.noteData = [];
+        this.musics.push(music);
+        localStorage.setItem(this.MUSIC_STORAGE_KEY(music.id), JSON.stringify(music));
+        this.registry.add(music.id);
+        localStorage.setItem(this.MUSIC_REGISTRY_KEY, JSON.stringify(Array.from(this.registry)));
+    }
 
+    async updateMusicInBase(music: MusicDto): Promise<void> {
+        try {
+            await this.musicFirestoreService.updateMusic(music);
+        } catch (e) {
+            this.updateCache();
+            throw e;
+        }
+        this.musics = this.musics.filter(m => m.id !== music.id);
+        this.musics.push(music);
+        localStorage.setItem(this.MUSIC_STORAGE_KEY(music.id), JSON.stringify(music));
+        this.registry.add(music.id);
+        localStorage.setItem(this.MUSIC_REGISTRY_KEY, JSON.stringify(Array.from(this.registry)));
+    }
 
+    async deleteMusicInBase(musicId: string): Promise<void> {
+        try {
+            await this.musicFirestoreService.deleteMusic(musicId);
+        } catch (e) {
+            this.updateCache();
+            throw e;
+        }
+
+        this.musics = this.musics.filter(m => m.id !== musicId);
+        this.registry.delete(musicId);
+        localStorage.removeItem(this.MUSIC_STORAGE_KEY(musicId));
+        localStorage.setItem(this.MUSIC_REGISTRY_KEY, JSON.stringify(Array.from(this.registry)));
+    }
+
+    async uploadNotesInBase(musicId: string, notes: NoteDataDto[]): Promise<void> {
+        try {
+            await this.musicFirestoreService.uploadNotes(musicId, notes);
+        } catch (e) {
+            this.updateCache();
+            throw e;
+        }
+        const music = this.musics.find(m => m.id === musicId);
+        if (!music) return;
+        music.noteData = music.noteData.concat(notes);
+        localStorage.setItem(this.MUSIC_STORAGE_KEY(music.id), JSON.stringify(music));
+    }
+
+    async deleteNoteInBase(musicId: string, note: NoteDataDto): Promise<void> {
+        try {
+            await this.musicFirestoreService.deleteNote(musicId, note);
+        } catch (e) {
+            this.updateCache();
+            throw e;
+        }
+        const music = this.musics.find(m => m.id === musicId);
+        if (!music) return;
+        music.noteData = music.noteData.filter(n => n.chartName !== note.chartName);
+        localStorage.setItem(this.MUSIC_STORAGE_KEY(music.id), JSON.stringify(music));
+    }
 }
