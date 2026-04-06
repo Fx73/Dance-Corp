@@ -116,13 +116,13 @@
 								<p style="color: var(--ion-color-warning);"> You are currently editing a local music file. Switch to url to be able to upload </p>
 							}@else{							
 								@if (isEditDB()) {
-									<ion-button (click)="updateMusic()" color="success" expand="block" [disabled]="isEditDB() && !metadataDirty()"> Upload music </ion-button>
+									<ion-button (click)="updateMusic()" color="success" expand="block" [disabled]="!metadataDirty()"> Update music </ion-button>
 									<ion-button (click)="uploadAllNotes()" expand="block" [disabled]="!anyNoteDirty()"> Upload All notes </ion-button>
 									@if (noNotes()) {
 										<ion-button color="danger" (click)="deleteMusic()" [disabled]="!noNotes()" expand="block"> Delete Music </ion-button>
 									}
 								}@else {
-									<ion-button (click)="uploadMusic()" color="success" expand="block" [disabled]="isEditDB() && !metadataDirty()"> Update music </ion-button>
+									<ion-button (click)="uploadMusic()" color="success" expand="block"> Upload music </ion-button>
 								}
 							}
 							<ion-button color="danger" (click)="deleteFile()" size="small" expand="block"> <ion-icon *ngIf="metadataDirty() || anyNoteDirty()" name="trash-outline"></ion-icon> {{metadataDirty() || anyNoteDirty() ? 'Discard local edit' : 'Cancel edition'}} </ion-button>

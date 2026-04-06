@@ -4,6 +4,7 @@ import { MusicDto, NoteDataDto } from '../../game/game-model/music.dto';
 import { Injectable } from '@angular/core';
 import { AppComponent } from 'src/app/app.component';
 import { DifficultyCriteria } from 'src/app/pages/upload/DifficultyCriteria';
+import { deepEqual } from 'src/app/shared/utils/object-extend';
 import { FirestoreConverter } from './firestore.converter';
 import { UserFirestoreService } from './user.firestore.service';
 
@@ -62,8 +63,8 @@ export class MusicFirestoreService {
             const current = (await getDoc(musicRef)).data();
             if (!current) throw new Error("Music not found");
             for (const field of this.protectedFields) {
-                console.log(`Checking field "${field}": current="${current[field]}", new="${dto[field]}"`);
-                if (dto[field] !== current[field])
+                console.log(`Checking field "${field}" : `, current[field], dto[field]);
+                if (!deepEqual(dto[field], current[field]))
                     throw new Error(`Field "${field}" cannot be modified after upload.`);
             }
 

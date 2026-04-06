@@ -1,27 +1,27 @@
-import { ActivatedRoute, Router } from "@angular/router";
-import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import { IMusicPlayer, MusicOrigin, MusicPlayerCommon } from './music-player/IMusicPlayer';
+import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { ActivatedRoute, Router } from "@angular/router";
 import { IonButton, IonCard, IonContent, IonHeader, IonIcon, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { IMusicPlayer, MusicOrigin, MusicPlayerCommon } from './music-player/IMusicPlayer';
 
-import { AnnouncerService } from 'src/app/services/gameplay/announcer.service';
-import { AppComponent } from '../app.component';
-import { ArrowDirection } from "./constants/arrow-direction.enum";
 import { FormsModule } from '@angular/forms';
-import { GameManager } from './game.manager';
-import { GameOverComponent } from "./game-display/game-over/game-over.component";
+import { addIcons } from 'ionicons';
+import { arrowBack } from 'ionicons/icons';
+import { AnnouncerService } from 'src/app/services/gameplay/announcer.service';
+import { UserConfigService } from "src/app/services/userconfig.service";
+import { AppComponent } from '../app.component';
 import { MusicCacheService } from '../services/local-storage/music.cache.service';
+import { UserCacheService } from '../services/local-storage/user.cache.service';
+import { PresenceService } from '../services/thirdpartyapp/presence.service';
+import { ArrowDirection } from "./constants/arrow-direction.enum";
+import { GameOverComponent } from "./game-display/game-over/game-over.component";
+import { PlayerDisplayComponent } from "./game-display/player-display.component";
+import { WaitingScreenComponent } from "./game-display/waiting-screen/waiting-screen.component";
 import { MusicDto } from "./game-model/music.dto";
+import { GameManager } from './game.manager';
 import { MusicPlayerLocalComponent } from "./music-player/music-player-local/music-player-local.component";
 import { MusicPlayerSoundcloudComponent } from './music-player/music-player-soundcloud/music-player-soundcloud.component';
 import { MusicPlayerYoutubeComponent } from "./music-player/music-player-youtube/music-player-youtube.component";
-import { PlayerDisplayComponent } from "./game-display/player-display.component";
-import { PresenceService } from '../services/thirdpartyapp/presence.service';
-import { UserCacheService } from '../services/local-storage/user.cache.service';
-import { UserConfigService } from "src/app/services/userconfig.service";
-import { WaitingScreenComponent } from "./game-display/waiting-screen/waiting-screen.component";
-import { addIcons } from 'ionicons';
-import { arrowBack } from 'ionicons/icons';
 
 @Component({
   selector: 'app-game',

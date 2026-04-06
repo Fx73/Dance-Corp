@@ -91,6 +91,23 @@ export class MusicCacheService {
         AppComponent.presentOkToast(`Music list updated: ${updateInfo.newMusicIds.length} new, ${updateInfo.toUpdateMusicIds.length} updated, ${updateInfo.toDeleteMusicIds.length} deleted.`);
     }
 
+    async updateCacheMusic(musicId: string) {
+        try {
+            const musics = await this.musicFirestoreService.getMusicListWithId([musicId]);
+            const music = musics[0];
+            if (!music) return;
+
+            this.musics = this.musics.filter(m => m.id !== music.id);
+            this.musics.push(music);
+            localStorage.setItem(this.MUSIC_STORAGE_KEY(music.id), JSON.stringify(music));
+            this.registry.add(music.id);
+            localStorage.setItem(this.MUSIC_REGISTRY_KEY, JSON.stringify(Array.from(this.registry)));
+            console.log(`Music ${musicId} updated in cache.`);
+
+        } catch (e) {
+            console.error(`Failed to update music ${musicId} in cache:`, e);
+        };
+    }
 
     getMusic(musicId: string): MusicDto | null {
         const cacheKey = this.MUSIC_STORAGE_KEY(musicId);

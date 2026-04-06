@@ -1,16 +1,20 @@
 import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from "@angular/core";
 import { IonInput, IonItem, IonLabel } from "@ionic/angular/standalone";
+import { IMusicEditableField, MUSIC_EDITABLE_FIELD_TOKEN } from "../editable-field.interface";
 
 import { SanitizeSscInput } from "../reader.ssc";
 
 @Component({
   selector: 'music-editable-field-autocomplete',
+  providers: [
+    { provide: MUSIC_EDITABLE_FIELD_TOKEN, useExisting: MusicEditableFieldAutocompleteComponent }
+  ],
   templateUrl: './editable-field-autocomplete.component.html',
   styleUrls: ['./editable-field-autocomplete.component.scss'],
   standalone: true,
   imports: [IonItem, IonLabel, IonInput]
 })
-export class MusicEditableFieldAutocompleteComponent {
+export class MusicEditableFieldAutocompleteComponent implements IMusicEditableField {
   @Input() isEditing = false;
 
   @Input() label!: string;

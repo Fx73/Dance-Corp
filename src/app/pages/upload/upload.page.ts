@@ -6,6 +6,7 @@ import { BaseDirectory, mkdir, readDir, remove, writeFile } from '@tauri-apps/pl
 import { addOutline, checkmarkCircle, closeCircle, folder, logoSoundcloud, logoYoutube, removeOutline, trashOutline } from 'ionicons/icons';
 import { Measures, MusicDto, NoteDataDto } from 'src/app/game/game-model/music.dto';
 import { MusicOrigin, MusicPlayerCommon } from 'src/app/game/music-player/IMusicPlayer';
+import { IMusicEditableField, MUSIC_EDITABLE_FIELD_TOKEN } from './editable-field.interface';
 import { SccReader, SccWriter } from './reader.ssc';
 
 import { FormsModule } from '@angular/forms';
@@ -60,8 +61,8 @@ export class UploadPage {
   @ViewChildren('notesCard', { read: ElementRef })
   notesCards!: QueryList<ElementRef>;
 
-  @ViewChildren(MusicEditableFieldComponent)
-  editableFields!: QueryList<MusicEditableFieldComponent>;
+  @ViewChildren(MUSIC_EDITABLE_FIELD_TOKEN)
+  editableFields!: QueryList<IMusicEditableField>;
   @ViewChildren(MusicEditableListComponent)
   editableLists!: QueryList<MusicEditableListComponent>;
   @ViewChildren(MusicSelectComponent)
@@ -98,6 +99,7 @@ export class UploadPage {
       ...this.selects.filter(s => this.metadataCard.nativeElement.contains(s.elementRef.nativeElement)),
     ];
 
+    console.log("Metadata dirty check:", cardMetadata.map(c => ({ label: c.label, isDirty: c.isDirty })));
     this.metadataDirty.set(
       cardMetadata.some(c => c.isDirty)
     );
@@ -323,7 +325,7 @@ export class UploadPage {
 
   async uploadAllNotes(): Promise<void> {
     if (this.musicData === null || !this.isEditDB()) return;
-    await this.fireStoreService.uploadNotes(this.musicData.id, this.musicData.noteData)
+    await this.musicCacheService.uploadNotesInBase(this.musicData.id, this.musicData.noteData)
     AppComponent.presentOkToast("All notes uploaded successfully!");
 
     await this.loadDbMusic(this.musicData.id)
@@ -334,7 +336,7 @@ export class UploadPage {
 
   async uploadNote(note: NoteDataDto): Promise<void> {
     if (this.musicData === null || !this.isEditDB()) return;
-    await this.fireStoreService.uploadNotes(this.musicData.id, [note])
+    await this.musicCacheService.uploadNotesInBase(this.musicData.id, [note])
     AppComponent.presentOkToast("Note uploaded successfully!");
     await this.loadDbMusic(this.musicData.id)
 
@@ -376,8 +378,8 @@ export class UploadPage {
     if (!this.musicData) return;
 
     if (this.musicDataDb && this.musicDataDb.noteData.some(n => n.chartName === note.chartName)) {
-      this.fireStoreService.deleteNote(this.musicData.id, note)
-      this.musicDataDb.noteData = this.musicDataDb.noteData.filter(n => n.chartName !== note.chartName)
+      this.musicCacheService.deleteNoteInBase(this.musicData.id, note)
+      this.loadDbMusic(this.musicData.id)
       AppComponent.presentOkToast("Note deleted successfully from database.");
 
     } else {
