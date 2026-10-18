@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonInput, IonItem, IonLabel, IonModal, IonRange, IonToggle } from '@ionic/angular/standalone';
+import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonInput, IonItem, IonLabel, IonModal, IonRange, IonToggle } from '@ionic/angular';
 
 import { AnnouncerService } from 'src/app/services/gameplay/announcer.service';
 import { Arrow } from '../../game/game-model/arrows/arrow';

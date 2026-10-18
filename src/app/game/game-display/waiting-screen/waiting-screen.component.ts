@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core';
 
-import { IonSpinner } from "@ionic/angular/standalone";
+import { IonSpinner } from "@ionic/angular";
 
 @Component({
   selector: 'app-waiting-screen',

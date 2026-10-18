@@ -1,5 +1,5 @@
 import { Component, ElementRef, EventEmitter, Input, Output } from '@angular/core';
-import { IonItem, IonLabel, IonSelect, IonSelectOption } from "@ionic/angular/standalone";
+import { IonItem, IonLabel, IonSelect, IonSelectOption } from "@ionic/angular";
 
 @Component({
   selector: 'music-select',

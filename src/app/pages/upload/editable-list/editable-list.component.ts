@@ -1,5 +1,5 @@
 import { Component, ElementRef, EventEmitter, Input, Output } from '@angular/core';
-import { IonButton, IonIcon, IonInput, IonItem, IonLabel, IonList } from "@ionic/angular/standalone";
+import { IonButton, IonIcon, IonInput, IonItem, IonLabel, IonList } from "@ionic/angular";
 import { addOutline, removeOutline } from 'ionicons/icons';
 
 import { FormsModule } from '@angular/forms';

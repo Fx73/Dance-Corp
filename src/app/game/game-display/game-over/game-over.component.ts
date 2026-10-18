@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core';
-import { IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonIcon, IonItem, IonLabel, IonList } from "@ionic/angular/standalone";
+import { IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonIcon, IonItem, IonLabel, IonList } from "@ionic/angular";
 import { checkmarkCircleOutline, closeCircleOutline, medalOutline, starOutline } from 'ionicons/icons';
 
 import { Color } from 'src/app/game/constants/color';

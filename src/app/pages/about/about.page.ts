@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { IonBadge, IonCard, IonCardContent, IonContent, IonIcon } from '@ionic/angular/standalone';
+import { IonBadge, IonCard, IonCardContent, IonContent, IonIcon } from '@ionic/angular';
 import { logoAngular, logoCss3, logoHtml5, logoIonic, logoSoundcloud, logoYoutube } from 'ionicons/icons';
 
 import { AppConfig } from 'src/app.config';

@@ -1,5 +1,5 @@
 import { Component, ViewChild, signal } from '@angular/core';
-import { IonicModule, PopoverController } from '@ionic/angular';
+import { IonButton, IonContent, IonIcon, IonItem, IonLabel, IonPopover, PopoverController } from '@ionic/angular';
 import { logoGoogle, person } from 'ionicons/icons';
 
 import { LoginComponent } from './login/login.component';
@@ -15,7 +15,7 @@ export const currentUser = signal<User | null>(null);
   templateUrl: './user.component.html',
   styleUrls: ['./user.component.scss'],
   standalone: true,
-  imports: [IonicModule],
+  imports: [IonButton, IonContent, IonIcon, IonItem, IonLabel, IonPopover],
 })
 export class UserComponent {
   @ViewChild('userpopover', { static: false }) userpopover!: HTMLIonPopoverElement;

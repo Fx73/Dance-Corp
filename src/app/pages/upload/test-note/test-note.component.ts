@@ -4,8 +4,7 @@ import { MusicDto, NoteDataDto } from 'src/app/game/game-model/music.dto';
 
 import { ArrowDirection } from 'src/app/game/constants/arrow-direction.enum';
 import { GameManager } from 'src/app/game/game.manager';
-import { IonicModule } from '@ionic/angular';
-import { ModalController } from '@ionic/angular/standalone';
+import { ModalController } from '@ionic/angular';
 import { MusicPlayerSoundcloudComponent } from "../../../game/music-player/music-player-soundcloud/music-player-soundcloud.component";
 import { MusicPlayerYoutubeComponent } from "../../../game/music-player/music-player-youtube/music-player-youtube.component";
 import { NgIf } from '@angular/common';
@@ -18,7 +17,7 @@ import { UserConfigService } from 'src/app/services/userconfig.service';
   templateUrl: './test-note.component.html',
   styleUrls: ['./test-note.component.scss'],
   standalone: true,
-  imports: [IonicModule, MusicPlayerYoutubeComponent, MusicPlayerSoundcloudComponent, PlayerDisplayComponent, NgIf]
+  imports: [MusicPlayerYoutubeComponent, MusicPlayerSoundcloudComponent, PlayerDisplayComponent, NgIf]
 })
 export class TestNoteComponent implements OnInit {
   //#region App Constants

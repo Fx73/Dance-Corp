@@ -1,7 +1,7 @@
 import { Component, Input, input } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
+import { IonButton, IonCard, IonInput, IonItem } from '@ionic/angular';
 import { LoginFireauthService } from 'src/app/services/firestore/login.fireauth.service';
 import { User } from 'firebase/auth';
 
@@ -10,7 +10,7 @@ import { User } from 'firebase/auth';
   templateUrl: './account.component.html',
   styleUrls: ['./account.component.scss'],
   standalone: true,
-  imports: [IonicModule, FormsModule],
+  imports: [IonButton, IonCard, IonInput, IonItem, FormsModule],
 })
 export class AccountComponent {
 

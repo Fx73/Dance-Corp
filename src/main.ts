@@ -1,4 +1,4 @@
-import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular/standalone';
+import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular';
 import { PreloadAllModules, RouteReuseStrategy, provideRouter, withPreloading, withRouterConfig } from '@angular/router';
 import { getFirestore, initializeFirestore } from 'firebase/firestore';
 

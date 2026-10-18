@@ -1,5 +1,5 @@
 import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from "@angular/core";
-import { IonInput, IonItem, IonLabel } from "@ionic/angular/standalone";
+import { IonInput, IonItem, IonLabel } from "@ionic/angular";
 import { IMusicEditableField, MUSIC_EDITABLE_FIELD_TOKEN } from "../editable-field.interface";
 
 import { SanitizeSscInput } from "../reader.ssc";

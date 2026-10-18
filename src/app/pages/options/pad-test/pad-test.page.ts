@@ -1,4 +1,4 @@
-import { AlertController, IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonItem, IonLabel, IonSelect, IonSelectOption } from '@ionic/angular/standalone';
+import { AlertController, IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonItem, IonLabel, IonSelect, IonSelectOption } from '@ionic/angular';
 
 import { AppComponent } from 'src/app/app.component';
 import { ArrowDirection } from 'src/app/game/constants/arrow-direction.enum';

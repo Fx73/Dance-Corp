@@ -1,7 +1,7 @@
 import { CommonModule, Location } from '@angular/common';
 import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ActivatedRoute, Router } from "@angular/router";
-import { IonButton, IonCard, IonContent, IonHeader, IonIcon, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { IonButton, IonCard, IonContent, IonHeader, IonIcon, IonTitle, IonToolbar } from '@ionic/angular';
 import { IMusicPlayer, MusicOrigin, MusicPlayerCommon } from './music-player/IMusicPlayer';
 
 import { FormsModule } from '@angular/forms';

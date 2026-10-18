@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 
 import { Color } from 'src/app/game/constants/color';
-import { IonBadge } from "@ionic/angular/standalone";
+import { IonBadge } from "@ionic/angular";
 
 @Component({
   selector: 'app-grade',
