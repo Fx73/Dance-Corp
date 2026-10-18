@@ -105,34 +105,34 @@ export class BrowsePage implements OnInit {
 
   readonly blockedKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'Spacebar', 'Enter'];
   private keyHandler = (event: KeyboardEvent) => {
+    if (this.isFocusOnSearchInput) return;
     if (this.blockedKeys.includes(event.key)) {
       event.preventDefault();
     }
     if (event.key === 'Enter') {
-      const active = document.activeElement;
-      if (active?.classList?.contains('search-input') || active?.closest('.search-input')) {
-        return;
-      }
       this.runGame();
     }
   };
 
+  isFocusOnSearchInput = false;
   isListeningInput = false;
   listenInput() {
-    for (let index = 0; index < this.dancepad.length; index++) {
-      const padstate = this.dancepad[index].getRefreshedState();
-      if (padstate[ArrowDirection.Left]) {
-        this.onSelectMusic(Math.max(0, this.selectedMusicIndex() - 1));
-      }
-      if (padstate[ArrowDirection.Right]) {
-        this.onSelectMusic(Math.min(this.storedMusics().length + this.dbMusics().length - 1, this.selectedMusicIndex() + 1));
-      }
-      if (padstate[ArrowDirection.Down]) {
-        const notesLength = this.musicNotes().length;
-        this.onSelectNote(Math.min(notesLength - 1, (this.selectedNotesIndex()[index] ?? 0) + 1), index);
-      }
-      if (padstate[ArrowDirection.Up]) {
-        this.onSelectNote(Math.max(0, (this.selectedNotesIndex()[index] ?? 0) - 1), index);
+    if (!this.isFocusOnSearchInput) {
+      for (let index = 0; index < this.dancepad.length; index++) {
+        const padstate = this.dancepad[index].getRefreshedState();
+        if (padstate[ArrowDirection.Left]) {
+          this.onSelectMusic(Math.max(0, this.selectedMusicIndex() - 1));
+        }
+        if (padstate[ArrowDirection.Right]) {
+          this.onSelectMusic(Math.min(this.storedMusics().length + this.dbMusics().length - 1, this.selectedMusicIndex() + 1));
+        }
+        if (padstate[ArrowDirection.Down]) {
+          const notesLength = this.musicNotes().length;
+          this.onSelectNote(Math.min(notesLength - 1, (this.selectedNotesIndex()[index] ?? 0) + 1), index);
+        }
+        if (padstate[ArrowDirection.Up]) {
+          this.onSelectNote(Math.max(0, (this.selectedNotesIndex()[index] ?? 0) - 1), index);
+        }
       }
     }
     if (this.isListeningInput)
