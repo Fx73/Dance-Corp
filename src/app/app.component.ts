@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular';
 
 import { AnnouncerService } from './services/gameplay/announcer.service';
@@ -14,9 +14,16 @@ import { ToastController } from '@ionic/angular';
   imports: [IonApp, IonRouterOutlet],
 })
 export class AppComponent implements OnInit {
+  private toastController = inject(ToastController);
+  private presenceService = inject(PresenceService);
+  private musicCacheService = inject(MusicCacheService);
+
   static appInstance: AppComponent;
 
-  constructor(announcerService: AnnouncerService, soundManager: SoundManager, private toastController: ToastController, private presenceService: PresenceService, private musicCacheService: MusicCacheService) {
+  constructor() {
+    const announcerService = inject(AnnouncerService);
+    const soundManager = inject(SoundManager);
+
     AppComponent.appInstance = this;
     announcerService.init();
 

@@ -3,7 +3,7 @@ import { AlertController, IonButton, IonCard, IonCardContent, IonCardHeader, Ion
 import { AppComponent } from 'src/app/app.component';
 import { ArrowDirection } from 'src/app/game/constants/arrow-direction.enum';
 
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { GamepadService } from 'src/app/services/gameplay/gamepad.service';
 import { HeaderComponent } from "src/app/shared/component/header/header.component";
@@ -18,6 +18,10 @@ import { UserConfigService } from 'src/app/services/userconfig.service';
   imports: [IonCardSubtitle, IonItem, IonLabel, IonButton, IonCardContent, IonCardTitle, IonCard, IonCardHeader, IonSelect, IonSelectOption, IonContent, FormsModule, HeaderComponent]
 })
 export class PadTestPage {
+  gamepadService = inject(GamepadService);
+  userConfigService = inject(UserConfigService);
+  private alertController = inject(AlertController);
+
   readonly ArrowDirection = ArrowDirection;
   readonly arrowKeys = Object.values(ArrowDirection).filter(value => typeof value === 'number')
   playerIndexSelected: number | undefined;
@@ -28,13 +32,6 @@ export class PadTestPage {
   keyboardStartBinding: string | null = null;
 
   waitingForInput: boolean = false;
-
-
-  constructor(
-    public gamepadService: GamepadService,
-    public userConfigService: UserConfigService,
-    private alertController: AlertController
-  ) { }
 
   selectPlayer(player: Player, playerIndex: number) {
     this.playerIndexSelected = playerIndex

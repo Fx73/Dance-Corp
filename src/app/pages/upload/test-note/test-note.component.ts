@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { IMusicPlayer, MusicOrigin, MusicPlayerCommon } from 'src/app/game/music-player/IMusicPlayer';
 import { MusicDto, NoteDataDto } from 'src/app/game/game-model/music.dto';
 
@@ -20,6 +20,9 @@ import { UserConfigService } from 'src/app/services/userconfig.service';
   imports: [MusicPlayerYoutubeComponent, MusicPlayerSoundcloudComponent, PlayerDisplayComponent]
 })
 export class TestNoteComponent implements OnInit, OnDestroy {
+  private modalController = inject(ModalController);
+  private userConfigService = inject(UserConfigService);
+
   //#region App Constants
   readonly ArrowDirection = ArrowDirection;
   readonly MusicOrigin = MusicOrigin;
@@ -32,11 +35,6 @@ export class TestNoteComponent implements OnInit, OnDestroy {
   playerDisplay!: PlayerDisplayComponent;
 
   game: GameManager | null = null;
-
-
-
-  constructor(private modalController: ModalController, private userConfigService: UserConfigService) {
-  }
 
   ngOnInit() {
     this.musicOrigin = MusicPlayerCommon.pickMusicPlayer(this.music.music!);

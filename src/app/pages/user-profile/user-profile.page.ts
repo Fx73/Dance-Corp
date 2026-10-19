@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { IonAvatar, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonContent, IonHeader, IonImg, IonItem, IonLabel, IonText, IonTitle, IonToolbar } from '@ionic/angular';
 
 import { AccountComponent } from "./account/account.component";
@@ -21,7 +21,10 @@ export class UserProfilePage {
   userAuth: User;
   userData: UserDto;
 
-  constructor(authService: LoginFireauthService, userService: UserFirestoreService) {
+  constructor() {
+    const authService = inject(LoginFireauthService);
+    const userService = inject(UserFirestoreService);
+
     this.userAuth = authService.getAuthUser()!
     this.userData = userService.user!
   }

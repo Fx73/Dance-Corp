@@ -1,4 +1,4 @@
-import { Component, Input, input } from '@angular/core';
+import { Component, Input, input, inject } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { IonButton, IonCard, IonInput, IonItem } from '@ionic/angular';
@@ -13,6 +13,8 @@ import { User } from 'firebase/auth';
   imports: [IonButton, IonCard, IonInput, IonItem, FormsModule],
 })
 export class AccountComponent {
+  private loginService = inject(LoginFireauthService);
+
 
   name: string = '';
   email: string = '';
@@ -20,7 +22,9 @@ export class AccountComponent {
   password2: string = '';
   isEmailVerified: Boolean = false;
 
-  constructor(private loginService: LoginFireauthService) {
+  constructor() {
+    const loginService = this.loginService;
+
     const user = loginService.getAuthUser()
     this.name = user!.displayName ?? ""
     this.email = user!.email ?? ""

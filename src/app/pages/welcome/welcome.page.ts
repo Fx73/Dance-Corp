@@ -1,4 +1,4 @@
-import { Component, OnInit, Signal } from '@angular/core';
+import { Component, OnInit, Signal, inject } from '@angular/core';
 import { IonBadge, IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonContent, IonGrid, IonItem, IonLabel, IonRow } from '@ionic/angular';
 
 
@@ -18,9 +18,13 @@ import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.
   imports: [IonCol, IonRow, IonGrid, IonBadge, IonLabel, IonItem, IonCardHeader, IonCardTitle, IonCardContent, IonCard, IonButton, IonContent, FormsModule, HeaderComponent, RouterModule, LoginComponent]
 })
 export class WelcomePage implements OnInit {
+  private discordRpcService = inject(PresenceService);
+
   user: Signal<UserDto | null>;
 
-  constructor(userService: UserFirestoreService, private discordRpcService: PresenceService) {
+  constructor() {
+    const userService = inject(UserFirestoreService);
+
     this.user = userService.userData;
   }
 

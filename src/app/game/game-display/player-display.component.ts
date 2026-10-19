@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, ViewChild, signal } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, ViewChild, signal, inject } from '@angular/core';
 
 import { Arrow } from '../game-model/arrows/arrow';
 import { ArrowDirection } from 'src/app/game/constants/arrow-direction.enum';
@@ -18,6 +18,9 @@ import { UserConfigService } from 'src/app/services/userconfig.service';
   imports: [CommonModule]
 })
 export class PlayerDisplayComponent implements AfterViewInit {
+  private userConfigService = inject(UserConfigService);
+  private cd = inject(ChangeDetectorRef);
+
   //#region App Constants
   readonly ArrowDirection = ArrowDirection;
   ARROW_SIZE = ArrowImageManager.ARROW_SIZE //px
@@ -42,9 +45,6 @@ export class PlayerDisplayComponent implements AfterViewInit {
   targetY = CONFIG.DISPLAY.TARGET_PERCENT;
   canvasWidth = 0;
   canvasHeight = 0;
-
-  constructor(private userConfigService: UserConfigService, private cd: ChangeDetectorRef) {
-  }
 
   ngAfterViewInit(): void {
     this.canvasHeight = this.userConfigService.getConfig()['canvasHeight']

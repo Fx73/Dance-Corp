@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonIcon, IonInput, IonItem, IonSelect, IonSelectOption } from '@ionic/angular';
 
 import { AnnouncerService } from 'src/app/services/gameplay/announcer.service';
@@ -21,10 +21,14 @@ import { addIcons } from 'ionicons';
   imports: [IonInput, IonIcon, IonCardSubtitle, IonCardHeader, IonButton, IonCardContent, IonItem, IonCard, IonCardTitle, IonContent, IonSelectOption, RouterModule, IonSelect, FormsModule, HeaderComponent]
 })
 export class PlayerSelectionPage {
+  userConfigService = inject(UserConfigService);
+  gamepadService = inject(GamepadService);
+  private announcerService = inject(AnnouncerService);
+
 
   userList: { id: string | null, name: string }[] = []
 
-  constructor(public userConfigService: UserConfigService, public gamepadService: GamepadService, private announcerService: AnnouncerService) {
+  constructor() {
     addIcons({ addCircle });
   }
 

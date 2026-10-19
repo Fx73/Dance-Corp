@@ -1,5 +1,5 @@
 import { CommonModule, Location } from '@angular/common';
-import { ChangeDetectorRef, Component, ElementRef, QueryList, ViewChild, ViewChildren, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, QueryList, ViewChild, ViewChildren, signal, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonGrid, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonList, IonRow, IonSpinner, ModalController } from '@ionic/angular';
 import { BaseDirectory, mkdir, readDir, remove, writeFile } from '@tauri-apps/plugin-fs';
@@ -38,6 +38,16 @@ import { TestNoteComponent } from './test-note/test-note.component';
   imports: [IonSpinner, MusicEditableFieldComponent, MusicEditableFieldAutocompleteComponent, MusicEditableListComponent, IonCardSubtitle, IonImg, IonCol, IonRow, IonGrid, IonInput, IonItem, IonLabel, IonList, FormsModule, IonIcon, IonButton, IonCardTitle, IonCardContent, IonCardHeader, IonCard, IonContent, CommonModule, FormsModule, HeaderComponent, IonButton, MusicPlayerYoutubeComponent, MusicPlayerSoundcloudComponent, MusicPlayerLocalComponent, RadarScoreComponent, MusicSelectComponent]
 })
 export class UploadPage {
+  private modalController = inject(ModalController);
+  private route = inject(ActivatedRoute);
+  private fireStoreService = inject(MusicFirestoreService);
+  private userService = inject(UserFirestoreService);
+  private localMusicService = inject(musicLocalService);
+  private musicCacheService = inject(MusicCacheService);
+  private cd = inject(ChangeDetectorRef);
+  private location = inject(Location);
+  private router = inject(Router);
+
   //#region Constants
   public static readonly MUSICEDIT_STORAGE_KEY = (musicId: string) => `MUSICEDIT_${musicId}`;
   pickMusicPlayer = MusicPlayerCommon.pickMusicPlayer;
@@ -71,7 +81,7 @@ export class UploadPage {
   metadataDirty = signal(false);
   notesDirty = signal<boolean[]>([]);
 
-  constructor(private modalController: ModalController, private route: ActivatedRoute, private fireStoreService: MusicFirestoreService, private userService: UserFirestoreService, private localMusicService: musicLocalService, private musicCacheService: MusicCacheService, private cd: ChangeDetectorRef, private location: Location, private router: Router) {
+  constructor() {
     addIcons({ logoYoutube, logoSoundcloud, folder, trashOutline, removeOutline, addOutline, checkmarkCircle, closeCircle });
 
   }

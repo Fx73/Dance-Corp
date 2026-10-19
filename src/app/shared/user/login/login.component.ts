@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonIcon, IonInput, IonItem, IonLabel, IonTab, IonTabBar, IonTabButton, IonTabs, IonTitle } from "@ionic/angular";
 import { NgClass } from '@angular/common';
@@ -15,6 +15,9 @@ import { addIcons } from 'ionicons';
   imports: [IonButton, IonItem, FormsModule, IonCardSubtitle, ReactiveFormsModule, IonTabButton, IonTabBar, IonCardHeader, IonCardTitle, IonCardContent, IonTitle, IonCard, IonTab, IonIcon, IonTabs, NgClass, IonLabel, IonInput],
 })
 export class LoginComponent {
+  private fb = inject(FormBuilder);
+  private loginService = inject(LoginFireauthService);
+
   @Input()
   isSmall = false;
 
@@ -23,7 +26,7 @@ export class LoginComponent {
   passwordRecoveryForm: FormGroup;
 
 
-  constructor(private fb: FormBuilder, private loginService: LoginFireauthService) {
+  constructor() {
     addIcons({ keyOutline, logInOutline, personAddOutline, refreshCircleOutline, logoGoogle });
 
     this.registerForm = this.fb.group({

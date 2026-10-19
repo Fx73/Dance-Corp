@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { InfiniteScrollCustomEvent, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonIcon, IonImg, IonInfiniteScroll, IonInfiniteScrollContent, IonSearchbar } from '@ionic/angular';
 
 
@@ -20,13 +20,18 @@ import { musicLocalService } from 'src/app/services/local-storage/local.music.se
   imports: [IonBadge, IonIcon, IonCardSubtitle, IonCardContent, IonCardTitle, IonInfiniteScrollContent, IonImg, IonInfiniteScroll, IonSearchbar, IonCard, IonCardHeader, IonContent, FormsModule, HeaderComponent]
 })
 export class BrowseUploadPage implements OnInit {
+  private router = inject(Router);
+  private musicCacheService = inject(MusicCacheService);
+  private localMusicService = inject(musicLocalService);
+  private discordRpcService = inject(PresenceService);
+
 
   dbMusics = signal<MusicDto[]>([]);
   storedMusics = signal<MusicDto[]>([]);
 
   searchQuery: string = '';
 
-  constructor(private router: Router, private musicCacheService: MusicCacheService, private localMusicService: musicLocalService, private discordRpcService: PresenceService) {
+  constructor() {
     addIcons({ addCircleOutline });
   }
 

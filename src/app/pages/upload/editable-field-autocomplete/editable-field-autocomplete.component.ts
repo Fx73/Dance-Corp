@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, ViewChild } from "@angular/core";
+import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, ViewChild, inject } from "@angular/core";
 import { IonInput, IonItem, IonLabel } from "@ionic/angular";
 import { IMusicEditableField, MUSIC_EDITABLE_FIELD_TOKEN } from "../editable-field.interface";
 
@@ -15,6 +15,8 @@ import { SanitizeSscInput } from "../reader.ssc";
   imports: [IonItem, IonLabel, IonInput]
 })
 export class MusicEditableFieldAutocompleteComponent implements IMusicEditableField, OnChanges {
+  elementRef = inject(ElementRef);
+
   @Input() isEditing = false;
 
   @Input() label!: string;
@@ -33,8 +35,6 @@ export class MusicEditableFieldAutocompleteComponent implements IMusicEditableFi
 
 
   public isDirty = false;
-
-  constructor(public elementRef: ElementRef) { }
 
   ngOnChanges() {
     this.isDirty = this.isEditing && this.normalize(this.value) !== this.normalize(this.valueDb);
