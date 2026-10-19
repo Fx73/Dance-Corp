@@ -132,7 +132,7 @@ export class MusicFirestoreService {
         console.log("Querying complete database for music list. This should only happen once per session and will be cached for next calls.");
 
         const musicRef = collection(this.db, this.MUSIC_COLLECTION).withConverter(this.firestoreConverterMusic);;
-        let q = query(musicRef, orderBy(documentId()),);
+        const q = query(musicRef, orderBy(documentId()),);
         const querySnapshot = await getDocs(q);
 
         if (querySnapshot.empty)

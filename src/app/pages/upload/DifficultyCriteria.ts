@@ -133,7 +133,7 @@ export class NoteEvaluator {
     const MAX_BPM_WEIGHT = 0.2;
 
 
-    let bpmDurations = new Map<number, number>();
+    const bpmDurations = new Map<number, number>();
 
     for (let i = 0; i < this.bpms.length - 1; i++) {
       const bpm = this.bpms[i];

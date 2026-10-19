@@ -87,7 +87,7 @@ export class AnnouncerService {
     playAnnouncer(category: string) {
         if (!this.preferredAnnouncer) return;
 
-        let lines = this.preferredAnnouncer.lines[category];
+        const lines = this.preferredAnnouncer.lines[category];
         if (lines) {
             const line = this.pickNoRepeat(lines, this.lastAnnouncerLine);
             this.enqueueAnnouncerLine(this.preferredAnnouncer, line);
@@ -155,7 +155,7 @@ export class AnnouncerService {
         console.log("Request to play countdown from announcer received");
         if (!this.preferredAnnouncer || this.isQueueBlocked) return;
 
-        let announcer = this.preferredAnnouncer.lines["countdown"] ? this.preferredAnnouncer : this.announcers.find(ann => ann.lines["countdown"]);
+        const announcer = this.preferredAnnouncer.lines["countdown"] ? this.preferredAnnouncer : this.announcers.find(ann => ann.lines["countdown"]);
 
         if (!announcer) return;
 

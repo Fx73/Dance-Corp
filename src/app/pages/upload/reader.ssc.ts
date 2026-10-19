@@ -80,7 +80,7 @@ export class SccReader {
         noteDataIndex++;
         tokenMap[`notedata${noteDataIndex}`] = currentNoteData;
       } else if (lowerKey === 'notes' && currentNoteData) {
-        let notes = isEscc ? value : SccReader.convertNotes(value);
+        const notes = isEscc ? value : SccReader.convertNotes(value);
         currentNoteData[lowerKey] = notes;
         currentNoteData = null;
       } else if (currentNoteData) {
@@ -107,7 +107,7 @@ export class SccReader {
 
       if (lowerKey === 'notes') {
         const lines = value.split(':').map(line => line.trim());
-        let currentNoteData: Record<string, string> = {};
+        const currentNoteData: Record<string, string> = {};
         noteDataIndex++;
         currentNoteData['stepstype'] = lines[0];
         currentNoteData['credits'] = lines[1];

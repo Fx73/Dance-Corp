@@ -20,7 +20,7 @@ export class AccountComponent {
   email: string = '';
   password: string = '';
   password2: string = '';
-  isEmailVerified: Boolean = false;
+  isEmailVerified: boolean = false;
 
   constructor() {
     const loginService = this.loginService;

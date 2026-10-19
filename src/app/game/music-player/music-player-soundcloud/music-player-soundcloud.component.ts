@@ -10,7 +10,7 @@ import { IMusicPlayer, MusicPlayerCommon } from '../IMusicPlayer';
 
 //import { Soundcloud } from 'soundcloud.ts';
 
-declare var SC: any;
+declare const SC: any;
 
 @Component({
   selector: 'app-music-player-soundcloud',

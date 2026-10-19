@@ -240,7 +240,7 @@ export class BrowsePage implements OnInit {
     const localIndex = lastId ? updateLocalMusics.findIndex(m => m.id === lastId) : -1;
     const remoteIndex = lastId ? updateDbMusics.findIndex(m => m.id === lastId) : -1;
 
-    let newIndex = localIndex !== -1 ? localIndex : (remoteIndex !== -1 ? remoteIndex + updateLocalMusics.length : 0);
+    const newIndex = localIndex !== -1 ? localIndex : (remoteIndex !== -1 ? remoteIndex + updateLocalMusics.length : 0);
     this.onSelectMusic(newIndex);
   }
 
