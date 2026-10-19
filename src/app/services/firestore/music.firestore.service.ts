@@ -1,7 +1,7 @@
 import { Firestore, collection, deleteDoc, doc, documentId, getDoc, getDocs, getFirestore, orderBy, query, setDoc, updateDoc, where } from 'firebase/firestore';
 import { MusicDto, NoteDataDto } from '../../game/game-model/music.dto';
 
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { AppComponent } from 'src/app/app.component';
 import { DifficultyCriteria } from 'src/app/pages/upload/DifficultyCriteria';
 import { deepEqual } from 'src/app/shared/utils/object-extend';
@@ -12,6 +12,8 @@ import { UserFirestoreService } from './user.firestore.service';
     providedIn: 'root'
 })
 export class MusicFirestoreService {
+    private userFirestoreService = inject(UserFirestoreService);
+
     //#region Constants
     readonly MUSIC_COLLECTION = "musics"
     readonly METADATA_COLLECTION = "metadata";
@@ -28,7 +30,7 @@ export class MusicFirestoreService {
     //#endregion
     db: Firestore
 
-    constructor(private userFirestoreService: UserFirestoreService) {
+    constructor() {
         this.db = getFirestore()
     }
 

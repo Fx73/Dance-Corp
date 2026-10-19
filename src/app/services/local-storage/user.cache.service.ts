@@ -1,4 +1,4 @@
-import { Injectable, effect } from "@angular/core";
+import { Injectable, effect, inject } from "@angular/core";
 import { UserDto, UserMusicDto, UserNoteDto } from 'src/app/pages/user-profile/user.dto';
 
 import { GameRound } from "src/app/game/game-model/gameRound";
@@ -6,6 +6,8 @@ import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.
 
 @Injectable({ providedIn: 'root' })
 export class UserCacheService {
+    private userFirestoreService = inject(UserFirestoreService);
+
     private readonly USER_KEY = "LAST_LOGGED_IN_USER";
     private readonly USERMUSIC_REGISTRY_KEY = 'REGISTRY_USER_MUSIC';
     private readonly USERMUSIC_STORAGE_KEY = (musicId: string) => `USER_MUSIC_${musicId}`;
@@ -15,7 +17,7 @@ export class UserCacheService {
 
     private isSessionOnly = false;
 
-    constructor(private userFirestoreService: UserFirestoreService) {
+    constructor() {
         effect(() => {
             const user = this.userFirestoreService.user;
             this.onUserDataChange(user);

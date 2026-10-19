@@ -1,16 +1,19 @@
 import { NavigationEnd, Router } from "@angular/router";
 
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import { UserConfigService } from 'src/app/services/userconfig.service';
 
 @Injectable({ providedIn: 'root' })
 export class SoundManager {
+    private userConfigService = inject(UserConfigService);
+    private router = inject(Router);
+
     readonly SOUND_BACKGROUND = new Audio('assets/Sounds/music/GGJ2024_Main.mp3');
     readonly SOUND_BACKGROUND2 = new Audio('assets/Sounds/music/GGJ2024_Main2.mp3');
 
     isPlaying = false;
 
-    constructor(private userConfigService: UserConfigService, private router: Router) {
+    constructor() {
         this.SOUND_BACKGROUND.volume = 0;
         this.SOUND_BACKGROUND2.volume = 0;
         this.SOUND_BACKGROUND.loop = true;

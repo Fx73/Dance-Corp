@@ -1,8 +1,10 @@
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import { UserConfigService } from "../userconfig.service";
 
 @Injectable({ providedIn: 'root' })
 export class AnnouncerService {
+    private userConfigService = inject(UserConfigService);
+
     private announcers: any[] = [];
     private crowd: any;
     private preferredAnnouncer: any;
@@ -18,8 +20,6 @@ export class AnnouncerService {
     private isQueueBlocked: boolean = false;
 
     private crowdAudio: HTMLAudioElement | null = null
-
-    constructor(private userConfigService: UserConfigService) {}
 
     async init() {
         this.announcers = [

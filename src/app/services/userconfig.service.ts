@@ -1,4 +1,4 @@
-import { Injectable, effect } from '@angular/core';
+import { Injectable, effect, inject } from '@angular/core';
 
 import { ArrowImageManager } from '../game/game-display/arrowImageManager';
 import { BehaviorSubject } from 'rxjs';
@@ -9,6 +9,8 @@ import { UserFirestoreService } from './firestore/user.firestore.service';
     providedIn: 'root',
 })
 export class UserConfigService {
+    private userFirestoreService = inject(UserFirestoreService);
+
     //#region Constants
     private readonly CONFIG_STORAGE_KEY = "userConfig"
     private readonly PLAYERS_STORAGE_KEY = (index: number) => `playersConfig${index}`;
@@ -20,7 +22,7 @@ export class UserConfigService {
 
     players: Player[] = []
 
-    constructor(private userFirestoreService: UserFirestoreService) {
+    constructor() {
         const storedConfig: UserConfig = JSON.parse(localStorage.getItem(this.CONFIG_STORAGE_KEY) || '{}');
         const defaultConfig = new UserConfig();
 
