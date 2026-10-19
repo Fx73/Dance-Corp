@@ -19,8 +19,6 @@ export class RadarScoreComponent implements AfterViewInit, OnChanges {
 
   @ViewChild('radar') radar!: ElementRef<HTMLCanvasElement>;
 
-  constructor() { }
-
   ngAfterViewInit() {
     this.drawRadar();
   }

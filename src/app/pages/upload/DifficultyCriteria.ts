@@ -254,12 +254,10 @@ export class NoteEvaluator {
     const intervals: number[] = [];
     let previousBeat: number = 0;
 
-    for (let i = 0; i < this.stepChart.length; i++) {
-      const measure = this.stepChart[i];
+    for (const measure of this.stepChart) {
       const beatDivision = measure.steps.length / 4;
 
-      for (let j = 0; j < measure.steps.length; j++) {
-        const line = measure.steps[j];
+      for (const line of measure.steps) {
         const hasNote = line.some(v => v === 1 || v === 2 || v === 4);
 
         if (hasNote) {

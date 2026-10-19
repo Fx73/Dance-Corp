@@ -105,8 +105,7 @@ export class ArrowImageManager {
     private static PreloadArrowImages(arrowImage: HTMLImageElement): void {
         // Loop through each color
         const colors = ['#FFA500', '#0000FF', '#FFFF00', '#8A2BE2']; // Orange, Blue, Yellow, Violet
-        for (let colorIndex = 0; colorIndex < colors.length; colorIndex++) {
-            const color = colors[colorIndex];
+        for (const color of colors) {
             const arrowImgRow: HTMLCanvasElement[] = []
 
             // Create the grayscale base arrow for rotations
