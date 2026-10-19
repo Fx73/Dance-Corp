@@ -2,7 +2,7 @@ import { Component, ElementRef, EventEmitter, Input, Output } from '@angular/cor
 import { IonItem, IonLabel, IonSelect, IonSelectOption } from "@ionic/angular";
 
 @Component({
-  selector: 'music-select',
+  selector: 'app-music-select',
   templateUrl: './select.component.html',
   styleUrls: ['./select.component.scss'],
   standalone: true,

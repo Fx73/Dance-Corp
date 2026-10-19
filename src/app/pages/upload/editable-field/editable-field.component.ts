@@ -5,7 +5,7 @@ import { IMusicEditableField, MUSIC_EDITABLE_FIELD_TOKEN } from "../editable-fie
 import { SanitizeSscInput } from "../reader.ssc";
 
 @Component({
-  selector: 'music-editable-field',
+  selector: 'app-music-editable-field',
   providers: [
     { provide: MUSIC_EDITABLE_FIELD_TOKEN, useExisting: MusicEditableFieldComponent }
   ],

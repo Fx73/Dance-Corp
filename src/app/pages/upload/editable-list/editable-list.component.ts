@@ -7,7 +7,7 @@ import { SanitizeSscInput } from '../reader.ssc';
 import { addIcons } from 'ionicons';
 
 @Component({
-  selector: 'music-editable-list',
+  selector: 'app-music-editable-list',
   templateUrl: './editable-list.component.html',
   styleUrls: ['./editable-list.component.scss'],
   standalone: true,

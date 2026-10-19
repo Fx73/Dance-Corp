@@ -35,59 +35,59 @@
 					</ion-card-header>
 					<ion-card-content>
 						<ion-list lines="none">
-							<music-editable-field label="Title" [value]="musicData.title" [valueDb]="musicDataDb?.title" [isEditing]="false"></music-editable-field>
+							<app-music-editable-field label="Title" [value]="musicData.title" [valueDb]="musicDataDb?.title" [isEditing]="false"></app-music-editable-field>
 
-							<music-editable-field label="Title (Translit)" [(value)]="musicData.titletranslit" [valueDb]="musicDataDb?.titletranslit" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </music-editable-field>
+							<app-music-editable-field label="Title (Translit)" [(value)]="musicData.titletranslit" [valueDb]="musicDataDb?.titletranslit" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </app-music-editable-field>
 
-							<music-editable-field label="Subtitle" [(value)]="musicData.subtitle" [valueDb]="musicDataDb?.subtitle" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </music-editable-field>
+							<app-music-editable-field label="Subtitle" [(value)]="musicData.subtitle" [valueDb]="musicDataDb?.subtitle" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </app-music-editable-field>
 
-							<music-editable-field label="Subtitle (Translit)" [(value)]="musicData.subtitletranslit" [valueDb]="musicDataDb?.subtitletranslit" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </music-editable-field>
+							<app-music-editable-field label="Subtitle (Translit)" [(value)]="musicData.subtitletranslit" [valueDb]="musicDataDb?.subtitletranslit" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </app-music-editable-field>
 
-							<music-editable-field label="Artist" [value]="musicData.artist" [valueDb]="musicDataDb?.artist " (valueChange)="onEndEditing()" [isEditing]="false"> </music-editable-field>
+							<app-music-editable-field label="Artist" [value]="musicData.artist" [valueDb]="musicDataDb?.artist " (valueChange)="onEndEditing()" [isEditing]="false"> </app-music-editable-field>
 
-							<music-editable-field label="Artist (Translit)" [(value)]="musicData.artisttranslit" [valueDb]="musicDataDb?.artisttranslit" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </music-editable-field>
+							<app-music-editable-field label="Artist (Translit)" [(value)]="musicData.artisttranslit" [valueDb]="musicDataDb?.artisttranslit" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </app-music-editable-field>
 
-							<music-editable-field-autocomplete label="Genre" [(value)]="musicData.genre" [valueDb]="musicDataDb?.genre" [suggestions]="genreOptions" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </music-editable-field-autocomplete>
+							<app-music-editable-field-autocomplete label="Genre" [(value)]="musicData.genre" [valueDb]="musicDataDb?.genre" [suggestions]="genreOptions" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </app-music-editable-field-autocomplete>
 
-							<music-editable-field label="Credit" [(value)]="musicData.credit" [valueDb]="musicDataDb?.credit" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </music-editable-field>
+							<app-music-editable-field label="Credit" [(value)]="musicData.credit" [valueDb]="musicDataDb?.credit" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </app-music-editable-field>
 
-							<music-editable-field label="Banner" [(value)]="musicData.banner" [valueDb]="musicDataDb?.banner" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </music-editable-field>
+							<app-music-editable-field label="Banner" [(value)]="musicData.banner" [valueDb]="musicDataDb?.banner" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </app-music-editable-field>
 
-							<music-editable-field label="Jacket" [(value)]="musicData.jacket" [valueDb]="musicDataDb?.jacket" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </music-editable-field>
+							<app-music-editable-field label="Jacket" [(value)]="musicData.jacket" [valueDb]="musicDataDb?.jacket" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </app-music-editable-field>
 
-							<music-editable-field label="CD Title" [(value)]="musicData.cdTitle" [valueDb]="musicDataDb?.cdTitle" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </music-editable-field>
+							<app-music-editable-field label="CD Title" [(value)]="musicData.cdTitle" [valueDb]="musicDataDb?.cdTitle" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </app-music-editable-field>
 
-							<music-editable-field label="Music" [(value)]="musicData.music" [valueDb]="musicDataDb?.music" (valueChange)="verifyMusicUrl();onEndEditing()" [isEditing]="isEditLocal() && !isEditDB()">
+							<app-music-editable-field label="Music" [(value)]="musicData.music" [valueDb]="musicDataDb?.music" (valueChange)="verifyMusicUrl();onEndEditing()" [isEditing]="isEditLocal() && !isEditDB()">
 								<ion-icon name="logo-youtube" style="margin-right: 4px;" slot="start" />
 								<ion-icon name="logo-soundcloud" style="margin-right: 4px;" slot="start" />
 								@if(isDesktop){
 								<ion-icon name="folder" slot="start" (click)="onPickLocalMusic()" />
 								}
-							</music-editable-field>
+							</app-music-editable-field>
 
-							<music-editable-field label="Beat 0 Offset (seconds)" type="number" [(value)]="musicData.offset" [valueDb]="musicDataDb?.offset" (valueChange)="onEndEditing()" [isEditing]="isEditLocal() && !isEditDB()"> </music-editable-field>
+							<app-music-editable-field label="Beat 0 Offset (seconds)" type="number" [(value)]="musicData.offset" [valueDb]="musicDataDb?.offset" (valueChange)="onEndEditing()" [isEditing]="isEditLocal() && !isEditDB()"> </app-music-editable-field>
 
-							<music-editable-field label="Music start (seconds)" type="number" [(value)]="musicData.musicoffset" [valueDb]="musicDataDb?.musicoffset" (valueChange)="onEndEditing()" [isEditing]="isEditLocal() && !isEditDB()"> </music-editable-field>
+							<app-music-editable-field label="Music start (seconds)" type="number" [(value)]="musicData.musicoffset" [valueDb]="musicDataDb?.musicoffset" (valueChange)="onEndEditing()" [isEditing]="isEditLocal() && !isEditDB()"> </app-music-editable-field>
 
-							<music-editable-field label="Sample Start" type="number" [(value)]="musicData.sampleStart" [valueDb]="musicDataDb?.sampleStart" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </music-editable-field>
+							<app-music-editable-field label="Sample Start" type="number" [(value)]="musicData.sampleStart" [valueDb]="musicDataDb?.sampleStart" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </app-music-editable-field>
 
-							<music-editable-field label="Sample Length" type="number" [(value)]="musicData.sampleLength" [valueDb]="musicDataDb?.sampleLength" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </music-editable-field>
+							<app-music-editable-field label="Sample Length" type="number" [(value)]="musicData.sampleLength" [valueDb]="musicDataDb?.sampleLength" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </app-music-editable-field>
 
-							<music-editable-list label="Bpms" [(value)]="musicData.bpms" [valueDb]="musicDataDb?.bpms" valueType="number" (valueChange)="onEndEditing()" [isEditing]="isEditLocal() && !isEditDB()"> </music-editable-list>
+							<app-music-editable-list label="Bpms" [(value)]="musicData.bpms" [valueDb]="musicDataDb?.bpms" valueType="number" (valueChange)="onEndEditing()" [isEditing]="isEditLocal() && !isEditDB()"> </app-music-editable-list>
 
-							<music-editable-list label="Stops" [(value)]="musicData.stops" [valueDb]="musicDataDb?.stops" valueType="number" (valueChange)="onEndEditing()" [isEditing]="isEditLocal() && !isEditDB()"> </music-editable-list>
+							<app-music-editable-list label="Stops" [(value)]="musicData.stops" [valueDb]="musicDataDb?.stops" valueType="number" (valueChange)="onEndEditing()" [isEditing]="isEditLocal() && !isEditDB()"> </app-music-editable-list>
 
-							<music-editable-list label="Warps <WIP>" [(value)]="musicData.warps" [valueDb]="musicDataDb?.warps" valueType="number" (valueChange)="onEndEditing()" [isEditing]="isEditLocal() && !isEditDB()"> </music-editable-list>
+							<app-music-editable-list label="Warps <WIP>" [(value)]="musicData.warps" [valueDb]="musicDataDb?.warps" valueType="number" (valueChange)="onEndEditing()" [isEditing]="isEditLocal() && !isEditDB()"> </app-music-editable-list>
 
-							<music-editable-list label="Speeds <WIP>" [(value)]="musicData.speeds" [valueDb]="musicDataDb?.speeds" valueType="number" (valueChange)="onEndEditing()" [isEditing]="isEditLocal() && !isEditDB()"> </music-editable-list>
+							<app-music-editable-list label="Speeds <WIP>" [(value)]="musicData.speeds" [valueDb]="musicDataDb?.speeds" valueType="number" (valueChange)="onEndEditing()" [isEditing]="isEditLocal() && !isEditDB()"> </app-music-editable-list>
 
-							<music-editable-list label="Scrolls <WIP>" [(value)]="musicData.scrolls" [valueDb]="musicDataDb?.scrolls" valueType="number" (valueChange)="onEndEditing()" [isEditing]="isEditLocal() && !isEditDB()"> </music-editable-list>
+							<app-music-editable-list label="Scrolls <WIP>" [(value)]="musicData.scrolls" [valueDb]="musicDataDb?.scrolls" valueType="number" (valueChange)="onEndEditing()" [isEditing]="isEditLocal() && !isEditDB()"> </app-music-editable-list>
 
-							<music-editable-list label="Backgrounds" [(value)]="musicData.bgChanges " [valueDb]="musicDataDb?.bgChanges" valueType="string" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </music-editable-list>
+							<app-music-editable-list label="Backgrounds" [(value)]="musicData.bgChanges " [valueDb]="musicDataDb?.bgChanges" valueType="string" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </app-music-editable-list>
 
-							<music-editable-list label="Foregrounds <WIP>" [(value)]="musicData.fgChanges " [valueDb]="musicDataDb?.fgChanges" valueType="string" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </music-editable-list>
+							<app-music-editable-list label="Foregrounds <WIP>" [(value)]="musicData.fgChanges " [valueDb]="musicDataDb?.fgChanges" valueType="string" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </app-music-editable-list>
 
-							<music-editable-list label="Labels <WIP>" [(value)]="musicData.labels" [valueDb]="musicDataDb?.labels" valueType="string" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </music-editable-list>
+							<app-music-editable-list label="Labels <WIP>" [(value)]="musicData.labels" [valueDb]="musicDataDb?.labels" valueType="string" (valueChange)="onEndEditing()" [isEditing]="isEditLocal()"> </app-music-editable-list>
 
 						</ion-list>
 					</ion-card-content>
@@ -187,20 +187,20 @@
 							</ion-card-header>
 							<ion-card-content>
 								<ion-list>
-									<music-select label="Dance Type" [(value)]="note.stepsType" [valueDb]="noteDb?.stepsType" [isEditing]="isEditLocal()" (valueChange)="onEndEditing()" [options]="DanceTypeList">
-									</music-select>
+									<app-music-select label="Dance Type" [(value)]="note.stepsType" [valueDb]="noteDb?.stepsType" [isEditing]="isEditLocal()" (valueChange)="onEndEditing()" [options]="DanceTypeList">
+									</app-music-select>
 
-									<music-editable-field label="Description" [(value)]="note.description" [valueDb]="noteDb?.description" [isEditing]="isEditLocal()" (valueChange)="onEndEditing()">
-									</music-editable-field>
+									<app-music-editable-field label="Description" [(value)]="note.description" [valueDb]="noteDb?.description" [isEditing]="isEditLocal()" (valueChange)="onEndEditing()">
+									</app-music-editable-field>
 
-									<music-select label="Difficulty" [(value)]="note.difficulty" [valueDb]="noteDb?.difficulty" [isEditing]="isEditLocal()" (valueChange)="onEndEditing()" [options]="NoteDifficultyList">
-									</music-select>
+									<app-music-select label="Difficulty" [(value)]="note.difficulty" [valueDb]="noteDb?.difficulty" [isEditing]="isEditLocal()" (valueChange)="onEndEditing()" [options]="NoteDifficultyList">
+									</app-music-select>
 
-									<music-editable-field label="Meter" [(value)]="note.meter" [valueDb]="noteDb?.meter" [isEditing]="isEditLocal()" type="number" (valueChange)="onEndEditing()" [warningMessage]="'Meter has been computed on upload from criterias to match DDR level as much as possible. Change it only if you know what you are doing !'">
-									</music-editable-field>
+									<app-music-editable-field label="Meter" [(value)]="note.meter" [valueDb]="noteDb?.meter" [isEditing]="isEditLocal()" type="number" (valueChange)="onEndEditing()" [warningMessage]="'Meter has been computed on upload from criterias to match DDR level as much as possible. Change it only if you know what you are doing !'">
+									</app-music-editable-field>
 
-									<music-editable-field label="Credit" [(value)]="note.credit" [valueDb]="noteDb?.credit" [isEditing]="isEditLocal()" (valueChange)="onEndEditing()">
-									</music-editable-field>
+									<app-music-editable-field label="Credit" [(value)]="note.credit" [valueDb]="noteDb?.credit" [isEditing]="isEditLocal()" (valueChange)="onEndEditing()">
+									</app-music-editable-field>
 
 									<ion-item [title]="noteDb?.creationDate">
 										<ion-label> <strong class="primary">Creation Date:</strong> {{ (note.creationDate | date:'dd/MM/yyyy') }} </ion-label>
