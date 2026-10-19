@@ -1,13 +1,20 @@
 import { Injectable, inject } from "@angular/core";
 import { UserConfigService } from "../userconfig.service";
 
+/** Contenu des fichiers assets/Sounds/announcers/*.json */
+interface SoundBank {
+    type: string;
+    name: string;
+    lines: Record<string, string[]>;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AnnouncerService {
     private userConfigService = inject(UserConfigService);
 
-    private announcers: any[] = [];
-    private crowd: any;
-    private preferredAnnouncer: any;
+    private announcers: SoundBank[] = [];
+    private crowd!: SoundBank;
+    private preferredAnnouncer?: SoundBank;
     private lastAnnouncerLine: string | null = null;
     private failSatisfaction = 0;
     private goodSatisfaction = 0;
@@ -16,7 +23,7 @@ export class AnnouncerService {
 
     // --- CHANNELS ---
     private announcerAudio: HTMLAudioElement | null = null;
-    private announcerQueue: { announcer: any, line: string }[] = [];
+    private announcerQueue: { announcer: SoundBank, line: string }[] = [];
     private isQueueBlocked: boolean = false;
 
     private crowdAudio: HTMLAudioElement | null = null
@@ -87,7 +94,7 @@ export class AnnouncerService {
     playAnnouncer(category: string) {
         if (!this.preferredAnnouncer) return;
 
-        let lines = this.preferredAnnouncer.lines[category];
+        const lines = this.preferredAnnouncer.lines[category];
         if (lines) {
             const line = this.pickNoRepeat(lines, this.lastAnnouncerLine);
             this.enqueueAnnouncerLine(this.preferredAnnouncer, line);
@@ -130,12 +137,12 @@ export class AnnouncerService {
         
         const announcer = this.random(this.announcers);
         const category = this.random(Object.keys(announcer.lines));
-        const line : any = this.random(announcer.lines[category]);
+        const line = this.random(announcer.lines[category]);
         
         this.playAnnouncerDirect(announcer, line, this.processAnnouncerQueue.bind(this));
     }
 
-    private enqueueAnnouncerLine(announcer: any, line: string) {
+    private enqueueAnnouncerLine(announcer: SoundBank, line: string) {
         this.lastAnnouncerLine = line;
         this.announcerQueue.push({ announcer, line });
         this.processAnnouncerQueue();
@@ -155,7 +162,7 @@ export class AnnouncerService {
         console.log("Request to play countdown from announcer received");
         if (!this.preferredAnnouncer || this.isQueueBlocked) return;
 
-        let announcer = this.preferredAnnouncer.lines["countdown"] ? this.preferredAnnouncer : this.announcers.find(ann => ann.lines["countdown"]);
+        const announcer = this.preferredAnnouncer.lines["countdown"] ? this.preferredAnnouncer : this.announcers.find(ann => ann.lines["countdown"]);
 
         if (!announcer) return;
 
@@ -181,7 +188,7 @@ export class AnnouncerService {
     }
 
 
-    private playAnnouncerDirect(announcer: any, line: string, onEndCallback?: () => void) {
+    private playAnnouncerDirect(announcer: SoundBank, line: string, onEndCallback?: () => void) {
         const src = `assets/Sounds/announcers/${announcer.name}/${line}.ogg`;
 
         this.announcerAudio = new Audio(src);

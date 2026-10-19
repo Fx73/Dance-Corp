@@ -10,7 +10,20 @@ import { IMusicPlayer, MusicPlayerCommon } from '../IMusicPlayer';
 
 //import { Soundcloud } from 'soundcloud.ts';
 
-declare var SC: any;
+/** Sous-ensemble utilisé de l'API du widget SoundCloud (https://developers.soundcloud.com/docs/api/html5-widget) */
+interface SoundCloudWidget {
+  load(url: string): void;
+  bind(eventName: string, listener: () => void): void;
+  play(): void;
+  pause(): void;
+  seekTo(milliseconds: number): void;
+  setVolume(volume: number): void;
+  getPosition(callback: (milliseconds: number) => void): void;
+}
+
+declare const SC: {
+  Widget: ((iframe: HTMLIFrameElement) => SoundCloudWidget) & { Events: { READY: string } };
+};
 
 @Component({
   selector: 'app-music-player-soundcloud',
@@ -28,7 +41,7 @@ export class MusicPlayerSoundcloudComponent extends MusicPlayerCommon
   @Output()
   ready: EventEmitter<IMusicPlayer> = new EventEmitter<IMusicPlayer>();
 
-  widgetSC: any;
+  widgetSC!: SoundCloudWidget;
 
 
 
@@ -60,7 +73,7 @@ export class MusicPlayerSoundcloudComponent extends MusicPlayerCommon
   }
 
   //#region CurrentTime management
-  private polling: any = null
+  private polling?: ReturnType<typeof setInterval>;
   private lastKnownTime = 0;
   startPolling() {
     this.polling = setInterval(() => {

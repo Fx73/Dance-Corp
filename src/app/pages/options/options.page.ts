@@ -1,5 +1,5 @@
 import { Component, ViewChild, inject } from '@angular/core';
-import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonInput, IonItem, IonLabel, IonModal, IonRange, IonToggle } from '@ionic/angular';
+import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonInput, IonItem, IonLabel, IonModal, IonRange, IonToggle, InputChangeEventDetail, RangeChangeEventDetail } from '@ionic/angular';
 
 import { AnnouncerService } from 'src/app/services/gameplay/announcer.service';
 import { Arrow } from '../../game/game-model/arrows/arrow';
@@ -13,7 +13,7 @@ import { PlayerDisplayComponent } from '../../game/game-display/player-display.c
 import { RouterModule } from '@angular/router';
 import { SoundManager } from './../../services/gameplay/sound.service';
 import { UserCacheService } from '../../services/local-storage/user.cache.service';
-import { UserConfigService } from 'src/app/services/userconfig.service';
+import { UserConfig, UserConfigService } from 'src/app/services/userconfig.service';
 import { musicLocalService } from 'src/app/services/local-storage/local.music.service';
 
 @Component({
@@ -49,21 +49,22 @@ export class OptionsPage {
   }
 
 
-  getConfigValue<T>(key: any): T {
-    return this.userConfigService.getConfig()[key] as T;
+  getConfigValue<K extends keyof UserConfig>(key: K): UserConfig[K] {
+    return this.userConfigService.getConfig()[key];
   }
 
-  updateConfigValue<T>(key: any, value: T): void {
-    this.userConfigService.updateConfig(key, value);
+  // Valeur brute des composants Ionic : ion-input renvoie une string (ex: canvasWidth), conservée telle quelle
+  updateConfigValue<K extends keyof UserConfig>(key: K, value: UserConfig[K] | InputChangeEventDetail['value'] | RangeChangeEventDetail['value']): void {
+    this.userConfigService.updateConfig(key, value as UserConfig[K]);
   }
 
-  updatePlayerNumber(value: any): void {
-    this.userConfigService.updatePlayerCount(value);
+  updatePlayerNumber(value: RangeChangeEventDetail['value']): void {
+    this.userConfigService.updatePlayerCount(value as number);
   }
 
 
-  verifySoundVolume(source: string): void {
-    const volume = this.getConfigValue<number>(source);
+  verifySoundVolume(source: keyof UserConfig): void {
+    const volume = this.getConfigValue(source);
     console.log(`Testing volume for ${source} at ${volume}`);
     switch (source) {
       case 'menuMusicVolume':
@@ -74,7 +75,7 @@ export class OptionsPage {
         break;
       case 'sfxVolume':
         const SOUND_ARROW_UP = new Audio('assets/Sounds/menuFx/arrow_up.ogg');
-        SOUND_ARROW_UP.volume = volume;
+        SOUND_ARROW_UP.volume = this.getConfigValue('sfxVolume');
         SOUND_ARROW_UP.play();
         break;
     }

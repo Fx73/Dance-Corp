@@ -1,4 +1,4 @@
-export function deepEqual(a: any, b: any): boolean {
+export function deepEqual(a: unknown, b: unknown): boolean {
     if (a === b) return true;
 
     if (typeof a !== typeof b) return false;
@@ -9,11 +9,13 @@ export function deepEqual(a: any, b: any): boolean {
             return a.every((v, i) => deepEqual(v, b[i]));
         }
 
-        const keysA = Object.keys(a);
-        const keysB = Object.keys(b);
+        const objA = a as Record<string, unknown>;
+        const objB = b as Record<string, unknown>;
+        const keysA = Object.keys(objA);
+        const keysB = Object.keys(objB);
         if (keysA.length !== keysB.length) return false;
 
-        return keysA.every(k => deepEqual(a[k], b[k]));
+        return keysA.every(k => deepEqual(objA[k], objB[k]));
     }
 
     return false;

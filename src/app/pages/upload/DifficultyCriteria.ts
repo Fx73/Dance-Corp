@@ -1,9 +1,9 @@
 import { BpmChange } from "src/app/game/game-model/timeline/timedChange";
 import { Measures } from "src/app/game/game-model/music.dto";
 
-export class DifficultyCriteria {
-  [key: string]: number | any;
+export type CriteriaKey = 'endurance' | 'speed' | 'technical' | 'burst' | 'chaos';
 
+export class DifficultyCriteria {
   endurance: number = 0;  //measures sustained effort
   speed: number = 0; //measures speed of notes
   technical: number = 0;   //measure variety of steps and patterns
@@ -133,7 +133,7 @@ export class NoteEvaluator {
     const MAX_BPM_WEIGHT = 0.2;
 
 
-    let bpmDurations = new Map<number, number>();
+    const bpmDurations = new Map<number, number>();
 
     for (let i = 0; i < this.bpms.length - 1; i++) {
       const bpm = this.bpms[i];

@@ -1,5 +1,5 @@
 import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, inject } from "@angular/core";
-import { IonInput, IonItem, IonLabel } from "@ionic/angular";
+import { InputChangeEventDetail, InputCustomEvent, IonInput, IonItem, IonLabel } from "@ionic/angular";
 import { IMusicEditableField, MUSIC_EDITABLE_FIELD_TOKEN } from "../editable-field.interface";
 
 import { SanitizeSscInput } from "../reader.ssc";
@@ -14,7 +14,7 @@ import { SanitizeSscInput } from "../reader.ssc";
   standalone: true,
   imports: [IonItem, IonLabel, IonInput]
 })
-export class MusicEditableFieldComponent implements IMusicEditableField, OnChanges {
+export class MusicEditableFieldComponent<T extends string | number | null | undefined = string | number | null | undefined> implements IMusicEditableField, OnChanges {
   elementRef = inject(ElementRef);
 
   @Input() isEditing = false;
@@ -22,12 +22,12 @@ export class MusicEditableFieldComponent implements IMusicEditableField, OnChang
   @Input() label!: string;
   @Input() type: 'string' | 'number' = 'string';
 
-  @Input() value!: any;
-  @Input() valueDb: any = null;
+  @Input() value!: T;
+  @Input() valueDb: T | null = null;
 
   @Input() warningMessage: string | null = null;
 
-  @Output() valueChange = new EventEmitter<any>();
+  @Output() valueChange = new EventEmitter<T>();
 
   public isDirty = false;
 
@@ -35,12 +35,13 @@ export class MusicEditableFieldComponent implements IMusicEditableField, OnChang
     this.isDirty = this.isEditing && this.normalize(this.value) !== this.normalize(this.valueDb);
   }
 
-  onInputChange(ev: any) {
-    let newValue = ev.detail.value;
-    newValue = SanitizeSscInput(newValue);
+  onInputChange(ev: InputCustomEvent<InputChangeEventDetail>) {
+    const rawValue = ev.detail.value;
+    const newValue = SanitizeSscInput(rawValue == null ? null : String(rawValue));
 
     this.isDirty = this.isEditing && this.normalize(newValue) !== this.normalize(this.valueDb);
-    this.valueChange.emit(newValue);
+    // SanitizeSscInput renvoie une string (ou null), émise telle quelle même si le champ lié est un number
+    this.valueChange.emit(newValue as T);
   }
 
 
@@ -48,7 +49,7 @@ export class MusicEditableFieldComponent implements IMusicEditableField, OnChang
     return this.isEditing && this.normalize(this.value) !== this.normalize(this.valueDb);
   }
 
-  private normalize(v: any): string {
+  private normalize(v: unknown): string {
     if (v === undefined || v === null) return "";
     return String(v).trim();
   }

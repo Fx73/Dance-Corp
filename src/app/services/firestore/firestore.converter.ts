@@ -4,9 +4,9 @@ export class FirestoreConverter<T extends object> {
     readonly IGNORE_UNDEFINED: boolean = true
     readonly IGNORED_FIELDS: Set<string> = new Set(["additionalFields"])
     readonly type;
-    readonly subtypes: Record<string, new () => any> = {};
+    readonly subtypes: Record<string, new () => object> = {};
 
-    constructor(type: { new(): T; }, subtypes: Record<string, new () => any> = {}) {
+    constructor(type: { new(): T; }, subtypes: Record<string, new () => object> = {}) {
         this.type = type
         this.subtypes = subtypes
     }
@@ -15,7 +15,7 @@ export class FirestoreConverter<T extends object> {
         return this.toFirestoreRecurse(dto)
     }
 
-    toFirestoreRecurse(dto: any): DocumentData {
+    toFirestoreRecurse(dto: object): DocumentData {
         const data: DocumentData = {};
         Object.keys(dto).forEach((key) => {
             const value = Reflect.get(dto, key);
@@ -37,15 +37,13 @@ export class FirestoreConverter<T extends object> {
         return data
     }
 
-    fromFirestore(snapshot: QueryDocumentSnapshot<any>): T {
+    fromFirestore(snapshot: QueryDocumentSnapshot<DocumentData>): T {
         const data = snapshot.data();
         const dto = new this.type()
         return this.fromFirestoreRecurse(data, dto) as T;
     }
-    fromFirestoreRecurse(data: any, dto?: any): any {
-        if (dto === undefined)
-            dto = {}
-        Object.keys(data as object).forEach((key) => {
+    fromFirestoreRecurse(data: DocumentData, dto: object = {}): object {
+        Object.keys(data).forEach((key) => {
             let value = data[key]
             if (Array.isArray(value))
                 value = this.mapArrayRecurse(value, key);
@@ -61,18 +59,18 @@ export class FirestoreConverter<T extends object> {
         return dto;
     }
 
-    mapArrayRecurse(array: any[], arrayName: string): any[] {
+    mapArrayRecurse(array: unknown[], arrayName: string): unknown[] {
         // Is empty or primitive
         if (array.length === 0 || Object(array[0]) !== array[0])
             return array
 
         // Is poorly Converted Array
-        if (Object.keys(array[0]).every((x, index) => Number(x) === index)) {
-            return array.map(x => this.mapArrayRecurse(Object.values(x), arrayName))
+        if (Object.keys(array[0] as object).every((x, index) => Number(x) === index)) {
+            return array.map(x => this.mapArrayRecurse(Object.values(x as object), arrayName))
         }
         // Is Object
         const subtype = this.subtypes[arrayName];
-        return array.map(x => this.fromFirestoreRecurse(x, subtype ? new subtype() : undefined));
+        return array.map(x => this.fromFirestoreRecurse(x as DocumentData, subtype ? new subtype() : undefined));
     }
 
 }

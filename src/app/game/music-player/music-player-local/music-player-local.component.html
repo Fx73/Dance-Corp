@@ -4,7 +4,7 @@
   </button>
 
   <div class="timeline">
-    <input type="range" [value]="currentTime()" [max]="duration()" (input)="setToTime($event)" />
+    <input type="range" [value]="currentTime()" [max]="duration()" (input)="onSeekInput($event)" />
   </div>
 
   <div class="time">

@@ -49,7 +49,7 @@ export class GameRound {
     constructor(notes: NoteDataDto, player: Player, isTrainingMode = false, private announcerService: AnnouncerService) {
         this.player = player
 
-        if (player.gamepad!.index! === -1)
+        if (player.gamepad!.index === -1)
             this.dancepad = new DancePadKeyboard(player.keyBindingKeyboard)
         else
             this.dancepad = new DancePadGamepad(player.gamepad!.index!, player.keyBindingGamepad)

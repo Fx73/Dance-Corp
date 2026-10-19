@@ -1,6 +1,6 @@
 import { NgClass, NgStyle, } from '@angular/common';
 import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren, signal, inject } from '@angular/core';
-import { InfiniteScrollCustomEvent, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonImg, IonInfiniteScroll, IonInfiniteScrollContent, IonMenu, IonSearchbar, IonSplitPane, IonText } from '@ionic/angular';
+import { InfiniteScrollCustomEvent, SearchbarCustomEvent, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonImg, IonInfiniteScroll, IonInfiniteScrollContent, IonMenu, IonSearchbar, IonSplitPane, IonText } from '@ionic/angular';
 import { MusicDto, NoteDataDto } from 'src/app/game/game-model/music.dto';
 import { IMusicPlayer, MusicOrigin, MusicPlayerCommon } from 'src/app/game/music-player/IMusicPlayer';
 import { UserMusicDto, UserNoteDto } from '../user-profile/user.dto';
@@ -105,7 +105,7 @@ export class BrowsePage implements OnInit {
   initPlayerInput() {
     const players = this.userConfigService.players;
     for (const player of players) {
-      if (player.gamepad!.index! === -1)
+      if (player.gamepad!.index === -1)
         this.dancepad.push(new DancePadKeyboard(player.keyBindingKeyboard));
       else
         this.dancepad.push(new DancePadGamepad(player.gamepad!.index!, player.keyBindingGamepad));
@@ -207,7 +207,7 @@ export class BrowsePage implements OnInit {
     this.cd.markForCheck();
   }
 
-  onSearch(event: any) {
+  onSearch(event: SearchbarCustomEvent) {
     this.searchQuery = (event.target.value || '').toLowerCase();
     localStorage.setItem('browseSearchQuery', this.searchQuery);
 
@@ -240,7 +240,7 @@ export class BrowsePage implements OnInit {
     const localIndex = lastId ? updateLocalMusics.findIndex(m => m.id === lastId) : -1;
     const remoteIndex = lastId ? updateDbMusics.findIndex(m => m.id === lastId) : -1;
 
-    let newIndex = localIndex !== -1 ? localIndex : (remoteIndex !== -1 ? remoteIndex + updateLocalMusics.length : 0);
+    const newIndex = localIndex !== -1 ? localIndex : (remoteIndex !== -1 ? remoteIndex + updateLocalMusics.length : 0);
     this.onSelectMusic(newIndex);
   }
 

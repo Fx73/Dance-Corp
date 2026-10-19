@@ -3,10 +3,13 @@ import { Measures, MusicDto } from "src/app/game/game-model/music.dto";
 
 import { NoteEvaluator } from "./DifficultyCriteria";
 
+/** Tokens d'un fichier SM/SSC : valeur texte, ou sous-map de tokens pour chaque bloc notedataN */
+export type SscTokenMap = Record<string, string | Record<string, string>>;
+
 export class SccReader {
 
   static parseFile(filename: string, content: string): MusicDto {
-    let tokenMap: Record<string, any>;
+    let tokenMap: SscTokenMap;
 
     if (filename.endsWith('.sm')) {
       tokenMap = this.tokenizeSM(content);
@@ -64,9 +67,9 @@ export class SccReader {
     return tokens;
   }
 
-  static tokenizeSSC(content: string, isEscc: boolean = false): Record<string, any> {
+  static tokenizeSSC(content: string, isEscc: boolean = false): SscTokenMap {
     const tokens = this.tokenizeCommon(content);
-    const tokenMap: Record<string, any> = {};
+    const tokenMap: SscTokenMap = {};
     let currentNoteData: Record<string, string> | null = null;
     let noteDataIndex = 0;
 
@@ -80,7 +83,7 @@ export class SccReader {
         noteDataIndex++;
         tokenMap[`notedata${noteDataIndex}`] = currentNoteData;
       } else if (lowerKey === 'notes' && currentNoteData) {
-        let notes = isEscc ? value : SccReader.convertNotes(value);
+        const notes = isEscc ? value : SccReader.convertNotes(value);
         currentNoteData[lowerKey] = notes;
         currentNoteData = null;
       } else if (currentNoteData) {
@@ -95,9 +98,9 @@ export class SccReader {
     return tokenMap;
   }
 
-  static tokenizeSM(content: string): Record<string, any> {
+  static tokenizeSM(content: string): SscTokenMap {
     const tokens = this.tokenizeCommon(content);
-    const tokenMap: Record<string, any> = {};
+    const tokenMap: SscTokenMap = {};
     let noteDataIndex = 0;
     tokens.forEach(token => {
       const [key, ...rest] = token.split(":");
@@ -107,7 +110,7 @@ export class SccReader {
 
       if (lowerKey === 'notes') {
         const lines = value.split(':').map(line => line.trim());
-        let currentNoteData: Record<string, string> = {};
+        const currentNoteData: Record<string, string> = {};
         noteDataIndex++;
         currentNoteData['stepstype'] = lines[0];
         currentNoteData['credits'] = lines[1];
@@ -196,8 +199,8 @@ export class SccReader {
 
 
 export class SccWriter {
-  static getOrderedFields(dto: any): [string, any][] {
-    return Object.keys(dto).map(key => [key, dto[key]]);
+  static getOrderedFields(dto: object): [string, unknown][] {
+    return Object.entries(dto);
   }
 
   static writeSscFile(dto: MusicDto): string {
@@ -219,14 +222,14 @@ export class SccWriter {
         esscContent += `;\n`;
       }
       esscContent += `#NOTES:\n`;
-      esscContent += noteData.stepChart.map((measure: Measures) => measure.steps.map((row: any) => row.join('')).join('\n')).join('\n,\n');
+      esscContent += noteData.stepChart.map((measure: Measures) => measure.steps.map(row => row.join('')).join('\n')).join('\n,\n');
       esscContent += `\n;\n\n`;
       count++;
     }
     return esscContent
   }
 
-  private static writeEsscValue(value: any): string {
+  private static writeEsscValue(value: unknown): string {
     if (value === undefined || value === null)
       return '';
     if (Array.isArray(value) && value[0]) {
@@ -237,7 +240,7 @@ export class SccWriter {
       return value.toISOString().split('T')[0];
     }
 
-    return value.toString();
+    return String(value);
   }
 }
 

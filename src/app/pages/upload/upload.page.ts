@@ -193,8 +193,8 @@ export class UploadPage {
 
   //#region New Music
 
-  onFileSelected(event: any): void {
-    const file: File = event.target.files[0];
+  onFileSelected(event: Event): void {
+    const file: File | undefined = (event.target as HTMLInputElement).files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = async (e) => {
@@ -207,7 +207,7 @@ export class UploadPage {
         const dbMusic = await this.musicCacheService.getMusic(this.musicData.id);
         if (dbMusic) {
           for (const field of this.fireStoreService.protectedFields) {
-            (this.musicData as any)[field] = (dbMusic as any)[field];
+            Object.assign(this.musicData, { [field]: dbMusic[field] });
           }
           this.localMusicService.updateMusic(this.musicData!);
 

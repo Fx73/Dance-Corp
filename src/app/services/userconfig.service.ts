@@ -61,7 +61,7 @@ export class UserConfigService {
     }
 
 
-    getConfig(): { [key: string]: any } {
+    getConfig(): UserConfig {
         return this.configSubject.value;
     }
 
@@ -93,7 +93,7 @@ export class UserConfigService {
         this.updateConfig("playerNumber", this.players.length)
     }
 
-    updateConfig(option: keyof UserConfig, value: any): void {
+    updateConfig<K extends keyof UserConfig>(option: K, value: UserConfig[K]): void {
         if (!(option in this.configSubject.value)) {
             console.error(`Invalid option  : ${option}`);
             return;
@@ -105,14 +105,14 @@ export class UserConfigService {
         localStorage.setItem(this.CONFIG_STORAGE_KEY, JSON.stringify(this.configSubject.value));
     }
 
-    updatePlayer(option: keyof Player, playerIndex: number, value: any): void {
+    updatePlayer<K extends keyof Player>(option: K, playerIndex: number, value: Player[K]): void {
         if (playerIndex < 0 || playerIndex >= this.players.length) {
             console.error(`Invalid player index: ${playerIndex}`);
             return;
         }
 
         const player: Player = this.players[playerIndex];
-        (player[option as keyof Player] as any) = value;
+        player[option] = value;
 
         localStorage.setItem(this.PLAYERS_STORAGE_KEY(playerIndex), JSON.stringify(player));
     }
@@ -126,7 +126,7 @@ export class UserConfigService {
 
 }
 
-class UserConfig {
+export class UserConfig {
     // General
 
 
@@ -139,6 +139,7 @@ class UserConfig {
     canvasWidth = 500
     canvasHeight = 1200
     canvasArrowSize = 120
+    showPlayerDisplay = false
 
     // Sound
     announcersVolume = 1

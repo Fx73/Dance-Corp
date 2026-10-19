@@ -3,6 +3,7 @@ import { IonButton, IonIcon, IonInput, IonItem, IonLabel, IonList } from "@ionic
 import { addOutline, removeOutline } from 'ionicons/icons';
 
 import { FormsModule } from '@angular/forms';
+import { ITimedChange } from 'src/app/game/game-model/timeline/timedChange';
 import { SanitizeSscInput } from '../reader.ssc';
 import { addIcons } from 'ionicons';
 
@@ -13,7 +14,7 @@ import { addIcons } from 'ionicons';
   standalone: true,
   imports: [IonList, IonItem, IonLabel, IonInput, IonButton, IonIcon, FormsModule]
 })
-export class MusicEditableListComponent implements OnChanges {
+export class MusicEditableListComponent<T extends ITimedChange = ITimedChange> implements OnChanges {
   elementRef = inject(ElementRef);
 
   @Input() isEditing = false;
@@ -21,10 +22,10 @@ export class MusicEditableListComponent implements OnChanges {
   @Input() label!: string;
   @Input() valueType: 'string' | 'number' = 'string';
 
-  @Input() value: any[] = [];
-  @Input() valueDb: any[] | undefined = [];
+  @Input() value: T[] = [];
+  @Input() valueDb: T[] | undefined = [];
 
-  @Output() valueChange = new EventEmitter<any[]>();
+  @Output() valueChange = new EventEmitter<T[]>();
 
   public isDirty = false;
 
@@ -43,11 +44,11 @@ export class MusicEditableListComponent implements OnChanges {
       value: this.valueType === 'string'
         ? SanitizeSscInput(String(row.value ?? ""))
         : row.value
-    }));
+    }) as T); // la valeur sanitisée (string ou null) remplace la valeur du champ
 
     this.valueChange.emit(this.value);
   }
-  private normalize(v: any, type: 'string' | 'number'): string {
+  private normalize(v: unknown, type: 'string' | 'number'): string {
     if (v === undefined || v === null) return "";
     if (type === 'number') return String(Number(v));
     return String(v).trim();
@@ -79,7 +80,7 @@ export class MusicEditableListComponent implements OnChanges {
     this.value.push({
       time: 0,
       value: this.valueType === 'number' ? 0 : ''
-    });
+    } as T);
 
     this.isDirty = this.isChanged
     this.valueChange.emit(this.value);
@@ -93,7 +94,7 @@ export class MusicEditableListComponent implements OnChanges {
     this.valueChange.emit(this.value);
   }
 
-  formatRow(row: any): string {
+  formatRow(row: T | undefined): string {
     if (!row) return '';
     return Object.entries(row)
       .map(([k, v]) => `${k}: ${v}`)
