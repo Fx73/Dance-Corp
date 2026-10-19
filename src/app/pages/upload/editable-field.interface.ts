@@ -8,4 +8,4 @@ export interface IMusicEditableField {
     isDirty: boolean;
 }
 
-export const MUSIC_EDITABLE_FIELD_TOKEN = new InjectionToken<IMusicEditableField>('MUSIC_EDITABLE_FIELD_TOKEN');
+export const MUSIC_EDITABLE_FIELD_TOKEN: InjectionToken<IMusicEditableField> = new InjectionToken('MUSIC_EDITABLE_FIELD_TOKEN');

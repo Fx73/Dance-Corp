@@ -29,7 +29,7 @@ export class MusicEditableFieldAutocompleteComponent<T extends string | null | u
 
   @Input() suggestions: string[] = [];
 
-  @Output() valueChange = new EventEmitter<T>();
+  @Output() valueChange: EventEmitter<T> = new EventEmitter();
 
   @ViewChild(IonInput) genreInput!: IonInput;
 

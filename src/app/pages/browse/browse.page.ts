@@ -63,7 +63,7 @@ export class BrowsePage implements OnInit {
   musicNotes = signal<NoteDataDto[]>([]);
   musicUserScore = signal<UserMusicDto | null>(null);
 
-  userScores: { [key: string]: number } = {};
+  userScores: Record<string, number> = {};
 
   searchQuery: string = '';
 

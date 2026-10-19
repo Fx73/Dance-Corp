@@ -47,7 +47,7 @@ export class GamepadService {
 
 }
 
-export type GamepadReference = {
+export interface GamepadReference {
     index: number | null;
     id: string;
-};
+}

@@ -22,8 +22,8 @@ export class MusicFirestoreService {
     readonly MUSIC_UPDATES_DOC = "music_updates";
 
 
-    readonly firestoreConverterMusic = new FirestoreConverter<MusicDto>(MusicDto, { noteData: NoteDataDto, difficultyCriterias: DifficultyCriteria });
-    readonly firestoreConverterNote = new FirestoreConverter<NoteDataDto>(NoteDataDto, { difficultyCriterias: DifficultyCriteria });
+    readonly firestoreConverterMusic: FirestoreConverter<MusicDto> = new FirestoreConverter(MusicDto, { noteData: NoteDataDto, difficultyCriterias: DifficultyCriteria });
+    readonly firestoreConverterNote: FirestoreConverter<NoteDataDto> = new FirestoreConverter(NoteDataDto, { difficultyCriterias: DifficultyCriteria });
 
     readonly protectedFields: (keyof MusicDto)[] = ['artist', 'title', 'offset', 'music', 'stops'];
 

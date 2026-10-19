@@ -17,13 +17,13 @@ import { addIcons } from 'ionicons';
 export class GameOverComponent implements OnInit {
   readonly Precision = Precision;
   @Input() gameRound!: GameRound;
-  @Output() mainMenu = new EventEmitter<void>();
+  @Output() mainMenu: EventEmitter<void> = new EventEmitter();
 
   grade: { grade: string; color: string; } = { grade: '', color: '' };
 
   personalGrades: { title: string; description: string; color: string }[] = [];
 
-  readonly precisionCounts = signal<{ [key in Precision]: number }>({
+  readonly precisionCounts = signal<Record<Precision, number>>({
     [Precision.Good]: 0,
     [Precision.Almost]: 0,
     [Precision.Perfect]: 0,

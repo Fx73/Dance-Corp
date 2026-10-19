@@ -6,7 +6,7 @@ export class FirestoreConverter<T extends object> {
     readonly type;
     readonly subtypes: Record<string, new () => object> = {};
 
-    constructor(type: { new(): T; }, subtypes: Record<string, new () => object> = {}) {
+    constructor(type: new() => T, subtypes: Record<string, new () => object> = {}) {
         this.type = type
         this.subtypes = subtypes
     }
@@ -80,7 +80,7 @@ export class SimpleFirestoreConverter<T extends object> {
     readonly IGNORE_UNDEFINED: boolean = true
     readonly IGNORED_FIELDS: Set<string> = new Set(["additionalFields"])
 
-    constructor(type: { new(): T; }) {
+    constructor(type: new() => T) {
         this.type = type
     }
 

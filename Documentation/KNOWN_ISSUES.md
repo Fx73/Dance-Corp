@@ -14,6 +14,10 @@ Bugs found but not fixed yet, and deprecations to migrate. Remove an entry once 
   `onBlur` clears the suggestion list when the input loses focus, so pressing Tab to reach a suggestion closes the list first.
   Possible fix: arrow up/down + Enter navigation from the input, with `aria-activedescendant`.
 
+- **User music converter: notes never converted to `UserNoteDto`**
+  In `user.firestore.service.ts`, the converter subtype key is `"notes:"` (with a colon) while the `UserMusicDto` field is `notes`, so the subtype never matches. Notes read from Firestore stay plain objects: `UserNoteDto` default values (`passed = false`, `highScore = 0`…) are not applied when a field is missing in the document.
+  Possible fix: rename the key to `notes`.
+
 ## Deprecations
 
 - **`<ion-img>`**: deprecated in Ionic 9, removed in Ionic 10 (runtime warning on every page). Replace with a native `<img loading="lazy">`.

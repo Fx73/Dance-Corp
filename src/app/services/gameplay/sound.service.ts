@@ -7,7 +7,7 @@ import { UserConfigService } from 'src/app/services/userconfig.service';
 export class SoundManager {
     private userConfigService = inject(UserConfigService);
     private router = inject(Router);
-    private fadeIntervals = new Map<HTMLAudioElement, ReturnType<typeof setInterval>>();
+    private fadeIntervals: Map<HTMLAudioElement, ReturnType<typeof setInterval>> = new Map();
 
     readonly SOUND_BACKGROUND = new Audio('assets/Sounds/music/GGJ2024_Main.mp3');
     readonly SOUND_BACKGROUND2 = new Audio('assets/Sounds/music/GGJ2024_Main2.mp3');
