@@ -26,7 +26,7 @@ export class MusicPlayerYoutubeComponent extends MusicPlayerCommon implements IM
   startOffset?: number = 0;
 
   @Output()
-  onReady: EventEmitter<IMusicPlayer> = new EventEmitter<IMusicPlayer>();
+  ready: EventEmitter<IMusicPlayer> = new EventEmitter<IMusicPlayer>();
 
   @ViewChild('musicPlayer') player!: YouTubePlayer;
 
@@ -38,7 +38,7 @@ export class MusicPlayerYoutubeComponent extends MusicPlayerCommon implements IM
     this.player.stopVideo();
     this.player.setVolume(this.getVolume() * 100);
 
-    this.onReady.emit(this);
+    this.ready.emit(this);
   }
 
 

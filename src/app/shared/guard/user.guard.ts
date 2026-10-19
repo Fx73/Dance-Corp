@@ -1,6 +1,6 @@
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { LoginFireauthService } from 'src/app/services/firestore/login.fireauth.service';
 import { Router } from '@angular/router';
 import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.service';
@@ -9,8 +9,10 @@ import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.
     providedIn: 'root'
 })
 export class UserGuard {
+    private loginFireauthService = inject(LoginFireauthService);
+    private userFirestoreService = inject(UserFirestoreService);
+    private router = inject(Router);
 
-    constructor(private loginFireauthService: LoginFireauthService, private userFirestoreService: UserFirestoreService, private router: Router) { }
 
     async canActivate(): Promise<boolean> {
         if (this.loginFireauthService.getAuthUser() && this.userFirestoreService.user)

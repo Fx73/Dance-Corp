@@ -13,7 +13,7 @@ export class MusicPlayerLocalComponent extends MusicPlayerCommon implements IMus
 
   @Input() musicUrl!: string;
   @Input() startOffset?: number;
-  @Output() onReady = new EventEmitter<IMusicPlayer>();
+  @Output() ready = new EventEmitter<IMusicPlayer>();
   private audio!: HTMLAudioElement;
 
   isPlaying = false;
@@ -45,7 +45,7 @@ export class MusicPlayerLocalComponent extends MusicPlayerCommon implements IMus
     });
 
     this.audio.addEventListener('canplaythrough', () => {
-      this.onReady.emit(this);
+      this.ready.emit(this);
     });
 
   }

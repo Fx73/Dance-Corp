@@ -1,4 +1,4 @@
-import { Injectable, NgZone } from '@angular/core';
+import { Injectable, NgZone, inject } from '@angular/core';
 
 import { AppComponent } from 'src/app/app.component';
 import { UserConfigService } from '../userconfig.service';
@@ -7,11 +7,14 @@ import { UserConfigService } from '../userconfig.service';
     providedIn: 'root',
 })
 export class GamepadService {
+    private userConfigService = inject(UserConfigService);
+    private ngZone = inject(NgZone);
+
 
 
     private gamepads: GamepadReference[] = [];
 
-    constructor(private userConfigService: UserConfigService, private ngZone: NgZone) {
+    constructor() {
         this.gamepads = [{ index: -1, id: "Keyboard" }]
 
         this.onGamepadConnect = this.onGamepadConnect.bind(this);

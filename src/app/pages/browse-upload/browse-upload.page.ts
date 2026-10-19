@@ -1,7 +1,7 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { InfiniteScrollCustomEvent, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonIcon, IonImg, IonInfiniteScroll, IonInfiniteScrollContent, IonSearchbar } from '@ionic/angular';
 
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from "src/app/shared/component/header/header.component";
 import { MusicCacheService } from 'src/app/services/local-storage/music.cache.service';
@@ -17,16 +17,21 @@ import { musicLocalService } from 'src/app/services/local-storage/local.music.se
   templateUrl: './browse-upload.page.html',
   styleUrls: ['./browse-upload.page.scss'],
   standalone: true,
-  imports: [IonBadge, IonIcon, IonCardSubtitle, IonCardContent, IonCardTitle, IonInfiniteScrollContent, IonImg, IonInfiniteScroll, IonSearchbar, IonCard, IonCardHeader, IonContent, CommonModule, FormsModule, HeaderComponent]
+  imports: [IonBadge, IonIcon, IonCardSubtitle, IonCardContent, IonCardTitle, IonInfiniteScrollContent, IonImg, IonInfiniteScroll, IonSearchbar, IonCard, IonCardHeader, IonContent, FormsModule, HeaderComponent]
 })
 export class BrowseUploadPage implements OnInit {
+  private router = inject(Router);
+  private musicCacheService = inject(MusicCacheService);
+  private localMusicService = inject(musicLocalService);
+  private discordRpcService = inject(PresenceService);
+
 
   dbMusics = signal<MusicDto[]>([]);
   storedMusics = signal<MusicDto[]>([]);
 
   searchQuery: string = '';
 
-  constructor(private router: Router, private musicCacheService: MusicCacheService, private localMusicService: musicLocalService, private discordRpcService: PresenceService) {
+  constructor() {
     addIcons({ addCircleOutline });
   }
 

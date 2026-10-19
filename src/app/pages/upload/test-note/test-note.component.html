@@ -1,6 +1,12 @@
-<app-music-player-youtube *ngIf="musicOrigin === MusicOrigin.Youtube" [musicUrl]="music.music!"
-  (onReady)="onPlayerReady($event)"></app-music-player-youtube>
-<app-music-player-soundcloud *ngIf="musicOrigin === MusicOrigin.Soundcloud" [musicUrl]="music.music!"
-  (onReady)="onPlayerReady($event)"></app-music-player-soundcloud>
+@if (musicOrigin === MusicOrigin.Youtube) {
+  <app-music-player-youtube [musicUrl]="music.music!"
+    (ready)="onPlayerReady($event)"></app-music-player-youtube>
+}
+@if (musicOrigin === MusicOrigin.Soundcloud) {
+  <app-music-player-soundcloud [musicUrl]="music.music!"
+    (ready)="onPlayerReady($event)"></app-music-player-soundcloud>
+}
 
-<app-player-display *ngIf="game?.gameRounds" [gameRound]="game!.gameRounds[0]"></app-player-display>
+@if (game?.gameRounds) {
+  <app-player-display [gameRound]="game!.gameRounds[0]"></app-player-display>
+}

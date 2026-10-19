@@ -16,8 +16,10 @@
       </ion-card-header>
 
       <ion-card-content>
-        <ion-img *ngIf="userData.avatar" [src]="userData.avatar" class="img-avatar">
-        </ion-img>
+        @if (userData.avatar) {
+          <ion-img [src]="userData.avatar" class="img-avatar">
+          </ion-img>
+        }
         <ion-item lines="none">
           <ion-label>Level</ion-label>
           <ion-badge color="primary">{{ userData.level }}</ion-badge>

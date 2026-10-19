@@ -1,14 +1,16 @@
-import { Component, ElementRef, EventEmitter, Input, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, inject } from '@angular/core';
 import { IonItem, IonLabel, IonSelect, IonSelectOption } from "@ionic/angular";
 
 @Component({
-  selector: 'music-select',
+  selector: 'app-music-select',
   templateUrl: './select.component.html',
   styleUrls: ['./select.component.scss'],
   standalone: true,
   imports: [IonLabel, IonItem, IonSelect, IonSelectOption]
 })
-export class MusicSelectComponent {
+export class MusicSelectComponent implements OnChanges {
+  elementRef = inject(ElementRef);
+
   @Input() label!: string;
   @Input() value!: any;
   @Input() valueDb: any = null;
@@ -19,8 +21,6 @@ export class MusicSelectComponent {
   @Output() valueChange = new EventEmitter<any>();
 
   public isDirty = false;
-
-  constructor(public elementRef: ElementRef) { }
 
   ngOnChanges() {
     this.isDirty = this.isEditing && this.normalize(this.value) !== this.normalize(this.valueDb);

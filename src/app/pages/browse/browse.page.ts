@@ -1,5 +1,5 @@
 import { NgClass, NgStyle, } from '@angular/common';
-import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren, signal, inject } from '@angular/core';
 import { InfiniteScrollCustomEvent, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonImg, IonInfiniteScroll, IonInfiniteScrollContent, IonMenu, IonSearchbar, IonSplitPane, IonText } from '@ionic/angular';
 import { MusicDto, NoteDataDto } from 'src/app/game/game-model/music.dto';
 import { IMusicPlayer, MusicOrigin, MusicPlayerCommon } from 'src/app/game/music-player/IMusicPlayer';
@@ -39,6 +39,17 @@ import { SoundManager } from './../../services/gameplay/sound.service';
   imports: [IonBadge, IonSplitPane, IonCardSubtitle, IonMenu, IonText, IonCardContent, IonCardTitle, IonInfiniteScrollContent, IonImg, IonInfiniteScroll, IonSearchbar, IonCard, IonCardHeader, IonContent, NgStyle, NgClass, FormsModule, HeaderComponent, GradeComponent, RadarScoreComponent, MusicPlayerYoutubeComponent, MusicPlayerLocalComponent, MusicPlayerSoundcloudComponent]
 })
 export class BrowsePage implements OnInit {
+  private router = inject(Router);
+  private cd = inject(ChangeDetectorRef);
+  private localMusicService = inject(musicLocalService);
+  private musicCacheService = inject(MusicCacheService);
+  private userFirestoreService = inject(UserFirestoreService);
+  private userConfigService = inject(UserConfigService);
+  private userCacheService = inject(UserCacheService);
+  private announcerService = inject(AnnouncerService);
+  private discordRpcService = inject(PresenceService);
+  private soundManager = inject(SoundManager);
+
   readonly SOUND_ARROW_UP = new Audio('assets/Sounds/menuFx/arrow_up.ogg');
   readonly SOUND_ARROW_DOWN = new Audio('assets/Sounds/menuFx/arrow_down.ogg');
 
@@ -66,8 +77,6 @@ export class BrowsePage implements OnInit {
   private sampleLoopActive = false;
 
   @ViewChildren('musicCard', { read: ElementRef }) musicCards!: QueryList<ElementRef>;
-
-  constructor(private router: Router, private cd: ChangeDetectorRef, private localMusicService: musicLocalService, private musicCacheService: MusicCacheService, private userFirestoreService: UserFirestoreService, private userConfigService: UserConfigService, private userCacheService: UserCacheService, private announcerService: AnnouncerService, private discordRpcService: PresenceService, private soundManager: SoundManager) { }
 
   ngOnInit() {
     this.searchQuery = localStorage.getItem('browseSearchQuery') ?? '';

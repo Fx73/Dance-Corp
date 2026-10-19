@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { IonButtons, IonHeader, IonImg, IonTitle, IonToolbar, PopoverController } from '@ionic/angular';
 
 import { RouterModule } from '@angular/router';
@@ -12,11 +12,11 @@ import { UserComponent } from '../../user/user.component';
   imports: [IonButtons, IonHeader, IonImg, IonTitle, IonToolbar, RouterModule, UserComponent]
 })
 export class HeaderComponent {
+  popoverController = inject(PopoverController);
+
 
   @Input()
   title: string = "Welcome";
-
-  constructor(public popoverController: PopoverController) { }
 
 
 

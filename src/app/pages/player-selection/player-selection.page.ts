@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonIcon, IonInput, IonItem, IonSelect, IonSelectOption } from '@ionic/angular';
 
 import { AnnouncerService } from 'src/app/services/gameplay/announcer.service';
 import { AppComponent } from 'src/app/app.component';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { GamepadService } from 'src/app/services/gameplay/gamepad.service';
 import { HeaderComponent } from "src/app/shared/component/header/header.component";
@@ -18,19 +18,21 @@ import { addIcons } from 'ionicons';
   templateUrl: './player-selection.page.html',
   styleUrls: ['./player-selection.page.scss'],
   standalone: true,
-  imports: [IonInput, IonIcon, IonCardSubtitle, IonCardHeader, IonButton, IonCardContent, IonItem, IonCard, IonCardTitle, IonContent, IonSelectOption, RouterModule, IonSelect, CommonModule, FormsModule, HeaderComponent]
+  imports: [IonInput, IonIcon, IonCardSubtitle, IonCardHeader, IonButton, IonCardContent, IonItem, IonCard, IonCardTitle, IonContent, IonSelectOption, RouterModule, IonSelect, FormsModule, HeaderComponent]
 })
-export class PlayerSelectionPage implements OnInit {
+export class PlayerSelectionPage {
+  userConfigService = inject(UserConfigService);
+  gamepadService = inject(GamepadService);
+  private announcerService = inject(AnnouncerService);
+
 
   userList: { id: string | null, name: string }[] = []
 
-  constructor(public userConfigService: UserConfigService, public gamepadService: GamepadService, private announcerService: AnnouncerService) {
+  constructor() {
     addIcons({ addCircle });
   }
 
-  ngOnInit() {
-    //TODO handle mutliple connexion
-  }
+  //TODO handle mutliple connexion
 
 
   getPlayers(): Player[] {

@@ -1,5 +1,5 @@
 import { DocumentData, Firestore, FirestoreDataConverter, QueryDocumentSnapshot, collection, doc, getDoc, getDocs, getFirestore, increment, setDoc, updateDoc } from 'firebase/firestore';
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
 import { UserDto, UserMusicDto, UserNoteDto } from 'src/app/pages/user-profile/user.dto';
 
 import { FirestoreConverter } from './firestore.converter';
@@ -26,7 +26,9 @@ export class UserFirestoreService {
 
 
 
-    constructor(loginFireauthService: LoginFireauthService) {
+    constructor() {
+        const loginFireauthService = inject(LoginFireauthService);
+
         this.db = getFirestore()
         loginFireauthService.listenForUserChanges(firebaseUser => {
             if (firebaseUser) {

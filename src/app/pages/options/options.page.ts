@@ -1,10 +1,10 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, inject } from '@angular/core';
 import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonInput, IonItem, IonLabel, IonModal, IonRange, IonToggle } from '@ionic/angular';
 
 import { AnnouncerService } from 'src/app/services/gameplay/announcer.service';
 import { Arrow } from '../../game/game-model/arrows/arrow';
 import { ArrowType } from '../../game/constants/arrow-type.enum';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { GameRound } from '../../game/game-model/gameRound';
 import { HeaderComponent } from "src/app/shared/component/header/header.component";
@@ -21,13 +21,20 @@ import { musicLocalService } from 'src/app/services/local-storage/local.music.se
   templateUrl: './options.page.html',
   styleUrls: ['./options.page.scss'],
   standalone: true,
-  imports: [IonRange, IonModal, IonLabel, IonInput, IonToggle, IonCardSubtitle, IonButton, IonItem, IonCardContent, IonCardHeader, IonCardTitle, IonCard, IonModal, IonContent, CommonModule, FormsModule, HeaderComponent, RouterModule, PlayerDisplayComponent]
+  imports: [IonRange, IonModal, IonLabel, IonInput, IonToggle, IonCardSubtitle, IonButton, IonItem, IonCardContent, IonCardHeader, IonCardTitle, IonCard, IonModal, IonContent, FormsModule, HeaderComponent, RouterModule, PlayerDisplayComponent]
 })
 export class OptionsPage {
+  private userConfigService = inject(UserConfigService);
+  private localMusicService = inject(musicLocalService);
+  private musicCacheService = inject(MusicCacheService);
+  private userCacheService = inject(UserCacheService);
+  private soundManager = inject(SoundManager);
+  private announcerService = inject(AnnouncerService);
+
   @ViewChild(PlayerDisplayComponent) playerDisplay?: PlayerDisplayComponent;
   showPlayerDisplay = false;
 
-  constructor(private userConfigService: UserConfigService, private localMusicService: musicLocalService, private musicCacheService: MusicCacheService, private userCacheService: UserCacheService, private soundManager: SoundManager, private announcerService: AnnouncerService) {
+  constructor() {
     // Initialize player display if needed
     if (this.userConfigService.getConfig()['showPlayerDisplay']) {
       this.showPlayerDisplay = true;

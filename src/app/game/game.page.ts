@@ -1,5 +1,5 @@
-import { CommonModule, Location } from '@angular/common';
-import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Location } from '@angular/common';
+import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import { ActivatedRoute, Router } from "@angular/router";
 import { IonButton, IonCard, IonContent, IonHeader, IonIcon, IonTitle, IonToolbar } from '@ionic/angular';
 import { IMusicPlayer, MusicOrigin, MusicPlayerCommon } from './music-player/IMusicPlayer';
@@ -28,9 +28,19 @@ import { MusicPlayerYoutubeComponent } from "./music-player/music-player-youtube
   templateUrl: './game.page.html',
   styleUrls: ['./game.page.scss'],
   standalone: true,
-  imports: [IonIcon, IonCard, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, PlayerDisplayComponent, GameOverComponent, WaitingScreenComponent, MusicPlayerYoutubeComponent, MusicPlayerSoundcloudComponent, MusicPlayerLocalComponent, IonButton]
+  imports: [IonIcon, IonCard, IonContent, IonHeader, IonTitle, IonToolbar, FormsModule, PlayerDisplayComponent, GameOverComponent, WaitingScreenComponent, MusicPlayerYoutubeComponent, MusicPlayerSoundcloudComponent, MusicPlayerLocalComponent, IonButton]
 })
 export class GamePage implements OnInit, OnDestroy, AfterViewInit {
+  private cdr = inject(ChangeDetectorRef);
+  private route = inject(ActivatedRoute);
+  private userConfigService = inject(UserConfigService);
+  private userCacheService = inject(UserCacheService);
+  private musicCacheService = inject(MusicCacheService);
+  private router = inject(Router);
+  private location = inject(Location);
+  private announcerService = inject(AnnouncerService);
+  private discordRpcService = inject(PresenceService);
+
   //#region App Constants
   readonly ArrowDirection = ArrowDirection;
   readonly MusicOrigin = MusicOrigin;
@@ -47,7 +57,7 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
   musicOrigin: MusicOrigin | null = null
   //#endregion
 
-  constructor(private cdr: ChangeDetectorRef, private route: ActivatedRoute, private userConfigService: UserConfigService, private userCacheService: UserCacheService, private musicCacheService: MusicCacheService, private router: Router, private location: Location, private announcerService: AnnouncerService, private discordRpcService: PresenceService) {
+  constructor() {
     addIcons({ arrowBack });
   }
 

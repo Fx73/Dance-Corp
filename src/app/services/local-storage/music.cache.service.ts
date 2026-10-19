@@ -1,12 +1,15 @@
 import { MusicDto, NoteDataDto } from "src/app/game/game-model/music.dto";
 
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import { AppComponent } from "src/app/app.component";
 import { musicLocalService } from 'src/app/services/local-storage/local.music.service';
 import { MusicFirestoreService } from "../firestore/music.firestore.service";
 
 @Injectable({ providedIn: 'root' })
 export class MusicCacheService {
+    private musicFirestoreService = inject(MusicFirestoreService);
+    private localMusicService = inject(musicLocalService);
+
     private readonly MUSIC_STORAGE_KEY = (musicId: string) => `MUSIC_${musicId}`;
     private readonly MUSIC_REGISTRY_KEY = 'REGISTRY_MUSIC';
     private readonly MUSIC_REGISTRY_TS_KEY = 'REGISTRY_MUSIC_TS';
@@ -15,7 +18,7 @@ export class MusicCacheService {
 
     musics: MusicDto[] = [];
 
-    constructor(private musicFirestoreService: MusicFirestoreService, private localMusicService: musicLocalService) {
+    constructor() {
         this.registry = new Set(JSON.parse(localStorage.getItem(this.MUSIC_REGISTRY_KEY) ?? '[]'));
 
         for (const id of this.registry) {

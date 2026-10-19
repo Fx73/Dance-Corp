@@ -1,5 +1,4 @@
 import {
-  AfterViewInit,
   Component,
   EventEmitter,
   Input,
@@ -20,14 +19,14 @@ declare var SC: any;
   standalone: true,
 })
 export class MusicPlayerSoundcloudComponent extends MusicPlayerCommon
-  implements IMusicPlayer, OnInit, AfterViewInit, OnDestroy {
+  implements IMusicPlayer, OnInit, OnDestroy {
 
   @Input()
   musicUrl!: string;
   @Input()
   startOffset?: number;
   @Output()
-  onReady: EventEmitter<IMusicPlayer> = new EventEmitter<IMusicPlayer>();
+  ready: EventEmitter<IMusicPlayer> = new EventEmitter<IMusicPlayer>();
 
   widgetSC: any;
 
@@ -44,11 +43,9 @@ export class MusicPlayerSoundcloudComponent extends MusicPlayerCommon
       this.widgetSC.setVolume(this.getVolume() * 100);
       if (this.startOffset !== undefined)
         this.widgetSC.seekTo(this.startOffset * 1000);
-      this.onReady.emit(this);
+      this.ready.emit(this);
     });
   }
-
-  ngAfterViewInit() { }
 
   play() {
     this.widgetSC.play();

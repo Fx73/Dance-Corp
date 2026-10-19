@@ -1,4 +1,4 @@
-import { Component, ViewChild, signal } from '@angular/core';
+import { Component, ViewChild, signal, inject } from '@angular/core';
 import { IonButton, IonContent, IonIcon, IonItem, IonLabel, IonPopover, PopoverController } from '@ionic/angular';
 import { logoGoogle, person } from 'ionicons/icons';
 
@@ -18,11 +18,17 @@ export const currentUser = signal<User | null>(null);
   imports: [IonButton, IonContent, IonIcon, IonItem, IonLabel, IonPopover],
 })
 export class UserComponent {
+  private router = inject(Router);
+  private popoverController = inject(PopoverController);
+  private loginService = inject(LoginFireauthService);
+
   @ViewChild('userpopover', { static: false }) userpopover!: HTMLIonPopoverElement;
 
   user = currentUser;
 
-  constructor(private router: Router, private popoverController: PopoverController, private loginService: LoginFireauthService) {
+  constructor() {
+    const loginService = this.loginService;
+
     loginService.listenForUserChanges(user => currentUser.set(user))
     addIcons({
       'person': person,

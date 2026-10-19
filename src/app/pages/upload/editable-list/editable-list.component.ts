@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, Input, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, inject } from '@angular/core';
 import { IonButton, IonIcon, IonInput, IonItem, IonLabel, IonList } from "@ionic/angular";
 import { addOutline, removeOutline } from 'ionicons/icons';
 
@@ -7,13 +7,15 @@ import { SanitizeSscInput } from '../reader.ssc';
 import { addIcons } from 'ionicons';
 
 @Component({
-  selector: 'music-editable-list',
+  selector: 'app-music-editable-list',
   templateUrl: './editable-list.component.html',
   styleUrls: ['./editable-list.component.scss'],
   standalone: true,
   imports: [IonList, IonItem, IonLabel, IonInput, IonButton, IonIcon, FormsModule]
 })
-export class MusicEditableListComponent {
+export class MusicEditableListComponent implements OnChanges {
+  elementRef = inject(ElementRef);
+
   @Input() isEditing = false;
 
   @Input() label!: string;
@@ -26,7 +28,7 @@ export class MusicEditableListComponent {
 
   public isDirty = false;
 
-  constructor(public elementRef: ElementRef) {
+  constructor() {
     addIcons({ removeOutline, addOutline });
   }
 

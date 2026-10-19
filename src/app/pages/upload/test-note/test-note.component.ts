@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { IMusicPlayer, MusicOrigin, MusicPlayerCommon } from 'src/app/game/music-player/IMusicPlayer';
 import { MusicDto, NoteDataDto } from 'src/app/game/game-model/music.dto';
 
@@ -7,7 +7,7 @@ import { GameManager } from 'src/app/game/game.manager';
 import { ModalController } from '@ionic/angular';
 import { MusicPlayerSoundcloudComponent } from "../../../game/music-player/music-player-soundcloud/music-player-soundcloud.component";
 import { MusicPlayerYoutubeComponent } from "../../../game/music-player/music-player-youtube/music-player-youtube.component";
-import { NgIf } from '@angular/common';
+
 import { Player } from 'src/app/game/game-model/player';
 import { PlayerDisplayComponent } from "../../../game/game-display/player-display.component";
 import { UserConfigService } from 'src/app/services/userconfig.service';
@@ -17,9 +17,12 @@ import { UserConfigService } from 'src/app/services/userconfig.service';
   templateUrl: './test-note.component.html',
   styleUrls: ['./test-note.component.scss'],
   standalone: true,
-  imports: [MusicPlayerYoutubeComponent, MusicPlayerSoundcloudComponent, PlayerDisplayComponent, NgIf]
+  imports: [MusicPlayerYoutubeComponent, MusicPlayerSoundcloudComponent, PlayerDisplayComponent]
 })
-export class TestNoteComponent implements OnInit {
+export class TestNoteComponent implements OnInit, OnDestroy {
+  private modalController = inject(ModalController);
+  private userConfigService = inject(UserConfigService);
+
   //#region App Constants
   readonly ArrowDirection = ArrowDirection;
   readonly MusicOrigin = MusicOrigin;
@@ -32,11 +35,6 @@ export class TestNoteComponent implements OnInit {
   playerDisplay!: PlayerDisplayComponent;
 
   game: GameManager | null = null;
-
-
-
-  constructor(private modalController: ModalController, private userConfigService: UserConfigService) {
-  }
 
   ngOnInit() {
     this.musicOrigin = MusicPlayerCommon.pickMusicPlayer(this.music.music!);
