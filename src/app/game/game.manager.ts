@@ -135,7 +135,7 @@ export class GameManager {
 
         if (!this.isTrainingMode) {
             for (const gameRound of this.gameRounds)
-                this.userCacheService.updateUserStatsFromRound(this.music!.id, this.music?.noteData[0].chartName!, gameRound)
+                this.userCacheService.updateUserStatsFromRound(this.music!.id, this.music!.noteData[0].chartName, gameRound)
         }
 
     }

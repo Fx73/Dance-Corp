@@ -105,7 +105,7 @@ export class BrowsePage implements OnInit {
   initPlayerInput() {
     const players = this.userConfigService.players;
     for (const player of players) {
-      if (player.gamepad!.index! === -1)
+      if (player.gamepad!.index === -1)
         this.dancepad.push(new DancePadKeyboard(player.keyBindingKeyboard));
       else
         this.dancepad.push(new DancePadGamepad(player.gamepad!.index!, player.keyBindingGamepad));
