@@ -207,7 +207,7 @@ export class UploadPage {
         const dbMusic = await this.musicCacheService.getMusic(this.musicData.id);
         if (dbMusic) {
           for (const field of this.fireStoreService.protectedFields) {
-            (this.musicData as any)[field] = (dbMusic as any)[field];
+            Object.assign(this.musicData, { [field]: dbMusic[field] });
           }
           this.localMusicService.updateMusic(this.musicData!);
 

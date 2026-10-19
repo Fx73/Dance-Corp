@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 
 import { CONFIG } from 'src/app/game/constants/game-config';
-import { DifficultyCriteria } from 'src/app/pages/upload/DifficultyCriteria';
+import { CriteriaKey, DifficultyCriteria } from 'src/app/pages/upload/DifficultyCriteria';
 
 @Component({
   selector: 'app-radar-score',
@@ -128,7 +128,7 @@ export class RadarScoreComponent implements AfterViewInit, OnChanges {
     for (let scoreIndex = 0; scoreIndex < this.scores.length; scoreIndex++) {
       const score = this.scores[scoreIndex];
       const values = this.labels.map((label, index) => {
-        const rawValue = score[label.toLowerCase()] ?? 0;
+        const rawValue = score[label.toLowerCase() as CriteriaKey] ?? 0;
         const factor = this.normalizationFactor[index] ?? 1;
         return Math.max(rawValue / factor, 0);
       });

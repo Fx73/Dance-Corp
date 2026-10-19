@@ -1,5 +1,14 @@
 import { ArrowDirection } from "src/app/game/constants/arrow-direction.enum";
 
+/** Forme sérialisée d'un Player (localStorage) */
+export interface PlayerJSON {
+    name: string | undefined;
+    userId: string | null;
+    gamepad: { index: number | null, id: string } | undefined;
+    keyBindingGamepad: Record<string, ArrowDirection>;
+    keyBindingKeyboard: Record<string, ArrowDirection>;
+}
+
 export class Player {
     name: string | undefined;
     userId: string | null = null
@@ -14,7 +23,7 @@ export class Player {
     }
 
 
-    toJSON(): object {
+    toJSON(): PlayerJSON {
         return {
             name: this.name,
             userId: this.userId,
@@ -24,7 +33,7 @@ export class Player {
         };
     }
 
-    static fromJSON(json: any): Player {
+    static fromJSON(json: PlayerJSON): Player {
         const player = new Player();
         player.userId = json.userId;
         player.gamepad = json.gamepad;

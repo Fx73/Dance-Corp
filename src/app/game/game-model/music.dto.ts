@@ -1,8 +1,9 @@
-import { BackgroundChange, BpmChange, LabelChange, ScrollChange, SpeedChange, StopChange, WarpChange } from "./timeline/timedChange";
+import { BackgroundChange, BpmChange, ITimedChange, LabelChange, ScrollChange, SpeedChange, StopChange, WarpChange } from "./timeline/timedChange";
 import { NoteDifficulty, difficultyMap } from "../constants/note-difficulty.enum";
 
 import { DanceType } from "../constants/dance-type.enum";
 import { DifficultyCriteria } from "src/app/pages/upload/DifficultyCriteria";
+import type { SscTokenMap } from "src/app/pages/upload/reader.ssc";
 
 export class MusicDto {
   title?: string;
@@ -42,8 +43,10 @@ export class MusicDto {
     return `${sanitize(this.artist!)}-${sanitize(this.title!)}`;
   }
 
-  constructor(tokenMap?: Record<string, any>) {
-    if (tokenMap === undefined) return
+  constructor(tokenMapWithNotes?: SscTokenMap) {
+    if (tokenMapWithNotes === undefined) return
+    // Les blocs notedataN (sous-maps) sont lus à part, plus bas
+    const tokenMap = tokenMapWithNotes as Record<string, string>;
 
     this.title = tokenMap["title"];
     delete tokenMap["title"];
@@ -112,7 +115,7 @@ export class MusicDto {
 
     Object.keys(tokenMap).forEach(key => {
       if (key.startsWith('notedata')) {
-        this.noteData.push(new NoteDataDto(tokenMap[key]))
+        this.noteData.push(new NoteDataDto(tokenMapWithNotes[key] as Record<string, string>))
         delete tokenMap[key];
       }
     });
@@ -135,24 +138,25 @@ export class MusicDto {
     this.additionalFields = { ...leftTokens };
   }
 
-  private parseChanges<ITimedChange>(token: string, parsefun: (value: string) => any): ITimedChange[] | undefined {
+  private parseChanges<T extends ITimedChange>(token: string, parsefun: (value: string) => T['value']): T[] | undefined {
     if (!token) return undefined;
     const changes = token.split(',');
-    const array: ITimedChange[] = []
+    const array: T[] = []
     for (const change of changes) {
       const [timeStr, valueStr] = change.split('=');
       const time = parseFloat(timeStr);
       const value = parsefun(valueStr);
-      array.push({ value, time } as ITimedChange);
+      array.push({ value, time } as T);
     }
 
     return array;
   }
 
-  static fromJSON(obj: any): MusicDto {
+  static fromJSON(obj: Record<string, unknown>): MusicDto {
     const instance = Object.assign(new MusicDto(), obj);
-    instance.noteData = Array.isArray(obj.noteData)
-      ? obj.noteData.map((n: Record<string, string> | undefined) => NoteDataDto.fromJSON(n))
+    const noteData = obj["noteData"];
+    instance.noteData = Array.isArray(noteData)
+      ? noteData.map((n: Record<string, unknown>) => NoteDataDto.fromJSON(n))
       : [];
     return instance;
   }
@@ -202,10 +206,11 @@ export class NoteDataDto {
 
   }
 
-  static fromJSON(obj: any): NoteDataDto {
+  static fromJSON(obj: Record<string, unknown>): NoteDataDto {
     const instance = Object.assign(new NoteDataDto(), obj);
-    instance.stepChart = Array.isArray(obj.stepChart)
-      ? obj.stepChart.map((n: Record<string, string> | undefined) => Measures.fromJSON(n))
+    const stepChart = obj["stepChart"];
+    instance.stepChart = Array.isArray(stepChart)
+      ? stepChart.map((n: Record<string, unknown>) => Measures.fromJSON(n))
       : [];
     return instance;
   }
@@ -216,9 +221,10 @@ export class NoteDataDto {
 export class Measures {
   steps: number[][] = [];
 
-  static fromJSON(obj: any): Measures {
+  static fromJSON(obj: Record<string, unknown>): Measures {
     const instance = Object.assign(new Measures(), obj);
-    instance.steps = Array.isArray(obj.steps) ? obj.steps.map((row: any) => Array.isArray(row) ? row.map(Number) : []) : [];
+    const steps = obj["steps"];
+    instance.steps = Array.isArray(steps) ? steps.map((row: unknown) => Array.isArray(row) ? row.map(Number) : []) : [];
     return instance;
   }
 }

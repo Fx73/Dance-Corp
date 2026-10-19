@@ -1,4 +1,4 @@
-import { DocumentData, Firestore, FirestoreDataConverter, QueryDocumentSnapshot, collection, doc, getDoc, getDocs, getFirestore, increment, setDoc, updateDoc } from 'firebase/firestore';
+import { DocumentData, Firestore, FirestoreDataConverter, QueryDocumentSnapshot, SnapshotOptions, collection, doc, getDoc, getDocs, getFirestore, increment, setDoc, updateDoc } from 'firebase/firestore';
 import { Injectable, signal, inject } from '@angular/core';
 import { UserDto, UserMusicDto, UserNoteDto } from 'src/app/pages/user-profile/user.dto';
 
@@ -121,7 +121,7 @@ export class UserFirestoreService {
             };
         },
 
-        fromFirestore(snapshot: QueryDocumentSnapshot, options: any): UserDto {
+        fromFirestore(snapshot: QueryDocumentSnapshot, options: SnapshotOptions): UserDto {
             const data = snapshot.data();
             const user = new UserDto(data["id"], data["name"]);
 

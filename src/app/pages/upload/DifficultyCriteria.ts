@@ -1,9 +1,9 @@
 import { BpmChange } from "src/app/game/game-model/timeline/timedChange";
 import { Measures } from "src/app/game/game-model/music.dto";
 
-export class DifficultyCriteria {
-  [key: string]: number | any;
+export type CriteriaKey = 'endurance' | 'speed' | 'technical' | 'burst' | 'chaos';
 
+export class DifficultyCriteria {
   endurance: number = 0;  //measures sustained effort
   speed: number = 0; //measures speed of notes
   technical: number = 0;   //measure variety of steps and patterns
