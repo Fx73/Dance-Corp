@@ -7,6 +7,7 @@ import { UserConfigService } from 'src/app/services/userconfig.service';
 export class SoundManager {
     private userConfigService = inject(UserConfigService);
     private router = inject(Router);
+    private fadeIntervals = new Map<HTMLAudioElement, ReturnType<typeof setInterval>>();
 
     readonly SOUND_BACKGROUND = new Audio('assets/Sounds/music/GGJ2024_Main.mp3');
     readonly SOUND_BACKGROUND2 = new Audio('assets/Sounds/music/GGJ2024_Main2.mp3');
@@ -64,8 +65,8 @@ export class SoundManager {
     // -------------------------
 
     fadeIn(audio: HTMLAudioElement, duration = 500) {
-        if ((audio as any)._fadeInterval) {
-            clearInterval((audio as any)._fadeInterval);
+        if (this.fadeIntervals.has(audio)) {
+            clearInterval(this.fadeIntervals.get(audio));
         }
 
         audio.play();
@@ -76,33 +77,33 @@ export class SoundManager {
         // Si volume déjà > 0, on repart de là (permet d'inverser un fadeOut)
         audio.volume = Math.max(0, audio.volume);
 
-        (audio as any)._fadeInterval = setInterval(() => {
+        this.fadeIntervals.set(audio, setInterval(() => {
             audio.volume = Math.min(this.getMusicVolume(), audio.volume + increment);
 
             if (audio.volume >= this.getMusicVolume()) {
-                clearInterval((audio as any)._fadeInterval);
-                (audio as any)._fadeInterval = null;
+                clearInterval(this.fadeIntervals.get(audio));
+                this.fadeIntervals.delete(audio);
             }
-        }, step);
+        }, step));
     }
 
     fadeOut(audio: HTMLAudioElement, duration = 500) {
-        if ((audio as any)._fadeInterval) {
-            clearInterval((audio as any)._fadeInterval);
+        if (this.fadeIntervals.has(audio)) {
+            clearInterval(this.fadeIntervals.get(audio));
         }
 
         const step = 50;
         const decrement = step / duration;
 
-        (audio as any)._fadeInterval = setInterval(() => {
+        this.fadeIntervals.set(audio, setInterval(() => {
             audio.volume = Math.max(0, audio.volume - decrement);
 
             if (audio.volume <= 0) {
-                clearInterval((audio as any)._fadeInterval);
-                (audio as any)._fadeInterval = null;
+                clearInterval(this.fadeIntervals.get(audio));
+                this.fadeIntervals.delete(audio);
                 audio.pause();
             }
-        }, step);
+        }, step));
     }
 
 

@@ -9,7 +9,7 @@ import { Color } from '../constants/color';
 import { CommonModule } from '@angular/common';
 import { GameRound } from '../game-model/gameRound';
 import { Precision } from '../constants/precision.enum';
-import { UserConfigService } from 'src/app/services/userconfig.service';
+import { UserConfig, UserConfigService } from 'src/app/services/userconfig.service';
 
 @Component({
   selector: 'app-player-display',
@@ -82,8 +82,8 @@ export class PlayerDisplayComponent implements AfterViewInit {
     return 'red';
   }
 
-  getConfigValue<T>(key: any): T {
-    return this.userConfigService.getConfig()[key] as T;
+  getConfigValue<K extends keyof UserConfig>(key: K): UserConfig[K] {
+    return this.userConfigService.getConfig()[key];
   }
 
   getDisplayScore(): string {
