@@ -1,9 +1,8 @@
-import { Component, Input, input, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { IonButton, IonCard, IonInput, IonItem } from '@ionic/angular';
 import { LoginFireauthService } from 'src/app/services/firestore/login.fireauth.service';
-import { User } from 'firebase/auth';
 
 @Component({
   selector: 'app-account',

@@ -1,14 +1,14 @@
 import { Component, inject } from '@angular/core';
-import { IonAvatar, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonContent, IonHeader, IonImg, IonItem, IonLabel, IonText, IonTitle, IonToolbar } from '@ionic/angular';
+import { IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonContent, IonImg, IonItem, IonLabel, IonText } from '@ionic/angular';
 
 import { AccountComponent } from "./account/account.component";
 
 import { FormsModule } from '@angular/forms';
-import { HeaderComponent } from "src/app/shared/component/header/header.component";
-import { LoginFireauthService } from 'src/app/services/firestore/login.fireauth.service';
 import { User } from 'firebase/auth';
-import { UserDto } from './user.dto';
+import { LoginFireauthService } from 'src/app/services/firestore/login.fireauth.service';
 import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.service';
+import { HeaderComponent } from "src/app/shared/component/header/header.component";
+import { UserDto } from './user.dto';
 
 @Component({
   selector: 'app-user-profile',

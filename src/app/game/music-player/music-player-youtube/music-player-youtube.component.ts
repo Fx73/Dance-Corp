@@ -1,6 +1,6 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, ViewChild } from '@angular/core';
-import { IMusicPlayer, MusicPlayerCommon } from '../IMusicPlayer';
+import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { YOUTUBE_PLAYER_CONFIG, YouTubePlayer } from '@angular/youtube-player';
+import { IMusicPlayer, MusicPlayerCommon } from '../IMusicPlayer';
 
 @Component({
   selector: 'app-music-player-youtube',
@@ -34,7 +34,9 @@ export class MusicPlayerYoutubeComponent extends MusicPlayerCommon implements IM
     super();
   }
 
-  onReadyInternal(event: YT.PlayerEvent): void {
+  // This method is called when the YouTube player is ready. 
+  // It can use : event: YT.PlayerEvent
+  onReadyInternal(): void {
     this.player.stopVideo();
     this.player.setVolume(this.getVolume() * 100);
 

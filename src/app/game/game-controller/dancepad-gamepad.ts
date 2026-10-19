@@ -10,6 +10,8 @@ export class DancePadGamepad implements IDancePad {
 
     public lastExposedState: DancePadInput;
 
+    // TODO: Add input mapping for enter button
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     constructor(gamepadIndex: number = 0, keyBinding: Map<number, ArrowDirection>, enterBinding: number = -1) {
         this.gamepadIndex = gamepadIndex;
         this.currentState = new Set();

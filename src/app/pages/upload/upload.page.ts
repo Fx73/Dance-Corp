@@ -1,5 +1,5 @@
 import { CommonModule, Location } from '@angular/common';
-import { ChangeDetectorRef, Component, ElementRef, QueryList, ViewChild, ViewChildren, signal, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, QueryList, ViewChild, ViewChildren, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonGrid, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonList, IonRow, IonSpinner, ModalController } from '@ionic/angular';
 import { BaseDirectory, mkdir, readDir, remove, writeFile } from '@tauri-apps/plugin-fs';
@@ -482,7 +482,7 @@ export class UploadPage {
         method: "HEAD"
       }).then(response => {
         resolve(response.status.toString()[0] === "2")
-      }).catch(error => {
+      }).catch(e => {
         reject(false)
       })
     })

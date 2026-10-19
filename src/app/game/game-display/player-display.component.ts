@@ -1,15 +1,15 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, ViewChild, signal, inject } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, ViewChild, inject, signal } from '@angular/core';
 
-import { Arrow } from '../game-model/arrows/arrow';
-import { ArrowDirection } from 'src/app/game/constants/arrow-direction.enum';
-import { ArrowImageManager } from './arrowImageManager';
-import { ArrowType } from '../constants/arrow-type.enum';
-import { CONFIG } from '../constants/game-config';
-import { Color } from '../constants/color';
 import { CommonModule } from '@angular/common';
-import { GameRound } from '../game-model/gameRound';
-import { Precision } from '../constants/precision.enum';
+import { ArrowDirection } from 'src/app/game/constants/arrow-direction.enum';
 import { UserConfig, UserConfigService } from 'src/app/services/userconfig.service';
+import { ArrowType } from '../constants/arrow-type.enum';
+import { Color } from '../constants/color';
+import { CONFIG } from '../constants/game-config';
+import { Precision } from '../constants/precision.enum';
+import { Arrow } from '../game-model/arrows/arrow';
+import { GameRound } from '../game-model/gameRound';
+import { ArrowImageManager } from './arrowImageManager';
 
 @Component({
   selector: 'app-player-display',
@@ -146,7 +146,7 @@ export class PlayerDisplayComponent implements AfterViewInit {
 
         if (isMeasure) {
           const measureNumber = Math.floor(beatNumber / 4); // Calculate measure number
-          this.drawMeasureNumber(measureNumber, beatY, canvas.width);
+          this.drawMeasureNumber(measureNumber, beatY);
         }
       }
     }
@@ -159,7 +159,7 @@ export class PlayerDisplayComponent implements AfterViewInit {
     this.ctx.fillRect(0, y, canvasWidth, lineWidth); // Horizontal bar spanning the width
   }
 
-  private drawMeasureNumber(measureNumber: number, y: number, canvasWidth: number): void {
+  private drawMeasureNumber(measureNumber: number, y: number): void {
     this.ctx.fillStyle = '#ffffff'; // White text color
     this.ctx.font = '18px Arial'; // Font size and type
     this.ctx.textAlign = 'left'; // Align the text to the left
