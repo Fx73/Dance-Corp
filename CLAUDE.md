@@ -1,18 +1,24 @@
 # CLAUDE.md
 
-## Suivi des modifications et des problèmes
+## Repository convention
+The repository language is English.
+Always generate repository-facing content in English, regardless of the language used in the conversation.
 
-Ces deux documents sont rédigés en anglais. Mets-les à jour dans le même commit que la modification concernée, et préviens l'utilisateur à la fin de ta réponse quand tu les as modifiés.
 
-### [Documentation/TO_VERIFY.md](Documentation/TO_VERIFY.md) : tests à faire
+## Tracking Untested Changes
+For each commit, for every modification that may have runtime impact and that you were unable to verify yourself, add a verification entry to [Documentation/TO_VERIFY.md](Documentation/TO_VERIFY.md) using the following format:
 
-À chaque modification qui peut avoir un impact à l'exécution et que tu n'as pas pu tester (comportement, affichage, données, intégrations externes…), ajoute une entrée :
+>## Commit: <commit title>
+>Link: <commit URL>
+>
+>- <file 1>: <summary of the change>
+>- <file 2>: <summary of the change>
+>- <file N>: <summary of the change>
+>
+>→ To verify:
+>  - <verification point 1>
+>  - <verification point 2>
+>  - <verification point 3>
 
-- ce qui a changé, avec le fichier ou le composant concerné et le hash du commit si disponible ;
-- comment le vérifier : la page ou l'action à faire, et le résultat attendu.
-
-Range l'entrée dans la section qui correspond, ou crée une section. Distingue les bugs corrigés volontairement (comportement modifié) des changements censés être sans effet. Ce fichier ne contient que des vérifications à faire.
-
-### [Documentation/KNOWN_ISSUES.md](Documentation/KNOWN_ISSUES.md) : problèmes connus
-
-Quand tu repères un bug sans le corriger, une dépréciation à migrer ou un point de maintenance en attente, ajoute-le ici avec sa cause et, si possible, une piste de correction. Quand un point est corrigé, retire-le de ce fichier (et ajoute dans TO_VERIFY.md ce qu'il faut tester si la correction n'a pas pu l'être).
+## Context Verification
+Every response must end with the hamster emoji: 🐹
