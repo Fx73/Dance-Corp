@@ -3,9 +3,9 @@
   @if (isEditing) {
   <div class="autocomplete-container">
     @if(filteredGenres.length > 0){
-    <ul role="listbox" class="suggestions">
+    <ul id="genre-list" role="listbox" class="suggestions">
       @for (g of filteredGenres; track $index) {
-      <li role="option" (click)="selectGenre(g)">
+      <li role="option" aria-selected="false" tabindex="0" (click)="selectGenre(g)" (keydown.enter)="selectGenre(g)">
         {{ g }}
       </li>
       }
