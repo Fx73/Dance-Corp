@@ -1,7 +1,7 @@
 import { Component, OnInit, Signal } from '@angular/core';
 import { IonBadge, IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonContent, IonGrid, IonItem, IonLabel, IonRow } from '@ionic/angular';
 
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from "src/app/shared/component/header/header.component";
 import { LoginComponent } from "../../shared/user/login/login.component";
@@ -15,7 +15,7 @@ import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.
   templateUrl: './welcome.page.html',
   styleUrls: ['./welcome.page.scss'],
   standalone: true,
-  imports: [IonCol, IonRow, IonGrid, IonBadge, IonLabel, IonItem, IonCardHeader, IonCardTitle, IonCardContent, IonCard, IonButton, IonContent, CommonModule, FormsModule, HeaderComponent, RouterModule, LoginComponent]
+  imports: [IonCol, IonRow, IonGrid, IonBadge, IonLabel, IonItem, IonCardHeader, IonCardTitle, IonCardContent, IonCard, IonButton, IonContent, FormsModule, HeaderComponent, RouterModule, LoginComponent]
 })
 export class WelcomePage implements OnInit {
   user: Signal<UserDto | null>;

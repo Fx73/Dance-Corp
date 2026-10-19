@@ -125,7 +125,7 @@
 									<ion-button (click)="uploadMusic()" color="success" expand="block"> Upload music </ion-button>
 								}
 							}
-							<ion-button color="danger" (click)="deleteFile()" size="small" expand="block"> <ion-icon *ngIf="metadataDirty() || anyNoteDirty()" name="trash-outline"></ion-icon> {{metadataDirty() || anyNoteDirty() ? 'Discard local edit' : 'Cancel edition'}} </ion-button>
+							<ion-button color="danger" (click)="deleteFile()" size="small" expand="block"> @if (metadataDirty() || anyNoteDirty()) { <ion-icon name="trash-outline"></ion-icon> } {{metadataDirty() || anyNoteDirty() ? 'Discard local edit' : 'Cancel edition'}} </ion-button>
 						}
 						@else {
 							<ion-button (click)="onStartEdit()" expand="block"> Edit Music </ion-button>
@@ -259,12 +259,14 @@
 						<ion-card-title>Additional Fields</ion-card-title>
 					</ion-card-header>
 					<ion-card-content>
-						<div *ngFor="let field of musicData.additionalFields | keyvalue">
-							<p>
-								<strong>{{ field.key }}:</strong>
-								{{ field.value }}
-							</p>
-						</div>
+						@for (field of musicData.additionalFields | keyvalue; track field) {
+							<div>
+								<p>
+									<strong>{{ field.key }}:</strong>
+									{{ field.value }}
+								</p>
+							</div>
+						}
 					</ion-card-content>
 				</ion-card>
 			</ion-col>

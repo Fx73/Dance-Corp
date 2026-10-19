@@ -7,7 +7,7 @@ import { GameManager } from 'src/app/game/game.manager';
 import { ModalController } from '@ionic/angular';
 import { MusicPlayerSoundcloudComponent } from "../../../game/music-player/music-player-soundcloud/music-player-soundcloud.component";
 import { MusicPlayerYoutubeComponent } from "../../../game/music-player/music-player-youtube/music-player-youtube.component";
-import { NgIf } from '@angular/common';
+
 import { Player } from 'src/app/game/game-model/player';
 import { PlayerDisplayComponent } from "../../../game/game-display/player-display.component";
 import { UserConfigService } from 'src/app/services/userconfig.service';
@@ -17,7 +17,7 @@ import { UserConfigService } from 'src/app/services/userconfig.service';
   templateUrl: './test-note.component.html',
   styleUrls: ['./test-note.component.scss'],
   standalone: true,
-  imports: [MusicPlayerYoutubeComponent, MusicPlayerSoundcloudComponent, PlayerDisplayComponent, NgIf]
+  imports: [MusicPlayerYoutubeComponent, MusicPlayerSoundcloudComponent, PlayerDisplayComponent]
 })
 export class TestNoteComponent implements OnInit {
   //#region App Constants

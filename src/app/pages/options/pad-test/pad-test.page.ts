@@ -2,7 +2,7 @@ import { AlertController, IonButton, IonCard, IonCardContent, IonCardHeader, Ion
 
 import { AppComponent } from 'src/app/app.component';
 import { ArrowDirection } from 'src/app/game/constants/arrow-direction.enum';
-import { CommonModule } from '@angular/common';
+
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { GamepadService } from 'src/app/services/gameplay/gamepad.service';
@@ -15,7 +15,7 @@ import { UserConfigService } from 'src/app/services/userconfig.service';
   templateUrl: './pad-test.page.html',
   styleUrls: ['./pad-test.page.scss'],
   standalone: true,
-  imports: [IonCardSubtitle, IonItem, IonLabel, IonButton, IonCardContent, IonCardTitle, IonCard, IonCardHeader, IonSelect, IonSelectOption, IonContent, CommonModule, FormsModule, HeaderComponent]
+  imports: [IonCardSubtitle, IonItem, IonLabel, IonButton, IonCardContent, IonCardTitle, IonCard, IonCardHeader, IonSelect, IonSelectOption, IonContent, FormsModule, HeaderComponent]
 })
 export class PadTestPage {
   readonly ArrowDirection = ArrowDirection;

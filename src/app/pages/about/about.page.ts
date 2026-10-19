@@ -3,7 +3,7 @@ import { IonBadge, IonCard, IonCardContent, IonContent, IonIcon } from '@ionic/a
 import { logoAngular, logoCss3, logoHtml5, logoIonic, logoSoundcloud, logoYoutube } from 'ionicons/icons';
 
 import { AppConfig } from 'src/app.config';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from "src/app/shared/component/header/header.component";
 import { addIcons } from 'ionicons';
@@ -14,7 +14,7 @@ import isTauri from 'src/app/shared/utils/tauri';
   templateUrl: './about.page.html',
   styleUrls: ['./about.page.scss'],
   standalone: true,
-  imports: [IonBadge, IonIcon, IonCardContent, IonCard, IonContent, CommonModule, FormsModule, HeaderComponent]
+  imports: [IonBadge, IonIcon, IonCardContent, IonCard, IonContent, FormsModule, HeaderComponent]
 })
 export class AboutPage implements OnInit {
   isDesktop = isTauri;

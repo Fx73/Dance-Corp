@@ -3,7 +3,7 @@ import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, Ion
 
 import { AnnouncerService } from 'src/app/services/gameplay/announcer.service';
 import { AppComponent } from 'src/app/app.component';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { GamepadService } from 'src/app/services/gameplay/gamepad.service';
 import { HeaderComponent } from "src/app/shared/component/header/header.component";
@@ -18,7 +18,7 @@ import { addIcons } from 'ionicons';
   templateUrl: './player-selection.page.html',
   styleUrls: ['./player-selection.page.scss'],
   standalone: true,
-  imports: [IonInput, IonIcon, IonCardSubtitle, IonCardHeader, IonButton, IonCardContent, IonItem, IonCard, IonCardTitle, IonContent, IonSelectOption, RouterModule, IonSelect, CommonModule, FormsModule, HeaderComponent]
+  imports: [IonInput, IonIcon, IonCardSubtitle, IonCardHeader, IonButton, IonCardContent, IonItem, IonCard, IonCardTitle, IonContent, IonSelectOption, RouterModule, IonSelect, FormsModule, HeaderComponent]
 })
 export class PlayerSelectionPage implements OnInit {
 
