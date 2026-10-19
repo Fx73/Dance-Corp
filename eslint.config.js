@@ -20,7 +20,8 @@ module.exports = tseslint.config(
       // Generic type written on the variable: x: Map<A, B> = new Map()
       '@typescript-eslint/consistent-generic-constructors': ['error', 'type-annotation'],
       // Warning only: some unused code belongs to features in progress
-      '@typescript-eslint/no-unused-vars': 'warn',
+      // ignoreRestSiblings: allows removing a property with destructuring, e.g. const { a, ...rest } = obj
+      '@typescript-eslint/no-unused-vars': ['warn', { ignoreRestSiblings: true }],
       '@angular-eslint/component-class-suffix': [
         'error',
         {

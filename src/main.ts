@@ -1,5 +1,5 @@
 import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular';
-import { PreloadAllModules, RouteReuseStrategy, provideRouter, withPreloading, withRouterConfig } from '@angular/router';
+import { PreloadAllModules, RouteReuseStrategy, provideRouter, withPreloading } from '@angular/router';
 import { getFirestore, initializeFirestore } from 'firebase/firestore';
 
 import { AppComponent } from './app/app.component';
@@ -18,9 +18,9 @@ if (environment.production) {
 }
 
 const firebaseApp = initializeApp(firebaseConfig);
-const analytics = getAnalytics(firebaseApp);
+getAnalytics(firebaseApp);
 initializeFirestore(firebaseApp, { ignoreUndefinedProperties: true });
-const db = getFirestore(firebaseApp);
+getFirestore(firebaseApp);
 
 
 registerLocaleData(localeFr);

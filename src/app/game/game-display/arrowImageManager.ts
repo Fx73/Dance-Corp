@@ -178,7 +178,6 @@ export class ArrowImageManager {
         canvas.width = this.ARROW_SIZE;
         canvas.height = this.ARROW_SIZE;
 
-        const diagonal = Math.sqrt(this.ARROW_SIZE * this.ARROW_SIZE * 2);
         const scaleFactor = this.ARROW_SIZE / Math.sqrt(2);
 
         const ctx = canvas.getContext('2d')!;

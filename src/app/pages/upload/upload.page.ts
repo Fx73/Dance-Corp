@@ -482,7 +482,7 @@ export class UploadPage {
         method: "HEAD"
       }).then(response => {
         resolve(response.status.toString()[0] === "2")
-      }).catch(e => {
+      }).catch(() => {
         reject(false)
       })
     })
