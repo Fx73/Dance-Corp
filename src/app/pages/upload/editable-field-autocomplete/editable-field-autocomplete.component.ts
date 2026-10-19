@@ -14,7 +14,7 @@ import { SanitizeSscInput } from "../reader.ssc";
   standalone: true,
   imports: [IonItem, IonLabel, IonInput]
 })
-export class MusicEditableFieldAutocompleteComponent implements IMusicEditableField, OnChanges {
+export class MusicEditableFieldAutocompleteComponent<T extends string | null | undefined = string | null | undefined> implements IMusicEditableField, OnChanges {
   elementRef = inject(ElementRef);
 
   @Input() isEditing = false;
@@ -22,14 +22,14 @@ export class MusicEditableFieldAutocompleteComponent implements IMusicEditableFi
   @Input() label!: string;
   @Input() type: 'string' | 'number' = 'string';
 
-  @Input() value!: any;
-  @Input() valueDb: any = null;
+  @Input() value!: T;
+  @Input() valueDb: T | null = null;
 
   @Input() warningMessage: string | null = null;
 
   @Input() suggestions: string[] = [];
 
-  @Output() valueChange = new EventEmitter<any>();
+  @Output() valueChange = new EventEmitter<T>();
 
   @ViewChild(IonInput) genreInput!: IonInput;
 
@@ -45,7 +45,8 @@ export class MusicEditableFieldAutocompleteComponent implements IMusicEditableFi
     const newValue = SanitizeSscInput(rawValue == null ? null : String(rawValue));
 
     this.isDirty = this.isEditing && this.normalize(newValue) !== this.normalize(this.valueDb);
-    this.valueChange.emit(newValue);
+    // SanitizeSscInput renvoie une string (ou null), émise telle quelle
+    this.valueChange.emit(newValue as T);
   }
 
 
@@ -53,15 +54,15 @@ export class MusicEditableFieldAutocompleteComponent implements IMusicEditableFi
     return this.isEditing && this.normalize(this.value) !== this.normalize(this.valueDb);
   }
 
-  private normalize(v: any): string {
+  private normalize(v: unknown): string {
     if (v === undefined || v === null) return "";
     return String(v).trim();
   }
 
 
   filteredGenres: string[] = [];
-  onInput(event: any) {
-    const value = (event.target.value || '').toLowerCase();
+  onInput(event: Event) {
+    const value = String((event.target as HTMLIonInputElement).value || '').toLowerCase();
 
     const parts = value.split(',');
     const lastPart = parts[parts.length - 1].trim();
@@ -73,7 +74,7 @@ export class MusicEditableFieldAutocompleteComponent implements IMusicEditableFi
 
     this.filteredGenres = this.suggestions
       .filter(g => g.toLowerCase().includes(lastPart))
-      .filter(g => !this.value.includes(g));
+      .filter(g => !this.value?.includes(g));
     ;
   }
 
@@ -83,7 +84,7 @@ export class MusicEditableFieldAutocompleteComponent implements IMusicEditableFi
 
     const parts = current.split(',');
     parts[parts.length - 1] = ' ' + g;
-    this.value = parts.join(',').trim();
+    this.value = parts.join(',').trim() as T;
 
     this.filteredGenres = [];
 
@@ -95,7 +96,7 @@ export class MusicEditableFieldAutocompleteComponent implements IMusicEditableFi
   onFocus() {
     if (!this.value) return;
     if (!this.value.trim().endsWith(',')) {
-      this.value = this.value.trim() + ', ';
+      this.value = this.value.trim() + ', ' as T;
     }
   }
 
@@ -104,7 +105,7 @@ export class MusicEditableFieldAutocompleteComponent implements IMusicEditableFi
       this.filteredGenres = [];
 
       if (!this.value) return;
-      this.value = this.value.trim().replace(/[, ]+$/, '').trim();
+      this.value = this.value.trim().replace(/[, ]+$/, '').trim() as T;
     }, 150);
   }
 
