@@ -168,3 +168,13 @@ Link: https://github.com/Fx73/Dance-Corp/commit/ed6082e1be043df7db7742dd534063d2
 
 → To verify:
   - SoundCloud song: the position advances, pause and resume work
+
+## Commit: Remove unused parameters required by API signatures
+Link: https://github.com/Fx73/Dance-Corp/commit/9540ad00c393c2b7c5df0696aa55dc26097ca249
+
+- src/app/shared/guard/game.guard.ts: unused `(route, state)` parameters removed from the `CanActivateFn`
+- src/app/services/firestore/user.firestore.service.ts: unused `options` parameter removed from `fromFirestore` (`FirestoreDataConverter`)
+
+→ To verify:
+  - Start a game from browse: `/play/game/:musicId` opens (guard returns true)
+  - Log in: the user profile (name, avatar, level, stats) loads from Firestore
