@@ -34,7 +34,7 @@ export class MusicPlayerYoutubeComponent extends MusicPlayerCommon implements IM
     super();
   }
 
-  onReadyInternal(event: any): void {
+  onReadyInternal(event: YT.PlayerEvent): void {
     this.player.stopVideo();
     this.player.setVolume(this.getVolume() * 100);
 

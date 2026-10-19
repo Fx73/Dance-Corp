@@ -93,9 +93,12 @@ export class MusicPlayerLocalComponent extends MusicPlayerCommon implements IMus
     return (this.audio?.duration ?? 0) - (this.startOffset ?? 0);
   }
 
-  setToTime(event: any): void {
-    const value = event.target.value;
-    this.audio.currentTime = value + (this.startOffset ?? 0);
+  setToTime(time: number): void {
+    this.audio.currentTime = time + (this.startOffset ?? 0);
+  }
+
+  onSeekInput(event: Event): void {
+    this.setToTime(Number((event.target as HTMLInputElement).value));
   }
 
   formatTime(sec: number): string {

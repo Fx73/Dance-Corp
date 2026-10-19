@@ -193,8 +193,8 @@ export class UploadPage {
 
   //#region New Music
 
-  onFileSelected(event: any): void {
-    const file: File = event.target.files[0];
+  onFileSelected(event: Event): void {
+    const file: File | undefined = (event.target as HTMLInputElement).files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = async (e) => {

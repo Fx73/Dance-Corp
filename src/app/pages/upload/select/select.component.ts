@@ -1,5 +1,5 @@
 import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, inject } from '@angular/core';
-import { IonItem, IonLabel, IonSelect, IonSelectOption } from "@ionic/angular";
+import { IonItem, IonLabel, IonSelect, IonSelectOption, SelectCustomEvent } from "@ionic/angular";
 
 @Component({
   selector: 'app-music-select',
@@ -26,7 +26,7 @@ export class MusicSelectComponent implements OnChanges {
     this.isDirty = this.isEditing && this.normalize(this.value) !== this.normalize(this.valueDb);
   }
 
-  onSelectChange(ev: any) {
+  onSelectChange(ev: SelectCustomEvent) {
     this.isDirty = this.isEditing && this.normalize(ev.detail.value) !== this.normalize(this.valueDb);
     this.valueChange.emit(ev.detail.value);
   }

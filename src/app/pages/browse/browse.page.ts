@@ -1,6 +1,6 @@
 import { NgClass, NgStyle, } from '@angular/common';
 import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren, signal, inject } from '@angular/core';
-import { InfiniteScrollCustomEvent, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonImg, IonInfiniteScroll, IonInfiniteScrollContent, IonMenu, IonSearchbar, IonSplitPane, IonText } from '@ionic/angular';
+import { InfiniteScrollCustomEvent, SearchbarCustomEvent, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonImg, IonInfiniteScroll, IonInfiniteScrollContent, IonMenu, IonSearchbar, IonSplitPane, IonText } from '@ionic/angular';
 import { MusicDto, NoteDataDto } from 'src/app/game/game-model/music.dto';
 import { IMusicPlayer, MusicOrigin, MusicPlayerCommon } from 'src/app/game/music-player/IMusicPlayer';
 import { UserMusicDto, UserNoteDto } from '../user-profile/user.dto';
@@ -207,7 +207,7 @@ export class BrowsePage implements OnInit {
     this.cd.markForCheck();
   }
 
-  onSearch(event: any) {
+  onSearch(event: SearchbarCustomEvent) {
     this.searchQuery = (event.target.value || '').toLowerCase();
     localStorage.setItem('browseSearchQuery', this.searchQuery);
 

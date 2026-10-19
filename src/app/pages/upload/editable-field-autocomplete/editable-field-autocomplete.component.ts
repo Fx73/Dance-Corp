@@ -1,5 +1,5 @@
 import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, ViewChild, inject } from "@angular/core";
-import { IonInput, IonItem, IonLabel } from "@ionic/angular";
+import { InputChangeEventDetail, InputCustomEvent, IonInput, IonItem, IonLabel } from "@ionic/angular";
 import { IMusicEditableField, MUSIC_EDITABLE_FIELD_TOKEN } from "../editable-field.interface";
 
 import { SanitizeSscInput } from "../reader.ssc";
@@ -40,9 +40,9 @@ export class MusicEditableFieldAutocompleteComponent implements IMusicEditableFi
     this.isDirty = this.isEditing && this.normalize(this.value) !== this.normalize(this.valueDb);
   }
 
-  onInputChange(ev: any) {
-    let newValue = ev.detail.value;
-    newValue = SanitizeSscInput(newValue);
+  onInputChange(ev: InputCustomEvent<InputChangeEventDetail>) {
+    const rawValue = ev.detail.value;
+    const newValue = SanitizeSscInput(rawValue == null ? null : String(rawValue));
 
     this.isDirty = this.isEditing && this.normalize(newValue) !== this.normalize(this.valueDb);
     this.valueChange.emit(newValue);

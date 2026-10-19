@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
-import { InfiniteScrollCustomEvent, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonIcon, IonImg, IonInfiniteScroll, IonInfiniteScrollContent, IonSearchbar } from '@ionic/angular';
+import { InfiniteScrollCustomEvent, SearchbarCustomEvent, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonIcon, IonImg, IonInfiniteScroll, IonInfiniteScrollContent, IonSearchbar } from '@ionic/angular';
 
 
 import { FormsModule } from '@angular/forms';
@@ -73,7 +73,7 @@ export class BrowseUploadPage implements OnInit {
       this.router.navigate(['/upload']);
   }
 
-  onSearch(event: any) {
+  onSearch(event: SearchbarCustomEvent) {
     this.searchQuery = (event.target.value || '').toLowerCase();
     this.initIonInfinite();
   }
