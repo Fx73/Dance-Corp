@@ -18,7 +18,7 @@ export class WaitingScreenComponent implements OnInit {
 
   countdown = signal<number | null>(null);
 
-  @Output() onCountdownFinished = new EventEmitter<void>();
+  @Output() countdownFinished = new EventEmitter<void>();
 
   constructor() { }
 
@@ -31,7 +31,7 @@ export class WaitingScreenComponent implements OnInit {
       if (this.countdown() === 0) {
         clearInterval(interval);
         setTimeout(() => {
-          this.onCountdownFinished.emit();
+          this.countdownFinished.emit();
         }, 500);
       }
     }, 1000);

@@ -27,7 +27,7 @@ export class MusicPlayerSoundcloudComponent extends MusicPlayerCommon
   @Input()
   startOffset?: number;
   @Output()
-  onReady: EventEmitter<IMusicPlayer> = new EventEmitter<IMusicPlayer>();
+  ready: EventEmitter<IMusicPlayer> = new EventEmitter<IMusicPlayer>();
 
   widgetSC: any;
 
@@ -44,7 +44,7 @@ export class MusicPlayerSoundcloudComponent extends MusicPlayerCommon
       this.widgetSC.setVolume(this.getVolume() * 100);
       if (this.startOffset !== undefined)
         this.widgetSC.seekTo(this.startOffset * 1000);
-      this.onReady.emit(this);
+      this.ready.emit(this);
     });
   }
 

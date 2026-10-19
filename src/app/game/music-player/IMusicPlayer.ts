@@ -11,7 +11,7 @@ export interface IMusicPlayer {
     getCurrentTime(): number; // Get the current playback time
     setToTime(time: number): void; // Set the playback time to a specific value
 
-    onReady: EventEmitter<IMusicPlayer>;
+    ready: EventEmitter<IMusicPlayer>;
 
 
 }
