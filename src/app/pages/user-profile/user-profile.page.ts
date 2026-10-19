@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { IonAvatar, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonContent, IonHeader, IonImg, IonItem, IonLabel, IonText, IonTitle, IonToolbar } from '@ionic/angular';
 
 import { AccountComponent } from "./account/account.component";
@@ -17,16 +17,13 @@ import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.
   standalone: true,
   imports: [IonLabel, IonImg, IonCardContent, IonCardTitle, IonCardHeader, IonItem, IonBadge, IonCard, IonText, IonContent, FormsModule, AccountComponent, HeaderComponent]
 })
-export class UserProfilePage implements OnInit {
+export class UserProfilePage {
   userAuth: User;
   userData: UserDto;
 
   constructor(authService: LoginFireauthService, userService: UserFirestoreService) {
     this.userAuth = authService.getAuthUser()!
     this.userData = userService.user!
-  }
-
-  ngOnInit() {
   }
 
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonIcon, IonInput, IonItem, IonSelect, IonSelectOption } from '@ionic/angular';
 
 import { AnnouncerService } from 'src/app/services/gameplay/announcer.service';
@@ -20,7 +20,7 @@ import { addIcons } from 'ionicons';
   standalone: true,
   imports: [IonInput, IonIcon, IonCardSubtitle, IonCardHeader, IonButton, IonCardContent, IonItem, IonCard, IonCardTitle, IonContent, IonSelectOption, RouterModule, IonSelect, FormsModule, HeaderComponent]
 })
-export class PlayerSelectionPage implements OnInit {
+export class PlayerSelectionPage {
 
   userList: { id: string | null, name: string }[] = []
 
@@ -28,9 +28,7 @@ export class PlayerSelectionPage implements OnInit {
     addIcons({ addCircle });
   }
 
-  ngOnInit() {
-    //TODO handle mutliple connexion
-  }
+  //TODO handle mutliple connexion
 
 
   getPlayers(): Player[] {

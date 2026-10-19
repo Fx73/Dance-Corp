@@ -36,9 +36,6 @@ export class PadTestPage {
     private alertController: AlertController
   ) { }
 
-  ngOnInit(): void {
-  }
-
   selectPlayer(player: Player, playerIndex: number) {
     this.playerIndexSelected = playerIndex
     this.playerSelected = player

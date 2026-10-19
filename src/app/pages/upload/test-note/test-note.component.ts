@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { IMusicPlayer, MusicOrigin, MusicPlayerCommon } from 'src/app/game/music-player/IMusicPlayer';
 import { MusicDto, NoteDataDto } from 'src/app/game/game-model/music.dto';
 
@@ -19,7 +19,7 @@ import { UserConfigService } from 'src/app/services/userconfig.service';
   standalone: true,
   imports: [MusicPlayerYoutubeComponent, MusicPlayerSoundcloudComponent, PlayerDisplayComponent]
 })
-export class TestNoteComponent implements OnInit {
+export class TestNoteComponent implements OnInit, OnDestroy {
   //#region App Constants
   readonly ArrowDirection = ArrowDirection;
   readonly MusicOrigin = MusicOrigin;

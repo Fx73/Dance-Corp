@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, Input, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 import { IonButton, IonIcon, IonInput, IonItem, IonLabel, IonList } from "@ionic/angular";
 import { addOutline, removeOutline } from 'ionicons/icons';
 
@@ -13,7 +13,7 @@ import { addIcons } from 'ionicons';
   standalone: true,
   imports: [IonList, IonItem, IonLabel, IonInput, IonButton, IonIcon, FormsModule]
 })
-export class MusicEditableListComponent {
+export class MusicEditableListComponent implements OnChanges {
   @Input() isEditing = false;
 
   @Input() label!: string;

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { IonBadge, IonCard, IonCardContent, IonContent, IonIcon } from '@ionic/angular';
 import { logoAngular, logoCss3, logoHtml5, logoIonic, logoSoundcloud, logoYoutube } from 'ionicons/icons';
 
@@ -16,7 +16,7 @@ import isTauri from 'src/app/shared/utils/tauri';
   standalone: true,
   imports: [IonBadge, IonIcon, IonCardContent, IonCard, IonContent, FormsModule, HeaderComponent]
 })
-export class AboutPage implements OnInit {
+export class AboutPage {
   isDesktop = isTauri;
 
   readonly version = AppConfig.version;
@@ -25,9 +25,6 @@ export class AboutPage implements OnInit {
   constructor() {
     addIcons({ logoYoutube, logoSoundcloud, logoHtml5, logoCss3, logoAngular, logoIonic, 'logo-html5': logoHtml5, 'logo-css3': logoCss3 });
 
-  }
-
-  ngOnInit() {
   }
 
 }

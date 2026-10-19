@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, Input, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 import { IonItem, IonLabel, IonSelect, IonSelectOption } from "@ionic/angular";
 
 @Component({
@@ -8,7 +8,7 @@ import { IonItem, IonLabel, IonSelect, IonSelectOption } from "@ionic/angular";
   standalone: true,
   imports: [IonLabel, IonItem, IonSelect, IonSelectOption]
 })
-export class MusicSelectComponent {
+export class MusicSelectComponent implements OnChanges {
   @Input() label!: string;
   @Input() value!: any;
   @Input() valueDb: any = null;

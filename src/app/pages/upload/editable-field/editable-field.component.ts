@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, Input, Output } from "@angular/core";
+import { Component, ElementRef, EventEmitter, Input, OnChanges, Output } from "@angular/core";
 import { IonInput, IonItem, IonLabel } from "@ionic/angular";
 import { IMusicEditableField, MUSIC_EDITABLE_FIELD_TOKEN } from "../editable-field.interface";
 
@@ -14,7 +14,7 @@ import { SanitizeSscInput } from "../reader.ssc";
   standalone: true,
   imports: [IonItem, IonLabel, IonInput]
 })
-export class MusicEditableFieldComponent implements IMusicEditableField {
+export class MusicEditableFieldComponent implements IMusicEditableField, OnChanges {
   @Input() isEditing = false;
 
   @Input() label!: string;

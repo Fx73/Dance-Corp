@@ -1,5 +1,4 @@
 import {
-  AfterViewInit,
   Component,
   EventEmitter,
   Input,
@@ -20,7 +19,7 @@ declare var SC: any;
   standalone: true,
 })
 export class MusicPlayerSoundcloudComponent extends MusicPlayerCommon
-  implements IMusicPlayer, OnInit, AfterViewInit, OnDestroy {
+  implements IMusicPlayer, OnInit, OnDestroy {
 
   @Input()
   musicUrl!: string;
@@ -47,8 +46,6 @@ export class MusicPlayerSoundcloudComponent extends MusicPlayerCommon
       this.ready.emit(this);
     });
   }
-
-  ngAfterViewInit() { }
 
   play() {
     this.widgetSC.play();
