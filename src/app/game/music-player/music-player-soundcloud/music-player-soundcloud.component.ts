@@ -68,7 +68,7 @@ export class MusicPlayerSoundcloudComponent extends MusicPlayerCommon
   stop() {
     try {
       this.widgetSC.pause();
-    } catch (e) { }
+    } catch { }
     this.stopPolling();
   }
 

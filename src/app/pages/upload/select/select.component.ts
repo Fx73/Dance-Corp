@@ -18,7 +18,7 @@ export class MusicSelectComponent<T = unknown> implements OnChanges {
 
   @Input() options: T[] = [];
 
-  @Output() valueChange = new EventEmitter<T>();
+  @Output() valueChange: EventEmitter<T> = new EventEmitter();
 
   public isDirty = false;
 

@@ -13,7 +13,7 @@ export class MusicPlayerLocalComponent extends MusicPlayerCommon implements IMus
 
   @Input() musicUrl!: string;
   @Input() startOffset?: number;
-  @Output() ready = new EventEmitter<IMusicPlayer>();
+  @Output() ready: EventEmitter<IMusicPlayer> = new EventEmitter();
   private audio!: HTMLAudioElement;
 
   isPlaying = false;

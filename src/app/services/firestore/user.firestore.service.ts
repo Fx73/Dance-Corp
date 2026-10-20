@@ -1,4 +1,4 @@
-import { DocumentData, Firestore, FirestoreDataConverter, QueryDocumentSnapshot, SnapshotOptions, collection, doc, getDoc, getDocs, getFirestore, increment, setDoc, updateDoc } from 'firebase/firestore';
+import { DocumentData, Firestore, FirestoreDataConverter, QueryDocumentSnapshot, collection, doc, getDoc, getDocs, getFirestore, increment, setDoc, updateDoc } from 'firebase/firestore';
 import { Injectable, signal, inject } from '@angular/core';
 import { UserDto, UserMusicDto, UserNoteDto } from 'src/app/pages/user-profile/user.dto';
 
@@ -14,7 +14,7 @@ export class UserFirestoreService {
     //#region Constants
     private readonly USER_COLLECTION = "users"
     private readonly USER_MUSIC_COLLECTION = "user_musics"
-    private readonly firestoreConverterUserMusic = new FirestoreConverter<UserMusicDto>(UserMusicDto, { "notes:": UserNoteDto });
+    private readonly firestoreConverterUserMusic: FirestoreConverter<UserMusicDto> = new FirestoreConverter(UserMusicDto, { "notes:": UserNoteDto });
     //#endregion
 
     private db: Firestore
@@ -90,7 +90,7 @@ export class UserFirestoreService {
     }
 
 
-    public async getScoresForMusic(musicId: string, userId: string): Promise<{ [noteId: string]: number }> {
+    public async getScoresForMusic(musicId: string, userId: string): Promise<Record<string, number>> {
         const musicRef = doc(this.db, this.USER_COLLECTION, userId, this.USER_MUSIC_COLLECTION, musicId).withConverter(this.firestoreConverterUserMusic);
 
         const snap = await getDoc(musicRef);
@@ -98,7 +98,7 @@ export class UserFirestoreService {
 
         const music = snap.data();
 
-        const scores: { [noteId: string]: number } = {};
+        const scores: Record<string, number> = {};
         for (const note of music.notes) {
             scores[note.id] = note.highScore ?? 0;
         }
@@ -121,7 +121,7 @@ export class UserFirestoreService {
             };
         },
 
-        fromFirestore(snapshot: QueryDocumentSnapshot, options: SnapshotOptions): UserDto {
+        fromFirestore(snapshot: QueryDocumentSnapshot): UserDto {
             const data = snapshot.data();
             const user = new UserDto(data["id"], data["name"]);
 

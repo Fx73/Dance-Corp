@@ -1,13 +1,13 @@
-import { AnnouncerService } from '../services/gameplay/announcer.service';
-import { BeatManager } from './game-model/timeline/beatManager';
-import { CONFIG } from "./constants/game-config";
-import { GameRound } from './game-model/gameRound';
-import { IMusicPlayer } from "./music-player/IMusicPlayer";
-import { MusicDto } from './game-model/music.dto';
-import { Player } from './game-model/player';
-import { PlayerDisplayComponent } from "./game-display/player-display.component";
 import { UserCacheService } from 'src/app/services/local-storage/user.cache.service';
 import { UserNoteDto } from '../pages/user-profile/user.dto';
+import { AnnouncerService } from '../services/gameplay/announcer.service';
+import { CONFIG } from "./constants/game-config";
+import { PlayerDisplayComponent } from "./game-display/player-display.component";
+import { GameRound } from './game-model/gameRound';
+import { MusicDto } from './game-model/music.dto';
+import { Player } from './game-model/player';
+import { BeatManager } from './game-model/timeline/beatManager';
+import { IMusicPlayer } from "./music-player/IMusicPlayer";
 
 export class GameManager {
 
@@ -147,16 +147,4 @@ export class GameManager {
         this.gameRounds = [];
     }
     //#EndRegion
-}
-
-class BPMSection {
-    timeStart: number;
-    beatStart: number;
-    bps: number;
-
-    constructor(timeStart: number, beatStart: number, bps: number) {
-        this.timeStart = timeStart;
-        this.beatStart = beatStart;
-        this.bps = bps;
-    }
 }

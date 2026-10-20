@@ -18,9 +18,7 @@ export class WaitingScreenComponent {
 
   countdown = signal<number | null>(null);
 
-  @Output() countdownFinished = new EventEmitter<void>();
-
-  constructor() { }
+  @Output() countdownFinished: EventEmitter<void> = new EventEmitter();
 
   startCountdown() {
     this.countdown.set(3);

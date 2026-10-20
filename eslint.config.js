@@ -8,9 +8,20 @@ module.exports = tseslint.config(
   },
   {
     files: ['**/*.ts'],
-    extends: [...angular.configs.tsRecommended],
+    extends: [
+      ...tseslint.configs.recommended,
+      ...tseslint.configs.stylistic,
+      ...angular.configs.tsRecommended,
+    ],
     processor: angular.processInlineTemplates,
     rules: {
+      // Explicit types are kept on variables, even when they could be inferred
+      '@typescript-eslint/no-inferrable-types': 'off',
+      // Generic type written on the variable: x: Map<A, B> = new Map()
+      '@typescript-eslint/consistent-generic-constructors': ['error', 'type-annotation'],
+      // Warning only: some unused code belongs to features in progress
+      // ignoreRestSiblings: allows removing a property with destructuring, e.g. const { a, ...rest } = obj
+      '@typescript-eslint/no-unused-vars': ['warn', { ignoreRestSiblings: true }],
       '@angular-eslint/component-class-suffix': [
         'error',
         {
@@ -37,7 +48,10 @@ module.exports = tseslint.config(
   },
   {
     files: ['**/*.html'],
-    extends: [...angular.configs.templateRecommended],
+    extends: [
+      ...angular.configs.templateRecommended,
+      ...angular.configs.templateAccessibility,
+    ],
     rules: {},
   },
 );

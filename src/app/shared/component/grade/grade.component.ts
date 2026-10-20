@@ -19,8 +19,6 @@ export class GradeComponent implements OnInit {
   grade: string = 'F'
   color: string = '#000000'
 
-  constructor() { }
-
   ngOnInit() {
     ({ grade: this.grade, color: this.color } = Color.gradeFromScore(this.score, this.failed));
   }

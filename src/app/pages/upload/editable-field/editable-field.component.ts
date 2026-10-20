@@ -27,7 +27,7 @@ export class MusicEditableFieldComponent<T extends string | number | null | unde
 
   @Input() warningMessage: string | null = null;
 
-  @Output() valueChange = new EventEmitter<T>();
+  @Output() valueChange: EventEmitter<T> = new EventEmitter();
 
   public isDirty = false;
 

@@ -1,6 +1,6 @@
 import { NgClass, NgStyle, } from '@angular/common';
-import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren, signal, inject } from '@angular/core';
-import { InfiniteScrollCustomEvent, SearchbarCustomEvent, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonImg, IonInfiniteScroll, IonInfiniteScrollContent, IonMenu, IonSearchbar, IonSplitPane, IonText } from '@ionic/angular';
+import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren, inject, signal } from '@angular/core';
+import { InfiniteScrollCustomEvent, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonImg, IonInfiniteScroll, IonInfiniteScrollContent, IonMenu, IonSearchbar, IonSplitPane, IonText, SearchbarCustomEvent } from '@ionic/angular';
 import { MusicDto, NoteDataDto } from 'src/app/game/game-model/music.dto';
 import { IMusicPlayer, MusicOrigin, MusicPlayerCommon } from 'src/app/game/music-player/IMusicPlayer';
 import { UserMusicDto, UserNoteDto } from '../user-profile/user.dto';
@@ -63,7 +63,7 @@ export class BrowsePage implements OnInit {
   musicNotes = signal<NoteDataDto[]>([]);
   musicUserScore = signal<UserMusicDto | null>(null);
 
-  userScores: { [key: string]: number } = {};
+  userScores: Record<string, number> = {};
 
   searchQuery: string = '';
 
@@ -323,9 +323,6 @@ export class BrowsePage implements OnInit {
   }
   getNoteColor(difficulty: NoteDifficulty): string {
     return Color.noteDifficultyColor(difficulty)
-  }
-  getGrade(score: number): string {
-    return "A"
   }
   getUserNote(chartname: string): UserNoteDto | null {
     return this.musicUserScore()?.notes.find(n => n.id === chartname) ?? null;

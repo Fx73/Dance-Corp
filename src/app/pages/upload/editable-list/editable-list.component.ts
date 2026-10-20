@@ -25,7 +25,7 @@ export class MusicEditableListComponent<T extends ITimedChange = ITimedChange> i
   @Input() value: T[] = [];
   @Input() valueDb: T[] | undefined = [];
 
-  @Output() valueChange = new EventEmitter<T[]>();
+  @Output() valueChange: EventEmitter<T[]> = new EventEmitter();
 
   public isDirty = false;
 
