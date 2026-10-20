@@ -74,6 +74,10 @@ Write new code the way the existing code is written. Known deviations to avoid a
 - `dev`: commit and push only when necessary, and only for bug fixes, one commit per fix. Never develop a feature directly on `dev`.
 - `master`: never commit or push.
 
+### Before Committing
+
+- Always run `npm install` then `ionic serve` right before a commit, and check that the build completes without errors. Do not commit a broken build.
+
 ### Commit Messages
 
 - Use concise commit messages focused on intent. Be technical when relevant, but do not just describe implementation details.
