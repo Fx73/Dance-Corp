@@ -1,8 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject } from '@angular/core'
 
-import { FormsModule } from '@angular/forms';
-import { IonButton, IonCard, IonInput, IonItem } from '@ionic/angular';
-import { LoginFireauthService } from 'src/app/services/firestore/login.fireauth.service';
+import { FormsModule } from '@angular/forms'
+import { IonButton, IonCard, IonInput, IonItem } from '@ionic/angular'
+import { LoginFireauthService } from 'src/app/services/firestore/login.fireauth.service'
 
 @Component({
   selector: 'app-account',
@@ -12,16 +12,16 @@ import { LoginFireauthService } from 'src/app/services/firestore/login.fireauth.
   imports: [IonButton, IonCard, IonInput, IonItem, FormsModule],
 })
 export class AccountComponent {
-  private loginService = inject(LoginFireauthService);
+  private loginService = inject(LoginFireauthService)
 
-  name: string = '';
-  email: string = '';
-  password: string = '';
-  password2: string = '';
-  isEmailVerified: boolean = false;
+  name: string = ''
+  email: string = ''
+  password: string = ''
+  password2: string = ''
+  isEmailVerified: boolean = false
 
   constructor() {
-    const loginService = this.loginService;
+    const loginService = this.loginService
 
     const user = loginService.getAuthUser()
     this.name = user!.displayName ?? ""

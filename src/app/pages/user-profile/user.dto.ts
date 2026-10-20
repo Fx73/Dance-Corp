@@ -1,38 +1,38 @@
 export class UserDto {
-    id: string;
-    name: string;
-    avatar?: string;
-    level: number = 0;
-    musicPlayed: number = 0;
-    musicCleared: number = 0;
-    preferedGamepad: string = " - ";
-    preferedMusic: string = " - ";
+    id: string
+    name: string
+    avatar?: string
+    level: number = 0
+    musicPlayed: number = 0
+    musicCleared: number = 0
+    preferedGamepad: string = " - "
+    preferedMusic: string = " - "
 
     constructor(id: string, name: string) {
-        this.id = id;
-        this.name = name;
+        this.id = id
+        this.name = name
     }
 
 }
 
 export class UserMusicDto {
-    id: string;
-    timesPlayed: number = 0;
-    notes: UserNoteDto[] = [];
+    id: string
+    timesPlayed: number = 0
+    notes: UserNoteDto[] = []
 
     constructor(id?: string) {
-        this.id = id ?? '';
+        this.id = id ?? ''
     }
 }
 
 export class UserNoteDto {
-    id: string;
-    passed: boolean = false;
-    timesPlayed: number = 0;
-    highScore: number = 0;
-    highScoreGamepad: string = "";
+    id: string
+    passed: boolean = false
+    timesPlayed: number = 0
+    highScore: number = 0
+    highScoreGamepad: string = ""
 
     constructor(id?: string) {
-        this.id = id ?? '';
+        this.id = id ?? ''
     }
 }

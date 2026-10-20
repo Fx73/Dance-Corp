@@ -1,6 +1,6 @@
-import { Component, EventEmitter, Input, Output, signal } from '@angular/core';
+import { Component, EventEmitter, Input, Output, signal } from '@angular/core'
 
-import { IonSpinner } from "@ionic/angular";
+import { IonSpinner } from "@ionic/angular"
 
 @Component({
   selector: 'app-waiting-screen',
@@ -11,26 +11,26 @@ import { IonSpinner } from "@ionic/angular";
 
 })
 export class WaitingScreenComponent {
-  @Input() title: string | undefined;
-  @Input() artist: string | undefined;
-  @Input() coverUrl: string | undefined;
-  @Input() level: string | undefined;
+  @Input() title: string | undefined
+  @Input() artist: string | undefined
+  @Input() coverUrl: string | undefined
+  @Input() level: string | undefined
 
-  countdown = signal<number | null>(null);
+  countdown = signal<number | null>(null)
 
-  @Output() countdownFinished: EventEmitter<void> = new EventEmitter();
+  @Output() countdownFinished: EventEmitter<void> = new EventEmitter()
 
   startCountdown() {
-    this.countdown.set(3);
+    this.countdown.set(3)
     const interval = setInterval(() => {
-      this.countdown.update((prev: number | null) => (prev || 0) - 1);
+      this.countdown.update((prev: number | null) => (prev || 0) - 1)
       if (this.countdown() === 0) {
-        clearInterval(interval);
+        clearInterval(interval)
         setTimeout(() => {
-          this.countdownFinished.emit();
-        }, 500);
+          this.countdownFinished.emit()
+        }, 500)
       }
-    }, 1000);
+    }, 1000)
   }
 
 }

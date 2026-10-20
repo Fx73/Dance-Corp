@@ -1,7 +1,7 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core'
 
-import { Color } from 'src/app/game/constants/color';
-import { IonBadge } from "@ionic/angular";
+import { Color } from 'src/app/game/constants/color'
+import { IonBadge } from "@ionic/angular"
 
 @Component({
   selector: 'app-grade',
@@ -20,7 +20,7 @@ export class GradeComponent implements OnInit {
   color: string = '#000000'
 
   ngOnInit() {
-    ({ grade: this.grade, color: this.color } = Color.gradeFromScore(this.score, this.failed));
+    ({ grade: this.grade, color: this.color } = Color.gradeFromScore(this.score, this.failed))
   }
 
 }

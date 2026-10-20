@@ -1,9 +1,9 @@
-import { Injectable, effect, inject } from '@angular/core';
+import { Injectable, effect, inject } from '@angular/core'
 
-import { ArrowImageManager } from '../game/game-display/arrowImageManager';
-import { BehaviorSubject } from 'rxjs';
-import { Player } from '../game/game-model/player';
-import { UserFirestoreService } from './firestore/user.firestore.service';
+import { ArrowImageManager } from '../game/game-display/arrowImageManager'
+import { BehaviorSubject } from 'rxjs'
+import { Player } from '../game/game-model/player'
+import { UserFirestoreService } from './firestore/user.firestore.service'
 
 @Injectable({
     providedIn: 'root',
@@ -11,120 +11,120 @@ import { UserFirestoreService } from './firestore/user.firestore.service';
 export class UserConfigService {
     //#region Constants
     private readonly CONFIG_STORAGE_KEY = "userConfig"
-    private readonly PLAYERS_STORAGE_KEY = (index: number) => `playersConfig${index}`;
+    private readonly PLAYERS_STORAGE_KEY = (index: number) => `playersConfig${index}`
     //#endregion
 
-    private userFirestoreService = inject(UserFirestoreService);
+    private userFirestoreService = inject(UserFirestoreService)
 
-    public isReady = false;
+    public isReady = false
 
-    private configSubject: BehaviorSubject<UserConfig> = new BehaviorSubject<UserConfig>(new UserConfig());
-    config$ = this.configSubject.asObservable();
+    private configSubject: BehaviorSubject<UserConfig> = new BehaviorSubject<UserConfig>(new UserConfig())
+    config$ = this.configSubject.asObservable()
 
     players: Player[] = []
 
     constructor() {
-        const storedConfig: UserConfig = JSON.parse(localStorage.getItem(this.CONFIG_STORAGE_KEY) || '{}');
-        const defaultConfig = new UserConfig();
+        const storedConfig: UserConfig = JSON.parse(localStorage.getItem(this.CONFIG_STORAGE_KEY) || '{}')
+        const defaultConfig = new UserConfig()
 
-        this.configSubject = new BehaviorSubject<UserConfig>({ ...defaultConfig, ...storedConfig });
+        this.configSubject = new BehaviorSubject<UserConfig>({ ...defaultConfig, ...storedConfig })
 
         for (let i = 0; i < this.configSubject.value.playerNumber; i++) {
-            this.players.push(this.instanciatePlayer(i));
+            this.players.push(this.instanciatePlayer(i))
         }
 
         // Set logged user to player 0
         effect(() => {
-            const user = this.userFirestoreService.userData();
+            const user = this.userFirestoreService.userData()
 
             if (user) {
-                this.players[0].userId = user.id;
-                this.players[0].name = user.name;
+                this.players[0].userId = user.id
+                this.players[0].name = user.name
             } else {
-                this.players[0].userId = null;
-                this.players[0].name = "Player 0";
+                this.players[0].userId = null
+                this.players[0].name = "Player 0"
             }
-        });
+        })
 
-        ArrowImageManager.setArrowSize(this.configSubject.value.canvasWidth / 4);
+        ArrowImageManager.setArrowSize(this.configSubject.value.canvasWidth / 4)
         this.isReady = true
     }
 
     instanciatePlayer(index: number): Player {
-        const storedPlayer = localStorage.getItem(this.PLAYERS_STORAGE_KEY(index));
+        const storedPlayer = localStorage.getItem(this.PLAYERS_STORAGE_KEY(index))
         const player: Player = storedPlayer ? Player.fromJSON(JSON.parse(storedPlayer)) : new Player()
 
         // Reassociating the gamepad if it exists and is valid
         if (player.gamepad && player.gamepad.index != -1) {
-            const matchingGamepad = navigator.getGamepads().find(g => g?.id === player.gamepad!.id);
-            player.gamepad.index = matchingGamepad ? matchingGamepad.index : null;
+            const matchingGamepad = navigator.getGamepads().find(g => g?.id === player.gamepad!.id)
+            player.gamepad.index = matchingGamepad ? matchingGamepad.index : null
         }
         return player
     }
 
     getConfig(): UserConfig {
-        return this.configSubject.value;
+        return this.configSubject.value
     }
 
     updatePlayerCount(count: number) {
-        const currentCount = this.configSubject.value.playerNumber;
+        const currentCount = this.configSubject.value.playerNumber
         if (count > currentCount) {
             for (let i = currentCount + 1; i <= count; i++) {
-                this.players.push(this.instanciatePlayer(i));
+                this.players.push(this.instanciatePlayer(i))
             }
 
         } else if (count < currentCount) {
-            this.players.splice(count);
+            this.players.splice(count)
         }
 
         this.updateConfig("playerNumber", count)
     }
 
     addPlayer() {
-        this.players.push(this.instanciatePlayer(this.players.length));
+        this.players.push(this.instanciatePlayer(this.players.length))
         this.updateConfig("playerNumber", this.players.length)
     }
 
     removePlayerAt(position: number) {
         if (position > 0) {
-            const playerToMove = this.players.splice(position, 1)[0];
+            const playerToMove = this.players.splice(position, 1)[0]
 
             this.players.forEach((player, index) => {
-                localStorage.setItem(this.PLAYERS_STORAGE_KEY(index), JSON.stringify(player));
-            });
-            localStorage.setItem(this.PLAYERS_STORAGE_KEY(this.players.length), JSON.stringify(playerToMove));
+                localStorage.setItem(this.PLAYERS_STORAGE_KEY(index), JSON.stringify(player))
+            })
+            localStorage.setItem(this.PLAYERS_STORAGE_KEY(this.players.length), JSON.stringify(playerToMove))
         }
         this.updateConfig("playerNumber", this.players.length)
     }
 
     updateConfig<K extends keyof UserConfig>(option: K, value: UserConfig[K]): void {
         if (!(option in this.configSubject.value)) {
-            console.error(`Invalid option  : ${option}`);
-            return;
+            console.error(`Invalid option  : ${option}`)
+            return
         }
 
-        const updatedConfig = { ...this.configSubject.value, [option]: value };
-        this.configSubject.next(updatedConfig);
+        const updatedConfig = { ...this.configSubject.value, [option]: value }
+        this.configSubject.next(updatedConfig)
 
-        localStorage.setItem(this.CONFIG_STORAGE_KEY, JSON.stringify(this.configSubject.value));
+        localStorage.setItem(this.CONFIG_STORAGE_KEY, JSON.stringify(this.configSubject.value))
     }
 
     updatePlayer<K extends keyof Player>(option: K, playerIndex: number, value: Player[K]): void {
         if (playerIndex < 0 || playerIndex >= this.players.length) {
-            console.error(`Invalid player index: ${playerIndex}`);
-            return;
+            console.error(`Invalid player index: ${playerIndex}`)
+            return
         }
 
-        const player: Player = this.players[playerIndex];
-        player[option] = value;
+        const player: Player = this.players[playerIndex]
+        player[option] = value
 
-        localStorage.setItem(this.PLAYERS_STORAGE_KEY(playerIndex), JSON.stringify(player));
+        localStorage.setItem(this.PLAYERS_STORAGE_KEY(playerIndex), JSON.stringify(player))
     }
 
     resetToDefault(): void {
-        localStorage.removeItem(this.CONFIG_STORAGE_KEY);
+        localStorage.removeItem(this.CONFIG_STORAGE_KEY)
         for (let index = 0; index < 4; index++) {
-            localStorage.removeItem(this.PLAYERS_STORAGE_KEY(index));
+            localStorage.removeItem(this.PLAYERS_STORAGE_KEY(index))
         }
     }
 

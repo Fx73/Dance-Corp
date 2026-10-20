@@ -75,7 +75,6 @@ Bugs found but not fixed yet, and deprecations to migrate. Remove an entry once 
 
 ## Code style to harmonize
 
-- **Semicolons**: about 85% of statements end with one, while the target style is semicolon-free. Convert with `@stylistic/eslint-plugin` (`semi: ['error', 'never']`, auto-fixable) and enable `no-unexpected-multiline` to catch lines that would be joined to the previous one.
 - **Magic numbers**: scoring and announcer values (`0.8`, `0.6`, `-4`, `-20`, `30`…) are inline while `CONFIG` exists. Move tunable gameplay values to `CONFIG`.
 - **Non-null assertions**: the assertions that were unnecessary for the type checker are removed. The remaining `!` are on values typed as nullable, some of which can really be null at runtime (`player.gamepad!.index`). Each one needs a guard or a type fix, which changes behavior: handle them with the related bugs.
 - **Optional chains on non-nullable types**: about 10 `?.` are on values typed as non-nullable (reported by `@typescript-eslint/no-unnecessary-condition`). They were kept on purpose, as data read from Firestore or localStorage may not match its type.

@@ -1,131 +1,131 @@
-import { BpmChange, ITimedChange } from "src/app/game/game-model/timeline/timedChange";
-import { Measures, MusicDto } from "src/app/game/game-model/music.dto";
+import { BpmChange, ITimedChange } from "src/app/game/game-model/timeline/timedChange"
+import { Measures, MusicDto } from "src/app/game/game-model/music.dto"
 
-import { NoteEvaluator } from "./DifficultyCriteria";
+import { NoteEvaluator } from "./DifficultyCriteria"
 
 /** Tokens of an SM/SSC file: text value, or a sub-map of tokens for each notedataN block */
-export type SscTokenMap = Record<string, string | Record<string, string>>;
+export type SscTokenMap = Record<string, string | Record<string, string>>
 
 export class SccReader {
 
   static parseFile(filename: string, content: string): MusicDto {
-    let tokenMap: SscTokenMap;
+    let tokenMap: SscTokenMap
 
     if (filename.endsWith('.sm')) {
-      tokenMap = this.tokenizeSM(content);
+      tokenMap = this.tokenizeSM(content)
     } else if (filename.endsWith('.ssc')) {
-      tokenMap = this.tokenizeSSC(content);
+      tokenMap = this.tokenizeSSC(content)
     } else if (filename.endsWith('.essc')) {
-      tokenMap = this.tokenizeSSC(content, true);
+      tokenMap = this.tokenizeSSC(content, true)
     } else {
-      throw new Error('Unsupported file format');
+      throw new Error('Unsupported file format')
     }
 
-    const musicData = new MusicDto(tokenMap);
-    console.log("Parsed Music Data:", musicData);
+    const musicData = new MusicDto(tokenMap)
+    console.log("Parsed Music Data:", musicData)
 
     const tsvLines: string[] = []
     for (const noteData of musicData.noteData) {
       if (!noteData.difficultyCriterias) {
-        const evaluator = new NoteEvaluator(musicData.bpms, noteData.stepChart);
-        evaluator.evaluateCriterias();
-        noteData.difficultyCriterias = evaluator.criterias;
+        const evaluator = new NoteEvaluator(musicData.bpms, noteData.stepChart)
+        evaluator.evaluateCriterias()
+        noteData.difficultyCriterias = evaluator.criterias
         console.log(noteData.meter, evaluator.criterias, evaluator.getLevelFromCriterias())
-        tsvLines.push(evaluator.generateTsvLine(musicData.title ?? "", noteData.meter ?? 0));
-        noteData.meter = Math.round(evaluator.getLevelFromCriterias());
+        tsvLines.push(evaluator.generateTsvLine(musicData.title ?? "", noteData.meter ?? 0))
+        noteData.meter = Math.round(evaluator.getLevelFromCriterias())
       }
     }
     if (tsvLines.length > 0) {
-      console.log("Analysis: title | targetScore | totalSteps | doubleSteps | chainedDoubleSteps | avgBpm | maxBpm | stepWithHoldCount | sameArrowRepeatCount | offBeatStepCount | tripleStepCount | mineCount | burstVariation ", tsvLines);
+      console.log("Analysis: title | targetScore | totalSteps | doubleSteps | chainedDoubleSteps | avgBpm | maxBpm | stepWithHoldCount | sameArrowRepeatCount | offBeatStepCount | tripleStepCount | mineCount | burstVariation ", tsvLines)
       console.log(tsvLines.join('\n'))
     }
 
-    return musicData;
+    return musicData
   }
 
   static tokenizeCommon(content: string): string[] {
     // Remove https:// 
-    content = content.replace(/https?:\/\//g, '');
+    content = content.replace(/https?:\/\//g, '')
     // Remove single-line comments //
-    content = content.replace(/\/\/.*$/gm, '');
+    content = content.replace(/\/\/.*$/gm, '')
     // Remove multi-line comments /* */
-    content = content.replace(/\/\*[\s\S]*?\*\//g, '');
+    content = content.replace(/\/\*[\s\S]*?\*\//g, '')
 
     // Split the content into tokens using the # symbol
-    const tokenRegex = /#([\s\S]*?);/g;
-    const tokens: string[] = [];
+    const tokenRegex = /#([\s\S]*?);/g
+    const tokens: string[] = []
 
-    let match;
+    let match
     while ((match = tokenRegex.exec(content)) !== null) {
-      const innerToken = match[1].trim();
-      tokens.push(innerToken);
+      const innerToken = match[1].trim()
+      tokens.push(innerToken)
     }
 
     //console.log("Tokens:", tokens);
 
-    return tokens;
+    return tokens
   }
 
   static tokenizeSSC(content: string, isEscc: boolean = false): SscTokenMap {
-    const tokens = this.tokenizeCommon(content);
-    const tokenMap: SscTokenMap = {};
-    let currentNoteData: Record<string, string> | null = null;
-    let noteDataIndex = 0;
+    const tokens = this.tokenizeCommon(content)
+    const tokenMap: SscTokenMap = {}
+    let currentNoteData: Record<string, string> | null = null
+    let noteDataIndex = 0
 
     tokens.forEach(token => {
-      const [key, value] = token.split(/:(.*)/s);
-      const lowerKey = key.toLowerCase();
+      const [key, value] = token.split(/:(.*)/s)
+      const lowerKey = key.toLowerCase()
 
       if (lowerKey === 'notedata') {
-        currentNoteData = {};
-        noteDataIndex++;
-        tokenMap[`notedata${noteDataIndex}`] = currentNoteData;
+        currentNoteData = {}
+        noteDataIndex++
+        tokenMap[`notedata${noteDataIndex}`] = currentNoteData
       } else if (lowerKey === 'notes' && currentNoteData) {
-        const notes = isEscc ? value : SccReader.convertNotes(value);
-        currentNoteData[lowerKey] = notes;
-        currentNoteData = null;
+        const notes = isEscc ? value : SccReader.convertNotes(value)
+        currentNoteData[lowerKey] = notes
+        currentNoteData = null
       } else if (currentNoteData) {
-        currentNoteData[lowerKey] = value;
+        currentNoteData[lowerKey] = value
       } else {
-        tokenMap[lowerKey] = value;
+        tokenMap[lowerKey] = value
       }
-    });
+    })
 
-    console.log("Token Map:", tokenMap);
+    console.log("Token Map:", tokenMap)
 
-    return tokenMap;
+    return tokenMap
   }
 
   static tokenizeSM(content: string): SscTokenMap {
-    const tokens = this.tokenizeCommon(content);
-    const tokenMap: SscTokenMap = {};
-    let noteDataIndex = 0;
+    const tokens = this.tokenizeCommon(content)
+    const tokenMap: SscTokenMap = {}
+    let noteDataIndex = 0
     tokens.forEach(token => {
-      const [key, ...rest] = token.split(":");
-      const value = rest.join(":");
+      const [key, ...rest] = token.split(":")
+      const value = rest.join(":")
 
-      const lowerKey = key.toLowerCase();
+      const lowerKey = key.toLowerCase()
 
       if (lowerKey === 'notes') {
-        const lines = value.split(':').map(line => line.trim());
-        const currentNoteData: Record<string, string> = {};
-        noteDataIndex++;
-        currentNoteData['stepstype'] = lines[0];
-        currentNoteData['credits'] = lines[1];
-        currentNoteData['difficulty'] = lines[2];
-        currentNoteData['meter'] = lines[3];
-        currentNoteData['notes'] = SccReader.convertNotes(lines[5]);
+        const lines = value.split(':').map(line => line.trim())
+        const currentNoteData: Record<string, string> = {}
+        noteDataIndex++
+        currentNoteData['stepstype'] = lines[0]
+        currentNoteData['credits'] = lines[1]
+        currentNoteData['difficulty'] = lines[2]
+        currentNoteData['meter'] = lines[3]
+        currentNoteData['notes'] = SccReader.convertNotes(lines[5])
 
-        tokenMap[`notedata${noteDataIndex}`] = currentNoteData;
+        tokenMap[`notedata${noteDataIndex}`] = currentNoteData
 
       } else {
-        tokenMap[lowerKey] = value;
+        tokenMap[lowerKey] = value
       }
-    });
+    })
 
-    console.log("Token Map:", tokenMap);
+    console.log("Token Map:", tokenMap)
 
-    return tokenMap;
+    return tokenMap
   }
 
   /**
@@ -147,107 +147,107 @@ export class SccReader {
     return token.split('').map(char => {
       switch (char) {
         case 'M':
-          return '5';
+          return '5'
         case 'N':
-          return '6';
+          return '6'
         case 'F':
-          return '7';
+          return '7'
         case 'H':
-          return '8';
+          return '8'
         default:
           if (/[A-Za-z]/.test(char)) {
-            return '0';
+            return '0'
           }
-          return char;
+          return char
       }
-    }).join('');
+    }).join('')
   }
 
-  static extractBasicMetadataFromSSC(content: string): { title?: string; artist?: string; jacket?: string; bpms?: BpmChange[] } {
-    const tokens = SccReader.tokenizeCommon(content);
-    const result: { title?: string; artist?: string; jacket?: string, bpms?: BpmChange[] } = {};
+  static extractBasicMetadataFromSSC(content: string): { title?: string, artist?: string, jacket?: string, bpms?: BpmChange[] } {
+    const tokens = SccReader.tokenizeCommon(content)
+    const result: { title?: string, artist?: string, jacket?: string, bpms?: BpmChange[] } = {}
 
     for (const token of tokens) {
-      const [rawKey, rawValue] = token.split(/:(.*)/s);
-      const key = rawKey.toLowerCase().trim();
-      const value = rawValue?.trim();
+      const [rawKey, rawValue] = token.split(/:(.*)/s)
+      const key = rawKey.toLowerCase().trim()
+      const value = rawValue?.trim()
 
       if (key === 'title' || key === 'artist' || key === 'jacket') {
-        result[key] = value;
+        result[key] = value
       }
 
       if (key === 'bpms') {
         result.bpms = value.split(',').map((v: string) => {
-          const [time, bpm] = v.split('=');
-          return { time: parseFloat(time), value: parseFloat(bpm) };
-        });
+          const [time, bpm] = v.split('=')
+          return { time: parseFloat(time), value: parseFloat(bpm) }
+        })
       }
 
       if (result.title && result.artist && result.jacket) {
-        return result;
+        return result
       }
     }
 
-    return result;
+    return result
   }
 
 }
 
 export class SccWriter {
   static getOrderedFields(dto: object): [string, unknown][] {
-    return Object.entries(dto);
+    return Object.entries(dto)
   }
 
   static writeSscFile(dto: MusicDto): string {
-    let esscContent = '';
-    const fileFields = SccWriter.getOrderedFields(dto).filter(([key]) => key !== 'noteData' && key !== 'additionalFields');
+    let esscContent = ''
+    const fileFields = SccWriter.getOrderedFields(dto).filter(([key]) => key !== 'noteData' && key !== 'additionalFields')
     for (const [key, value] of fileFields) {
-      esscContent += `#${key.toUpperCase()}:`;
-      esscContent += this.writeEsscValue(value);
-      esscContent += ';\n';
+      esscContent += `#${key.toUpperCase()}:`
+      esscContent += this.writeEsscValue(value)
+      esscContent += ';\n'
     }
-    esscContent += '\n';
+    esscContent += '\n'
 
     let count = 0
     for (const noteData of dto.noteData) {
-      esscContent += `//--------------- Dance ${count} / ${dto.noteData.length} ----------------\n#NOTEDATA:;\n`;
+      esscContent += `//--------------- Dance ${count} / ${dto.noteData.length} ----------------\n#NOTEDATA:;\n`
       for (const [subKey, subValue] of Object.entries(noteData).filter(([key]) => key !== 'stepChart')) {
-        esscContent += `#${subKey.toUpperCase()}:`;
-        esscContent += this.writeEsscValue(subValue);
-        esscContent += `;\n`;
+        esscContent += `#${subKey.toUpperCase()}:`
+        esscContent += this.writeEsscValue(subValue)
+        esscContent += `;\n`
       }
-      esscContent += `#NOTES:\n`;
-      esscContent += noteData.stepChart.map((measure: Measures) => measure.steps.map(row => row.join('')).join('\n')).join('\n,\n');
-      esscContent += `\n;\n\n`;
-      count++;
+      esscContent += `#NOTES:\n`
+      esscContent += noteData.stepChart.map((measure: Measures) => measure.steps.map(row => row.join('')).join('\n')).join('\n,\n')
+      esscContent += `\n;\n\n`
+      count++
     }
     return esscContent
   }
 
   private static writeEsscValue(value: unknown): string {
     if (value === undefined || value === null)
-      return '';
+      return ''
     if (Array.isArray(value) && value[0]) {
-      return value.map((v: ITimedChange) => v.time.toFixed(3) + '=' + v.value).join(',');
+      return value.map((v: ITimedChange) => v.time.toFixed(3) + '=' + v.value).join(',')
     }
 
     if (value instanceof Date) {
-      return value.toISOString().split('T')[0];
+      return value.toISOString().split('T')[0]
     }
 
-    return String(value);
+    return String(value)
   }
 }
 
 export function SanitizeSscInput(input: string | null): string | null {
-  if (!input || input.trim() === "") return null;
+  if (!input || input.trim() === "") return null
 
   // Remove http:// or https://
-  input = input.replace(/^https?:\/\//i, "");
+  input = input.replace(/^https?:\/\//i, "")
   // Remove all remaining // in the string
-  input = input.replace(/\/{2,}/g, "/");
+  input = input.replace(/\/{2,}/g, "/")
   // Replace ; with ,
-  input = input.replace(/;/g, ",");
+  input = input.replace(/;/g, ",")
 
-  return input;
+  return input
 }

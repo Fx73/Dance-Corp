@@ -1,18 +1,18 @@
 export interface ITimedChange {
-    time: number;              // Beat
-    value: string | number;    // Payload
+    time: number              // Beat
+    value: string | number    // Payload
 }
 
 /* -----------------------------------------
  * BPM Change
  * ----------------------------------------- */
 export class BpmChange implements ITimedChange {
-    time: number = 0;          // Beat
-    value: number = 120;       // BPM
+    time: number = 0          // Beat
+    value: number = 120       // BPM
 
     constructor(time: number, bpm: number) {
-        this.time = time;
-        this.value = bpm;
+        this.time = time
+        this.value = bpm
     }
 }
 
@@ -20,12 +20,12 @@ export class BpmChange implements ITimedChange {
  * STOP Change
  * ----------------------------------------- */
 export class StopChange implements ITimedChange {
-    time: number = 0;          // Beat
-    value: number = 0;         // Duration in seconds
+    time: number = 0          // Beat
+    value: number = 0         // Duration in seconds
 
     constructor(time: number, duration: number) {
-        this.time = time;
-        this.value = duration;
+        this.time = time
+        this.value = duration
     }
 }
 
@@ -33,12 +33,12 @@ export class StopChange implements ITimedChange {
  * WARP Change (skip beats)
  * ----------------------------------------- */
 export class WarpChange implements ITimedChange {
-    time: number = 0;          // Beat where warp starts
-    value: number = 0;         // Number of beats to skip
+    time: number = 0          // Beat where warp starts
+    value: number = 0         // Number of beats to skip
 
     constructor(time: number, beatsToSkip: number) {
-        this.time = time;
-        this.value = beatsToSkip;
+        this.time = time
+        this.value = beatsToSkip
     }
 }
 
@@ -46,12 +46,12 @@ export class WarpChange implements ITimedChange {
  * SPEED Change (visual only, scroll speed)
  * ----------------------------------------- */
 export class SpeedChange implements ITimedChange {
-    time: number = 0;      // Beat
-    value: number = 1.0;   // Speed multiplier
+    time: number = 0      // Beat
+    value: number = 1.0   // Speed multiplier
 
     constructor(time: number, multiplier: number) {
-        this.time = time;
-        this.value = multiplier;
+        this.time = time
+        this.value = multiplier
     }
 }
 
@@ -59,12 +59,12 @@ export class SpeedChange implements ITimedChange {
  * SCROLL Change (visual only, scroll spacing)
  * ----------------------------------------- */
 export class ScrollChange implements ITimedChange {
-    time: number = 0;      // Beat
-    value: number = 1.0;   // Scroll factor
+    time: number = 0      // Beat
+    value: number = 1.0   // Scroll factor
 
     constructor(time: number, factor: number) {
-        this.time = time;
-        this.value = factor;
+        this.time = time
+        this.value = factor
     }
 }
 
@@ -72,12 +72,12 @@ export class ScrollChange implements ITimedChange {
  * LABEL Change
  * ----------------------------------------- */
 export class LabelChange implements ITimedChange {
-    time: number = 0;          // Beat
-    value: string = "";        // Label text
+    time: number = 0          // Beat
+    value: string = ""        // Label text
 
     constructor(time: number, label: string) {
-        this.time = time;
-        this.value = label;
+        this.time = time
+        this.value = label
     }
 }
 
@@ -85,11 +85,11 @@ export class LabelChange implements ITimedChange {
  * BACKGROUND Change
  * ----------------------------------------- */
 export class BackgroundChange implements ITimedChange {
-    time: number = 0;          // Beat
-    value: string = "";        // Path or identifier
+    time: number = 0          // Beat
+    value: string = ""        // Path or identifier
 
     constructor(time: number, path: string) {
-        this.time = time;
-        this.value = path;
+        this.time = time
+        this.value = path
     }
 }

@@ -1,6 +1,6 @@
-import { BaseDirectory, readFile } from '@tauri-apps/plugin-fs';
-import { Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core';
-import { IMusicPlayer, MusicPlayerCommon } from '../IMusicPlayer';
+import { BaseDirectory, readFile } from '@tauri-apps/plugin-fs'
+import { Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core'
+import { IMusicPlayer, MusicPlayerCommon } from '../IMusicPlayer'
 
 @Component({
   selector: 'app-music-player-local',
@@ -11,98 +11,98 @@ import { IMusicPlayer, MusicPlayerCommon } from '../IMusicPlayer';
 })
 export class MusicPlayerLocalComponent extends MusicPlayerCommon implements IMusicPlayer, OnInit {
 
-  @Input() musicUrl!: string;
-  @Input() startOffset?: number;
-  @Output() ready: EventEmitter<IMusicPlayer> = new EventEmitter();
-  private audio!: HTMLAudioElement;
+  @Input() musicUrl!: string
+  @Input() startOffset?: number
+  @Output() ready: EventEmitter<IMusicPlayer> = new EventEmitter()
+  private audio!: HTMLAudioElement
 
-  isPlaying = false;
-  currentTime = signal(0);
-  duration = signal(0);
+  isPlaying = false
+  currentTime = signal(0)
+  duration = signal(0)
 
   constructor() {
-    super();
+    super()
   }
 
   async ngOnInit(): Promise<void> {
-    const url = this.musicUrl.replace("local:", "");
-    const localUri = await this.createMusicUri(url);
-    console.log("Created local music URI:", localUri);
-    this.audio = new Audio();
-    this.audio.src = localUri;
-    this.audio.volume = this.getVolume();
-    this.audio.preload = 'auto';
+    const url = this.musicUrl.replace("local:", "")
+    const localUri = await this.createMusicUri(url)
+    console.log("Created local music URI:", localUri)
+    this.audio = new Audio()
+    this.audio.src = localUri
+    this.audio.volume = this.getVolume()
+    this.audio.preload = 'auto'
     
     if (this.startOffset)
-      this.audio.currentTime = this.startOffset;
+      this.audio.currentTime = this.startOffset
 
     this.audio.addEventListener('loadedmetadata', () => {
-      this.duration.set(this.audio.duration);
-    });
+      this.duration.set(this.audio.duration)
+    })
 
     this.audio.addEventListener('timeupdate', () => {
-      this.currentTime.set(this.audio.currentTime);
-    });
+      this.currentTime.set(this.audio.currentTime)
+    })
 
     this.audio.addEventListener('canplaythrough', () => {
-      this.ready.emit(this);
-    });
+      this.ready.emit(this)
+    })
 
   }
 
   async createMusicUri(path: string): Promise<string> {
-    const mimeType = guessMimeType(path);
+    const mimeType = guessMimeType(path)
 
-    const bytes = await readFile(path, { baseDir: BaseDirectory.AppData });
-    const blob = new Blob([bytes], { type: mimeType });
-    return URL.createObjectURL(blob);
+    const bytes = await readFile(path, { baseDir: BaseDirectory.AppData })
+    const blob = new Blob([bytes], { type: mimeType })
+    return URL.createObjectURL(blob)
 
     function guessMimeType(path: string): string {
-      const ext = path.split('.').pop()?.toLowerCase();
+      const ext = path.split('.').pop()?.toLowerCase()
 
       switch (ext) {
-        case "mp3": return "audio/mpeg";
-        case "wav": return "audio/wav";
-        case "ogg": return "audio/ogg";
-        case "opus": return "audio/opus";
-        case "m4a": return "audio/mp4";
-        case "flac": return "audio/flac";
-        default: return "audio/*";
+        case "mp3": return "audio/mpeg"
+        case "wav": return "audio/wav"
+        case "ogg": return "audio/ogg"
+        case "opus": return "audio/opus"
+        case "m4a": return "audio/mp4"
+        case "flac": return "audio/flac"
+        default: return "audio/*"
       }
     }
   }
 
   play(): void {
-    this.audio.play();
-    this.isPlaying = true;
+    this.audio.play()
+    this.isPlaying = true
   }
 
   stop(): void {
-    this.audio.pause();
-    this.isPlaying = false;
+    this.audio.pause()
+    this.isPlaying = false
 
   }
 
   getCurrentTime(): number {
-    return (this.audio?.currentTime ?? 0) - (this.startOffset ?? 0);
+    return (this.audio?.currentTime ?? 0) - (this.startOffset ?? 0)
   }
 
   getDuration(): number {
-    return (this.audio?.duration ?? 0) - (this.startOffset ?? 0);
+    return (this.audio?.duration ?? 0) - (this.startOffset ?? 0)
   }
 
   setToTime(time: number): void {
-    this.audio.currentTime = time + (this.startOffset ?? 0);
+    this.audio.currentTime = time + (this.startOffset ?? 0)
   }
 
   onSeekInput(event: Event): void {
-    this.setToTime(Number((event.target as HTMLInputElement).value));
+    this.setToTime(Number((event.target as HTMLInputElement).value))
   }
 
   formatTime(sec: number): string {
-    if (!sec) return '0:00';
-    const m = Math.floor(sec / 60);
-    const s = Math.floor(sec % 60).toString().padStart(2, '0');
-    return `${m}:${s}`;
+    if (!sec) return '0:00'
+    const m = Math.floor(sec / 60)
+    const s = Math.floor(sec % 60).toString().padStart(2, '0')
+    return `${m}:${s}`
   }
 }

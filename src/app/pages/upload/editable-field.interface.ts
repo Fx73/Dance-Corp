@@ -1,11 +1,11 @@
-import { ElementRef, InjectionToken } from "@angular/core";
+import { ElementRef, InjectionToken } from "@angular/core"
 
 export interface IMusicEditableField {
-    elementRef: ElementRef;
+    elementRef: ElementRef
 
-    label: string;
-    type: 'string' | 'number';
-    isDirty: boolean;
+    label: string
+    type: 'string' | 'number'
+    isDirty: boolean
 }
 
-export const MUSIC_EDITABLE_FIELD_TOKEN: InjectionToken<IMusicEditableField> = new InjectionToken('MUSIC_EDITABLE_FIELD_TOKEN');
+export const MUSIC_EDITABLE_FIELD_TOKEN: InjectionToken<IMusicEditableField> = new InjectionToken('MUSIC_EDITABLE_FIELD_TOKEN')

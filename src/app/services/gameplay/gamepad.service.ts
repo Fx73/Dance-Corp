@@ -1,51 +1,51 @@
-import { Injectable, NgZone, inject } from '@angular/core';
+import { Injectable, NgZone, inject } from '@angular/core'
 
-import { AppComponent } from 'src/app/app.component';
-import { UserConfigService } from '../userconfig.service';
+import { AppComponent } from 'src/app/app.component'
+import { UserConfigService } from '../userconfig.service'
 
 @Injectable({
     providedIn: 'root',
 })
 export class GamepadService {
-    private userConfigService = inject(UserConfigService);
-    private ngZone = inject(NgZone);
+    private userConfigService = inject(UserConfigService)
+    private ngZone = inject(NgZone)
 
-    private gamepads: IGamepadReference[] = [];
+    private gamepads: IGamepadReference[] = []
 
     constructor() {
         this.gamepads = [{ index: -1, id: "Keyboard" }]
 
-        this.onGamepadConnect = this.onGamepadConnect.bind(this);
-        this.onGamepadDisconnect = this.onGamepadDisconnect.bind(this);
-        window.addEventListener("gamepadconnected", this.onGamepadConnect);
-        window.addEventListener("gamepaddisconnected", this.onGamepadDisconnect);
+        this.onGamepadConnect = this.onGamepadConnect.bind(this)
+        this.onGamepadDisconnect = this.onGamepadDisconnect.bind(this)
+        window.addEventListener("gamepadconnected", this.onGamepadConnect)
+        window.addEventListener("gamepaddisconnected", this.onGamepadDisconnect)
     }
 
     onGamepadConnect(event: GamepadEvent) {
-        const gamepad = event.gamepad;
-        console.log('Gamepad connected : ' + gamepad.id);
+        const gamepad = event.gamepad
+        console.log('Gamepad connected : ' + gamepad.id)
         this.gamepads.push(gamepad)
 
-        const assignedIndex = this.userConfigService.players.findIndex(player => player.gamepad?.id === gamepad.id);
-        const assignedPlayer = this.userConfigService.players[assignedIndex];
+        const assignedIndex = this.userConfigService.players.findIndex(player => player.gamepad?.id === gamepad.id)
+        const assignedPlayer = this.userConfigService.players[assignedIndex]
         if (assignedPlayer) {
-            this.userConfigService.updatePlayer('gamepad', assignedIndex, { index: gamepad.index, id: gamepad.id });
+            this.userConfigService.updatePlayer('gamepad', assignedIndex, { index: gamepad.index, id: gamepad.id })
             AppComponent.presentOkToast(`Reassigning to player ${assignedPlayer.name} gamepad ${gamepad.id} `)
         }
     }
 
     onGamepadDisconnect(event: GamepadEvent) {
-        console.log('Gamepad disconnected : ' + event.gamepad.id);
-        this.gamepads = this.gamepads.filter(g => g.id !== event.gamepad.id);
+        console.log('Gamepad disconnected : ' + event.gamepad.id)
+        this.gamepads = this.gamepads.filter(g => g.id !== event.gamepad.id)
     }
 
     getGamepads(): IGamepadReference[] {
-        return this.gamepads;
+        return this.gamepads
     }
 
 }
 
 export interface IGamepadReference {
-    index: number | null;
-    id: string;
+    index: number | null
+    id: string
 }

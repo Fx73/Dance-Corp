@@ -1,5 +1,5 @@
-import { ArrowDirection } from "src/app/game/constants/arrow-direction.enum";
-import { CONFIG } from "../constants/game-config";
+import { ArrowDirection } from "src/app/game/constants/arrow-direction.enum"
+import { CONFIG } from "../constants/game-config"
 
 export enum ArrowColor {
     Orange = 0,
@@ -11,65 +11,65 @@ export enum ArrowColor {
 export class ArrowImageManager {
     private static _ARROW_SIZE = 80 //px
     public static get ARROW_SIZE(): number {
-        return this._ARROW_SIZE;
+        return this._ARROW_SIZE
     }
     private static _HOLD_PRELOAD_PRECISION = 4 // part of beat
 
-    private static arrowImages: HTMLCanvasElement[][] = [];
-    private static holdImages: HTMLCanvasElement[] = [];
-    private static mineImage: HTMLCanvasElement;
+    private static arrowImages: HTMLCanvasElement[][] = []
+    private static holdImages: HTMLCanvasElement[] = []
+    private static mineImage: HTMLCanvasElement
 
     public static getArrowImage(color: ArrowColor, direction: ArrowDirection): HTMLCanvasElement {
-        return ArrowImageManager.arrowImages[color][direction];
+        return ArrowImageManager.arrowImages[color][direction]
     }
 
     public static getHoldForDistance(distance: number): HTMLCanvasElement {
-        const interval = CONFIG.DISPLAY.BEAT_INTERVAL / this._HOLD_PRELOAD_PRECISION;
-        const closestIndex = Math.min(Math.round(distance / interval), ArrowImageManager.holdImages.length);
+        const interval = CONFIG.DISPLAY.BEAT_INTERVAL / this._HOLD_PRELOAD_PRECISION
+        const closestIndex = Math.min(Math.round(distance / interval), ArrowImageManager.holdImages.length)
         return ArrowImageManager.holdImages[closestIndex]
     }
 
     public static getMineImage(): HTMLCanvasElement {
-        return ArrowImageManager.mineImage;
+        return ArrowImageManager.mineImage
     }
 
     public static setArrowSize(size: number) {
-        this._ARROW_SIZE = size;
+        this._ARROW_SIZE = size
         CONFIG.DISPLAY.BEAT_INTERVAL = size * 1.2
         this.loadImages()
     }
     static { }
     public static loadImages() {
-        const baseArrowImage = new Image();
-        baseArrowImage.src = "assets/Arrow/Arrow.png";
+        const baseArrowImage = new Image()
+        baseArrowImage.src = "assets/Arrow/Arrow.png"
         baseArrowImage.onload = () => {
-            ArrowImageManager.preloadArrowImages(baseArrowImage);
-        };
+            ArrowImageManager.preloadArrowImages(baseArrowImage)
+        }
 
-        const holdCenterImage = new Image();
-        holdCenterImage.src = "assets/Arrow/HoldCenter.png";
+        const holdCenterImage = new Image()
+        holdCenterImage.src = "assets/Arrow/HoldCenter.png"
 
-        const holdCapImage = new Image();
-        holdCapImage.src = "assets/Arrow/HoldBottomCap.png";
+        const holdCapImage = new Image()
+        holdCapImage.src = "assets/Arrow/HoldBottomCap.png"
 
-        const mineImage = new Image();
-        mineImage.src = "assets/Arrow/Mine.png";
+        const mineImage = new Image()
+        mineImage.src = "assets/Arrow/Mine.png"
         mineImage.onload = () => {
-            ArrowImageManager.mineImage = this.createResizedImage(mineImage);
+            ArrowImageManager.mineImage = this.createResizedImage(mineImage)
         }
 
         Promise.all([
-            new Promise<void>((resolve) => { holdCenterImage.onload = () => resolve(); }),
-            new Promise<void>((resolve) => { holdCapImage.onload = () => resolve(); }),
+            new Promise<void>((resolve) => { holdCenterImage.onload = () => resolve() }),
+            new Promise<void>((resolve) => { holdCapImage.onload = () => resolve() }),
         ]).then(() => {
-            this.preloadHoldImages(holdCenterImage, holdCapImage);
-        });
+            this.preloadHoldImages(holdCenterImage, holdCapImage)
+        })
 
     }
 
     public static preloadHoldImages(centerImage: HTMLImageElement, capImage: HTMLImageElement) {
-        const interval = CONFIG.DISPLAY.BEAT_INTERVAL / ArrowImageManager._HOLD_PRELOAD_PRECISION;
-        const maxMultiplier = ArrowImageManager._HOLD_PRELOAD_PRECISION * 20; // Preload up to 20 beats of hold images
+        const interval = CONFIG.DISPLAY.BEAT_INTERVAL / ArrowImageManager._HOLD_PRELOAD_PRECISION
+        const maxMultiplier = ArrowImageManager._HOLD_PRELOAD_PRECISION * 20 // Preload up to 20 beats of hold images
         for (let multiplier = 0; multiplier <= maxMultiplier; multiplier++) {
             const img = ArrowImageManager.preloadHoldImage(centerImage, capImage, multiplier * interval)
             this.holdImages.push(img)
@@ -77,43 +77,43 @@ export class ArrowImageManager {
     }
 
     private static preloadHoldImage(centerImage: HTMLImageElement, capImage: HTMLImageElement, height: number): HTMLCanvasElement {
-        const canvas = document.createElement('canvas');
-        canvas.width = this.ARROW_SIZE;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d')!;
-        let y = 0;
+        const canvas = document.createElement('canvas')
+        canvas.width = this.ARROW_SIZE
+        canvas.height = height
+        const ctx = canvas.getContext('2d')!
+        let y = 0
 
         // Draw the center images
         while (y + centerImage.height <= height - capImage.height) {
-            ctx.drawImage(centerImage, 0, y, canvas.width, centerImage.height);
-            y += centerImage.height;
+            ctx.drawImage(centerImage, 0, y, canvas.width, centerImage.height)
+            y += centerImage.height
         }
 
         // Adjust last center image to fit the remaining space
-        const remainingHeight = height - capImage.height - y;
+        const remainingHeight = height - capImage.height - y
         if (remainingHeight > 0) {
-            ctx.drawImage(centerImage, 0, y, canvas.width, remainingHeight);
-            y += remainingHeight;
+            ctx.drawImage(centerImage, 0, y, canvas.width, remainingHeight)
+            y += remainingHeight
         }
         // Draw the bottom cap image
-        ctx.drawImage(capImage, 0, y, canvas.width, capImage.height);
+        ctx.drawImage(capImage, 0, y, canvas.width, capImage.height)
         return canvas
     }
 
     private static preloadArrowImages(arrowImage: HTMLImageElement): void {
         // Loop through each color
-        const colors = ['#FFA500', '#0000FF', '#FFFF00', '#8A2BE2']; // Orange, Blue, Yellow, Violet
+        const colors = ['#FFA500', '#0000FF', '#FFFF00', '#8A2BE2'] // Orange, Blue, Yellow, Violet
         for (const color of colors) {
             const arrowImgRow: HTMLCanvasElement[] = []
 
             // Create the grayscale base arrow for rotations
-            const baseUp = ArrowImageManager.createColorizedImage(arrowImage, color);
+            const baseUp = ArrowImageManager.createColorizedImage(arrowImage, color)
 
             // Generate rotated images for each direction
-            arrowImgRow[ArrowDirection.Left] = this.createRotatedImage(baseUp, Math.PI / 4); // Rotate 45° (Left)
-            arrowImgRow[ArrowDirection.Down] = this.createRotatedImage(baseUp, -Math.PI / 4); // Rotate -45° (Down)
-            arrowImgRow[ArrowDirection.Up] = this.createRotatedImage(baseUp, (3 * Math.PI) / 4); // Rotate 135° (Up)
-            arrowImgRow[ArrowDirection.Right] = this.createRotatedImage(baseUp, (-3 * Math.PI) / 4); // Rotate -135° (Right)      
+            arrowImgRow[ArrowDirection.Left] = this.createRotatedImage(baseUp, Math.PI / 4) // Rotate 45° (Left)
+            arrowImgRow[ArrowDirection.Down] = this.createRotatedImage(baseUp, -Math.PI / 4) // Rotate -45° (Down)
+            arrowImgRow[ArrowDirection.Up] = this.createRotatedImage(baseUp, (3 * Math.PI) / 4) // Rotate 135° (Up)
+            arrowImgRow[ArrowDirection.Right] = this.createRotatedImage(baseUp, (-3 * Math.PI) / 4) // Rotate -135° (Right)      
 
             this.arrowImages.push(arrowImgRow)
         }
@@ -125,68 +125,68 @@ export class ArrowImageManager {
         color: string,
         luminanceBoost: number = 3
     ): HTMLCanvasElement {
-        const canvas = document.createElement('canvas');
-        canvas.width = baseImage.width;
-        canvas.height = baseImage.height;
-        const ctx = canvas.getContext('2d')!;
+        const canvas = document.createElement('canvas')
+        canvas.width = baseImage.width
+        canvas.height = baseImage.height
+        const ctx = canvas.getContext('2d')!
 
         // Draw the original grayscale image onto the canvas
-        ctx.drawImage(baseImage, 0, 0, canvas.width, canvas.height);
+        ctx.drawImage(baseImage, 0, 0, canvas.width, canvas.height)
 
         // Retrieve image data
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const data = imageData.data;
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+        const data = imageData.data
 
         // Extract the target color's RGB components
-        const targetRed = parseInt(color.slice(1, 3), 16);
-        const targetGreen = parseInt(color.slice(3, 5), 16);
-        const targetBlue = parseInt(color.slice(5, 7), 16);
+        const targetRed = parseInt(color.slice(1, 3), 16)
+        const targetGreen = parseInt(color.slice(3, 5), 16)
+        const targetBlue = parseInt(color.slice(5, 7), 16)
 
         // Loop through each pixel and apply brightened color tint based on grayscale intensity
         for (let i = 0; i < data.length; i += 4) {
-            const gray = data[i]; // Grayscale value
+            const gray = data[i] // Grayscale value
 
             // Boost luminance to brighten the colors
-            const adjustedGray = Math.min(255, gray * luminanceBoost);
+            const adjustedGray = Math.min(255, gray * luminanceBoost)
 
             // Scale the target color by the boosted grayscale intensity
-            data[i] = (adjustedGray / 255) * targetRed; // Red channel
-            data[i + 1] = (adjustedGray / 255) * targetGreen; // Green channel
-            data[i + 2] = (adjustedGray / 255) * targetBlue; // Blue channel
+            data[i] = (adjustedGray / 255) * targetRed // Red channel
+            data[i + 1] = (adjustedGray / 255) * targetGreen // Green channel
+            data[i + 2] = (adjustedGray / 255) * targetBlue // Blue channel
             // Alpha channel remains unchanged
         }
 
         // Put the modified image data back onto the canvas
-        ctx.putImageData(imageData, 0, 0);
+        ctx.putImageData(imageData, 0, 0)
 
-        return canvas;
+        return canvas
     }
 
     private static createResizedImage(image: HTMLCanvasElement | HTMLImageElement): HTMLCanvasElement {
-        const canvas = document.createElement('canvas');
-        canvas.width = this.ARROW_SIZE;
-        canvas.height = this.ARROW_SIZE;
-        const ctx = canvas.getContext('2d')!;
-        ctx.drawImage(image, 0, 0, this.ARROW_SIZE, this.ARROW_SIZE);
-        return canvas;
+        const canvas = document.createElement('canvas')
+        canvas.width = this.ARROW_SIZE
+        canvas.height = this.ARROW_SIZE
+        const ctx = canvas.getContext('2d')!
+        ctx.drawImage(image, 0, 0, this.ARROW_SIZE, this.ARROW_SIZE)
+        return canvas
     }
 
     private static createRotatedImage(image: HTMLCanvasElement, angle: number): HTMLCanvasElement {
-        const canvas = document.createElement('canvas');
-        canvas.width = this.ARROW_SIZE;
-        canvas.height = this.ARROW_SIZE;
+        const canvas = document.createElement('canvas')
+        canvas.width = this.ARROW_SIZE
+        canvas.height = this.ARROW_SIZE
 
-        const scaleFactor = this.ARROW_SIZE / Math.sqrt(2);
+        const scaleFactor = this.ARROW_SIZE / Math.sqrt(2)
 
-        const ctx = canvas.getContext('2d')!;
+        const ctx = canvas.getContext('2d')!
 
         // Apply rotation to the image
-        ctx.save();
-        ctx.translate(this.ARROW_SIZE / 2, this.ARROW_SIZE / 2);
-        ctx.rotate(angle);
-        ctx.drawImage(image, -scaleFactor / 2, -scaleFactor / 2, scaleFactor, scaleFactor);
-        ctx.restore();
+        ctx.save()
+        ctx.translate(this.ARROW_SIZE / 2, this.ARROW_SIZE / 2)
+        ctx.rotate(angle)
+        ctx.drawImage(image, -scaleFactor / 2, -scaleFactor / 2, scaleFactor, scaleFactor)
+        ctx.restore()
 
-        return canvas;
+        return canvas
     }
 }

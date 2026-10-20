@@ -1,11 +1,11 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { IonApp, IonRouterOutlet } from '@ionic/angular';
+import { Component, OnInit, inject } from '@angular/core'
+import { IonApp, IonRouterOutlet } from '@ionic/angular'
 
-import { AnnouncerService } from './services/gameplay/announcer.service';
-import { MusicCacheService } from './services/local-storage/music.cache.service';
-import { PresenceService } from './services/thirdpartyapp/presence.service';
-import { SoundService } from './services/gameplay/sound.service';
-import { ToastController } from '@ionic/angular';
+import { AnnouncerService } from './services/gameplay/announcer.service'
+import { MusicCacheService } from './services/local-storage/music.cache.service'
+import { PresenceService } from './services/thirdpartyapp/presence.service'
+import { SoundService } from './services/gameplay/sound.service'
+import { ToastController } from '@ionic/angular'
 
 @Component({
   selector: 'app-root',
@@ -14,20 +14,20 @@ import { ToastController } from '@ionic/angular';
   imports: [IonApp, IonRouterOutlet],
 })
 export class AppComponent implements OnInit {
-  private toastController = inject(ToastController);
-  private presenceService = inject(PresenceService);
-  private musicCacheService = inject(MusicCacheService);
+  private toastController = inject(ToastController)
+  private presenceService = inject(PresenceService)
+  private musicCacheService = inject(MusicCacheService)
 
-  static appInstance: AppComponent;
+  static appInstance: AppComponent
 
   constructor() {
-    const announcerService = inject(AnnouncerService);
-    const soundService = inject(SoundService);
+    const announcerService = inject(AnnouncerService)
+    const soundService = inject(SoundService)
 
-    AppComponent.appInstance = this;
-    announcerService.init();
+    AppComponent.appInstance = this
+    announcerService.init()
 
-    document.addEventListener('click', () => soundService.initBackgroundMusic(), { once: true });
+    document.addEventListener('click', () => soundService.initBackgroundMusic(), { once: true })
   }
 
   ngOnInit() {
@@ -41,8 +41,8 @@ export class AppComponent implements OnInit {
       message: message,
       duration: 6000,
       color: 'success'
-    });
-    toast.present();
+    })
+    toast.present()
   }
 
   async presentWarningToast(message: string) {
@@ -50,8 +50,8 @@ export class AppComponent implements OnInit {
       message: message,
       duration: 6000,
       color: 'warning'
-    });
-    toast.present();
+    })
+    toast.present()
   }
 
   async presentErrorToast(message: string) {
@@ -59,8 +59,8 @@ export class AppComponent implements OnInit {
       message: message,
       duration: 6000,
       color: 'danger'
-    });
-    toast.present();
+    })
+    toast.present()
   }
   //#endregion
 
