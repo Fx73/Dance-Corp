@@ -75,7 +75,9 @@ Bugs found but not fixed yet, and deprecations to migrate. Remove an entry once 
 
 ## Code style to harmonize
 
-- **Semicolons**: about 15% of statements have none. Always end statements with a semicolon.
+- **Semicolons**: about 85% of statements end with one, while the target style is semicolon-free. Convert with `@stylistic/eslint-plugin` (`semi: ['error', 'never']`, auto-fixable) and enable `no-unexpected-multiline` to catch lines that would be joined to the previous one.
+- **Class member order**: most classes put `inject()` fields before the `Constants` region, and static methods are not grouped at the bottom (`MusicDto.fromJSON`, toasts in `AppComponent`). Reorder to: Constants region, `inject()` fields, the rest, `Statics` region.
+- **Braceless loops**: 4 `for` / `while` without braces (e.g. `game.manager.ts`). Loops always take braces.
 - **Blank lines**: runs of 3–4 empty lines between methods. Use a single blank line.
 - **Method naming**: some methods are PascalCase (`EndFail`, `EndVictory`, `GetAllMusics`, `TestNote`, `GetPlayerStatus`, `InitBackgroundMusic`, `StartBackgroundMusic`, `PauseBackgroundMusic`). Use camelCase.
 - **Region markers**: `//#region` / `//#endregion` mostly, but `//#Region` / `//#EndRegion` in `game.manager.ts`. Use the lowercase form.
