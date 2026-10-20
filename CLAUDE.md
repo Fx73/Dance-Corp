@@ -63,15 +63,23 @@ Write new code the way the existing code is written. Known deviations to avoid a
 
 ### Branches
 
+- `master`: released versions only. Protected; updated only by merging `dev` through a pull request.
+- `dev`: integration branch. Feature branches start from `dev` and are merged back into `dev` through a pull request.
 - New features must always be developed on a dedicated branch.
 - Bug fixes may be developed on a dedicated branch or directly on `dev`, depending on their scope and impact.
+
+### What Claude may do
+
+- Feature branches: commit and push freely, without asking.
+- `dev`: commit and push only when necessary, and only for bug fixes, one commit per fix. Never develop a feature directly on `dev`.
+- `master`: never commit or push.
 
 ### Commit Messages
 
 - Use concise commit messages focused on intent. Be technical when relevant, but do not just describe implementation details.
 - Standard abbreviations are encouraged (e.g. `UT`, `WIP`, `DB`).
 - Avoid describing every file-level or line-level change that is obvious from the diff.
-- On feature branches (any branch other than `master` and `dev`), do not hesitate to amend the latest commit when applying a small correction, omission, or adjustment directly related to that commit. (followed by `git push --force-with-lease`)
+- On feature branches (any branch other than `master` and `dev`), do not hesitate to amend the latest commit when applying a small correction, omission, or adjustment directly related to that commit, followed by `git push --force-with-lease`. Amending changes the commit hash: update the matching `Link:` in [Documentation/TO_VERIFY.md](Documentation/TO_VERIFY.md) if the commit has an entry there.
 
 ## Context Verification
 Every response must end with the hamster emoji: 🐹
