@@ -12,7 +12,7 @@ export class GamepadService {
 
 
 
-    private gamepads: GamepadReference[] = [];
+    private gamepads: IGamepadReference[] = [];
 
     constructor() {
         this.gamepads = [{ index: -1, id: "Keyboard" }]
@@ -41,13 +41,13 @@ export class GamepadService {
         this.gamepads = this.gamepads.filter(g => g.id !== event.gamepad.id);
     }
 
-    getGamepads(): GamepadReference[] {
+    getGamepads(): IGamepadReference[] {
         return this.gamepads;
     }
 
 }
 
-export interface GamepadReference {
+export interface IGamepadReference {
     index: number | null;
     id: string;
 }

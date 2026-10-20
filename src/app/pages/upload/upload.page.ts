@@ -15,7 +15,7 @@ import { AppComponent } from 'src/app/app.component';
 import { MusicPlayerLocalComponent } from "src/app/game/music-player/music-player-local/music-player-local.component";
 import { MusicFirestoreService } from 'src/app/services/firestore/music.firestore.service';
 import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.service';
-import { musicLocalService } from 'src/app/services/local-storage/local.music.service';
+import { MusicLocalService } from 'src/app/services/local-storage/local.music.service';
 import { MusicCacheService } from 'src/app/services/local-storage/music.cache.service';
 import { HeaderComponent } from 'src/app/shared/component/header/header.component';
 import { RadarScoreComponent } from "src/app/shared/component/radar-score/radar-score.component";
@@ -51,7 +51,7 @@ export class UploadPage {
   private route = inject(ActivatedRoute);
   private fireStoreService = inject(MusicFirestoreService);
   private userService = inject(UserFirestoreService);
-  private localMusicService = inject(musicLocalService);
+  private localMusicService = inject(MusicLocalService);
   private musicCacheService = inject(MusicCacheService);
   private cd = inject(ChangeDetectorRef);
   private location = inject(Location);

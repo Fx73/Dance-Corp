@@ -11,10 +11,10 @@ import { HeaderComponent } from "src/app/shared/component/header/header.componen
 import { MusicCacheService } from '../../services/local-storage/music.cache.service';
 import { PlayerDisplayComponent } from '../../game/game-display/player-display.component';
 import { RouterModule } from '@angular/router';
-import { SoundManager } from './../../services/gameplay/sound.service';
+import { SoundService } from './../../services/gameplay/sound.service';
 import { UserCacheService } from '../../services/local-storage/user.cache.service';
 import { UserConfig, UserConfigService } from 'src/app/services/userconfig.service';
-import { musicLocalService } from 'src/app/services/local-storage/local.music.service';
+import { MusicLocalService } from 'src/app/services/local-storage/local.music.service';
 
 @Component({
   selector: 'app-options',
@@ -25,10 +25,10 @@ import { musicLocalService } from 'src/app/services/local-storage/local.music.se
 })
 export class OptionsPage {
   private userConfigService = inject(UserConfigService);
-  private localMusicService = inject(musicLocalService);
+  private localMusicService = inject(MusicLocalService);
   private musicCacheService = inject(MusicCacheService);
   private userCacheService = inject(UserCacheService);
-  private soundManager = inject(SoundManager);
+  private soundService = inject(SoundService);
   private announcerService = inject(AnnouncerService);
 
   @ViewChild(PlayerDisplayComponent) playerDisplay?: PlayerDisplayComponent;
@@ -68,7 +68,7 @@ export class OptionsPage {
     console.log(`Testing volume for ${source} at ${volume}`);
     switch (source) {
       case 'menuMusicVolume':
-        this.soundManager.refreshMusicVolume();
+        this.soundService.refreshMusicVolume();
         break;
       case 'announcersVolume':
         this.announcerService.testAnnouncerSound();

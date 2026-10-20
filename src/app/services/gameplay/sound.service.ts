@@ -4,7 +4,7 @@ import { Injectable, inject } from "@angular/core";
 import { UserConfigService } from 'src/app/services/userconfig.service';
 
 @Injectable({ providedIn: 'root' })
-export class SoundManager {
+export class SoundService {
     //#region Constants
     readonly SOUND_BACKGROUND = new Audio('assets/Sounds/music/GGJ2024_Main.mp3');
     readonly SOUND_BACKGROUND2 = new Audio('assets/Sounds/music/GGJ2024_Main2.mp3');

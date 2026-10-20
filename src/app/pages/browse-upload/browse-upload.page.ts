@@ -10,7 +10,7 @@ import { PresenceService } from 'src/app/services/thirdpartyapp/presence.service
 import { Router } from '@angular/router';
 import { addCircleOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
-import { musicLocalService } from 'src/app/services/local-storage/local.music.service';
+import { MusicLocalService } from 'src/app/services/local-storage/local.music.service';
 
 @Component({
   selector: 'app-browse-upload',
@@ -22,7 +22,7 @@ import { musicLocalService } from 'src/app/services/local-storage/local.music.se
 export class BrowseUploadPage implements OnInit {
   private router = inject(Router);
   private musicCacheService = inject(MusicCacheService);
-  private localMusicService = inject(musicLocalService);
+  private localMusicService = inject(MusicLocalService);
   private discordRpcService = inject(PresenceService);
 
 

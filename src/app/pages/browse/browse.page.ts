@@ -19,7 +19,7 @@ import { MusicPlayerLocalComponent } from "src/app/game/music-player/music-playe
 import { MusicPlayerSoundcloudComponent } from "src/app/game/music-player/music-player-soundcloud/music-player-soundcloud.component";
 import { MusicPlayerYoutubeComponent } from "src/app/game/music-player/music-player-youtube/music-player-youtube.component";
 import { AnnouncerService } from 'src/app/services/gameplay/announcer.service';
-import { musicLocalService } from 'src/app/services/local-storage/local.music.service';
+import { MusicLocalService } from 'src/app/services/local-storage/local.music.service';
 import { UserCacheService } from 'src/app/services/local-storage/user.cache.service';
 import { UserConfigService } from 'src/app/services/userconfig.service';
 import { HeaderComponent } from "src/app/shared/component/header/header.component";
@@ -29,7 +29,7 @@ import { PresenceService } from '../../services/thirdpartyapp/presence.service';
 import { GradeComponent } from "../../shared/component/grade/grade.component";
 import { DifficultyCriteria } from '../upload/DifficultyCriteria';
 import { UserFirestoreService } from './../../services/firestore/user.firestore.service';
-import { SoundManager } from './../../services/gameplay/sound.service';
+import { SoundService } from './../../services/gameplay/sound.service';
 
 @Component({
   selector: 'app-browse',
@@ -50,14 +50,14 @@ export class BrowsePage implements OnInit {
 
   private router = inject(Router);
   private cd = inject(ChangeDetectorRef);
-  private localMusicService = inject(musicLocalService);
+  private localMusicService = inject(MusicLocalService);
   private musicCacheService = inject(MusicCacheService);
   private userFirestoreService = inject(UserFirestoreService);
   private userConfigService = inject(UserConfigService);
   private userCacheService = inject(UserCacheService);
   private announcerService = inject(AnnouncerService);
   private discordRpcService = inject(PresenceService);
-  private soundManager = inject(SoundManager);
+  private soundService = inject(SoundService);
 
   dbMusics = signal<MusicDto[]>([]);
   storedMusics = signal<MusicDto[]>([]);
@@ -194,7 +194,7 @@ export class BrowsePage implements OnInit {
 
     this.musicUserScore.set(this.userCacheService.getMusicStats(music.id));
 
-    this.soundManager.playSfx(this.SOUND_ARROW_UP);
+    this.soundService.playSfx(this.SOUND_ARROW_UP);
 
     setTimeout(() => {
       const el = this.musicCards.toArray()[listIndex]?.nativeElement;
@@ -205,7 +205,7 @@ export class BrowsePage implements OnInit {
   }
   onSelectNote(noteIdx: number, playerIndex: number = 0) {
     this.selectedNotesIndex()[playerIndex] = noteIdx;
-    this.soundManager.playSfx(this.SOUND_ARROW_DOWN);
+    this.soundService.playSfx(this.SOUND_ARROW_DOWN);
     this.cd.markForCheck();
   }
 

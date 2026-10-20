@@ -2,7 +2,7 @@ import { MusicDto, NoteDataDto } from "src/app/game/game-model/music.dto";
 
 import { Injectable, inject } from "@angular/core";
 import { AppComponent } from "src/app/app.component";
-import { musicLocalService } from 'src/app/services/local-storage/local.music.service';
+import { MusicLocalService } from 'src/app/services/local-storage/local.music.service';
 import { MusicFirestoreService } from "../firestore/music.firestore.service";
 
 @Injectable({ providedIn: 'root' })
@@ -14,7 +14,7 @@ export class MusicCacheService {
     //#endregion
 
     private musicFirestoreService = inject(MusicFirestoreService);
-    private localMusicService = inject(musicLocalService);
+    private localMusicService = inject(MusicLocalService);
 
     private registry: Set<string> = new Set();
 

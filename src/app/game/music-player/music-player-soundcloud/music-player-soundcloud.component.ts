@@ -11,7 +11,7 @@ import { IMusicPlayer, MusicPlayerCommon } from '../IMusicPlayer';
 //import { Soundcloud } from 'soundcloud.ts';
 
 /** Subset of the SoundCloud widget API in use (https://developers.soundcloud.com/docs/api/html5-widget) */
-interface SoundCloudWidget {
+interface ISoundCloudWidget {
   load(url: string): void;
   bind(eventName: string, listener: () => void): void;
   play(): void;
@@ -22,7 +22,7 @@ interface SoundCloudWidget {
 }
 
 declare const SC: {
-  Widget: ((iframe: HTMLIFrameElement) => SoundCloudWidget) & { Events: { READY: string } };
+  Widget: ((iframe: HTMLIFrameElement) => ISoundCloudWidget) & { Events: { READY: string } };
 };
 
 @Component({
@@ -41,7 +41,7 @@ export class MusicPlayerSoundcloudComponent extends MusicPlayerCommon
   @Output()
   ready: EventEmitter<IMusicPlayer> = new EventEmitter<IMusicPlayer>();
 
-  widgetSC!: SoundCloudWidget;
+  widgetSC!: ISoundCloudWidget;
 
 
 

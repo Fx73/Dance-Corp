@@ -2,7 +2,7 @@ import { Injectable, inject } from "@angular/core";
 import { UserConfigService } from "../userconfig.service";
 
 /** Content of the assets/Sounds/announcers/*.json files */
-interface SoundBank {
+interface ISoundBank {
     type: string;
     name: string;
     lines: Record<string, string[]>;
@@ -12,9 +12,9 @@ interface SoundBank {
 export class AnnouncerService {
     private userConfigService = inject(UserConfigService);
 
-    private announcers: SoundBank[] = [];
-    private crowd!: SoundBank;
-    private preferredAnnouncer?: SoundBank;
+    private announcers: ISoundBank[] = [];
+    private crowd!: ISoundBank;
+    private preferredAnnouncer?: ISoundBank;
     private lastAnnouncerLine: string | null = null;
     private failSatisfaction = 0;
     private goodSatisfaction = 0;
@@ -23,7 +23,7 @@ export class AnnouncerService {
 
     // --- CHANNELS ---
     private announcerAudio: HTMLAudioElement | null = null;
-    private announcerQueue: { announcer: SoundBank, line: string }[] = [];
+    private announcerQueue: { announcer: ISoundBank, line: string }[] = [];
     private isQueueBlocked: boolean = false;
 
     private crowdAudio: HTMLAudioElement | null = null
@@ -142,7 +142,7 @@ export class AnnouncerService {
         this.playAnnouncerDirect(announcer, line, this.processAnnouncerQueue.bind(this));
     }
 
-    private enqueueAnnouncerLine(announcer: SoundBank, line: string) {
+    private enqueueAnnouncerLine(announcer: ISoundBank, line: string) {
         this.lastAnnouncerLine = line;
         this.announcerQueue.push({ announcer, line });
         this.processAnnouncerQueue();
@@ -188,7 +188,7 @@ export class AnnouncerService {
     }
 
 
-    private playAnnouncerDirect(announcer: SoundBank, line: string, onEndCallback?: () => void) {
+    private playAnnouncerDirect(announcer: ISoundBank, line: string, onEndCallback?: () => void) {
         const src = `assets/Sounds/announcers/${announcer.name}/${line}.ogg`;
 
         this.announcerAudio = new Audio(src);

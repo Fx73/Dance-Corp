@@ -1,7 +1,7 @@
 import { ArrowDirection } from "src/app/game/constants/arrow-direction.enum";
 
 /** Serialized form of a Player (localStorage) */
-export interface PlayerJSON {
+export interface IPlayerJSON {
     name: string | undefined;
     userId: string | null;
     gamepad: { index: number | null, id: string } | undefined;
@@ -19,11 +19,11 @@ export class Player {
 
     constructor() {
         this.keyBindingGamepad = Player.defaultGamepadBinding();
-        this.keyBindingKeyboard = Player.defaultKeyboardbinding();
+        this.keyBindingKeyboard = Player.defaultKeyboardBinding();
     }
 
 
-    toJSON(): PlayerJSON {
+    toJSON(): IPlayerJSON {
         return {
             name: this.name,
             userId: this.userId,
@@ -34,7 +34,7 @@ export class Player {
     }
 
     //#region Statics
-    static fromJSON(json: PlayerJSON): Player {
+    static fromJSON(json: IPlayerJSON): Player {
         const player = new Player();
         player.userId = json.userId;
         player.gamepad = json.gamepad;
@@ -52,7 +52,7 @@ export class Player {
         ]);
     }
 
-    static defaultKeyboardbinding(): Map<string, ArrowDirection> {
+    static defaultKeyboardBinding(): Map<string, ArrowDirection> {
         return new Map<string, ArrowDirection>([
             ['ArrowLeft', ArrowDirection.Left],
             ['ArrowDown', ArrowDirection.Down],

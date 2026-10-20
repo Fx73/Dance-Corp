@@ -4,7 +4,7 @@ import { IonApp, IonRouterOutlet } from '@ionic/angular';
 import { AnnouncerService } from './services/gameplay/announcer.service';
 import { MusicCacheService } from './services/local-storage/music.cache.service';
 import { PresenceService } from './services/thirdpartyapp/presence.service';
-import { SoundManager } from './services/gameplay/sound.service';
+import { SoundService } from './services/gameplay/sound.service';
 import { ToastController } from '@ionic/angular';
 
 @Component({
@@ -22,12 +22,12 @@ export class AppComponent implements OnInit {
 
   constructor() {
     const announcerService = inject(AnnouncerService);
-    const soundManager = inject(SoundManager);
+    const soundService = inject(SoundService);
 
     AppComponent.appInstance = this;
     announcerService.init();
 
-    document.addEventListener('click', () => soundManager.initBackgroundMusic(), { once: true });
+    document.addEventListener('click', () => soundService.initBackgroundMusic(), { once: true });
   }
 
   ngOnInit() {
