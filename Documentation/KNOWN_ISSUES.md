@@ -78,7 +78,6 @@ Bugs found but not fixed yet, and deprecations to migrate. Remove an entry once 
 - **Semicolons**: about 85% of statements end with one, while the target style is semicolon-free. Convert with `@stylistic/eslint-plugin` (`semi: ['error', 'never']`, auto-fixable) and enable `no-unexpected-multiline` to catch lines that would be joined to the previous one.
 - **Class member order**: most classes put `inject()` fields before the `Constants` region, and static methods are not grouped at the bottom (`MusicDto.fromJSON`, toasts in `AppComponent`). Reorder to: Constants region, `inject()` fields, the rest, `Statics` region.
 - **Blank lines**: runs of 3–4 empty lines between methods. Use a single blank line.
-- **Method naming**: some methods are PascalCase (`EndFail`, `EndVictory`, `GetAllMusics`, `TestNote`, `GetPlayerStatus`, `InitBackgroundMusic`, `StartBackgroundMusic`, `PauseBackgroundMusic`). Use camelCase.
 - **Comment language**: comments mix French and English (13 files). Translate to English.
 - **Typos in comments**: `DDetermine` (`music.firestore.service.ts`), `exctract` (`upload.page.ts`).
 - **Magic numbers**: scoring and announcer values (`0.8`, `0.6`, `-4`, `-20`, `30`…) are inline while `CONFIG` exists. Move tunable gameplay values to `CONFIG`.

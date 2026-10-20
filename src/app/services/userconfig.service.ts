@@ -45,7 +45,7 @@ export class UserConfigService {
             }
         });
 
-        ArrowImageManager.Set_ARROW_SIZE(this.configSubject.value.canvasWidth / 4);
+        ArrowImageManager.setArrowSize(this.configSubject.value.canvasWidth / 4);
         this.isReady = true
     }
     instanciatePlayer(index: number): Player {

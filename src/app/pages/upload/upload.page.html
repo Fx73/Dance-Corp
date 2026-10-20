@@ -234,7 +234,7 @@
 							@if (isNoteMine(note) && isEditLocal()) {
 							<ion-card class="base-card btn-action-card">
 								<ion-card-content>
-									<!--ion-button (click)="TestNote(note)" color="tertiary" size="small" expand="block"> Test </ion-button-->
+									<!--ion-button (click)="testNote(note)" color="tertiary" size="small" expand="block"> Test </ion-button-->
 									@if(musicDataDb){
 									<ion-button (click)="uploadNote(note)" size="small" [color]="noteDb?'primary':'success'" expand="block" [disabled]="!notesDirty()[$index]"> {{ noteDb ? 'Update notes' : 'Upload notes'}}</ion-button>
 									}@else {

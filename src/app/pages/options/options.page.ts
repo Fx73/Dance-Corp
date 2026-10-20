@@ -85,7 +85,7 @@ export class OptionsPage {
   verifyDisplay(): void {
     console.log("Updating player display with current config...", this.showPlayerDisplay);
     this.showPlayerDisplay = true;
-    this.playerDisplay?.Update(0)
+    this.playerDisplay?.update(0)
   }
   getFakeGameRound(): GameRound {
     const arrowMap: Arrow[] = [

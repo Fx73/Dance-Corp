@@ -488,7 +488,7 @@ export class UploadPage {
     })
   }
 
-  async TestNote(note: NoteDataDto) {
+  async testNote(note: NoteDataDto) {
     const modal = await this.modalController.create({
       component: TestNoteComponent,
       componentProps: {

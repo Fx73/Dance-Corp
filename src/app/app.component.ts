@@ -27,7 +27,7 @@ export class AppComponent implements OnInit {
     AppComponent.appInstance = this;
     announcerService.init();
 
-    document.addEventListener('click', () => soundManager.InitBackgroundMusic(), { once: true });
+    document.addEventListener('click', () => soundManager.initBackgroundMusic(), { once: true });
   }
 
   ngOnInit() {

@@ -39,7 +39,7 @@ export class MusicCacheService {
     async updateCache() {
         const ts = parseInt(localStorage.getItem(this.MUSIC_REGISTRY_TS_KEY) || '0');
         if (ts === 0) {
-            this.musics = await this.musicFirestoreService.GetAllMusics()
+            this.musics = await this.musicFirestoreService.getAllMusics()
             for (const music of this.musics) {
                 localStorage.setItem(this.MUSIC_STORAGE_KEY(music.id), JSON.stringify(music));
                 this.registry.add(music.id);

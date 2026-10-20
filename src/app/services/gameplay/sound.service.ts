@@ -31,14 +31,14 @@ export class SoundManager {
       url.startsWith('/upload');
 
     if (shouldMute) {
-      this.PauseBackgroundMusic();
+      this.pauseBackgroundMusic();
     } else {
-      this.StartBackgroundMusic();
+      this.startBackgroundMusic();
     }
   }
 
 
-    InitBackgroundMusic() {
+    initBackgroundMusic() {
         this.router.events.subscribe(event => {
             if (event instanceof NavigationEnd) {
                 this.handleRouteChange(event.urlAfterRedirects);
@@ -47,14 +47,14 @@ export class SoundManager {
         this.handleRouteChange(this.router.url);
     }
 
-    StartBackgroundMusic() {
+    startBackgroundMusic() {
         if (this.isPlaying) return;
         this.isPlaying = true;
         this.fadeIn(this.SOUND_BACKGROUND, 4000);
 
     }
 
-    PauseBackgroundMusic() {
+    pauseBackgroundMusic() {
         if (!this.isPlaying) return;
         this.isPlaying = false;
         this.fadeOut(this.SOUND_BACKGROUND, 1000);

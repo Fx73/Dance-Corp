@@ -128,7 +128,7 @@ export class MusicFirestoreService {
     }
 
 
-    async GetAllMusics(): Promise<MusicDto[]> {
+    async getAllMusics(): Promise<MusicDto[]> {
         console.log("Querying complete database for music list. This should only happen once per session and will be cached for next calls.");
 
         const musicRef = collection(this.db, this.MUSIC_COLLECTION).withConverter(this.firestoreConverterMusic);;

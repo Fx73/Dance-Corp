@@ -68,7 +68,7 @@ export class PlayerSelectionPage {
     return this.userConfigService.players.every(player => player.gamepad?.id && player.gamepad.index !== null);
   }
 
-  GetPlayerStatus(): string {
+  getPlayerStatus(): string {
     const players = this.userConfigService.players;
 
     if (this.allPlayersReady) {

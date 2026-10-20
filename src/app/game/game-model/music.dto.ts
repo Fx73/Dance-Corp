@@ -202,7 +202,7 @@ export class NoteDataDto {
       measureInstance.steps = measure.trim().split('\n').map(line => line.trim().split('').map(step => parseInt(step)));
       return measureInstance;
     });
-    this.difficultyCriterias = tokenMap["difficultycriterias"] ? DifficultyCriteria.ParseCriteria(tokenMap["difficultycriterias"]) : undefined;
+    this.difficultyCriterias = tokenMap["difficultycriterias"] ? DifficultyCriteria.parseCriteria(tokenMap["difficultycriterias"]) : undefined;
 
   }
 

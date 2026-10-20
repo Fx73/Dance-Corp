@@ -113,14 +113,14 @@ export class GameRound {
         while (arrowMap[this.currentArrowIndex].isOut) {
             this.currentArrowIndex++
             if (this.currentArrowIndex >= arrowMap.length) {
-                this.EndVictory()
+                this.endVictory()
                 return
             }
         }
 
         //Check Fail
         if (this.performance <= 0) {
-            this.EndFail()
+            this.endFail()
             return
         }
     }
@@ -280,11 +280,11 @@ export class GameRound {
 
     }
 
-    EndFail() {
+    endFail() {
         this.isFailed = true
         this.performance = 1
     }
-    EndVictory() {
+    endVictory() {
         if (this.isFailed) return
         this.isFinished = true;
     }

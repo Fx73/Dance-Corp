@@ -94,12 +94,12 @@ export class PlayerDisplayComponent implements AfterViewInit {
     if (this.gameRound.isFailed || this.gameRound.isFinished) {
       return;
     }
-    this.Update(this.gameRound.currentBeat);
+    this.update(this.gameRound.currentBeat);
     requestAnimationFrame(() => this.loopUpdate());
   }
 
-  public Update(currentBeat: number): void {
-    this.UpdateCanvas(currentBeat)
+  public update(currentBeat: number): void {
+    this.updateCanvas(currentBeat)
 
     if (this.gameRound.precisionMessage.length > 0) {
       for (const msg of this.gameRound.precisionMessage) {
@@ -114,7 +114,7 @@ export class PlayerDisplayComponent implements AfterViewInit {
 
   }
 
-  private UpdateCanvas(currentBeat: number): void {
+  private updateCanvas(currentBeat: number): void {
     // Clean the canvas
     const canvas = this.canvasRef.nativeElement;
     const canvasHeight = canvas.height;
@@ -127,12 +127,12 @@ export class PlayerDisplayComponent implements AfterViewInit {
 
     // Build Canvas
     if (this.userConfigService.getConfig()['showBars'])
-      this.RenderBars(canvas, currentBeat);
-    this.RenderArrows(this.currentVisibleArrows, canvas, currentBeat);
+      this.renderBars(canvas, currentBeat);
+    this.renderArrows(this.currentVisibleArrows, canvas, currentBeat);
   }
 
   //#region Bars
-  private RenderBars(canvas: HTMLCanvasElement, currentBeat: number) {
+  private renderBars(canvas: HTMLCanvasElement, currentBeat: number) {
     // Calculate the vertical offset for the `currentBeat` bar
     const baseOffset = this.targetY - (currentBeat % 1) * CONFIG.DISPLAY.BEAT_INTERVAL;
 
@@ -187,26 +187,26 @@ export class PlayerDisplayComponent implements AfterViewInit {
     }
   }
 
-  private RenderArrows(arrows: Arrow[], canvas: HTMLCanvasElement, currentBeat: number) {
+  private renderArrows(arrows: Arrow[], canvas: HTMLCanvasElement, currentBeat: number) {
     for (const arrow of arrows) {
       const arrowY = this.targetY + (arrow.beatPosition - currentBeat) * CONFIG.DISPLAY.BEAT_INTERVAL;
       const arrowX = canvas.width * ((arrow.direction + 0.5) * 0.25)
 
       if (arrow.type === ArrowType.Mine) {
-        this.DrawMine(arrow, arrowX, arrowY)
+        this.drawMine(arrow, arrowX, arrowY)
         continue;
       }
 
       if (arrow.type === ArrowType.Hold) {
         const arrowEndY = this.targetY + (arrow.beatEnd! - currentBeat) * CONFIG.DISPLAY.BEAT_INTERVAL;
-        this.DrawHold(arrow, arrowX, arrowY, arrowEndY)
+        this.drawHold(arrow, arrowX, arrowY, arrowEndY)
       }
 
-      this.DrawArrow(arrow, arrowX, arrowY)
+      this.drawArrow(arrow, arrowX, arrowY)
     }
   }
 
-  private DrawHold(arrow: Arrow, x: number, y: number, yend: number) {
+  private drawHold(arrow: Arrow, x: number, y: number, yend: number) {
     if (arrow.isMissed) {
       this.ctx.filter = 'brightness(20%)'; // Darken the arrow
       this.ctx.shadowColor = 'white'; // White glow for contrast
@@ -225,7 +225,7 @@ export class PlayerDisplayComponent implements AfterViewInit {
     }
   }
 
-  private DrawArrow(arrow: Arrow, x: number, y: number): void {
+  private drawArrow(arrow: Arrow, x: number, y: number): void {
     if (arrow.isMissed) {
       this.ctx.filter = 'brightness(20%)'; // Darken the arrow
       this.ctx.shadowColor = 'white'; // White glow for contrast
@@ -244,7 +244,7 @@ export class PlayerDisplayComponent implements AfterViewInit {
     }
   }
 
-  private DrawMine(arrow: Arrow, x: number, y: number) {
+  private drawMine(arrow: Arrow, x: number, y: number) {
     // Draw the arrow
     const mineImage = ArrowImageManager.getMineImage();
     this.ctx.drawImage(mineImage, x - mineImage.width / 2, y - mineImage.height / 2);
