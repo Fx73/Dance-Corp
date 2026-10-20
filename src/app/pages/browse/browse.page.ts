@@ -183,7 +183,7 @@ export class BrowsePage implements OnInit {
     }
 
     const isSinglePlayer = this.userConfigService.players.length === 1;
-    const filteredNotes = music.noteData.filter(note => !isSinglePlayer || note.stepsType === DanceType.DanceSingle).sort((a, b) => a.meter - b.meter) ?? [];
+    const filteredNotes = music.noteData.filter(note => !isSinglePlayer || note.stepsType === DanceType.DanceSingle).sort((a, b) => a.meter - b.meter);
 
     this.musicNotes.set(filteredNotes);
 

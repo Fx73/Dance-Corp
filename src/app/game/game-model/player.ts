@@ -37,7 +37,7 @@ export class Player {
         const player = new Player();
         player.userId = json.userId;
         player.gamepad = json.gamepad;
-        player.keyBindingGamepad = new Map<number, ArrowDirection>(Object.entries(json.keyBindingGamepad).map(([k, v]) => [Number(k), v as ArrowDirection]));
+        player.keyBindingGamepad = new Map<number, ArrowDirection>(Object.entries(json.keyBindingGamepad).map(([k, v]) => [Number(k), v]))
         player.keyBindingKeyboard = new Map<string, ArrowDirection>(Object.entries(json.keyBindingKeyboard));
         return player;
     }

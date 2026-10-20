@@ -200,7 +200,7 @@ export class UploadPage {
       reader.onload = async (e) => {
         const content = e.target?.result as string;
         this.musicData = SccReader.parseFile(file.name, content);
-        this.localMusicService.updateMusic(this.musicData!);
+        this.localMusicService.updateMusic(this.musicData);
         this.isEditLocal.set(true);
         AppComponent.presentOkToast("Music loaded successfully : " + this.musicData.id);
 
@@ -209,7 +209,7 @@ export class UploadPage {
           for (const field of this.fireStoreService.protectedFields) {
             Object.assign(this.musicData, { [field]: dbMusic[field] });
           }
-          this.localMusicService.updateMusic(this.musicData!);
+          this.localMusicService.updateMusic(this.musicData);
 
           AppComponent.presentWarningToast("This music already exists in the database. You are now editing the local version. Uploading will overwrite the database version.");
           this.switchToDbPage();
@@ -230,7 +230,7 @@ export class UploadPage {
     const uri = await this.saveLocalMusic(file, this.musicData.id);
 
     this.musicData.music = "local:" + uri;
-    this.localMusicService.updateMusic(this.musicData!);
+    this.localMusicService.updateMusic(this.musicData);
 
     this.cd.markForCheck()
 
@@ -287,7 +287,7 @@ export class UploadPage {
   }
 
   exportEssc(): void {
-    const esscContent = SccWriter.writeSscFile(this.isEditLocal() ? this.musicData! : this.musicDataDb!);
+    const esscContent = SccWriter.writeSscFile(this.isEditLocal() ? this.musicData : this.musicDataDb!);
     function pick(translit?: string | null, normal?: string | null): string {
       const t = translit?.trim();
       return t ? t : (normal?.trim() ?? "");
@@ -394,7 +394,7 @@ export class UploadPage {
 
     } else {
       this.musicData.noteData = this.musicData.noteData.filter(n => n.chartName !== note.chartName)
-      this.localMusicService.updateMusic(this.musicData!);
+      this.localMusicService.updateMusic(this.musicData);
 
     }
 
@@ -424,7 +424,7 @@ export class UploadPage {
 
   //#region Local editing
   onEndEditing() {
-    this.localMusicService.updateMusic(this.musicData!);
+    this.localMusicService.updateMusic(this.musicData);
     this.updateGlobalDirty();
   }
 
@@ -478,7 +478,7 @@ export class UploadPage {
     if (!this.musicData?.music) return Promise.resolve(false);
 
     return new Promise((resolve, reject) => {
-      fetch(this.musicData!.music!, {
+      fetch(this.musicData.music!, {
         method: "HEAD"
       }).then(response => {
         resolve(response.status.toString()[0] === "2")

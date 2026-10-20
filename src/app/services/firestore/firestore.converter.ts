@@ -87,7 +87,7 @@ export class SimpleFirestoreConverter<T extends object> {
 
     toFirestore(dto: T): DocumentData {
         const data: DocumentData = {};
-        Object.keys(dto as object).forEach((key) => {
+        Object.keys(dto).forEach((key) => {
             if (!this.IGNORED_FIELDS.has(key)) {
                 const value = Reflect.get(dto, key);
                 if (!this.IGNORE_UNDEFINED || value !== undefined) {
@@ -102,7 +102,7 @@ export class SimpleFirestoreConverter<T extends object> {
     fromFirestore(snapshot: QueryDocumentSnapshot<T>): T {
         const data = snapshot.data();
         const dto = new this.type()
-        Object.keys(data as object).forEach((key) => {
+        Object.keys(data).forEach((key) => {
             Reflect.set(dto, key, data[key as keyof T]);
         });
         return dto;

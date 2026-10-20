@@ -311,7 +311,7 @@ export class MusicFirestoreService {
         const refUpdates = doc(this.db, this.METADATA_COLLECTION, this.MUSIC_UPDATES_DOC);
         const snapUpdates = await getDoc(refUpdates);
 
-        const updates: Record<string, number> = snapUpdates.exists() ? snapUpdates.data() as Record<string, number> : {};
+        const updates: Record<string, number> = snapUpdates.exists() ? snapUpdates.data() : {};
 
         // 4) Determine the music tracks modified since the last timestamp
         const toUpdateMusicIds = Object.entries(updates).filter(([, ts]) => ts > lastUpdateTimestamp).map(([id]) => id);

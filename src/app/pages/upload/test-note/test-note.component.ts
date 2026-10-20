@@ -44,7 +44,7 @@ export class TestNoteComponent implements OnInit, OnDestroy {
 
   onPlayerReady(musicPlayer: IMusicPlayer) {
     const player = this.userConfigService.players[0] || new Player();
-    this.game = new GameManager(this.music!, [player], [0], true, null!, null!);
+    this.game = new GameManager(this.music, [player], [0], true, null!, null!);
     this.game.registerExternalComponents(musicPlayer);
     this.game.startGame();
   }

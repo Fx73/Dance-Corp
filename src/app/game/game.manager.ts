@@ -66,7 +66,7 @@ export class GameManager {
 
         const { beat: currentBeat, bps: currentBps } = this.beatManager.getBeatAndBpsAtTime(elapsedTime);
 
-        if (this.music!.bgChanges && this.music!.bgChanges[this.currentBackgroundIndex + 1] && currentBeat >= this.music!.bgChanges[this.currentBackgroundIndex + 1].time) {
+        if (this.music.bgChanges && this.music.bgChanges[this.currentBackgroundIndex + 1] && currentBeat >= this.music.bgChanges[this.currentBackgroundIndex + 1].time) {
             this.currentBackgroundIndex++;
         }
 
@@ -106,7 +106,7 @@ export class GameManager {
     }
     gameOver() {
         console.log('Game Over: All game rounds have failed or finished.');
-        console.log(this.music, this.music!.id)
+        console.log(this.music, this.music.id)
         this.isGameOver = true;
 
         // At least one player finished and has a score of MAX_SCORE
@@ -136,7 +136,7 @@ export class GameManager {
 
         if (!this.isTrainingMode) {
             for (const gameRound of this.gameRounds) {
-                this.userCacheService.updateUserStatsFromRound(this.music!.id, this.music!.noteData[0].chartName, gameRound)
+                this.userCacheService.updateUserStatsFromRound(this.music.id, this.music.noteData[0].chartName, gameRound)
             }
         }
 
