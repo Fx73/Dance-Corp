@@ -28,7 +28,7 @@ For each commit, for every modification that may have runtime impact and that yo
 Write new code the way the existing code is written. Known deviations to avoid are listed in [Documentation/KNOWN_ISSUES.md](Documentation/KNOWN_ISSUES.md) (Improvements, Code style to harmonize).
 
 ### Structure
-- Group class members with `//#region <Name>` / `//#endregion` (lowercase). Put constants first, in a `//#region Constants` block.
+- Group class members with `//#region <Name>` / `//#endregion` (lowercase). Put constants first, in a `//#region Constants` block. Put static methods last, in a `//#region Statics` block.
 - Constants are `readonly` and `UPPER_SNAKE_CASE`. Storage keys too; parameterized keys are lambdas: `readonly MUSIC_STORAGE_KEY = (musicId: string) => \`MUSIC_${musicId}\`;`.
 - Expose enums and static helpers to templates through class fields: `readonly DanceType = DanceType;`.
 - Small, single-purpose methods named after the domain (`arrowPerfect`, `minePassed`, `getCurrentBackground`).
@@ -38,7 +38,7 @@ Write new code the way the existing code is written. Known deviations to avoid a
 ### Naming
 - camelCase for methods and fields, PascalCase for classes, enums and interfaces.
 - Interfaces are prefixed with `I` (`IMusicPlayer`, `IDancePad`).
-- Plain (non-Angular) logic classes that own a part of the game are suffixed `Manager` (`GameManager`, `BeatManager`). Angular injectables are suffixed `Service`.
+- Non-Angular classes responsible for orchestrating a game subsystem are suffixed Manager (GameManager, BeatManager). Angular injectables are suffixed Service.
 - Data objects are suffixed `Dto`.
 
 ### Data and layers
@@ -49,11 +49,9 @@ Write new code the way the existing code is written. Known deviations to avoid a
 - State shared with templates uses Angular signals. Components are standalone; dependencies are injected with `inject()` in private fields at the top of the class.
 
 ### Formatting
-- Always end statements with a semicolon. One blank line between methods.
-- A single-statement `if` / `else` / `for` may omit braces when the statement is on the next line.
-- Keep the indentation of the file being edited (4 spaces in services and game code, 2 in Angular pages and components).
+- Use a semicolon-free TypeScript style. One blank line between methods.
+- A single-statement `if`  / `else` may omit braces when the statement is on the next line. Always use braces for `for`, `while`, and other control structures.
 - Comments are in English, short, and explain intent or a step (`// 1) Read the global timestamp…`), not the obvious.
-- No `console.log` in per-frame or per-arrow code paths.
 
 ## Context Verification
 Every response must end with the hamster emoji: 🐹
