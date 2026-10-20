@@ -23,19 +23,19 @@ export class MusicSelectComponent<T = unknown> implements OnChanges {
   public isDirty = false
 
   ngOnChanges() {
-    this.isDirty = this.isEditing && this.normalize(this.value) !== this.normalize(this.valueDb)
+    this.isDirty = this.isEditing && this.Normalize(this.value) !== this.Normalize(this.valueDb)
   }
 
-  onSelectChange(ev: SelectCustomEvent<T>) {
-    this.isDirty = this.isEditing && this.normalize(ev.detail.value) !== this.normalize(this.valueDb)
+  OnSelectChange(ev: SelectCustomEvent<T>) {
+    this.isDirty = this.isEditing && this.Normalize(ev.detail.value) !== this.Normalize(this.valueDb)
     this.valueChange.emit(ev.detail.value)
   }
 
   get isChanged(): boolean {
-    return this.isEditing && this.normalize(this.value) !== this.normalize(this.valueDb)
+    return this.isEditing && this.Normalize(this.value) !== this.Normalize(this.valueDb)
   }
 
-  private normalize(v: unknown): string {
+  private Normalize(v: unknown): string {
     if (v === undefined || v === null) return ""
     return String(v).trim()
   }

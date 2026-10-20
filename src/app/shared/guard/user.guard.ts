@@ -14,16 +14,16 @@ export class UserGuard {
     private router = inject(Router)
 
     async canActivate(): Promise<boolean> {
-        if (this.loginFireauthService.getAuthUser() && this.userFirestoreService.user)
+        if (this.loginFireauthService.GetAuthUser() && this.userFirestoreService.user)
             return true
         try {
-            const isLogged = await this.guardWaitForAuth()
+            const isLogged = await this.GuardWaitForAuth()
             if (!isLogged) {
                 this.router.navigate(['/home'])
                 return false
             }
 
-            const isUserFetched = this.guardWaitForUserDataFetch()
+            const isUserFetched = this.GuardWaitForUserDataFetch()
             if (!isUserFetched) {
                 this.router.navigate(['/home'])
                 return false
@@ -36,7 +36,7 @@ export class UserGuard {
         }
     }
 
-    private guardWaitForAuth(): Promise<boolean> {
+    private GuardWaitForAuth(): Promise<boolean> {
         const timeout = 500
         let timeoutId: NodeJS.Timeout
 
@@ -54,7 +54,7 @@ export class UserGuard {
         })
     }
 
-    private guardWaitForUserDataFetch(): Promise<boolean> {
+    private GuardWaitForUserDataFetch(): Promise<boolean> {
         const timeout = 500
         let timeoutId: NodeJS.Timeout
 

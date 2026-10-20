@@ -30,7 +30,7 @@ export class UserConfigService {
         this.configSubject = new BehaviorSubject<UserConfig>({ ...defaultConfig, ...storedConfig })
 
         for (let i = 0; i < this.configSubject.value.playerNumber; i++) {
-            this.players.push(this.instanciatePlayer(i))
+            this.players.push(this.InstanciatePlayer(i))
         }
 
         // Set logged user to player 0
@@ -46,13 +46,13 @@ export class UserConfigService {
             }
         })
 
-        ArrowImageManager.setArrowSize(this.configSubject.value.canvasWidth / 4)
+        ArrowImageManager.SetArrowSize(this.configSubject.value.canvasWidth / 4)
         this.isReady = true
     }
 
-    instanciatePlayer(index: number): Player {
+    InstanciatePlayer(index: number): Player {
         const storedPlayer = localStorage.getItem(this.PLAYERS_STORAGE_KEY(index))
-        const player: Player = storedPlayer ? Player.fromJSON(JSON.parse(storedPlayer)) : new Player()
+        const player: Player = storedPlayer ? Player.FromJSON(JSON.parse(storedPlayer)) : new Player()
 
         // Reassociating the gamepad if it exists and is valid
         if (player.gamepad && player.gamepad.index != -1) {
@@ -62,30 +62,30 @@ export class UserConfigService {
         return player
     }
 
-    getConfig(): UserConfig {
+    GetConfig(): UserConfig {
         return this.configSubject.value
     }
 
-    updatePlayerCount(count: number) {
+    UpdatePlayerCount(count: number) {
         const currentCount = this.configSubject.value.playerNumber
         if (count > currentCount) {
             for (let i = currentCount + 1; i <= count; i++) {
-                this.players.push(this.instanciatePlayer(i))
+                this.players.push(this.InstanciatePlayer(i))
             }
 
         } else if (count < currentCount) {
             this.players.splice(count)
         }
 
-        this.updateConfig("playerNumber", count)
+        this.UpdateConfig("playerNumber", count)
     }
 
-    addPlayer() {
-        this.players.push(this.instanciatePlayer(this.players.length))
-        this.updateConfig("playerNumber", this.players.length)
+    AddPlayer() {
+        this.players.push(this.InstanciatePlayer(this.players.length))
+        this.UpdateConfig("playerNumber", this.players.length)
     }
 
-    removePlayerAt(position: number) {
+    RemovePlayerAt(position: number) {
         if (position > 0) {
             const playerToMove = this.players.splice(position, 1)[0]
 
@@ -94,10 +94,10 @@ export class UserConfigService {
             })
             localStorage.setItem(this.PLAYERS_STORAGE_KEY(this.players.length), JSON.stringify(playerToMove))
         }
-        this.updateConfig("playerNumber", this.players.length)
+        this.UpdateConfig("playerNumber", this.players.length)
     }
 
-    updateConfig<K extends keyof UserConfig>(option: K, value: UserConfig[K]): void {
+    UpdateConfig<K extends keyof UserConfig>(option: K, value: UserConfig[K]): void {
         if (!(option in this.configSubject.value)) {
             console.error(`Invalid option  : ${option}`)
             return
@@ -109,7 +109,7 @@ export class UserConfigService {
         localStorage.setItem(this.CONFIG_STORAGE_KEY, JSON.stringify(this.configSubject.value))
     }
 
-    updatePlayer<K extends keyof Player>(option: K, playerIndex: number, value: Player[K]): void {
+    UpdatePlayer<K extends keyof Player>(option: K, playerIndex: number, value: Player[K]): void {
         if (playerIndex < 0 || playerIndex >= this.players.length) {
             console.error(`Invalid player index: ${playerIndex}`)
             return
@@ -121,7 +121,7 @@ export class UserConfigService {
         localStorage.setItem(this.PLAYERS_STORAGE_KEY(playerIndex), JSON.stringify(player))
     }
 
-    resetToDefault(): void {
+    ResetToDefault(): void {
         localStorage.removeItem(this.CONFIG_STORAGE_KEY)
         for (let index = 0; index < 4; index++) {
             localStorage.removeItem(this.PLAYERS_STORAGE_KEY(index))

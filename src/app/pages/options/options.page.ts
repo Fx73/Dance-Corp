@@ -36,58 +36,58 @@ export class OptionsPage {
 
   constructor() {
     // Initialize player display if needed
-    if (this.userConfigService.getConfig()['showPlayerDisplay']) {
+    if (this.userConfigService.GetConfig()['showPlayerDisplay']) {
       this.showPlayerDisplay = true
     }
   }
 
-  pinFormatter(value: number) {
+  PinFormatter(value: number) {
     return `${value}`
   }
 
-  pinFormatterVolume(value: number) {
+  PinFormatterVolume(value: number) {
     return (value * 100).toFixed(0) + '%'
   }
 
-  getConfigValue<K extends keyof UserConfig>(key: K): UserConfig[K] {
-    return this.userConfigService.getConfig()[key]
+  GetConfigValue<K extends keyof UserConfig>(key: K): UserConfig[K] {
+    return this.userConfigService.GetConfig()[key]
   }
 
   // Raw value from Ionic components: ion-input returns a string (e.g. canvasWidth), kept as is
-  updateConfigValue<K extends keyof UserConfig>(key: K, value: UserConfig[K] | InputChangeEventDetail['value'] | RangeChangeEventDetail['value']): void {
-    this.userConfigService.updateConfig(key, value as UserConfig[K])
+  UpdateConfigValue<K extends keyof UserConfig>(key: K, value: UserConfig[K] | InputChangeEventDetail['value'] | RangeChangeEventDetail['value']): void {
+    this.userConfigService.UpdateConfig(key, value as UserConfig[K])
   }
 
-  updatePlayerNumber(value: RangeChangeEventDetail['value']): void {
-    this.userConfigService.updatePlayerCount(value as number)
+  UpdatePlayerNumber(value: RangeChangeEventDetail['value']): void {
+    this.userConfigService.UpdatePlayerCount(value as number)
   }
 
-  verifySoundVolume(source: keyof UserConfig): void {
-    const volume = this.getConfigValue(source)
+  VerifySoundVolume(source: keyof UserConfig): void {
+    const volume = this.GetConfigValue(source)
     console.log(`Testing volume for ${source} at ${volume}`)
     switch (source) {
       case 'menuMusicVolume':
-        this.soundService.refreshMusicVolume()
+        this.soundService.RefreshMusicVolume()
         break
       case 'announcersVolume':
-        this.announcerService.testAnnouncerSound()
+        this.announcerService.TestAnnouncerSound()
         break
       case 'sfxVolume':
         const SOUND_ARROW_UP = new Audio('assets/Sounds/menuFx/arrow_up.ogg')
-        SOUND_ARROW_UP.volume = this.getConfigValue('sfxVolume')
+        SOUND_ARROW_UP.volume = this.GetConfigValue('sfxVolume')
         SOUND_ARROW_UP.play()
         break
     }
 
   }
 
-  verifyDisplay(): void {
+  VerifyDisplay(): void {
     console.log("Updating player display with current config...", this.showPlayerDisplay)
     this.showPlayerDisplay = true
-    this.playerDisplay?.update(0)
+    this.playerDisplay?.Update(0)
   }
 
-  getFakeGameRound(): GameRound {
+  GetFakeGameRound(): GameRound {
     const arrowMap: Arrow[] = [
       new Arrow(0, 1, ArrowType.Hold, 1.5),
       new Arrow(1, 2, ArrowType.Tap),
@@ -106,9 +106,9 @@ export class OptionsPage {
     } as unknown as GameRound
   }
 
-  getModalStyle() {
-    const w = this.getConfigValue('canvasWidth')
-    const h = this.getConfigValue('canvasHeight')
+  GetModalStyle() {
+    const w = this.GetConfigValue('canvasWidth')
+    const h = this.GetConfigValue('canvasHeight')
 
     return {
       'width': `${w}px`,
@@ -116,18 +116,18 @@ export class OptionsPage {
     }
   }
 
-  resetAll(): void {
-    this.userConfigService.resetToDefault()
+  ResetAll(): void {
+    this.userConfigService.ResetToDefault()
     location.reload()
   }
 
-  clearMusicCache() {
-    this.musicCacheService.clearCache()
-    this.userCacheService.clearCache()
+  ClearMusicCache() {
+    this.musicCacheService.ClearCache()
+    this.userCacheService.ClearCache()
   }
 
-  clearMusicEditCache() {
-    this.localMusicService.clearAllLocalMusics()
+  ClearMusicEditCache() {
+    this.localMusicService.ClearAllLocalMusics()
 
   }
 }

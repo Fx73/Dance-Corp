@@ -40,7 +40,7 @@ import { TestNoteComponent } from './test-note/test-note.component'
 export class UploadPage {
   //#region Constants
   public static readonly MUSICEDIT_STORAGE_KEY = (musicId: string) => `MUSICEDIT_${musicId}`
-  pickMusicPlayer = MusicPlayerCommon.pickMusicPlayer
+  pickMusicPlayer = MusicPlayerCommon.PickMusicPlayer
   MusicOrigin = MusicOrigin
   isDesktop = isTauri
   readonly DanceTypeList = Object.values(DanceType)
@@ -91,18 +91,18 @@ export class UploadPage {
     this.musicDataDb = null
     this.isEditDB.set(false)
     this.isEditLocal.set(false)
-    this.fireStoreService.getGenres().then(genres => this.genreOptions = genres)
+    this.fireStoreService.GetGenres().then(genres => this.genreOptions = genres)
 
     const musicId = this.route.snapshot.queryParamMap.get('music')
     console.log("UploadPage initialized with musicId:", musicId)
     if (musicId) {
-      this.startLoad(musicId)
+      this.StartLoad(musicId)
     }
   }
 
   //#region Dirty state management
 
-  updateGlobalDirty() {
+  UpdateGlobalDirty() {
     const cardMetadata = [
       ...this.editableFields.filter(f => this.metadataCard.nativeElement.contains(f.elementRef.nativeElement)),
       ...this.editableLists.filter(l => this.metadataCard.nativeElement.contains(l.elementRef.nativeElement)),
@@ -130,28 +130,28 @@ export class UploadPage {
     this.notesDirty.set(dirtyArray)
   }
 
-  anyNoteDirty(): boolean {
+  AnyNoteDirty(): boolean {
     return this.notesDirty().some(d => d)
   }
   //#endregion
 
   //#region Load
-  async startLoad(musicId: string) {
+  async StartLoad(musicId: string) {
     this.isLoading = true
-    this.loadLocalMusic(musicId)
-    await this.loadDbMusic(musicId)
+    this.LoadLocalMusic(musicId)
+    await this.LoadDbMusic(musicId)
 
     if (!this.musicData) {
       if (!this.musicDataDb) {
-        AppComponent.presentErrorToast("Music not found in local storage or database.")
+        AppComponent.PresentErrorToast("Music not found in local storage or database.")
         return
       }
-      this.musicData = this.musicDataDb.deepClone()
+      this.musicData = this.musicDataDb.DeepClone()
     }
   }
 
-  async loadDbMusic(musicId: string) {
-    const data = await this.musicCacheService.getMusicWithCheck(musicId)
+  async LoadDbMusic(musicId: string) {
+    const data = await this.musicCacheService.GetMusicWithCheck(musicId)
     if (data) {
       this.musicDataDb = data
       this.isEditDB.set(true)
@@ -160,61 +160,61 @@ export class UploadPage {
       this.cd.markForCheck()
 
       setTimeout(() => {
-        this.updateGlobalDirty()
+        this.UpdateGlobalDirty()
         this.cd.markForCheck()
       })
     }
   }
 
-  loadLocalMusic(musicId: string) {
-    const data = this.localMusicService.getMusic(musicId)
+  LoadLocalMusic(musicId: string) {
+    const data = this.localMusicService.GetMusic(musicId)
     if (data) {
       this.musicData = data
       this.isEditLocal.set(true)
       this.isLoading = false
 
       if (this.musicDataDb)
-        this.updateGlobalDirty()
+        this.UpdateGlobalDirty()
 
       this.cd.markForCheck()
 
     }
   }
 
-  switchToDbPage() {
+  SwitchToDbPage() {
     this.router.navigate(['/upload'], {
       queryParams: { music: this.musicData.id },
       replaceUrl: true,
     })
-    this.startLoad(this.musicData.id)
+    this.StartLoad(this.musicData.id)
   }
   //#endregion
 
   //#region New Music
 
-  onFileSelected(event: Event): void {
+  OnFileSelected(event: Event): void {
     const file: File | undefined = (event.target as HTMLInputElement).files?.[0]
     if (file) {
       const reader = new FileReader()
       reader.onload = async (e) => {
         const content = e.target?.result as string
-        this.musicData = SccReader.parseFile(file.name, content)
-        this.localMusicService.updateMusic(this.musicData)
+        this.musicData = SccReader.ParseFile(file.name, content)
+        this.localMusicService.UpdateMusic(this.musicData)
         this.isEditLocal.set(true)
-        AppComponent.presentOkToast("Music loaded successfully : " + this.musicData.id)
+        AppComponent.PresentOkToast("Music loaded successfully : " + this.musicData.id)
 
-        const dbMusic = await this.musicCacheService.getMusic(this.musicData.id)
+        const dbMusic = await this.musicCacheService.GetMusic(this.musicData.id)
         if (dbMusic) {
           for (const field of this.fireStoreService.protectedFields) {
             Object.assign(this.musicData, { [field]: dbMusic[field] })
           }
-          this.localMusicService.updateMusic(this.musicData)
+          this.localMusicService.UpdateMusic(this.musicData)
 
-          AppComponent.presentWarningToast("This music already exists in the database. You are now editing the local version. Uploading will overwrite the database version.")
-          this.switchToDbPage()
+          AppComponent.PresentWarningToast("This music already exists in the database. You are now editing the local version. Uploading will overwrite the database version.")
+          this.SwitchToDbPage()
         } else {
           setTimeout(() => {
-            this.updateGlobalDirty()
+            this.UpdateGlobalDirty()
             this.cd.markForCheck()
           })
         }
@@ -223,19 +223,19 @@ export class UploadPage {
     }
   }
 
-  async onPickLocalMusic() {
-    const file = await this.pickLocalMusic()
-    const uri = await this.saveLocalMusic(file, this.musicData.id)
+  async OnPickLocalMusic() {
+    const file = await this.PickLocalMusic()
+    const uri = await this.SaveLocalMusic(file, this.musicData.id)
 
     this.musicData.music = "local:" + uri
-    this.localMusicService.updateMusic(this.musicData)
+    this.localMusicService.UpdateMusic(this.musicData)
 
     this.cd.markForCheck()
 
-    AppComponent.presentOkToast("Music file saved successfully!")
+    AppComponent.PresentOkToast("Music file saved successfully!")
   }
 
-  pickLocalMusic() {
+  PickLocalMusic() {
     return new Promise<File>((resolve, reject) => {
       const input = document.createElement('input')
       input.type = 'file'
@@ -251,7 +251,7 @@ export class UploadPage {
     })
   }
 
-  async saveLocalMusic(file: File, musicId: string): Promise<string> {
+  async SaveLocalMusic(file: File, musicId: string): Promise<string> {
     const extension = file.name.split('.').pop() || 'audio'
     const fileName = `${musicId}.${extension}`
     const path = `music/${fileName}`
@@ -271,26 +271,26 @@ export class UploadPage {
     return path
   }
 
-  isLocalMusic(): boolean {
+  IsLocalMusic(): boolean {
     return this.musicData?.music !== undefined && this.musicData.music.startsWith("local:")
   }
 
-  onStartEdit() {
-    this.musicData = this.musicDataDb!.deepClone()
+  OnStartEdit() {
+    this.musicData = this.musicDataDb!.DeepClone()
     this.isEditLocal.set(true)
     this.cd.detectChanges()
 
   }
 
-  exportEssc(): void {
-    const esscContent = SccWriter.writeSscFile(this.isEditLocal() ? this.musicData : this.musicDataDb!)
-    function pick(translit?: string | null, normal?: string | null): string {
+  ExportEssc(): void {
+    const esscContent = SccWriter.WriteSscFile(this.isEditLocal() ? this.musicData : this.musicDataDb!)
+    function Pick(translit?: string | null, normal?: string | null): string {
       const t = translit?.trim()
       return t ? t : (normal?.trim() ?? "")
     }
 
-    const artist = pick(this.isEditLocal() ? this.musicData.artisttranslit : this.musicDataDb?.artisttranslit, this.isEditLocal() ? this.musicData.artist : this.musicDataDb?.artist)
-    const title = pick(this.isEditLocal() ? this.musicData.titletranslit : this.musicDataDb?.titletranslit, this.isEditLocal() ? this.musicData.title : this.musicDataDb?.title)
+    const artist = Pick(this.isEditLocal() ? this.musicData.artisttranslit : this.musicDataDb?.artisttranslit, this.isEditLocal() ? this.musicData.artist : this.musicDataDb?.artist)
+    const title = Pick(this.isEditLocal() ? this.musicData.titletranslit : this.musicDataDb?.titletranslit, this.isEditLocal() ? this.musicData.title : this.musicDataDb?.title)
     const filename = `${artist}_${title}.essc`
 
     const blob = new Blob([esscContent], { type: "text/plain" })
@@ -308,93 +308,93 @@ export class UploadPage {
   //#endregion
 
   //#region Upload
-  async uploadMusic(): Promise<void> {
+  async UploadMusic(): Promise<void> {
     if (this.musicData === null || this.isEditDB()) return
 
-    await this.musicCacheService.createMusicInBase(this.musicData)
+    await this.musicCacheService.CreateMusicInBase(this.musicData)
     this.isEditDB.set(true)
-    AppComponent.presentOkToast("Music uploaded successfully!")
-    this.switchToDbPage()
+    AppComponent.PresentOkToast("Music uploaded successfully!")
+    this.SwitchToDbPage()
   }
 
-  async updateMusic(): Promise<void> {
+  async UpdateMusic(): Promise<void> {
     if (this.musicData === null || !this.isEditDB()) return
 
-    await this.musicCacheService.updateMusicInBase(this.musicData)
-    AppComponent.presentOkToast("Music updated successfully!")
+    await this.musicCacheService.UpdateMusicInBase(this.musicData)
+    AppComponent.PresentOkToast("Music updated successfully!")
 
-    await this.loadDbMusic(this.musicData.id)
-    if (!this.anyNoteDirty()) {
-      this.deleteFile(true)
+    await this.LoadDbMusic(this.musicData.id)
+    if (!this.AnyNoteDirty()) {
+      this.DeleteFile(true)
     }
   }
 
-  async uploadAllNotes(): Promise<void> {
+  async UploadAllNotes(): Promise<void> {
     if (this.musicData === null || !this.isEditDB()) return
-    await this.musicCacheService.uploadNotesInBase(this.musicData.id, this.musicData.noteData)
-    AppComponent.presentOkToast("All notes uploaded successfully!")
+    await this.musicCacheService.UploadNotesInBase(this.musicData.id, this.musicData.noteData)
+    AppComponent.PresentOkToast("All notes uploaded successfully!")
 
-    await this.loadDbMusic(this.musicData.id)
+    await this.LoadDbMusic(this.musicData.id)
     if (!this.metadataDirty()) {
-      this.deleteFile(true)
+      this.DeleteFile(true)
     }
   }
 
-  async uploadNote(note: NoteDataDto): Promise<void> {
+  async UploadNote(note: NoteDataDto): Promise<void> {
     if (this.musicData === null || !this.isEditDB()) return
-    await this.musicCacheService.uploadNotesInBase(this.musicData.id, [note])
-    AppComponent.presentOkToast("Note uploaded successfully!")
-    await this.loadDbMusic(this.musicData.id)
+    await this.musicCacheService.UploadNotesInBase(this.musicData.id, [note])
+    AppComponent.PresentOkToast("Note uploaded successfully!")
+    await this.LoadDbMusic(this.musicData.id)
 
   }
   //#endregion
 
   //#region Delete
-  deleteFile(silent = false) {
+  DeleteFile(silent = false) {
     if (this.musicData === null) return
     const musicId = this.musicData.id
-    this.localMusicService.deleteMusic(musicId)
+    this.localMusicService.DeleteMusic(musicId)
     this.musicData = new MusicDto()
     this.isEditLocal.set(false)
 
     if (!this.isEditDB()) {
-      this.deleteLocalMusicFile(musicId)
+      this.DeleteLocalMusicFile(musicId)
       this.location.back()
-      if (!silent) AppComponent.presentOkToast("Music has been discarded")
+      if (!silent) AppComponent.PresentOkToast("Music has been discarded")
 
     } else {
-      this.musicCacheService.updateCache().then(() => this.loadDbMusic(musicId))
-      if (!silent) AppComponent.presentOkToast("Music changes have been removed")
+      this.musicCacheService.UpdateCache().then(() => this.LoadDbMusic(musicId))
+      if (!silent) AppComponent.PresentOkToast("Music changes have been removed")
     }
 
   }
 
-  async deleteMusic() {
+  async DeleteMusic() {
     if (!this.musicDataDb) return
-    await this.musicCacheService.deleteMusicInBase(this.musicDataDb.id)
+    await this.musicCacheService.DeleteMusicInBase(this.musicDataDb.id)
     this.musicDataDb = null
     this.isEditDB.set(false)
     this.cd.detectChanges()
-    AppComponent.presentOkToast("Music deleted successfully from database.")
+    AppComponent.PresentOkToast("Music deleted successfully from database.")
   }
 
-  deleteNote(note: NoteDataDto): void {
+  DeleteNote(note: NoteDataDto): void {
     if (!this.musicData) return
 
     if (this.musicDataDb && this.musicDataDb.noteData.some(n => n.chartName === note.chartName)) {
-      this.musicCacheService.deleteNoteInBase(this.musicData.id, note)
-      this.loadDbMusic(this.musicData.id)
-      AppComponent.presentOkToast("Note deleted successfully from database.")
+      this.musicCacheService.DeleteNoteInBase(this.musicData.id, note)
+      this.LoadDbMusic(this.musicData.id)
+      AppComponent.PresentOkToast("Note deleted successfully from database.")
 
     } else {
       this.musicData.noteData = this.musicData.noteData.filter(n => n.chartName !== note.chartName)
-      this.localMusicService.updateMusic(this.musicData)
+      this.localMusicService.UpdateMusic(this.musicData)
 
     }
 
   }
 
-  async deleteLocalMusicFile(musicId: string) {
+  async DeleteLocalMusicFile(musicId: string) {
     try {
       const list = await readDir("music", {
         baseDir: BaseDirectory.AppData
@@ -416,14 +416,14 @@ export class UploadPage {
   //#endregion
 
   //#region Local editing
-  onEndEditing() {
-    this.localMusicService.updateMusic(this.musicData)
-    this.updateGlobalDirty()
+  OnEndEditing() {
+    this.localMusicService.UpdateMusic(this.musicData)
+    this.UpdateGlobalDirty()
   }
 
   //#endregion
 
-  getStepCount(stepChart: Measures[], stepType: number): number {
+  GetStepCount(stepChart: Measures[], stepType: number): number {
     let count = 0
     stepChart.forEach(measure => {
       measure.steps.forEach(row => {
@@ -437,7 +437,7 @@ export class UploadPage {
     return count
   }
 
-  verifyMusicUrl() {
+  VerifyMusicUrl() {
     let url = this.musicData.music
     if (!url) return
 
@@ -454,7 +454,7 @@ export class UploadPage {
     const isSoundcloudUrl = url.startsWith('soundcloud.com')
 
     if (!isYoutubeUrl && !isSoundcloudUrl) {
-      AppComponent.presentWarningToast("URL is not a valid YouTube or SoundCloud link.")
+      AppComponent.PresentWarningToast("URL is not a valid YouTube or SoundCloud link.")
       return
     }
 
@@ -465,7 +465,7 @@ export class UploadPage {
 
   }
 
-  checkUrl(): Promise<boolean> {
+  CheckUrl(): Promise<boolean> {
     if (!this.musicData?.music) return Promise.resolve(false)
 
     return new Promise((resolve, reject) => {
@@ -479,7 +479,7 @@ export class UploadPage {
     })
   }
 
-  async testNote(note: NoteDataDto) {
+  async TestNote(note: NoteDataDto) {
     const modal = await this.modalController.create({
       component: TestNoteComponent,
       componentProps: {
@@ -492,17 +492,17 @@ export class UploadPage {
     await modal.present()
   }
 
-  noNotes(): boolean {
+  NoNotes(): boolean {
     if (!this.musicDataDb || !this.musicDataDb.noteData) return true
     return this.musicDataDb.noteData.length === 0
   }
 
-  isNoteMine(note: NoteDataDto): boolean {
+  IsNoteMine(note: NoteDataDto): boolean {
     if (!note.creatorId || note.creatorId.trim() === "") return true
     return note.creatorId === this.userService.user?.id
   }
 
-  getDbNote(chartName: string): NoteDataDto | undefined {
+  GetDbNote(chartName: string): NoteDataDto | undefined {
     return this.musicDataDb?.noteData.find(n => n.chartName === chartName)
   }
 

@@ -55,7 +55,7 @@ export class GameRound {
         this.level = notes.meter ?? 1
         this.arrowManager = new ArrowManager(notes)
 
-        this.calculateScore()
+        this.CalculateScore()
 
         if (isTrainingMode) {
             this.isTrainingMode = true
@@ -63,7 +63,7 @@ export class GameRound {
         }
     }
 
-    private calculateScore() {
+    private CalculateScore() {
         const arrowMap = this.arrowManager.arrowMap
         const holdArrows = arrowMap.filter(arrow => arrow.type === ArrowType.Hold)
         const tapArrows = arrowMap.filter(arrow => arrow.type === ArrowType.Tap)
@@ -82,12 +82,12 @@ export class GameRound {
 
     }
 
-    public gameLoop(currentBeat: number, tolerance: number): void {
+    public GameLoop(currentBeat: number, tolerance: number): void {
         const arrowMap = this.arrowManager.arrowMap
         this.currentBeat = currentBeat
 
         // Get DancePad state
-        const padstate = this.dancepad.getRefreshedState()
+        const padstate = this.dancepad.GetRefreshedState()
 
         if (this.isFinished)
             return
@@ -97,7 +97,7 @@ export class GameRound {
         while (currentArrowCheck < arrowMap.length && arrowMap[currentArrowCheck].beatPosition < currentBeat + tolerance) {
             const arrow = arrowMap[currentArrowCheck]
             if (!arrow.isOut) {
-                this.checkArrowPress(arrow, currentBeat, padstate[arrow.direction], tolerance)
+                this.CheckArrowPress(arrow, currentBeat, padstate[arrow.direction], tolerance)
             }
             currentArrowCheck++
         }
@@ -106,26 +106,26 @@ export class GameRound {
         while (arrowMap[this.currentArrowIndex].isOut) {
             this.currentArrowIndex++
             if (this.currentArrowIndex >= arrowMap.length) {
-                this.endVictory()
+                this.EndVictory()
                 return
             }
         }
 
         //Check Fail
         if (this.performance <= 0) {
-            this.endFail()
+            this.EndFail()
             return
         }
     }
 
-    private checkArrowPress(arrow: Arrow, currentBeat: number, padArrowState: ArrowState, tolerance: number) {
+    private CheckArrowPress(arrow: Arrow, currentBeat: number, padArrowState: ArrowState, tolerance: number) {
         if (arrow.type === ArrowType.Mine) {
             if (!arrow.isPressed && padArrowState === ArrowState.Press) {
-                this.mineHit(arrow)
+                this.MineHit(arrow)
                 console.log(`Hit mine at beat ${arrow.beatPosition}.`)
             } else {
                 if (currentBeat > arrow.beatPosition + 1) {
-                    this.minePassed(arrow)
+                    this.MinePassed(arrow)
                     console.log(`Missed mine at beat ${arrow.beatPosition}.`)
                 }
             }
@@ -134,14 +134,14 @@ export class GameRound {
 
         if (arrow.type === ArrowType.Hold && arrow.isPressed) {
             if (arrow.beatEnd !== null && currentBeat > arrow.beatEnd) {
-                this.arrowOk(arrow)
+                this.ArrowOk(arrow)
                 return
             }
 
             if (padArrowState !== ArrowState.Hold) {
                 arrow.missedFrames--
                 if (arrow.missedFrames <= 0)
-                    this.arrowMissed(arrow)
+                    this.ArrowMissed(arrow)
             }
             else if (arrow.missedFrames < CONFIG.GAME.MAX_MISSED_FRAME_HOLD)
                 arrow.missedFrames++
@@ -151,14 +151,14 @@ export class GameRound {
 
         if (currentBeat > arrow.beatPosition + (2 * tolerance)) {
             arrow.isMissed = true
-            this.arrowMissed(arrow)
+            this.ArrowMissed(arrow)
             console.log(`Missed arrow at beat ${arrow.beatPosition}.`)
             return
         }
 
         if (padArrowState === ArrowState.Press) {
             if (currentBeat > arrow.beatPosition + tolerance) {
-                this.arrowAlmost(arrow)
+                this.ArrowAlmost(arrow)
                 console.log(`Almost arrow at beat ${arrow.beatPosition}.`)
                 return
             }
@@ -166,108 +166,108 @@ export class GameRound {
 
             if (difference <= tolerance * 0.25) {
                 // Perfect: Very close to the beat
-                this.arrowPerfect(arrow)
+                this.ArrowPerfect(arrow)
                 console.log(`Perfect arrow at beat ${arrow.beatPosition}.`)
                 return
             } else if (difference <= tolerance * 0.5) {
                 // Great: Slightly off but close enough
-                this.arrowGreat(arrow)
+                this.ArrowGreat(arrow)
                 console.log(`Great arrow at beat ${arrow.beatPosition}.`)
                 return
             } else if (difference <= tolerance) {
                 // Good: Further off but still acceptable
-                this.arrowGood(arrow)
+                this.ArrowGood(arrow)
                 console.log(`Good arrow at beat ${arrow.beatPosition}.`)
                 return
             }
         }
     }
 
-    arrowPerfect(arrow: Arrow) {
-        arrow.perfect()
-        this.updatePerformance(2)
+    ArrowPerfect(arrow: Arrow) {
+        arrow.Perfect()
+        this.UpdatePerformance(2)
         this.score += this.scorePerArrow
         this.comboCount++
         this.precisionMessage.push(arrow)
 
-        this.announcerService.changeSatisfaction(2, 4)
+        this.announcerService.ChangeSatisfaction(2, 4)
     }
 
-    arrowGreat(arrow: Arrow) {
-        arrow.great()
-        this.updatePerformance(1)
+    ArrowGreat(arrow: Arrow) {
+        arrow.Great()
+        this.UpdatePerformance(1)
         this.score += this.scorePerArrow * 0.8
         this.comboCount++
         this.precisionMessage.push(arrow)
 
         if (this.comboCount >= 10)
-            this.announcerService.changeSatisfaction(2, 2)
+            this.announcerService.ChangeSatisfaction(2, 2)
         else
-            this.announcerService.changeSatisfaction(1, 4)
+            this.announcerService.ChangeSatisfaction(1, 4)
     }
 
-    arrowGood(arrow: Arrow) {
-        arrow.good()
-        this.updatePerformance(1)
+    ArrowGood(arrow: Arrow) {
+        arrow.Good()
+        this.UpdatePerformance(1)
         this.score += this.scorePerArrow * 0.6
         this.comboCount++
         this.precisionMessage.push(arrow)
 
         if (this.comboCount >= 20)
-            this.announcerService.changeSatisfaction(2, 1)
+            this.announcerService.ChangeSatisfaction(2, 1)
         else
-            this.announcerService.changeSatisfaction(1, 2)
+            this.announcerService.ChangeSatisfaction(1, 2)
     }
 
-    arrowAlmost(arrow: Arrow) {
-        arrow.almost()
-        this.updatePerformance(- 3)
+    ArrowAlmost(arrow: Arrow) {
+        arrow.Almost()
+        this.UpdatePerformance(- 3)
         this.score += this.scorePerArrow * 0.2
         this.comboCount = 0
         this.precisionMessage.push(arrow)
 
-        this.announcerService.changeSatisfaction(0, 1)
+        this.announcerService.ChangeSatisfaction(0, 1)
     }
 
-    arrowMissed(arrow: Arrow) {
-        arrow.missed()
-        this.updatePerformance(-4)
+    ArrowMissed(arrow: Arrow) {
+        arrow.Missed()
+        this.UpdatePerformance(-4)
         this.comboCount = 0
         this.precisionMessage.push(arrow)
 
-        this.announcerService.changeSatisfaction(0, 4)
+        this.announcerService.ChangeSatisfaction(0, 4)
     }
 
-    arrowOk(arrow: Arrow) {
-        arrow.ok()
+    ArrowOk(arrow: Arrow) {
+        arrow.Ok()
         const arrowLength = arrow.beatEnd! - arrow.beatPosition
         this.performance = Math.min(100, this.performance + arrowLength)
         this.score += arrowLength * this.scorePerHoldBeat
         this.precisionMessage.push(arrow)
 
         if (this.comboCount >= 10)
-            this.announcerService.changeSatisfaction(2, 1)
+            this.announcerService.ChangeSatisfaction(2, 1)
         else
-            this.announcerService.changeSatisfaction(1, 2)
+            this.announcerService.ChangeSatisfaction(1, 2)
     }
 
-    mineHit(arrow: Arrow) {
-        arrow.boom()
-        this.updatePerformance(-20)
+    MineHit(arrow: Arrow) {
+        arrow.Boom()
+        this.UpdatePerformance(-20)
         this.comboCount = 0
         this.precisionMessage.push(arrow)
 
         this.mineHitSound.currentTime = 0
         this.mineHitSound.play()
 
-        this.announcerService.changeSatisfaction(0, 10)
+        this.announcerService.ChangeSatisfaction(0, 10)
     }
 
-    minePassed(arrow: Arrow) {
-        arrow.ok()
+    MinePassed(arrow: Arrow) {
+        arrow.Ok()
     }
 
-    updatePerformance(amount: number): void {
+    UpdatePerformance(amount: number): void {
         if (this.isTrainingMode || this.isFailed)
             return
 
@@ -280,12 +280,12 @@ export class GameRound {
 
     }
 
-    endFail() {
+    EndFail() {
         this.isFailed = true
         this.performance = 1
     }
 
-    endVictory() {
+    EndVictory() {
         if (this.isFailed) return
         this.isFinished = true
     }

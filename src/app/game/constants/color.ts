@@ -2,7 +2,7 @@ import { NoteDifficulty } from "./note-difficulty.enum"
 import { Precision } from "./precision.enum"
 
 export class Color {
-    static precisionGradient(precision: Precision): string {
+    static PrecisionGradient(precision: Precision): string {
         switch (precision) {
             case Precision.Perfect: return 'yellow'
             case Precision.Great: return 'green'
@@ -14,7 +14,7 @@ export class Color {
         }
     }
 
-    static noteDifficultyColor(difficulty: NoteDifficulty): string {
+    static NoteDifficultyColor(difficulty: NoteDifficulty): string {
         switch (difficulty) {
             case NoteDifficulty.Beginner:
                 return 'cyan'
@@ -29,7 +29,7 @@ export class Color {
         }
     }
 
-    static gradeFromScore(score: number, failed: boolean): { grade: string, color: string } {
+    static GradeFromScore(score: number, failed: boolean): { grade: string, color: string } {
         if (!failed) {
             if (score >= 1000000) return { grade: 'S', color: '#FFFAAA' }
             if (score >= 980000) return { grade: 'AAA', color: '#89adf6' }

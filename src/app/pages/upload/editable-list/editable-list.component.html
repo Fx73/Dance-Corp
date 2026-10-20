@@ -5,12 +5,12 @@
     @if (isEditing) {
     @for (row of value; track $index; let i = $index) {
 
-    <ion-item [class.changed]="isRowChanged(i)" [title]="formatRow(valueDb?.[i])">
+    <ion-item [class.changed]="IsRowChanged(i)" [title]="FormatRow(valueDb?.[i])">
 
-      <ion-input label="Time (s)" type="number" [(ngModel)]="row.time" (ionChange)="onFieldChange()"> </ion-input>
-      <ion-input label="Value" [type]="valueType" [(ngModel)]="row.value" (ionChange)="onFieldChange()"></ion-input>
+      <ion-input label="Time (s)" type="number" [(ngModel)]="row.time" (ionChange)="OnFieldChange()"> </ion-input>
+      <ion-input label="Value" [type]="valueType" [(ngModel)]="row.value" (ionChange)="OnFieldChange()"></ion-input>
 
-      <ion-button color="danger" (click)="removeRow(i)">
+      <ion-button color="danger" (click)="RemoveRow(i)">
         <ion-icon slot="icon-only" name="remove-outline"></ion-icon>
       </ion-button>
 
@@ -19,7 +19,7 @@
     }
 
     <ion-item>
-      <ion-button color="success" size="small" (click)="addRow()">
+      <ion-button color="success" size="small" (click)="AddRow()">
         <ion-icon slot="icon-only" name="add-outline"></ion-icon>
       </ion-button>
     </ion-item>

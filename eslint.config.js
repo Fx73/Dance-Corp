@@ -28,6 +28,17 @@ module.exports = tseslint.config(
       // Interface and type members: no delimiter on multiple lines, commas on a single line
       '@stylistic/member-delimiter-style': ['error', { multiline: { delimiter: 'none' }, singleline: { delimiter: 'comma', requireLast: false } }],
       'no-unexpected-multiline': 'error',
+      // Naming from CLAUDE.md: methods and functions in PascalCase (C# convention),
+      // except names called by the framework or an external API.
+      // classMethod also matches properties holding an arrow function: UPPER_CASE is allowed for constant lambdas.
+      '@typescript-eslint/naming-convention': ['error', {
+        selector: ['classMethod', 'typeMethod', 'function'],
+        format: ['PascalCase', 'UPPER_CASE'],
+        filter: {
+          regex: '^(ng[A-Z]\\w*|ionView\\w*|toJSON|toString|valueOf|toFirestore|fromFirestore|canActivate|canDeactivate|canMatch|resolve|transform|writeValue|registerOnChange|registerOnTouched|setDisabledState)$',
+          match: false,
+        },
+      }],
       // Explicit types are kept on variables, even when they could be inferred
       '@typescript-eslint/no-inferrable-types': 'off',
       // Generic type written on the variable: x: Map<A, B> = new Map()

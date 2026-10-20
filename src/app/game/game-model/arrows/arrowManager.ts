@@ -8,10 +8,10 @@ export class ArrowManager {
     arrowMap: Arrow[] = []
 
     constructor(notes: NoteDataDto) {
-        this.loadArrows(notes)
+        this.LoadArrows(notes)
     }
 
-    private loadArrows(notes: NoteDataDto): void {
+    private LoadArrows(notes: NoteDataDto): void {
         const activeHolds: (Arrow | null)[] = Array(Object.values(ArrowDirection).length).fill(null)
 
         for (let measureIndex = 0; measureIndex < notes.stepChart.length; measureIndex++) {

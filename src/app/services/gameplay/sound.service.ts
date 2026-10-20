@@ -25,7 +25,7 @@ export class SoundService {
 
     }
 
-  private handleRouteChange(url: string) {
+  private HandleRouteChange(url: string) {
     const shouldMute =
       url.startsWith('/play/browse') ||
       url.startsWith('/play/game') ||
@@ -33,39 +33,39 @@ export class SoundService {
       url.startsWith('/upload')
 
     if (shouldMute) {
-      this.pauseBackgroundMusic()
+      this.PauseBackgroundMusic()
     } else {
-      this.startBackgroundMusic()
+      this.StartBackgroundMusic()
     }
   }
 
-    initBackgroundMusic() {
+    InitBackgroundMusic() {
         this.router.events.subscribe(event => {
             if (event instanceof NavigationEnd) {
-                this.handleRouteChange(event.urlAfterRedirects)
+                this.HandleRouteChange(event.urlAfterRedirects)
             }
         })
-        this.handleRouteChange(this.router.url)
+        this.HandleRouteChange(this.router.url)
     }
 
-    startBackgroundMusic() {
+    StartBackgroundMusic() {
         if (this.isPlaying) return
         this.isPlaying = true
-        this.fadeIn(this.SOUND_BACKGROUND, 4000)
+        this.FadeIn(this.SOUND_BACKGROUND, 4000)
 
     }
 
-    pauseBackgroundMusic() {
+    PauseBackgroundMusic() {
         if (!this.isPlaying) return
         this.isPlaying = false
-        this.fadeOut(this.SOUND_BACKGROUND, 1000)
+        this.FadeOut(this.SOUND_BACKGROUND, 1000)
     }
 
     // -------------------------
     // FADES
     // -------------------------
 
-    fadeIn(audio: HTMLAudioElement, duration = 500) {
+    FadeIn(audio: HTMLAudioElement, duration = 500) {
         if (this.fadeIntervals.has(audio)) {
             clearInterval(this.fadeIntervals.get(audio))
         }
@@ -79,16 +79,16 @@ export class SoundService {
         audio.volume = Math.max(0, audio.volume)
 
         this.fadeIntervals.set(audio, setInterval(() => {
-            audio.volume = Math.min(this.getMusicVolume(), audio.volume + increment)
+            audio.volume = Math.min(this.GetMusicVolume(), audio.volume + increment)
 
-            if (audio.volume >= this.getMusicVolume()) {
+            if (audio.volume >= this.GetMusicVolume()) {
                 clearInterval(this.fadeIntervals.get(audio))
                 this.fadeIntervals.delete(audio)
             }
         }, step))
     }
 
-    fadeOut(audio: HTMLAudioElement, duration = 500) {
+    FadeOut(audio: HTMLAudioElement, duration = 500) {
         if (this.fadeIntervals.has(audio)) {
             clearInterval(this.fadeIntervals.get(audio))
         }
@@ -110,8 +110,8 @@ export class SoundService {
     // -------------------------
     // SFX
     // -------------------------
-    playSfx(audio: HTMLAudioElement) {
-        audio.volume = this.getSfxVolume()
+    PlaySfx(audio: HTMLAudioElement) {
+        audio.volume = this.GetSfxVolume()
         audio.currentTime = 0
         audio.play()
     }
@@ -119,16 +119,16 @@ export class SoundService {
     // -------------------------
     // Utils
     // -------------------------
-      public refreshMusicVolume() {
-        this.SOUND_BACKGROUND.volume = this.getMusicVolume()
-        this.SOUND_BACKGROUND2.volume = this.getMusicVolume()
+      public RefreshMusicVolume() {
+        this.SOUND_BACKGROUND.volume = this.GetMusicVolume()
+        this.SOUND_BACKGROUND2.volume = this.GetMusicVolume()
       }
 
-      private getMusicVolume(): number {
-        return this.userConfigService.getConfig()["menuMusicVolume"] ?? 0.2
+      private GetMusicVolume(): number {
+        return this.userConfigService.GetConfig()["menuMusicVolume"] ?? 0.2
     }
 
-    private getSfxVolume(): number {
-        return this.userConfigService.getConfig()["sfxVolume"] ?? 1
+    private GetSfxVolume(): number {
+        return this.userConfigService.GetConfig()["sfxVolume"] ?? 1
     }
 }

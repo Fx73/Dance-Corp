@@ -20,16 +20,16 @@ export class RadarScoreComponent implements AfterViewInit, OnChanges {
   @ViewChild('radar') radar!: ElementRef<HTMLCanvasElement>
 
   ngAfterViewInit() {
-    this.drawRadar()
+    this.DrawRadar()
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['size'] || changes['scores']) {
-      this.drawRadar()
+      this.DrawRadar()
     }
   }
 
-  private drawRadar(): void {
+  private DrawRadar(): void {
     if (!this.radar) {
       return
     }

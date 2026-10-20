@@ -9,11 +9,11 @@ import { Injectable } from "@angular/core"
 export class LoginFireauthService {
   private auth: Auth = getAuth()
 
-  getAuthUser(): User | null {
+  GetAuthUser(): User | null {
     return this.auth.currentUser
   }
 
-  public listenForUserChanges(callback: (user: User | null) => void): void {
+  public ListenForUserChanges(callback: (user: User | null) => void): void {
     const auth: Auth = getAuth()
     onAuthStateChanged(auth, (firebaseUser: User | null) => {
       callback(firebaseUser)
@@ -21,85 +21,85 @@ export class LoginFireauthService {
   }
 
   //#region Login
-  register(email: string, password: string): void {
+  Register(email: string, password: string): void {
     createUserWithEmailAndPassword(this.auth, email, password)
       .catch((error) => {
         console.log(email)
         const errorCode = error.code
         const errorMessage = error.message
-        AppComponent.presentWarningToast(errorMessage)
+        AppComponent.PresentWarningToast(errorMessage)
         alert(errorCode)
       })
   }
 
-  login(email: string, password: string): void {
+  Login(email: string, password: string): void {
     signInWithEmailAndPassword(this.auth, email, password)
       .catch((error) => {
         const errorCode = error.code
         const errorMessage = error.message
-        AppComponent.presentWarningToast(errorMessage)
+        AppComponent.PresentWarningToast(errorMessage)
         alert(errorCode)
       })
   }
 
-  loginWithGoogle() {
+  LoginWithGoogle() {
     const provider = new GoogleAuthProvider()
     signInWithPopup(this.auth, provider)
       .catch((error) => {
         const errorCode = error.code
         const errorMessage = error.message
-        AppComponent.presentWarningToast(errorMessage)
+        AppComponent.PresentWarningToast(errorMessage)
         alert(errorCode)
       })
   }
 
-  loginWithFacebook() {
+  LoginWithFacebook() {
     const provider = new FacebookAuthProvider()
     signInWithPopup(this.auth, provider)
       .catch((error) => {
         const errorCode = error.code
         const errorMessage = error.message
-        AppComponent.presentWarningToast(errorMessage)
+        AppComponent.PresentWarningToast(errorMessage)
         alert(errorCode)
       })
   }
 
-  passwordRecovery(email: string): void {
+  PasswordRecovery(email: string): void {
     sendPasswordResetEmail(this.auth, email)
       .catch((error) => {
         const errorCode = error.code
         const errorMessage = error.message
-        AppComponent.presentWarningToast(errorMessage)
+        AppComponent.PresentWarningToast(errorMessage)
         alert(errorCode)
       })
   }
   //#endregion
 
   //#region Account
-  resendEmail(): void {
+  ResendEmail(): void {
     if (this.auth.currentUser)
       sendEmailVerification(this.auth.currentUser)
         .catch((error) => {
           const errorCode = error.code
           const errorMessage = error.message
-          AppComponent.presentWarningToast(errorMessage)
+          AppComponent.PresentWarningToast(errorMessage)
           alert(errorCode)
         })
   }
 
-  updatePassword(password: string) {
+  UpdatePassword(password: string) {
     if (this.auth.currentUser)
       updatePassword(this.auth.currentUser, password).then(() => {
         alert('Password updated')
       }).catch((error) => {
         const errorCode = error.code
         const errorMessage = error.message
-        AppComponent.presentWarningToast(errorMessage)
+        AppComponent.PresentWarningToast(errorMessage)
         alert(errorCode)
       })
   }
 
-  updateProfile(email: string, name: string) {
+  UpdateProfile(email: string, name: string) {
     if (this.auth.currentUser)
       updateEmail(this.auth.currentUser, email).then(() => {
         updateProfile(this.auth.currentUser!, { displayName: name }).then(() => {
@@ -107,25 +107,25 @@ export class LoginFireauthService {
         }).catch((error) => {
           const errorCode = error.code
           const errorMessage = error.message
-          AppComponent.presentWarningToast(errorMessage)
+          AppComponent.PresentWarningToast(errorMessage)
           alert(errorCode)
         })
 
       }).catch((error) => {
         const errorCode = error.code
         const errorMessage = error.message
-        AppComponent.presentWarningToast(errorMessage)
+        AppComponent.PresentWarningToast(errorMessage)
         alert(errorCode)
       })
   }
   //#endregion
 
-  logOut(): void {
+  LogOut(): void {
     signOut(this.auth)
       .catch((error) => {
         const errorCode = error.code
         const errorMessage = error.message
-        AppComponent.presentWarningToast(errorMessage)
+        AppComponent.PresentWarningToast(errorMessage)
         alert(errorCode)
       })
   }

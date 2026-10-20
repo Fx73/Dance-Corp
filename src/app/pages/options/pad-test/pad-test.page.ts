@@ -33,7 +33,7 @@ export class PadTestPage {
 
   waitingForInput: boolean = false
 
-  selectPlayer(player: Player, playerIndex: number) {
+  SelectPlayer(player: Player, playerIndex: number) {
     this.playerIndexSelected = playerIndex
     this.playerSelected = player
     this.gampadBindings.clear()
@@ -49,20 +49,20 @@ export class PadTestPage {
     }
   }
 
-  updateGamepad(playerIndex: number, gamepadId: string): void {
+  UpdateGamepad(playerIndex: number, gamepadId: string): void {
     if (gamepadId === "Keyboard") {
-      this.userConfigService.updatePlayer('gamepad', playerIndex, { index: -1, id: "Keyboard" })
+      this.userConfigService.UpdatePlayer('gamepad', playerIndex, { index: -1, id: "Keyboard" })
 
     } else {
       const gamepad = navigator.getGamepads().filter(g => g !== null).find(g => g.id === gamepadId)
       if (gamepad)
-        this.userConfigService.updatePlayer("gamepad", playerIndex, { index: gamepad.index, id: gamepad.id })
+        this.userConfigService.UpdatePlayer("gamepad", playerIndex, { index: gamepad.index, id: gamepad.id })
       else
-        AppComponent.presentWarningToast(`Gamepad not found. Please ensure it is connected.`)
+        AppComponent.PresentWarningToast(`Gamepad not found. Please ensure it is connected.`)
     }
   }
 
-  async openBindPopover(arrowDirection: ArrowDirection): Promise<void> {
+  async OpenBindPopover(arrowDirection: ArrowDirection): Promise<void> {
     const gamepad = this.playerSelected?.gamepad
     if (gamepad === undefined || gamepad.index === null) return
 
@@ -76,16 +76,16 @@ export class PadTestPage {
     this.waitingForInput = true
 
     if (gamepad.index !== -1)
-      this.waitForGamepadInput(gamepad.index, arrowDirection, alert)
+      this.WaitForGamepadInput(gamepad.index, arrowDirection, alert)
     else
-      this.waitForKeyboardInput(arrowDirection, alert)
+      this.WaitForKeyboardInput(arrowDirection, alert)
   }
 
-  waitForGamepadInput(gamepadIndex: number, arrowDirection: ArrowDirection, alert: HTMLIonAlertElement): void {
+  WaitForGamepadInput(gamepadIndex: number, arrowDirection: ArrowDirection, alert: HTMLIonAlertElement): void {
     const checkInput = () => {
       const gamepad = navigator.getGamepads()[gamepadIndex]
       if (!gamepad) {
-        AppComponent.presentWarningToast(`Gamepad disconnected. Please reconnect.`)
+        AppComponent.PresentWarningToast(`Gamepad disconnected. Please reconnect.`)
         this.waitingForInput = false
         alert.dismiss()
         return
@@ -107,11 +107,11 @@ export class PadTestPage {
     requestAnimationFrame(checkInput)
   }
 
-  waitForKeyboardInput(arrowDirection: ArrowDirection, alert: HTMLIonAlertElement) {
+  WaitForKeyboardInput(arrowDirection: ArrowDirection, alert: HTMLIonAlertElement) {
     const checkKeyboardInput = (event: KeyboardEvent) => {
 
       if (event.key === 'Enter') {
-        AppComponent.presentWarningToast(`'Enter' key is default "Start" and cannot be used for bindings.`)
+        AppComponent.PresentWarningToast(`'Enter' key is default "Start" and cannot be used for bindings.`)
         return
       }
       // Bind the action to the pressed button
@@ -123,7 +123,7 @@ export class PadTestPage {
     window.addEventListener('keydown', checkKeyboardInput)
   }
 
-  validateMapping(): void {
+  ValidateMapping(): void {
     if (this.playerSelected?.gamepad == null)
       return
 
@@ -132,16 +132,16 @@ export class PadTestPage {
       for (const [direction, key] of this.keyboardBindings.entries()) {
         keyboardBindingsObject.set(key, direction)
       }
-      this.userConfigService.updatePlayer("keyBindingKeyboard", this.playerIndexSelected!, keyboardBindingsObject)
-      AppComponent.presentOkToast("Player keyboard mappings have been updated.")
+      this.userConfigService.UpdatePlayer("keyBindingKeyboard", this.playerIndexSelected!, keyboardBindingsObject)
+      AppComponent.PresentOkToast("Player keyboard mappings have been updated.")
 
     } else {
       const gamepadBindingsObject: Map<number, ArrowDirection> = new Map<number, ArrowDirection>()
       for (const [direction, button] of this.gampadBindings.entries()) {
         gamepadBindingsObject.set(button, direction)
       }
-      this.userConfigService.updatePlayer('keyBindingGamepad', this.playerIndexSelected!, gamepadBindingsObject)
-      AppComponent.presentOkToast("Player gamepad mappings have been updated.")
+      this.userConfigService.UpdatePlayer('keyBindingGamepad', this.playerIndexSelected!, gamepadBindingsObject)
+      AppComponent.PresentOkToast("Player gamepad mappings have been updated.")
     }
 
   }

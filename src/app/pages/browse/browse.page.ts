@@ -45,7 +45,7 @@ export class BrowsePage implements OnInit {
 
   readonly MusicOrigin = MusicOrigin
   readonly DanceType = DanceType
-  pickMusicPlayer = MusicPlayerCommon.pickMusicPlayer
+  pickMusicPlayer = MusicPlayerCommon.PickMusicPlayer
   //#endregion
 
   private router = inject(Router)
@@ -84,26 +84,26 @@ export class BrowsePage implements OnInit {
     this.searchQuery = localStorage.getItem('browseSearchQuery') ?? ''
     this.selectedNotesIndex.set(new Array(this.userConfigService.players.length).fill(0))
 
-    this.initIonInfinite()
+    this.InitIonInfinite()
 
-    this.initPlayerInput()
-    this.discordRpcService.update("Browsing")
+    this.InitPlayerInput()
+    this.discordRpcService.Update("Browsing")
   }
 
   //#region Input handling
   ionViewWillEnter() {
-    window.addEventListener('keydown', this.keyHandler)
+    window.addEventListener('keydown', this.KeyHandler)
     this.isListeningInput = true
-    this.listenInput()
+    this.ListenInput()
   }
 
   ionViewWillLeave() {
-    window.removeEventListener('keydown', this.keyHandler)
+    window.removeEventListener('keydown', this.KeyHandler)
     this.isListeningInput = false
     this.sampleLoopActive = false
   }
 
-  initPlayerInput() {
+  InitPlayerInput() {
     const players = this.userConfigService.players
     for (const player of players) {
       if (player.gamepad!.index === -1)
@@ -114,43 +114,43 @@ export class BrowsePage implements OnInit {
   }
 
   readonly blockedKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'Spacebar', 'Enter']
-  private keyHandler = (event: KeyboardEvent) => {
+  private KeyHandler = (event: KeyboardEvent) => {
     if (this.isFocusOnSearchInput) return
     if (this.blockedKeys.includes(event.key)) {
       event.preventDefault()
     }
     if (event.key === 'Enter') {
-      this.runGame()
+      this.RunGame()
     }
   }
 
   isFocusOnSearchInput = false
   isListeningInput = false
-  listenInput() {
+  ListenInput() {
     if (!this.isFocusOnSearchInput) {
       for (let index = 0; index < this.dancepad.length; index++) {
-        const padstate = this.dancepad[index].getRefreshedState()
+        const padstate = this.dancepad[index].GetRefreshedState()
         if (padstate[ArrowDirection.Left]) {
-          this.onSelectMusic(Math.max(0, this.selectedMusicIndex() - 1))
+          this.OnSelectMusic(Math.max(0, this.selectedMusicIndex() - 1))
         }
         if (padstate[ArrowDirection.Right]) {
-          this.onSelectMusic(Math.min(this.storedMusics().length + this.dbMusics().length - 1, this.selectedMusicIndex() + 1))
+          this.OnSelectMusic(Math.min(this.storedMusics().length + this.dbMusics().length - 1, this.selectedMusicIndex() + 1))
         }
         if (padstate[ArrowDirection.Down]) {
           const notesLength = this.musicNotes().length
-          this.onSelectNote(Math.min(notesLength - 1, (this.selectedNotesIndex()[index] ?? 0) + 1), index)
+          this.OnSelectNote(Math.min(notesLength - 1, (this.selectedNotesIndex()[index] ?? 0) + 1), index)
         }
         if (padstate[ArrowDirection.Up]) {
-          this.onSelectNote(Math.max(0, (this.selectedNotesIndex()[index] ?? 0) - 1), index)
+          this.OnSelectNote(Math.max(0, (this.selectedNotesIndex()[index] ?? 0) - 1), index)
         }
       }
     }
     if (this.isListeningInput)
-      setTimeout(() => this.listenInput(), 100)
+      setTimeout(() => this.ListenInput(), 100)
   }
   //#endregion
 
-  getSelectedMusic(index: number): MusicDto | null {
+  GetSelectedMusic(index: number): MusicDto | null {
     if (index >= 0) {
       if (index < this.storedMusics().length)
         return this.storedMusics()[index]
@@ -160,7 +160,7 @@ export class BrowsePage implements OnInit {
     return null
   }
 
-  trySetSelectedMusicById(musicId: string) {
+  TrySetSelectedMusicById(musicId: string) {
     let index = this.storedMusics().findIndex((m: { id: string }) => m.id === musicId)
 
     if (index === -1) {
@@ -168,15 +168,15 @@ export class BrowsePage implements OnInit {
     }
 
     if (index === -1) {
-      this.onSelectMusic(0)
+      this.OnSelectMusic(0)
     }
     else {
-      this.onSelectMusic(index)
+      this.OnSelectMusic(index)
     }
   }
 
-  onSelectMusic(listIndex: number) {
-    const music = this.getSelectedMusic(listIndex)
+  OnSelectMusic(listIndex: number) {
+    const music = this.GetSelectedMusic(listIndex)
     if (!music) {
       this.musicNotes.set([])
       return
@@ -190,9 +190,9 @@ export class BrowsePage implements OnInit {
     this.selectedMusicIndex.set(listIndex)
     localStorage.setItem('lastMusicSelectedId', music.id)
 
-    this.musicUserScore.set(this.userCacheService.getMusicStats(music.id))
+    this.musicUserScore.set(this.userCacheService.GetMusicStats(music.id))
 
-    this.soundService.playSfx(this.SOUND_ARROW_UP)
+    this.soundService.PlaySfx(this.SOUND_ARROW_UP)
 
     setTimeout(() => {
       const el = this.musicCards.toArray()[listIndex]?.nativeElement
@@ -202,20 +202,20 @@ export class BrowsePage implements OnInit {
     })
   }
 
-  onSelectNote(noteIdx: number, playerIndex: number = 0) {
+  OnSelectNote(noteIdx: number, playerIndex: number = 0) {
     this.selectedNotesIndex()[playerIndex] = noteIdx
-    this.soundService.playSfx(this.SOUND_ARROW_DOWN)
+    this.soundService.PlaySfx(this.SOUND_ARROW_DOWN)
     this.cd.markForCheck()
   }
 
-  onSearch(event: SearchbarCustomEvent) {
+  OnSearch(event: SearchbarCustomEvent) {
     this.searchQuery = (event.target.value || '').toLowerCase()
     localStorage.setItem('browseSearchQuery', this.searchQuery)
 
-    this.initIonInfinite()
+    this.InitIonInfinite()
   }
 
-  initIonInfinite() {
+  InitIonInfinite() {
     const q = this.searchQuery.toLowerCase()
 
     let updateDbMusics = this.musicCacheService.allRemoteMusics
@@ -242,60 +242,60 @@ export class BrowsePage implements OnInit {
     const remoteIndex = lastId ? updateDbMusics.findIndex(m => m.id === lastId) : -1
 
     const newIndex = localIndex !== -1 ? localIndex : (remoteIndex !== -1 ? remoteIndex + updateLocalMusics.length : 0)
-    this.onSelectMusic(newIndex)
+    this.OnSelectMusic(newIndex)
   }
 
-  onIonInfinite(event: InfiniteScrollCustomEvent) {
+  OnIonInfinite(event: InfiniteScrollCustomEvent) {
     console.info("Congratz, you found the infinite scroll ! But there is no more music to load :)")
     event.target.complete()
   }
 
-  onPlayerReady(mPlayer: IMusicPlayer) {
-    const music = this.getSelectedMusic(this.selectedMusicIndex())
+  OnPlayerReady(mPlayer: IMusicPlayer) {
+    const music = this.GetSelectedMusic(this.selectedMusicIndex())
     if (!music) return
 
     const start = music.sampleStart ?? 0
     const length = music.sampleLength ?? 5
 
     this.sampleLoopActive = true
-    this.startSampleLoop(mPlayer, start, length)
+    this.StartSampleLoop(mPlayer, start, length)
   }
 
-  private async startSampleLoop(player: IMusicPlayer, start: number, length: number, delay: number = 2) {
-    function sleep(ms: number) {
+  private async StartSampleLoop(player: IMusicPlayer, start: number, length: number, delay: number = 2) {
+    function Sleep(ms: number) {
       return new Promise(res => setTimeout(res, ms))
     }
     while (this.sampleLoopActive) {
-      player.setToTime(start)
-      player.play()
+      player.SetToTime(start)
+      player.Play()
 
       const endTime = start + length
 
-      while (this.sampleLoopActive && player.getCurrentTime() < endTime) {
-        await sleep(100)
+      while (this.sampleLoopActive && player.GetCurrentTime() < endTime) {
+        await Sleep(100)
       }
-      player.stop()
+      player.Stop()
 
       let waited = 0
       while (this.sampleLoopActive && waited < delay * 1000) {
-        await sleep(100)
+        await Sleep(100)
         waited += 100
       }
     }
   }
 
-  async runGame(): Promise<void> {
-    const selectedMusic = this.getSelectedMusic(this.selectedMusicIndex())
+  async RunGame(): Promise<void> {
+    const selectedMusic = this.GetSelectedMusic(this.selectedMusicIndex())
     if (!selectedMusic) return
     console.log("Selected music for game:", selectedMusic, "with notes:", this.musicNotes())
-    await this.musicCacheService.updateCacheMusic(selectedMusic.id)
+    await this.musicCacheService.UpdateCacheMusic(selectedMusic.id)
 
     for (let i = 0; i < this.selectedNotesIndex().length; i++) {
       const newDifficulty: NoteDifficulty = this.musicNotes()[this.selectedNotesIndex()[i]]?.difficulty
       const lastDifficulty = this.lastDifficultyPlayed[i]
       if (newDifficulty && newDifficulty !== lastDifficulty) {
         this.lastDifficultyPlayed[i] = newDifficulty
-        this.announcerService.playAnnouncerLine("difficulty", newDifficulty.toLowerCase())
+        this.announcerService.PlayAnnouncerLine("difficulty", newDifficulty.toLowerCase())
       }
     }
 
@@ -308,26 +308,26 @@ export class BrowsePage implements OnInit {
 
   //#region Utils
 
-  getSelectedNotesDifficulty(): DifficultyCriteria[] {
+  GetSelectedNotesDifficulty(): DifficultyCriteria[] {
     const notes = this.musicNotes().filter((note, index) => this.selectedNotesIndex().includes(index))
     return notes.map(note => note.difficultyCriterias).filter((d): d is DifficultyCriteria => d !== undefined)
   }
 
-  getPlayersForNote(noteIndex: number): number[] {
+  GetPlayersForNote(noteIndex: number): number[] {
     return this.selectedNotesIndex()
       .map((selectedIdx, player) => selectedIdx === noteIndex ? player : null)
       .filter((v): v is number => v !== null)
   }
 
-  getPlayerColor(playerIndex: number): string {
+  GetPlayerColor(playerIndex: number): string {
     return CONFIG.PLAYER_COLORS[playerIndex % CONFIG.PLAYER_COLORS.length].stroke
   }
 
-  getNoteColor(difficulty: NoteDifficulty): string {
-    return Color.noteDifficultyColor(difficulty)
+  GetNoteColor(difficulty: NoteDifficulty): string {
+    return Color.NoteDifficultyColor(difficulty)
   }
 
-  getUserNote(chartname: string): UserNoteDto | null {
+  GetUserNote(chartname: string): UserNoteDto | null {
     return this.musicUserScore()?.notes.find(n => n.id === chartname) ?? null
   }
   //#endregion

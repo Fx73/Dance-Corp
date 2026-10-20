@@ -23,28 +23,28 @@ export class AccountComponent {
   constructor() {
     const loginService = this.loginService
 
-    const user = loginService.getAuthUser()
+    const user = loginService.GetAuthUser()
     this.name = user!.displayName ?? ""
     this.email = user!.email ?? ""
     this.isEmailVerified = user!.emailVerified
 
   }
 
-  saveProfile() {
-    this.loginService.updateProfile(this.email, this.name)
+  SaveProfile() {
+    this.loginService.UpdateProfile(this.email, this.name)
   }
 
-  savePassword() {
+  SavePassword() {
     if (this.password === this.password2)
-      this.loginService.updatePassword(this.password)
+      this.loginService.UpdatePassword(this.password)
   }
 
-  resendEmail() {
-    this.loginService.resendEmail()
+  ResendEmail() {
+    this.loginService.ResendEmail()
   }
 
-  logOut() {
-    this.loginService.logOut()
+  LogOut() {
+    this.loginService.LogOut()
   }
 
 }

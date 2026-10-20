@@ -28,9 +28,9 @@ export class UserFirestoreService {
         const loginFireauthService = inject(LoginFireauthService)
 
         this.db = getFirestore()
-        loginFireauthService.listenForUserChanges(firebaseUser => {
+        loginFireauthService.ListenForUserChanges(firebaseUser => {
             if (firebaseUser) {
-                this.getUserFromFirestore(firebaseUser).then(user => {
+                this.GetUserFromFirestore(firebaseUser).then(user => {
                     this._userData.set(user)
                 })
             } else {
@@ -39,7 +39,7 @@ export class UserFirestoreService {
         })
     }
 
-    private async getUserFromFirestore(firebaseUser: User): Promise<UserDto> {
+    private async GetUserFromFirestore(firebaseUser: User): Promise<UserDto> {
         const userRef = doc(this.db, this.USER_COLLECTION, firebaseUser.uid).withConverter(this.userConverter)
         const userSnapshot = await getDoc(userRef)
 
@@ -55,7 +55,7 @@ export class UserFirestoreService {
         }
     }
 
-    public async getAllUserMusics(userId: string): Promise<UserMusicDto[]> {
+    public async GetAllUserMusics(userId: string): Promise<UserMusicDto[]> {
         if (!userId) return []
 
         const collectionRef = collection(this.db, this.USER_COLLECTION, userId, this.USER_MUSIC_COLLECTION).withConverter(this.firestoreConverterUserMusic)
@@ -69,7 +69,7 @@ export class UserFirestoreService {
         return musics
     }
 
-    public async updateUserStatsFromRound(music: UserMusicDto, gameRound: GameRound): Promise<void> {
+    public async UpdateUserStatsFromRound(music: UserMusicDto, gameRound: GameRound): Promise<void> {
         const userId = gameRound.player.userId
         if (!userId) return
 
@@ -86,7 +86,7 @@ export class UserFirestoreService {
         await setDoc(musicRef, music, { merge: true })
     }
 
-    public async getScoresForMusic(musicId: string, userId: string): Promise<Record<string, number>> {
+    public async GetScoresForMusic(musicId: string, userId: string): Promise<Record<string, number>> {
         const musicRef = doc(this.db, this.USER_COLLECTION, userId, this.USER_MUSIC_COLLECTION, musicId).withConverter(this.firestoreConverterUserMusic)
 
         const snap = await getDoc(musicRef)

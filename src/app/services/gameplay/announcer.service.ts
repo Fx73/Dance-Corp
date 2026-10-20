@@ -27,7 +27,7 @@ export class AnnouncerService {
 
     private crowdAudio: HTMLAudioElement | null = null
 
-    async init() {
+    async Init() {
         this.announcers = [
             await fetch('assets/Sounds/announcers/girl1.json').then(r => r.json()),
             await fetch('assets/Sounds/announcers/girl2.json').then(r => r.json()),
@@ -35,17 +35,17 @@ export class AnnouncerService {
         ]
         this.crowd = await fetch('assets/Sounds/announcers/crowd.json').then(r => r.json())
 
-        this.pickPreferredAnnouncer()
+        this.PickPreferredAnnouncer()
     }
 
     // -------------------------
     // ANNOUNCER
     // -------------------------
-    pickPreferredAnnouncer() {
-        this.preferredAnnouncer = this.random(this.announcers)
+    PickPreferredAnnouncer() {
+        this.preferredAnnouncer = this.Random(this.announcers)
     }
 
-    changeSatisfaction( type: number, amount: number) {
+    ChangeSatisfaction( type: number, amount: number) {
         // type: 0 = fail, 1 = good, 2 = perfect
         if (type === 0) {
             this.failSatisfaction += amount
@@ -68,20 +68,20 @@ export class AnnouncerService {
         this.perfectSatisfaction = Math.max(0, this.perfectSatisfaction)
 
         if (this.failSatisfaction > 30) {
-            this.playAnnouncer("combo_fail")
+            this.PlayAnnouncer("combo_fail")
             this.failSatisfaction = 0
             this.goodSatisfaction /= 2
             this.perfectSatisfaction /= 2
         }
         else if (this.goodSatisfaction > 30) {
-            this.playAnnouncer("combo_good")
+            this.PlayAnnouncer("combo_good")
             this.goodSatisfaction = 0
             this.failSatisfaction /= 2
             this.perfectSatisfaction /= 2
         }
         else if (this.perfectSatisfaction > 30) {
-            this.playAnnouncer("combo_perfect")
-            this.playCrowdOneShot("applause_light", 4000)
+            this.PlayAnnouncer("combo_perfect")
+            this.PlayCrowdOneShot("applause_light", 4000)
             this.perfectSatisfaction = 0
             this.failSatisfaction /= 2
             this.goodSatisfaction /= 2
@@ -90,75 +90,75 @@ export class AnnouncerService {
         console.log(`Satisfaction - Fail: ${this.failSatisfaction}, Good: ${this.goodSatisfaction}, Perfect: ${this.perfectSatisfaction}`)
     }
 
-    playAnnouncer(category: string) {
+    PlayAnnouncer(category: string) {
         if (!this.preferredAnnouncer) return
 
         const lines = this.preferredAnnouncer.lines[category]
         if (lines) {
-            const line = this.pickNoRepeat(lines, this.lastAnnouncerLine)
-            this.enqueueAnnouncerLine(this.preferredAnnouncer, line)
+            const line = this.PickNoRepeat(lines, this.lastAnnouncerLine)
+            this.EnqueueAnnouncerLine(this.preferredAnnouncer, line)
             return
         }
 
         for (const ann of this.announcers) {
             if (ann === this.preferredAnnouncer) continue
             if (ann.lines[category]) {
-                const line = this.pickNoRepeat(ann.lines[category], this.lastAnnouncerLine)
-                this.enqueueAnnouncerLine(ann, line)
+                const line = this.PickNoRepeat(ann.lines[category], this.lastAnnouncerLine)
+                this.EnqueueAnnouncerLine(ann, line)
                 return
             }
         }
     }
 
-    playAnnouncerLine(category: string, line: string) {
+    PlayAnnouncerLine(category: string, line: string) {
         if (!this.preferredAnnouncer) return
 
         if (this.preferredAnnouncer.lines[category]?.includes(line)) {
-            this.enqueueAnnouncerLine(this.preferredAnnouncer, line)
+            this.EnqueueAnnouncerLine(this.preferredAnnouncer, line)
             return
         }
 
         for (const ann of this.announcers) {
             if (ann === this.preferredAnnouncer) continue
             if (ann.lines[category]?.includes(line)) {
-                this.enqueueAnnouncerLine(ann, line)
+                this.EnqueueAnnouncerLine(ann, line)
                 return
             }
         }
 
     }
 
-    public testAnnouncerSound() {
-        const volume = this.getAnnouncerVolume()
+    public TestAnnouncerSound() {
+        const volume = this.GetAnnouncerVolume()
         if (this.announcerAudio) {
             this.announcerAudio.volume = volume
             return
         }
         
-        const announcer = this.random(this.announcers)
-        const category = this.random(Object.keys(announcer.lines))
-        const line = this.random(announcer.lines[category])
+        const announcer = this.Random(this.announcers)
+        const category = this.Random(Object.keys(announcer.lines))
+        const line = this.Random(announcer.lines[category])
         
-        this.playAnnouncerDirect(announcer, line, this.processAnnouncerQueue.bind(this))
+        this.PlayAnnouncerDirect(announcer, line, this.ProcessAnnouncerQueue.bind(this))
     }
 
-    private enqueueAnnouncerLine(announcer: ISoundBank, line: string) {
+    private EnqueueAnnouncerLine(announcer: ISoundBank, line: string) {
         this.lastAnnouncerLine = line
         this.announcerQueue.push({ announcer, line })
-        this.processAnnouncerQueue()
+        this.ProcessAnnouncerQueue()
     }
 
-    private processAnnouncerQueue() {
+    private ProcessAnnouncerQueue() {
         if (this.announcerAudio || this.isQueueBlocked) return
 
         const next = this.announcerQueue.shift()
 
         if (!next) return
 
-        this.playAnnouncerDirect(next.announcer, next.line, this.processAnnouncerQueue.bind(this))
+        this.PlayAnnouncerDirect(next.announcer, next.line, this.ProcessAnnouncerQueue.bind(this))
     }
 
-    async playCountdownFromAnnouncer(delayMs: number = 1000) {
+    async PlayCountdownFromAnnouncer(delayMs: number = 1000) {
         console.log("Request to play countdown from announcer received")
         if (!this.preferredAnnouncer || this.isQueueBlocked) return
 
@@ -175,21 +175,21 @@ export class AnnouncerService {
                 this.announcerAudio.pause()
                 this.announcerAudio.currentTime = 0
             }
-            this.playAnnouncerDirect(announcer, line)
+            this.PlayAnnouncerDirect(announcer, line)
             await new Promise(resolve => setTimeout(resolve, delayMs))
         }
 
         this.isQueueBlocked = false
         this.announcerAudio = null
 
-        this.processAnnouncerQueue()
+        this.ProcessAnnouncerQueue()
     }
 
-    private playAnnouncerDirect(announcer: ISoundBank, line: string, onEndCallback?: () => void) {
+    private PlayAnnouncerDirect(announcer: ISoundBank, line: string, onEndCallback?: () => void) {
         const src = `assets/Sounds/announcers/${announcer.name}/${line}.ogg`
 
         this.announcerAudio = new Audio(src)
-        this.announcerAudio.volume = this.getAnnouncerVolume()
+        this.announcerAudio.volume = this.GetAnnouncerVolume()
         
         if (onEndCallback) {
             this.announcerAudio.onended = () => {
@@ -204,39 +204,39 @@ export class AnnouncerService {
     // -------------------------
     // CROWD / AMBIANCE
     // -------------------------
-    playCrowdOneShot(type: string, fadeOutMs: number = 4000) {
+    PlayCrowdOneShot(type: string, fadeOutMs: number = 4000) {
         const list = this.crowd.lines[type]
         if (!list) return
 
         // Crowd sounds can't overlap
         if (this.crowdAudio && !this.crowdAudio.paused) return
 
-        const file = this.random(list)
+        const file = this.Random(list)
         const src = `assets/Sounds/announcers/crowd/${file}.ogg`
 
-        this.crowdAudio = this.playAudio(src, { volume: this.getAnnouncerVolume(), fadeOutMs })
+        this.crowdAudio = this.PlayAudio(src, { volume: this.GetAnnouncerVolume(), fadeOutMs })
     }
 
     // -------------------------
     // UTILS
     // -------------------------
-    private getAnnouncerVolume(): number {
-        return this.userConfigService.getConfig()["announcersVolume"] ?? 1
+    private GetAnnouncerVolume(): number {
+        return this.userConfigService.GetConfig()["announcersVolume"] ?? 1
     }
 
-    private random<T>(arr: T[]): T {
+    private Random<T>(arr: T[]): T {
         return arr[Math.floor(Math.random() * arr.length)]
     }
 
-    private pickNoRepeat(arr: string[], last: string | null) {
+    private PickNoRepeat(arr: string[], last: string | null) {
         let pick
         do {
-            pick = this.random(arr)
+            pick = this.Random(arr)
         } while (arr.length > 1 && pick === last)
         return pick
     }
 
-    private playAudio(src: string, options: { volume?: number, fadeOutMs?: number } = {}) {
+    private PlayAudio(src: string, options: { volume?: number, fadeOutMs?: number } = {}) {
         const audio = new Audio(src)
         audio.volume = options.volume ?? 1
 

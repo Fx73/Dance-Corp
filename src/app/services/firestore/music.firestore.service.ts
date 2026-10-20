@@ -4,7 +4,7 @@ import { MusicDto, NoteDataDto } from '../../game/game-model/music.dto'
 import { Injectable, inject } from '@angular/core'
 import { AppComponent } from 'src/app/app.component'
 import { DifficultyCriteria } from 'src/app/pages/upload/DifficultyCriteria'
-import { deepEqual } from 'src/app/shared/utils/object-extend'
+import { DeepEqual } from 'src/app/shared/utils/object-extend'
 import { FirestoreConverter } from './firestore.converter'
 import { UserFirestoreService } from './user.firestore.service'
 
@@ -34,7 +34,7 @@ export class MusicFirestoreService {
         this.db = getFirestore()
     }
 
-    async uploadMusic(dto: MusicDto): Promise<void> {
+    async UploadMusic(dto: MusicDto): Promise<void> {
         try {
             if (!this.userFirestoreService.user) throw new Error("User not authenticated")
 
@@ -43,17 +43,17 @@ export class MusicFirestoreService {
             const { noteData: notes, ...mainData } = dto
             await setDoc(musicRef, mainData)
 
-            this.addGenres(dto.genre ?? "")
+            this.AddGenres(dto.genre ?? "")
 
-            this.updateMusicIndex(dto.id, false)
-            AppComponent.presentOkToast("Music successfully uploaded to firebase!")
+            this.UpdateMusicIndex(dto.id, false)
+            AppComponent.PresentOkToast("Music successfully uploaded to firebase!")
         } catch (error) {
-            AppComponent.presentWarningToast("Error uploading music: " + error)
+            AppComponent.PresentWarningToast("Error uploading music: " + error)
             throw error
         }
     }
 
-    async updateMusic(dto: MusicDto): Promise<void> {
+    async UpdateMusic(dto: MusicDto): Promise<void> {
         try {
             if (!this.userFirestoreService.user) throw new Error("User not authenticated")
 
@@ -64,24 +64,24 @@ export class MusicFirestoreService {
             if (!current) throw new Error("Music not found")
             for (const field of this.protectedFields) {
                 console.log(`Checking field "${field}" : `, current[field], dto[field])
-                if (!deepEqual(dto[field], current[field]))
+                if (!DeepEqual(dto[field], current[field]))
                     throw new Error(`Field "${field}" cannot be modified after upload.`)
             }
 
             const { noteData: notes, ...mainData } = dto
             await updateDoc(musicRef, mainData)
 
-            this.addGenres(dto.genre ?? "")
+            this.AddGenres(dto.genre ?? "")
 
-            this.updateMusicIndex(dto.id)
-            AppComponent.presentOkToast("Music successfully updated to firebase!")
+            this.UpdateMusicIndex(dto.id)
+            AppComponent.PresentOkToast("Music successfully updated to firebase!")
         } catch (error) {
-            AppComponent.presentWarningToast("Error updating music: " + error)
+            AppComponent.PresentWarningToast("Error updating music: " + error)
             throw error
         }
     }
 
-    async uploadNotes(musicId: string, notes: NoteDataDto[]): Promise<void> {
+    async UploadNotes(musicId: string, notes: NoteDataDto[]): Promise<void> {
         try {
             const user = this.userFirestoreService.user
             if (!user) throw new Error("User not authenticated")
@@ -117,15 +117,15 @@ export class MusicFirestoreService {
             // 3. Rewrite the complete document
             await setDoc(musicRef, { noteData: toUpdateNotes }, { merge: true })
 
-            this.updateMusicIndex(musicId)
+            this.UpdateMusicIndex(musicId)
 
         } catch (error) {
-            AppComponent.presentWarningToast("Error updating music: " + error)
+            AppComponent.PresentWarningToast("Error updating music: " + error)
             throw error
         }
     }
 
-    async getAllMusics(): Promise<MusicDto[]> {
+    async GetAllMusics(): Promise<MusicDto[]> {
         console.log("Querying complete database for music list. This should only happen once per session and will be cached for next calls.")
 
         const musicRef = collection(this.db, this.MUSIC_COLLECTION).withConverter(this.firestoreConverterMusic)
@@ -142,7 +142,7 @@ export class MusicFirestoreService {
         return musics
     }
 
-    async getMusicListWithId(ids: string[]): Promise<MusicDto[]> {
+    async GetMusicListWithId(ids: string[]): Promise<MusicDto[]> {
         if (ids.length === 0) return []
 
         const musicRef = collection(this.db, this.MUSIC_COLLECTION)
@@ -168,7 +168,7 @@ export class MusicFirestoreService {
         return results
     }
 
-    async deleteMusic(musicId: string): Promise<void> {
+    async DeleteMusic(musicId: string): Promise<void> {
         try {
             const musicRef = doc(this.db, this.MUSIC_COLLECTION, musicId).withConverter(this.firestoreConverterMusic)
 
@@ -185,16 +185,16 @@ export class MusicFirestoreService {
 
             await deleteDoc(musicRef)
 
-            this.removeMusicFromIndex(musicId)
-            AppComponent.presentOkToast("Music successfully deleted from firebase !")
+            this.RemoveMusicFromIndex(musicId)
+            AppComponent.PresentOkToast("Music successfully deleted from firebase !")
 
         } catch (error) {
-            AppComponent.presentErrorToast("Error deleting music: " + error)
+            AppComponent.PresentErrorToast("Error deleting music: " + error)
             throw error
         }
     }
 
-    async deleteNote(musicId: string, note: NoteDataDto): Promise<void> {
+    async DeleteNote(musicId: string, note: NoteDataDto): Promise<void> {
         try {
             const userId = this.userFirestoreService.user?.id
             if (!userId) throw new Error("User not authenticated")
@@ -217,17 +217,17 @@ export class MusicFirestoreService {
             // Rewrite the whole document
             await updateDoc(musicRef, { noteData: notedata })
 
-            this.updateMusicIndex(musicId, false)
+            this.UpdateMusicIndex(musicId, false)
 
         } catch (error) {
-            AppComponent.presentWarningToast("Error deleting note: " + error)
+            AppComponent.PresentWarningToast("Error deleting note: " + error)
             throw error
         }
     }
 
     //#region Genres
 
-    async addGenres(genres: string): Promise<void> {
+    async AddGenres(genres: string): Promise<void> {
         if (!genres || genres.trim().length === 0) return
 
         const normalized = genres.split(',').map(g => g.trim().toLowerCase()).filter(g => g.length > 0)
@@ -247,7 +247,7 @@ export class MusicFirestoreService {
         await updateDoc(ref, { genres: merged })
     }
 
-    async getGenres(): Promise<string[]> {
+    async GetGenres(): Promise<string[]> {
         const ref = doc(this.db, this.METADATA_COLLECTION, this.MUSIC_METADATA_DOC)
         const snap = await getDoc(ref)
 
@@ -265,7 +265,7 @@ export class MusicFirestoreService {
     //#endregion
 
     //#region Updater Mechanism
-    async initMusicIndex(): Promise<void> {
+    async InitMusicIndex(): Promise<void> {
         const musicRef = collection(this.db, this.MUSIC_COLLECTION)
         const snapshot = await getDocs(musicRef)
 
@@ -282,7 +282,7 @@ export class MusicFirestoreService {
         console.log("Music index initialized:", ids.length, "entries")
     }
 
-    async getUpdate(lastUpdateTimestamp: number, knownIds: Set<string>): Promise<{ newMusicIds: string[], toUpdateMusicIds: string[], toDeleteMusicIds: string[], updatedAt: number } | null> {
+    async GetUpdate(lastUpdateTimestamp: number, knownIds: Set<string>): Promise<{ newMusicIds: string[], toUpdateMusicIds: string[], toDeleteMusicIds: string[], updatedAt: number } | null> {
         // 1) Read the global timestamp of the last update and the list of all music ids
         const refIndex = doc(this.db, this.METADATA_COLLECTION, this.MUSIC_INDEX_DOC)
         const snapIndex = await getDoc(refIndex)
@@ -322,7 +322,7 @@ export class MusicFirestoreService {
         }
     }
 
-    async updateMusicIndex(musicId: string, isUpdate: boolean = true): Promise<void> {
+    async UpdateMusicIndex(musicId: string, isUpdate: boolean = true): Promise<void> {
         const indexRef = doc(this.db, this.METADATA_COLLECTION, this.MUSIC_INDEX_DOC)
         const snap = await getDoc(indexRef)
 
@@ -349,7 +349,7 @@ export class MusicFirestoreService {
         }, { merge: true })
     }
 
-    async removeMusicFromIndex(musicId: string): Promise<void> {
+    async RemoveMusicFromIndex(musicId: string): Promise<void> {
         const indexRef = doc(this.db, this.METADATA_COLLECTION, this.MUSIC_INDEX_DOC)
         const snap = await getDoc(indexRef)
 

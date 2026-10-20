@@ -15,10 +15,10 @@ export class FirestoreConverter<T extends object> {
     }
 
     toFirestore(dto: T): DocumentData {
-        return this.toFirestoreRecurse(dto)
+        return this.ToFirestoreRecurse(dto)
     }
 
-    toFirestoreRecurse(dto: object): DocumentData {
+    ToFirestoreRecurse(dto: object): DocumentData {
         const data: DocumentData = {}
         Object.keys(dto).forEach((key) => {
             const value = Reflect.get(dto, key)
@@ -29,11 +29,11 @@ export class FirestoreConverter<T extends object> {
                 if (!this.IGNORE_UNDEFINED) data[key] = null
             }
             else if (Array.isArray(value))
-                data[key] = value.map(v => Object(v) === v ? this.toFirestoreRecurse(v) : v)
+                data[key] = value.map(v => Object(v) === v ? this.ToFirestoreRecurse(v) : v)
             else if (value instanceof Date)
                 data[key] = value
             else if (Object(value) === value)
-                data[key] = this.toFirestoreRecurse(value)
+                data[key] = this.ToFirestoreRecurse(value)
             else
                 data[key] = value
         })
@@ -43,19 +43,19 @@ export class FirestoreConverter<T extends object> {
     fromFirestore(snapshot: QueryDocumentSnapshot<DocumentData>): T {
         const data = snapshot.data()
         const dto = new this.type()
-        return this.fromFirestoreRecurse(data, dto) as T
+        return this.FromFirestoreRecurse(data, dto) as T
     }
 
-    fromFirestoreRecurse(data: DocumentData, dto: object = {}): object {
+    FromFirestoreRecurse(data: DocumentData, dto: object = {}): object {
         Object.keys(data).forEach((key) => {
             let value = data[key]
             if (Array.isArray(value))
-                value = this.mapArrayRecurse(value, key)
+                value = this.MapArrayRecurse(value, key)
             else if (value instanceof Timestamp)
                 value = value.toDate()
             else if (Object(value) === value) {
                 const subtype = this.subtypes[key]
-                value = this.fromFirestoreRecurse(value, subtype ? new subtype() : undefined)
+                value = this.FromFirestoreRecurse(value, subtype ? new subtype() : undefined)
             }
 
             Reflect.set(dto, key, value)
@@ -63,18 +63,18 @@ export class FirestoreConverter<T extends object> {
         return dto
     }
 
-    mapArrayRecurse(array: unknown[], arrayName: string): unknown[] {
+    MapArrayRecurse(array: unknown[], arrayName: string): unknown[] {
         // Is empty or primitive
         if (array.length === 0 || Object(array[0]) !== array[0])
             return array
 
         // Is poorly Converted Array
         if (Object.keys(array[0] as object).every((x, index) => Number(x) === index)) {
-            return array.map(x => this.mapArrayRecurse(Object.values(x as object), arrayName))
+            return array.map(x => this.MapArrayRecurse(Object.values(x as object), arrayName))
         }
         // Is Object
         const subtype = this.subtypes[arrayName]
-        return array.map(x => this.fromFirestoreRecurse(x as DocumentData, subtype ? new subtype() : undefined))
+        return array.map(x => this.FromFirestoreRecurse(x as DocumentData, subtype ? new subtype() : undefined))
     }
 
 }

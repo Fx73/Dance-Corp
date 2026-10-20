@@ -41,24 +41,24 @@ export class LoginComponent {
     })
   }
 
-  register(email: string, password: string): void {
-    this.loginService.register(email, password)
+  Register(email: string, password: string): void {
+    this.loginService.Register(email, password)
   }
 
-  login(email: string, password: string): void {
-    this.loginService.login(email, password)
+  Login(email: string, password: string): void {
+    this.loginService.Login(email, password)
   }
 
-  loginWithGoogle() {
-    this.loginService.loginWithGoogle()
+  LoginWithGoogle() {
+    this.loginService.LoginWithGoogle()
   }
 
-  loginWithFacebook() {
-    this.loginService.loginWithFacebook()
+  LoginWithFacebook() {
+    this.loginService.LoginWithFacebook()
   }
 
-  passwordRecovery(email: string): void {
-    this.passwordRecovery(email)
+  PasswordRecovery(email: string): void {
+    this.PasswordRecovery(email)
   }
 
 }

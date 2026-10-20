@@ -25,7 +25,7 @@ export class UserProfilePage {
     const authService = inject(LoginFireauthService)
     const userService = inject(UserFirestoreService)
 
-    this.userAuth = authService.getAuthUser()!
+    this.userAuth = authService.GetAuthUser()!
     this.userData = userService.user!
   }
 

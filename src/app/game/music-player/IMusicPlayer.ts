@@ -6,10 +6,10 @@ export interface IMusicPlayer {
     musicUrl: string // Unique identifier for the music track
     startOffset?: number // Optional start offset in seconds
 
-    play(): void // Start playback
-    stop(): void // Stop playback and reset
-    getCurrentTime(): number // Get the current playback time
-    setToTime(time: number): void // Set the playback time to a specific value
+    Play(): void // Start playback
+    Stop(): void // Stop playback and reset
+    GetCurrentTime(): number // Get the current playback time
+    SetToTime(time: number): void // Set the playback time to a specific value
 
     ready: EventEmitter<IMusicPlayer>
 
@@ -22,12 +22,12 @@ export class MusicPlayerCommon {
     @Input()
     size: { width: number | string, height: number | string } = { width: '1', height: '1' }
 
-    public getVolume(): number {
-        return this.userConfig.getConfig()["musicVolume"] ?? 1
+    public GetVolume(): number {
+        return this.userConfig.GetConfig()["musicVolume"] ?? 1
     }
 
     //#region Statics
-    public static pickMusicPlayer(uri: string): MusicOrigin | null {
+    public static PickMusicPlayer(uri: string): MusicOrigin | null {
         if (!uri) return null
 
         if (uri.includes("youtube") || uri.includes("youtu.be"))
@@ -42,7 +42,7 @@ export class MusicPlayerCommon {
         return null
     }
 
-    public static musicOriginAllowCache(musicOrigin: MusicOrigin): boolean {
+    public static MusicOriginAllowCache(musicOrigin: MusicOrigin): boolean {
         switch (musicOrigin) {
             case MusicOrigin.Youtube:
                 return false

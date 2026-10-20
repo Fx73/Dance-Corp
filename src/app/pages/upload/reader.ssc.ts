@@ -8,15 +8,15 @@ export type SscTokenMap = Record<string, string | Record<string, string>>
 
 export class SccReader {
 
-  static parseFile(filename: string, content: string): MusicDto {
+  static ParseFile(filename: string, content: string): MusicDto {
     let tokenMap: SscTokenMap
 
     if (filename.endsWith('.sm')) {
-      tokenMap = this.tokenizeSM(content)
+      tokenMap = this.TokenizeSM(content)
     } else if (filename.endsWith('.ssc')) {
-      tokenMap = this.tokenizeSSC(content)
+      tokenMap = this.TokenizeSSC(content)
     } else if (filename.endsWith('.essc')) {
-      tokenMap = this.tokenizeSSC(content, true)
+      tokenMap = this.TokenizeSSC(content, true)
     } else {
       throw new Error('Unsupported file format')
     }
@@ -28,11 +28,11 @@ export class SccReader {
     for (const noteData of musicData.noteData) {
       if (!noteData.difficultyCriterias) {
         const evaluator = new NoteEvaluator(musicData.bpms, noteData.stepChart)
-        evaluator.evaluateCriterias()
+        evaluator.EvaluateCriterias()
         noteData.difficultyCriterias = evaluator.criterias
-        console.log(noteData.meter, evaluator.criterias, evaluator.getLevelFromCriterias())
-        tsvLines.push(evaluator.generateTsvLine(musicData.title ?? "", noteData.meter ?? 0))
-        noteData.meter = Math.round(evaluator.getLevelFromCriterias())
+        console.log(noteData.meter, evaluator.criterias, evaluator.GetLevelFromCriterias())
+        tsvLines.push(evaluator.GenerateTsvLine(musicData.title ?? "", noteData.meter ?? 0))
+        noteData.meter = Math.round(evaluator.GetLevelFromCriterias())
       }
     }
     if (tsvLines.length > 0) {
@@ -43,7 +43,7 @@ export class SccReader {
     return musicData
   }
 
-  static tokenizeCommon(content: string): string[] {
+  static TokenizeCommon(content: string): string[] {
     // Remove https:// 
     content = content.replace(/https?:\/\//g, '')
     // Remove single-line comments //
@@ -66,8 +66,8 @@ export class SccReader {
     return tokens
   }
 
-  static tokenizeSSC(content: string, isEscc: boolean = false): SscTokenMap {
-    const tokens = this.tokenizeCommon(content)
+  static TokenizeSSC(content: string, isEscc: boolean = false): SscTokenMap {
+    const tokens = this.TokenizeCommon(content)
     const tokenMap: SscTokenMap = {}
     let currentNoteData: Record<string, string> | null = null
     let noteDataIndex = 0
@@ -81,7 +81,7 @@ export class SccReader {
         noteDataIndex++
         tokenMap[`notedata${noteDataIndex}`] = currentNoteData
       } else if (lowerKey === 'notes' && currentNoteData) {
-        const notes = isEscc ? value : SccReader.convertNotes(value)
+        const notes = isEscc ? value : SccReader.ConvertNotes(value)
         currentNoteData[lowerKey] = notes
         currentNoteData = null
       } else if (currentNoteData) {
@@ -96,8 +96,8 @@ export class SccReader {
     return tokenMap
   }
 
-  static tokenizeSM(content: string): SscTokenMap {
-    const tokens = this.tokenizeCommon(content)
+  static TokenizeSM(content: string): SscTokenMap {
+    const tokens = this.TokenizeCommon(content)
     const tokenMap: SscTokenMap = {}
     let noteDataIndex = 0
     tokens.forEach(token => {
@@ -114,7 +114,7 @@ export class SccReader {
         currentNoteData['credits'] = lines[1]
         currentNoteData['difficulty'] = lines[2]
         currentNoteData['meter'] = lines[3]
-        currentNoteData['notes'] = SccReader.convertNotes(lines[5])
+        currentNoteData['notes'] = SccReader.ConvertNotes(lines[5])
 
         tokenMap[`notedata${noteDataIndex}`] = currentNoteData
 
@@ -143,7 +143,7 @@ export class SccReader {
    * @param token - The input token containing notes
    * @return The converted token
    */
-  static convertNotes(token: string): string {
+  static ConvertNotes(token: string): string {
     return token.split('').map(char => {
       switch (char) {
         case 'M':
@@ -163,8 +163,8 @@ export class SccReader {
     }).join('')
   }
 
-  static extractBasicMetadataFromSSC(content: string): { title?: string, artist?: string, jacket?: string, bpms?: BpmChange[] } {
-    const tokens = SccReader.tokenizeCommon(content)
+  static ExtractBasicMetadataFromSSC(content: string): { title?: string, artist?: string, jacket?: string, bpms?: BpmChange[] } {
+    const tokens = SccReader.TokenizeCommon(content)
     const result: { title?: string, artist?: string, jacket?: string, bpms?: BpmChange[] } = {}
 
     for (const token of tokens) {
@@ -194,16 +194,16 @@ export class SccReader {
 }
 
 export class SccWriter {
-  static getOrderedFields(dto: object): [string, unknown][] {
+  static GetOrderedFields(dto: object): [string, unknown][] {
     return Object.entries(dto)
   }
 
-  static writeSscFile(dto: MusicDto): string {
+  static WriteSscFile(dto: MusicDto): string {
     let esscContent = ''
-    const fileFields = SccWriter.getOrderedFields(dto).filter(([key]) => key !== 'noteData' && key !== 'additionalFields')
+    const fileFields = SccWriter.GetOrderedFields(dto).filter(([key]) => key !== 'noteData' && key !== 'additionalFields')
     for (const [key, value] of fileFields) {
       esscContent += `#${key.toUpperCase()}:`
-      esscContent += this.writeEsscValue(value)
+      esscContent += this.WriteEsscValue(value)
       esscContent += ';\n'
     }
     esscContent += '\n'
@@ -213,7 +213,7 @@ export class SccWriter {
       esscContent += `//--------------- Dance ${count} / ${dto.noteData.length} ----------------\n#NOTEDATA:;\n`
       for (const [subKey, subValue] of Object.entries(noteData).filter(([key]) => key !== 'stepChart')) {
         esscContent += `#${subKey.toUpperCase()}:`
-        esscContent += this.writeEsscValue(subValue)
+        esscContent += this.WriteEsscValue(subValue)
         esscContent += `;\n`
       }
       esscContent += `#NOTES:\n`
@@ -224,7 +224,7 @@ export class SccWriter {
     return esscContent
   }
 
-  private static writeEsscValue(value: unknown): string {
+  private static WriteEsscValue(value: unknown): string {
     if (value === undefined || value === null)
       return ''
     if (Array.isArray(value) && value[0]) {

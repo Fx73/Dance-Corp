@@ -27,7 +27,7 @@ export class MusicCacheService {
             const raw = localStorage.getItem(this.MUSIC_STORAGE_KEY(id))
             if (!raw) continue
             try {
-                this.musics.push(MusicDto.fromJSON(JSON.parse(raw)))
+                this.musics.push(MusicDto.FromJSON(JSON.parse(raw)))
             } catch { }
         }
 
@@ -37,10 +37,10 @@ export class MusicCacheService {
         return this.musics.filter(m => this.localMusicService.registry.has(m.id) === false)
     }
 
-    async updateCache() {
+    async UpdateCache() {
         const ts = parseInt(localStorage.getItem(this.MUSIC_REGISTRY_TS_KEY) || '0')
         if (ts === 0) {
-            this.musics = await this.musicFirestoreService.getAllMusics()
+            this.musics = await this.musicFirestoreService.GetAllMusics()
             for (const music of this.musics) {
                 localStorage.setItem(this.MUSIC_STORAGE_KEY(music.id), JSON.stringify(music))
                 this.registry.add(music.id)
@@ -50,9 +50,9 @@ export class MusicCacheService {
             return
         }
 
-        const updateInfo = await this.musicFirestoreService.getUpdate(ts, this.registry)
+        const updateInfo = await this.musicFirestoreService.GetUpdate(ts, this.registry)
         if (!updateInfo) {
-            AppComponent.presentErrorToast("Failed to fetch music updates from server.")
+            AppComponent.PresentErrorToast("Failed to fetch music updates from server.")
             return
         }
 
@@ -68,7 +68,7 @@ export class MusicCacheService {
         }
 
         if (updateInfo.toUpdateMusicIds.length > 0) {
-            const updatedMusics = await this.musicFirestoreService.getMusicListWithId(updateInfo.toUpdateMusicIds)
+            const updatedMusics = await this.musicFirestoreService.GetMusicListWithId(updateInfo.toUpdateMusicIds)
 
             for (const music of updatedMusics) {
                 this.musics = this.musics.filter(m => m.id !== music.id)
@@ -79,7 +79,7 @@ export class MusicCacheService {
         }
 
         if (updateInfo.newMusicIds.length > 0) {
-            const newMusics = await this.musicFirestoreService.getMusicListWithId(updateInfo.newMusicIds)
+            const newMusics = await this.musicFirestoreService.GetMusicListWithId(updateInfo.newMusicIds)
 
             for (const music of newMusics) {
                 this.musics.push(music)
@@ -91,12 +91,12 @@ export class MusicCacheService {
         localStorage.setItem(this.MUSIC_REGISTRY_KEY, JSON.stringify(Array.from(this.registry)))
         localStorage.setItem(this.MUSIC_REGISTRY_TS_KEY, updateInfo.updatedAt.toString())
 
-        AppComponent.presentOkToast(`Music list updated: ${updateInfo.newMusicIds.length} new, ${updateInfo.toUpdateMusicIds.length} updated, ${updateInfo.toDeleteMusicIds.length} deleted.`)
+        AppComponent.PresentOkToast(`Music list updated: ${updateInfo.newMusicIds.length} new, ${updateInfo.toUpdateMusicIds.length} updated, ${updateInfo.toDeleteMusicIds.length} deleted.`)
     }
 
-    async updateCacheMusic(musicId: string) {
+    async UpdateCacheMusic(musicId: string) {
         try {
-            const musics = await this.musicFirestoreService.getMusicListWithId([musicId])
+            const musics = await this.musicFirestoreService.GetMusicListWithId([musicId])
             const music = musics[0]
             if (!music) return
 
@@ -112,13 +112,13 @@ export class MusicCacheService {
         }
     }
 
-    getMusic(musicId: string): MusicDto | null {
+    GetMusic(musicId: string): MusicDto | null {
         const cacheKey = this.MUSIC_STORAGE_KEY(musicId)
 
         const raw = localStorage.getItem(cacheKey)
         if (raw) {
             try {
-                return MusicDto.fromJSON(JSON.parse(raw))
+                return MusicDto.FromJSON(JSON.parse(raw))
             } catch { }
         }
 
@@ -126,30 +126,30 @@ export class MusicCacheService {
         return null
     }
 
-    async getMusicWithCheck(musicId: string): Promise<MusicDto | null> {
-        const music = this.getMusic(musicId)
+    async GetMusicWithCheck(musicId: string): Promise<MusicDto | null> {
+        const music = this.GetMusic(musicId)
         if (music)
             return music
 
         console.warn(`Music ${musicId} not found in cache, updating cache...`)
-        await this.updateCache()
-        return this.getMusic(musicId)
+        await this.UpdateCache()
+        return this.GetMusic(musicId)
 
     }
 
-    async getMusicWithDbNoUpdate(musicId: string): Promise<MusicDto | null> {
+    async GetMusicWithDbNoUpdate(musicId: string): Promise<MusicDto | null> {
         const cacheKey = this.MUSIC_STORAGE_KEY(musicId)
 
         const raw = localStorage.getItem(cacheKey)
         if (raw) {
             try {
-                return MusicDto.fromJSON(JSON.parse(raw))
+                return MusicDto.FromJSON(JSON.parse(raw))
             } catch { }
         }
 
         console.error(`Music ${musicId} not found in cache, fetching from server...`)
 
-        const music = (await this.musicFirestoreService.getMusicListWithId([musicId]))[0]
+        const music = (await this.musicFirestoreService.GetMusicListWithId([musicId]))[0]
         if (!music) return null
 
         localStorage.setItem(this.MUSIC_STORAGE_KEY(musicId), JSON.stringify(music))
@@ -160,7 +160,7 @@ export class MusicCacheService {
         return music
     }
 
-    clearCache(): void {
+    ClearCache(): void {
         for (const musicId of this.registry) {
             localStorage.removeItem(this.MUSIC_STORAGE_KEY(musicId))
         }
@@ -169,11 +169,11 @@ export class MusicCacheService {
         localStorage.removeItem(this.MUSIC_REGISTRY_TS_KEY)
     }
 
-    async createMusicInBase(music: MusicDto): Promise<void> {
+    async CreateMusicInBase(music: MusicDto): Promise<void> {
         try {
-            await this.musicFirestoreService.uploadMusic(music)
+            await this.musicFirestoreService.UploadMusic(music)
         } catch (e) {
-            this.updateCache()
+            this.UpdateCache()
             throw e
         }
         music.noteData = []
@@ -183,11 +183,11 @@ export class MusicCacheService {
         localStorage.setItem(this.MUSIC_REGISTRY_KEY, JSON.stringify(Array.from(this.registry)))
     }
 
-    async updateMusicInBase(music: MusicDto): Promise<void> {
+    async UpdateMusicInBase(music: MusicDto): Promise<void> {
         try {
-            await this.musicFirestoreService.updateMusic(music)
+            await this.musicFirestoreService.UpdateMusic(music)
         } catch (e) {
-            this.updateCache()
+            this.UpdateCache()
             throw e
         }
         this.musics = this.musics.filter(m => m.id !== music.id)
@@ -197,11 +197,11 @@ export class MusicCacheService {
         localStorage.setItem(this.MUSIC_REGISTRY_KEY, JSON.stringify(Array.from(this.registry)))
     }
 
-    async deleteMusicInBase(musicId: string): Promise<void> {
+    async DeleteMusicInBase(musicId: string): Promise<void> {
         try {
-            await this.musicFirestoreService.deleteMusic(musicId)
+            await this.musicFirestoreService.DeleteMusic(musicId)
         } catch (e) {
-            this.updateCache()
+            this.UpdateCache()
             throw e
         }
 
@@ -211,11 +211,11 @@ export class MusicCacheService {
         localStorage.setItem(this.MUSIC_REGISTRY_KEY, JSON.stringify(Array.from(this.registry)))
     }
 
-    async uploadNotesInBase(musicId: string, notes: NoteDataDto[]): Promise<void> {
+    async UploadNotesInBase(musicId: string, notes: NoteDataDto[]): Promise<void> {
         try {
-            await this.musicFirestoreService.uploadNotes(musicId, notes)
+            await this.musicFirestoreService.UploadNotes(musicId, notes)
         } catch (e) {
-            this.updateCache()
+            this.UpdateCache()
             throw e
         }
         const music = this.musics.find(m => m.id === musicId)
@@ -224,11 +224,11 @@ export class MusicCacheService {
         localStorage.setItem(this.MUSIC_STORAGE_KEY(music.id), JSON.stringify(music))
     }
 
-    async deleteNoteInBase(musicId: string, note: NoteDataDto): Promise<void> {
+    async DeleteNoteInBase(musicId: string, note: NoteDataDto): Promise<void> {
         try {
-            await this.musicFirestoreService.deleteNote(musicId, note)
+            await this.musicFirestoreService.DeleteNote(musicId, note)
         } catch (e) {
-            this.updateCache()
+            this.UpdateCache()
             throw e
         }
         const music = this.musics.find(m => m.id === musicId)

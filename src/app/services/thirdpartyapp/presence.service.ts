@@ -7,7 +7,7 @@ export class PresenceService {
     private discordReady = false
     private steamReady = false
 
-    async init() {
+    async Init() {
         // Discord
         try {
             await invoke("init_discord")
@@ -25,7 +25,7 @@ export class PresenceService {
         }
     }
 
-    async update(status: string, details: string = "") {
+    async Update(status: string, details: string = "") {
 
         // Discord
         if (this.discordReady) {
@@ -39,7 +39,7 @@ export class PresenceService {
         }
     }
 
-    async clear() {
+    async Clear() {
         if (this.discordReady) {
             await invoke("clear_discord_rpc")
         }

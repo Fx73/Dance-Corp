@@ -7,11 +7,11 @@ Bugs found but not fixed yet, and deprecations to migrate. Remove an entry once 
 ## Bugs
 
 - **`/play/browse` crashes without a configured player**
-  Reloading the page or opening it from a direct link (without going through player selection) throws `Cannot read properties of undefined (reading 'index')` in `initPlayerInput` (`browse.page.ts`, `player.gamepad!.index`), then a second error on `musicCards.toArray()` in a `setTimeout`.
+  Reloading the page or opening it from a direct link (without going through player selection) throws `Cannot read properties of undefined (reading 'index')` in `InitPlayerInput` (`browse.page.ts`, `player.gamepad!.index`), then a second error on `musicCards.toArray()` in a `setTimeout`.
   Possible fix: guard with `?.` and redirect to player selection when no player is configured.
 
 - **Genre autocomplete: suggestions unreachable with the keyboard**
-  `onBlur` clears the suggestion list when the input loses focus, so pressing Tab to reach a suggestion closes the list first.
+  `OnBlur` clears the suggestion list when the input loses focus, so pressing Tab to reach a suggestion closes the list first.
   Possible fix: arrow up/down + Enter navigation from the input, with `aria-activedescendant`.
 
 - **User music converter: notes never converted to `UserNoteDto`**
@@ -27,24 +27,24 @@ Bugs found but not fixed yet, and deprecations to migrate. Remove an entry once 
   Possible fix: use `getAll('notes')`, or join the array before navigating.
 
 - **Scores saved against the wrong chart**
-  `GameManager.gameOver()` calls `updateUserStatsFromRound(music.id, music.noteData[0].chartName, gameRound)` for every round, so all players' stats go to the first chart of the music instead of the one they played. Same `noteData[0]` shortcut in the Discord presence of `game.page.ts`.
+  `GameManager.GameOver()` calls `UpdateUserStatsFromRound(music.id, music.noteData[0].chartName, gameRound)` for every round, so all players' stats go to the first chart of the music instead of the one they played. Same `noteData[0]` shortcut in the Discord presence of `game.page.ts`.
   Possible fix: use each `gameRound`'s own note data.
 
 - **`UserGuard`: user data fetch is never awaited**
-  `canActivate()` calls `guardWaitForUserDataFetch()` without `await`; a Promise is always truthy, so `!isUserFetched` is never true and the check is skipped.
+  `canActivate()` calls `GuardWaitForUserDataFetch()` without `await`; a Promise is always truthy, so `!isUserFetched` is never true and the check is skipped.
 
 - **`DancePadKeyboard` listeners are never removed**
   The constructor adds `keydown`/`keyup` listeners on `window` with no way to remove them. A new instance is created on each browse page init and each `GameRound`, so listeners accumulate during a session.
   Possible fix: add a `destroy()` to `IDancePad` and call it on leave.
 
 - **Note upload duplicates notes in the local music cache**
-  `MusicCacheService.uploadNotesInBase()` does `music.noteData.concat(notes)`, while Firestore replaces notes with the same `chartName`. Re-uploading an existing note leaves a duplicate in the cache until the next full refresh.
+  `MusicCacheService.UploadNotesInBase()` does `music.noteData.concat(notes)`, while Firestore replaces notes with the same `chartName`. Re-uploading an existing note leaves a duplicate in the cache until the next full refresh.
 
-- **Upload page: DB fallback never runs in `startLoad()`**
-  `musicData` is initialised with `new MusicDto()` and never set to `null`, so `if (!this.musicData)` is always false and the `musicDataDb.deepClone()` fallback is dead code.
+- **Upload page: DB fallback never runs in `StartLoad()`**
+  `musicData` is initialised with `new MusicDto()` and never set to `null`, so `if (!this.musicData)` is always false and the `musicDataDb.DeepClone()` fallback is dead code.
 
 - **Crowd sound fade-out starts immediately (unverified)**
-  `AnnouncerService.playAudio()` schedules the fade with `audio.duration * 1000 - fadeDuration` right after `play()`, when `duration` is usually still `NaN` (metadata not loaded); `setTimeout(NaN)` runs at once.
+  `AnnouncerService.PlayAudio()` schedules the fade with `audio.duration * 1000 - fadeDuration` right after `audio.play()`, when `duration` is usually still `NaN` (metadata not loaded); `setTimeout(NaN)` runs at once.
   Possible fix: schedule the fade on `loadedmetadata`.
 
 - **Music offset fallback is dead code**
@@ -65,13 +65,13 @@ Bugs found but not fixed yet, and deprecations to migrate. Remove an entry once 
   Chart, music and player indexes travel between browse, the URL and the game (`selectedNotesIndex`, `selectedMusicIndex` over two concatenated lists). Three of the bugs above come from this. Prefer `chartName` / `music.id`.
 
 - **Floating promises**
-  Async calls are often fired without `await` (`addGenres()`, `updateMusicIndex()`, `updateCache()` in `catch` blocks, `deleteNoteInBase()` followed by `loadDbMusic()`). Await them, or mark intentional ones with `void`. The ESLint rule `@typescript-eslint/no-floating-promises` would list them all. Also review the 4 empty `catch { }` blocks that swallow errors.
+  Async calls are often fired without `await` (`AddGenres()`, `UpdateMusicIndex()`, `UpdateCache()` in `catch` blocks, `DeleteNoteInBase()` followed by `LoadDbMusic()`). Await them, or mark intentional ones with `void`. The ESLint rule `@typescript-eslint/no-floating-promises` would list them all. Also review the 4 empty `catch { }` blocks that swallow errors.
 
 - **Duplicated persistence block in `MusicCacheService`**
-  "update `musics` + `localStorage.setItem` + `registry.add` + save registry" is repeated about 8 times. Extract a `persistMusic(music)` / `removeMusic(id)` helper.
+  "update `musics` + `localStorage.setItem` + `registry.add` + save registry" is repeated about 8 times. Extract a `PersistMusic(music)` / `RemoveMusic(id)` helper.
 
 - **Logging**
-  60 `console.log`, some in per-frame or per-arrow paths (`GameRound.checkArrowPress`, `AnnouncerService.changeSatisfaction`, chart name parsing, protected field check). Replace with a small logger that can be silenced, or remove debug traces.
+  60 `console.log`, some in per-frame or per-arrow paths (`GameRound.CheckArrowPress`, `AnnouncerService.ChangeSatisfaction`, chart name parsing, protected field check). Replace with a small logger that can be silenced, or remove debug traces.
 
 ## Code style to harmonize
 

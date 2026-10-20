@@ -19,31 +19,31 @@ export class ArrowImageManager {
     private static holdImages: HTMLCanvasElement[] = []
     private static mineImage: HTMLCanvasElement
 
-    public static getArrowImage(color: ArrowColor, direction: ArrowDirection): HTMLCanvasElement {
+    public static GetArrowImage(color: ArrowColor, direction: ArrowDirection): HTMLCanvasElement {
         return ArrowImageManager.arrowImages[color][direction]
     }
 
-    public static getHoldForDistance(distance: number): HTMLCanvasElement {
+    public static GetHoldForDistance(distance: number): HTMLCanvasElement {
         const interval = CONFIG.DISPLAY.BEAT_INTERVAL / this._HOLD_PRELOAD_PRECISION
         const closestIndex = Math.min(Math.round(distance / interval), ArrowImageManager.holdImages.length)
         return ArrowImageManager.holdImages[closestIndex]
     }
 
-    public static getMineImage(): HTMLCanvasElement {
+    public static GetMineImage(): HTMLCanvasElement {
         return ArrowImageManager.mineImage
     }
 
-    public static setArrowSize(size: number) {
+    public static SetArrowSize(size: number) {
         this._ARROW_SIZE = size
         CONFIG.DISPLAY.BEAT_INTERVAL = size * 1.2
-        this.loadImages()
+        this.LoadImages()
     }
     static { }
-    public static loadImages() {
+    public static LoadImages() {
         const baseArrowImage = new Image()
         baseArrowImage.src = "assets/Arrow/Arrow.png"
         baseArrowImage.onload = () => {
-            ArrowImageManager.preloadArrowImages(baseArrowImage)
+            ArrowImageManager.PreloadArrowImages(baseArrowImage)
         }
 
         const holdCenterImage = new Image()
@@ -55,28 +55,28 @@ export class ArrowImageManager {
         const mineImage = new Image()
         mineImage.src = "assets/Arrow/Mine.png"
         mineImage.onload = () => {
-            ArrowImageManager.mineImage = this.createResizedImage(mineImage)
+            ArrowImageManager.mineImage = this.CreateResizedImage(mineImage)
         }
 
         Promise.all([
             new Promise<void>((resolve) => { holdCenterImage.onload = () => resolve() }),
             new Promise<void>((resolve) => { holdCapImage.onload = () => resolve() }),
         ]).then(() => {
-            this.preloadHoldImages(holdCenterImage, holdCapImage)
+            this.PreloadHoldImages(holdCenterImage, holdCapImage)
         })
 
     }
 
-    public static preloadHoldImages(centerImage: HTMLImageElement, capImage: HTMLImageElement) {
+    public static PreloadHoldImages(centerImage: HTMLImageElement, capImage: HTMLImageElement) {
         const interval = CONFIG.DISPLAY.BEAT_INTERVAL / ArrowImageManager._HOLD_PRELOAD_PRECISION
         const maxMultiplier = ArrowImageManager._HOLD_PRELOAD_PRECISION * 20 // Preload up to 20 beats of hold images
         for (let multiplier = 0; multiplier <= maxMultiplier; multiplier++) {
-            const img = ArrowImageManager.preloadHoldImage(centerImage, capImage, multiplier * interval)
+            const img = ArrowImageManager.PreloadHoldImage(centerImage, capImage, multiplier * interval)
             this.holdImages.push(img)
         }
     }
 
-    private static preloadHoldImage(centerImage: HTMLImageElement, capImage: HTMLImageElement, height: number): HTMLCanvasElement {
+    private static PreloadHoldImage(centerImage: HTMLImageElement, capImage: HTMLImageElement, height: number): HTMLCanvasElement {
         const canvas = document.createElement('canvas')
         canvas.width = this.ARROW_SIZE
         canvas.height = height
@@ -100,27 +100,27 @@ export class ArrowImageManager {
         return canvas
     }
 
-    private static preloadArrowImages(arrowImage: HTMLImageElement): void {
+    private static PreloadArrowImages(arrowImage: HTMLImageElement): void {
         // Loop through each color
         const colors = ['#FFA500', '#0000FF', '#FFFF00', '#8A2BE2'] // Orange, Blue, Yellow, Violet
         for (const color of colors) {
             const arrowImgRow: HTMLCanvasElement[] = []
 
             // Create the grayscale base arrow for rotations
-            const baseUp = ArrowImageManager.createColorizedImage(arrowImage, color)
+            const baseUp = ArrowImageManager.CreateColorizedImage(arrowImage, color)
 
             // Generate rotated images for each direction
-            arrowImgRow[ArrowDirection.Left] = this.createRotatedImage(baseUp, Math.PI / 4) // Rotate 45° (Left)
-            arrowImgRow[ArrowDirection.Down] = this.createRotatedImage(baseUp, -Math.PI / 4) // Rotate -45° (Down)
-            arrowImgRow[ArrowDirection.Up] = this.createRotatedImage(baseUp, (3 * Math.PI) / 4) // Rotate 135° (Up)
-            arrowImgRow[ArrowDirection.Right] = this.createRotatedImage(baseUp, (-3 * Math.PI) / 4) // Rotate -135° (Right)      
+            arrowImgRow[ArrowDirection.Left] = this.CreateRotatedImage(baseUp, Math.PI / 4) // Rotate 45° (Left)
+            arrowImgRow[ArrowDirection.Down] = this.CreateRotatedImage(baseUp, -Math.PI / 4) // Rotate -45° (Down)
+            arrowImgRow[ArrowDirection.Up] = this.CreateRotatedImage(baseUp, (3 * Math.PI) / 4) // Rotate 135° (Up)
+            arrowImgRow[ArrowDirection.Right] = this.CreateRotatedImage(baseUp, (-3 * Math.PI) / 4) // Rotate -135° (Right)      
 
             this.arrowImages.push(arrowImgRow)
         }
 
     }
 
-    private static createColorizedImage(
+    private static CreateColorizedImage(
         baseImage: HTMLImageElement,
         color: string,
         luminanceBoost: number = 3
@@ -162,7 +162,7 @@ export class ArrowImageManager {
         return canvas
     }
 
-    private static createResizedImage(image: HTMLCanvasElement | HTMLImageElement): HTMLCanvasElement {
+    private static CreateResizedImage(image: HTMLCanvasElement | HTMLImageElement): HTMLCanvasElement {
         const canvas = document.createElement('canvas')
         canvas.width = this.ARROW_SIZE
         canvas.height = this.ARROW_SIZE
@@ -171,7 +171,7 @@ export class ArrowImageManager {
         return canvas
     }
 
-    private static createRotatedImage(image: HTMLCanvasElement, angle: number): HTMLCanvasElement {
+    private static CreateRotatedImage(image: HTMLCanvasElement, angle: number): HTMLCanvasElement {
         const canvas = document.createElement('canvas')
         canvas.width = this.ARROW_SIZE
         canvas.height = this.ARROW_SIZE

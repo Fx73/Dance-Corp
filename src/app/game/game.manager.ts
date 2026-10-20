@@ -25,7 +25,7 @@ export class GameManager {
         }
 
         this.beatManager = new BeatManager(this.music)
-        this.mainUserStats = this.userCacheService.getMusicStats(this.music.id).notes.find((n: UserNoteDto) => n.id === this.music.noteData[noteSelected[0]].chartName) ?? null
+        this.mainUserStats = this.userCacheService.GetMusicStats(this.music.id).notes.find((n: UserNoteDto) => n.id === this.music.noteData[noteSelected[0]].chartName) ?? null
     }
 
     public gameRounds: GameRound[] = []
@@ -37,41 +37,41 @@ export class GameManager {
     private currentBackgroundIndex = 0
     private zeroTimeStamp: number = 0
 
-    public registerExternalComponents(musicPlayer: IMusicPlayer) {
+    public RegisterExternalComponents(musicPlayer: IMusicPlayer) {
         this.musicPlayer = musicPlayer
     }
 
-    public async startGame() {
+    public async StartGame() {
         console.log("Waiting for audio to start…")
 
-        this.musicPlayer.play()
-        await new Promise<void>(resolve => { const check = () => { const t = this.musicPlayer.getCurrentTime(); if (t > 0) { resolve() } else { requestAnimationFrame(check) } }; check() })
+        this.musicPlayer.Play()
+        await new Promise<void>(resolve => { const check = () => { const t = this.musicPlayer.GetCurrentTime(); if (t > 0) { resolve() } else { requestAnimationFrame(check) } }; check() })
 
-        const musicCurrentTime = this.musicPlayer.getCurrentTime()
+        const musicCurrentTime = this.musicPlayer.GetCurrentTime()
         this.zeroTimeStamp = Math.round(performance.now()) - (musicCurrentTime * 1000)
 
-        this.gameGlobalLoop(this.zeroTimeStamp)
+        this.GameGlobalLoop(this.zeroTimeStamp)
 
         console.log("Game has started")
     }
 
     private gameLoopId: number | null = null
-    private gameGlobalLoop(currentTimestamp: DOMHighResTimeStamp): void {
+    private GameGlobalLoop(currentTimestamp: DOMHighResTimeStamp): void {
         const roundedTimestamp = Math.round(currentTimestamp)
         const elapsedTime = (roundedTimestamp - this.zeroTimeStamp) / 1000 // In seconds
 
-        const { beat: currentBeat, bps: currentBps } = this.beatManager.getBeatAndBpsAtTime(elapsedTime)
+        const { beat: currentBeat, bps: currentBps } = this.beatManager.GetBeatAndBpsAtTime(elapsedTime)
 
         if (this.music.bgChanges && this.music.bgChanges[this.currentBackgroundIndex + 1] && currentBeat >= this.music.bgChanges[this.currentBackgroundIndex + 1].time) {
             this.currentBackgroundIndex++
         }
 
         for (const gameRound of this.gameRounds) {
-            gameRound.gameLoop(currentBeat, CONFIG.GAME.TOLERANCE_WINDOW * currentBps)
+            gameRound.GameLoop(currentBeat, CONFIG.GAME.TOLERANCE_WINDOW * currentBps)
         }
 
         if (this.gameRounds.every(gameRound => gameRound.isFailed || gameRound.isFinished)) {
-            this.gameOver()
+            this.GameOver()
             return // Stop loop
         }
 
@@ -79,10 +79,10 @@ export class GameManager {
         //const musicCurrentTime = this.musicPlayer.getCurrentTime();
 
         // Schedule the next loop iteration
-        this.gameLoopId = requestAnimationFrame(this.gameGlobalLoop.bind(this))
+        this.gameLoopId = requestAnimationFrame(this.GameGlobalLoop.bind(this))
     }
 
-    public getCurrentBackground(): string {
+    public GetCurrentBackground(): string {
         if (!this.music.bgChanges || this.music.bgChanges.length === 0) {
             return CONFIG.GAME.DEFAULT_BACKGROUND
         }
@@ -99,45 +99,45 @@ export class GameManager {
         this._isGameOver = value
     }
 
-    gameOver() {
+    GameOver() {
         console.log('Game Over: All game rounds have failed or finished.')
         console.log(this.music, this.music.id)
         this.isGameOver = true
 
         // At least one player finished and has a score of MAX_SCORE
         if (this.gameRounds.some(gr => gr.isFinished && gr.score >= gr.MAX_SCORE)) {
-            this.announcerService.playAnnouncer("victory")
-            this.announcerService.playCrowdOneShot("special")
+            this.announcerService.PlayAnnouncer("victory")
+            this.announcerService.PlayCrowdOneShot("special")
         }
         // At least one player finished and has a score of A
         else if (this.gameRounds.some(gr => gr.isFinished && gr.score >= gr.MAX_SCORE * 0.9)) {
-            this.announcerService.playAnnouncer("victory")
-            this.announcerService.playCrowdOneShot("applause_heavy")
+            this.announcerService.PlayAnnouncer("victory")
+            this.announcerService.PlayCrowdOneShot("applause_heavy")
         }
         // At least one player finished
         else if (this.gameRounds.some(gr => gr.isFinished)) {
-            this.announcerService.playAnnouncer("victory_small")
-            this.announcerService.playCrowdOneShot("applause_light")
+            this.announcerService.PlayAnnouncer("victory_small")
+            this.announcerService.PlayCrowdOneShot("applause_light")
         }
         // All players failed
         else {
-            this.announcerService.playAnnouncer("game_over")
-            this.announcerService.playCrowdOneShot("boo")
+            this.announcerService.PlayAnnouncer("game_over")
+            this.announcerService.PlayCrowdOneShot("boo")
         }
         // Main Player get new highscore
         if (this.gameRounds[0].isFinished && this.mainUserStats && this.gameRounds[0].score > this.mainUserStats.highScore) {
-            this.announcerService.playAnnouncer("high_score")
+            this.announcerService.PlayAnnouncer("high_score")
         }
 
         if (!this.isTrainingMode) {
             for (const gameRound of this.gameRounds) {
-                this.userCacheService.updateUserStatsFromRound(this.music.id, this.music.noteData[0].chartName, gameRound)
+                this.userCacheService.UpdateUserStatsFromRound(this.music.id, this.music.noteData[0].chartName, gameRound)
             }
         }
 
     }
 
-    public destroyGame() {
+    public DestroyGame() {
         if (this.gameLoopId !== null) {
             cancelAnimationFrame(this.gameLoopId)
         }

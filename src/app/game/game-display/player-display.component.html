@@ -1,9 +1,9 @@
 <div style="display: flex; justify-content: center;">
-<div class="player-hud" [style.width.px]="getConfigValue('canvasWidth')">
-  <div class="score"> {{gameRound.player.name}} - Level {{ gameRound.level }} : {{ getDisplayScore() }}</div>
+<div class="player-hud" [style.width.px]="GetConfigValue('canvasWidth')">
+  <div class="score"> {{gameRound.player.name}} - Level {{ gameRound.level }} : {{ GetDisplayScore() }}</div>
   <div class="performance-container" >
-    <div class="performance-bar" [style.width.%]="gameRound.performance" [style.backgroundColor]="getPerformanceColor()">
-      @if (getConfigValue('trainingMode')) {
+    <div class="performance-bar" [style.width.%]="gameRound.performance" [style.backgroundColor]="GetPerformanceColor()">
+      @if (GetConfigValue('trainingMode')) {
         <div class="performance-label"> Training Mode </div>
       }
       @if (gameRound.isFailed) {

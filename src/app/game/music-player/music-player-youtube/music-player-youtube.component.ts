@@ -36,30 +36,30 @@ export class MusicPlayerYoutubeComponent extends MusicPlayerCommon implements IM
 
   // This method is called when the YouTube player is ready. 
   // It can use : event: YT.PlayerEvent
-  onReadyInternal(): void {
+  OnReadyInternal(): void {
     this.player.stopVideo()
-    this.player.setVolume(this.getVolume() * 100)
+    this.player.setVolume(this.GetVolume() * 100)
 
     this.ready.emit(this)
   }
 
-  play(): void {
+  Play(): void {
     this.player.playVideo()
   }
 
-  stop(): void {
+  Stop(): void {
     this.player.stopVideo()
   }
 
-  getCurrentTime(): number {
+  GetCurrentTime(): number {
     return this.player.getCurrentTime() - (this.startOffset ?? 0)
   }
 
-  setToTime(time: number): void {
+  SetToTime(time: number): void {
     this.player.seekTo(time + (this.startOffset ?? 0), true)
   }
 
-  public extractVideoId(url: string): string {
+  public ExtractVideoId(url: string): string {
     const match = url.match(
       /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:embed\/|watch\?v=)|youtu\.be\/)([0-9A-Za-z_-]{11})/
     )

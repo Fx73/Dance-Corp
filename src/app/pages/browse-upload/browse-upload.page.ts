@@ -34,12 +34,12 @@ export class BrowseUploadPage implements OnInit {
   }
 
   ngOnInit() {
-    this.initIonInfinite()
+    this.InitIonInfinite()
 
-    this.discordRpcService.update("Editing")
+    this.discordRpcService.Update("Editing")
   }
 
-  initIonInfinite() {
+  InitIonInfinite() {
     const q = this.searchQuery.toLowerCase()
 
     let updateDbMusics = this.musicCacheService.allRemoteMusics
@@ -62,19 +62,19 @@ export class BrowseUploadPage implements OnInit {
     this.dbMusics.set(updateDbMusics)
   }
 
-  pickMusic(music: MusicDto | null = null) {
+  PickMusic(music: MusicDto | null = null) {
     if (music !== null)
       this.router.navigate(['/upload'], { queryParams: { music: music.id } })
     else
       this.router.navigate(['/upload'])
   }
 
-  onSearch(event: SearchbarCustomEvent) {
+  OnSearch(event: SearchbarCustomEvent) {
     this.searchQuery = (event.target.value || '').toLowerCase()
-    this.initIonInfinite()
+    this.InitIonInfinite()
   }
 
-  onIonInfinite(event: InfiniteScrollCustomEvent) {
+  OnIonInfinite(event: InfiniteScrollCustomEvent) {
     console.info("Congratz, you found the infinite scroll ! But there is no more music to load :)")
     event.target.complete()
   }

@@ -11,6 +11,8 @@ import { IMusicPlayer, MusicPlayerCommon } from '../IMusicPlayer'
 //import { Soundcloud } from 'soundcloud.ts';
 
 /** Subset of the SoundCloud widget API in use (https://developers.soundcloud.com/docs/api/html5-widget) */
+// External API names: kept as declared by SoundCloud
+/* eslint-disable @typescript-eslint/naming-convention */
 interface ISoundCloudWidget {
   load(url: string): void
   bind(eventName: string, listener: () => void): void
@@ -20,6 +22,7 @@ interface ISoundCloudWidget {
   setVolume(volume: number): void
   getPosition(callback: (milliseconds: number) => void): void
 }
+/* eslint-enable @typescript-eslint/naming-convention */
 
 declare const SC: {
   Widget: ((iframe: HTMLIFrameElement) => ISoundCloudWidget) & { Events: { READY: string } }
@@ -51,29 +54,29 @@ export class MusicPlayerSoundcloudComponent extends MusicPlayerCommon
       this.widgetSC.seekTo(this.startOffset * 1000)
     }
     this.widgetSC.bind(SC.Widget.Events.READY, () => {
-      this.widgetSC.setVolume(this.getVolume() * 100)
+      this.widgetSC.setVolume(this.GetVolume() * 100)
       if (this.startOffset !== undefined)
         this.widgetSC.seekTo(this.startOffset * 1000)
       this.ready.emit(this)
     })
   }
 
-  play() {
+  Play() {
     this.widgetSC.play()
-    this.startPolling()
+    this.StartPolling()
   }
 
-  stop() {
+  Stop() {
     try {
       this.widgetSC.pause()
     } catch { }
-    this.stopPolling()
+    this.StopPolling()
   }
 
   //#region CurrentTime management
   private polling?: ReturnType<typeof setInterval>
   private lastKnownTime = 0
-  startPolling() {
+  StartPolling() {
     this.polling = setInterval(() => {
       this.widgetSC.getPosition((ms: number) => {
         this.lastKnownTime = ms / 1000
@@ -81,20 +84,20 @@ export class MusicPlayerSoundcloudComponent extends MusicPlayerCommon
     }, 100)
   }
 
-  stopPolling() {
+  StopPolling() {
     clearInterval(this.polling)
   }
 
-  getCurrentTime(): number {
+  GetCurrentTime(): number {
     return this.lastKnownTime - (this.startOffset ?? 0)
   }
   //#endregion
 
-  setToTime(time: number): void {
+  SetToTime(time: number): void {
     this.widgetSC.seekTo((time + (this.startOffset ?? 0)) * 1000)
   }
 
   ngOnDestroy() {
-    this.stopPolling()
+    this.StopPolling()
   }
 }

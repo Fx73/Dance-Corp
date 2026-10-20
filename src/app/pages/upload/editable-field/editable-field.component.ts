@@ -32,23 +32,23 @@ export class MusicEditableFieldComponent<T extends string | number | null | unde
   public isDirty = false
 
   ngOnChanges() {
-    this.isDirty = this.isEditing && this.normalize(this.value) !== this.normalize(this.valueDb)
+    this.isDirty = this.isEditing && this.Normalize(this.value) !== this.Normalize(this.valueDb)
   }
 
-  onInputChange(ev: InputCustomEvent<InputChangeEventDetail>) {
+  OnInputChange(ev: InputCustomEvent<InputChangeEventDetail>) {
     const rawValue = ev.detail.value
     const newValue = SanitizeSscInput(rawValue == null ? null : String(rawValue))
 
-    this.isDirty = this.isEditing && this.normalize(newValue) !== this.normalize(this.valueDb)
+    this.isDirty = this.isEditing && this.Normalize(newValue) !== this.Normalize(this.valueDb)
     // SanitizeSscInput returns a string (or null), emitted as is even if the bound field is a number
     this.valueChange.emit(newValue as T)
   }
 
   get isChanged(): boolean {
-    return this.isEditing && this.normalize(this.value) !== this.normalize(this.valueDb)
+    return this.isEditing && this.Normalize(this.value) !== this.Normalize(this.valueDb)
   }
 
-  private normalize(v: unknown): string {
+  private Normalize(v: unknown): string {
     if (v === undefined || v === null) return ""
     return String(v).trim()
   }

@@ -29,14 +29,14 @@ export class UserComponent {
   constructor() {
     const loginService = this.loginService
 
-    loginService.listenForUserChanges(user => currentUser.set(user))
+    loginService.ListenForUserChanges(user => currentUser.set(user))
     addIcons({
       'person': person,
       'logoGoogle': logoGoogle
     })
   }
 
-  async presentPopover(e: Event) {
+  async PresentPopover(e: Event) {
     let popover: HTMLIonPopoverElement
     if (this.user()) {
       popover = this.userpopover
@@ -55,8 +55,8 @@ export class UserComponent {
     await popover.onDidDismiss()
   }
 
-  logout() {
-    this.loginService.logOut()
+  Logout() {
+    this.loginService.LogOut()
     this.popoverController.dismiss().then(() => {
       this.router.navigateByUrl('home')
     }

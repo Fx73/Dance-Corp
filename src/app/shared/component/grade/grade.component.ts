@@ -20,7 +20,7 @@ export class GradeComponent implements OnInit {
   color: string = '#000000'
 
   ngOnInit() {
-    ({ grade: this.grade, color: this.color } = Color.gradeFromScore(this.score, this.failed))
+    ({ grade: this.grade, color: this.color } = Color.GradeFromScore(this.score, this.failed))
   }
 
 }

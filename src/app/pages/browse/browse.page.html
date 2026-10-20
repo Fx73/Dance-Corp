@@ -1,19 +1,19 @@
 <app-header title="Browse Musics"></app-header>
 <ion-content fullscreen="false">
   <ion-split-pane when="xs" contentId="music-list">
-    @let selectedMusic = getSelectedMusic(selectedMusicIndex());
+    @let selectedMusic = GetSelectedMusic(selectedMusicIndex());
 
     <ion-menu contentId="music-list">
       @if (selectedMusic) {
       @switch (pickMusicPlayer(selectedMusic.music!)) {
       @case (MusicOrigin.Youtube){
-      <app-music-player-youtube [musicUrl]="selectedMusic.music!" (ready)="onPlayerReady($event)" [startOffset]="selectedMusic?.musicoffset"></app-music-player-youtube>
+      <app-music-player-youtube [musicUrl]="selectedMusic.music!" (ready)="OnPlayerReady($event)" [startOffset]="selectedMusic?.musicoffset"></app-music-player-youtube>
       }
       @case (MusicOrigin.Soundcloud){
-      <app-music-player-soundcloud [musicUrl]="selectedMusic?.music!" (ready)="onPlayerReady($event)" [startOffset]="selectedMusic?.musicoffset"></app-music-player-soundcloud>
+      <app-music-player-soundcloud [musicUrl]="selectedMusic?.music!" (ready)="OnPlayerReady($event)" [startOffset]="selectedMusic?.musicoffset"></app-music-player-soundcloud>
       }
       @case (MusicOrigin.Local){
-      <app-music-player-local [musicUrl]="selectedMusic?.music!" (ready)="onPlayerReady($event)" [startOffset]="selectedMusic?.musicoffset"></app-music-player-local>
+      <app-music-player-local [musicUrl]="selectedMusic?.music!" (ready)="OnPlayerReady($event)" [startOffset]="selectedMusic?.musicoffset"></app-music-player-local>
       }
       }
       <ion-card class="levelCard" [ngStyle]="{'background-image': 'url(https://' + selectedMusic.jacket + ')'}">
@@ -23,13 +23,13 @@
         </ion-card-header>
         <ion-card-content>
           @for (note of musicNotes(); track $index) {
-          @let userNote = getUserNote(note.chartName);
-          <ion-card class="note-card" (mouseenter)="onSelectNote($index)" (click)="runGame()" [style.backgroundColor]="getNoteColor(note.difficulty)">
+          @let userNote = GetUserNote(note.chartName);
+          <ion-card class="note-card" (mouseenter)="OnSelectNote($index)" (click)="RunGame()" [style.backgroundColor]="GetNoteColor(note.difficulty)">
             <ion-card-content>
               <ion-img class="player-number-icon" [src]="note.stepsType === DanceType.DanceSingle ? 'assets/Icons/SingleDance.png' : 'assets/Icons/DoubleDance.png'"></ion-img>
               <div class="badge-container" [style.--badge-left]="'4vw'">
-                @for (playerIndex of getPlayersForNote($index); track playerIndex) {
-                <ion-badge slot="end" class="player-badge" [style.backgroundColor]="getPlayerColor(playerIndex)">{{ playerIndex + 1 }}</ion-badge>
+                @for (playerIndex of GetPlayersForNote($index); track playerIndex) {
+                <ion-badge slot="end" class="player-badge" [style.backgroundColor]="GetPlayerColor(playerIndex)">{{ playerIndex + 1 }}</ion-badge>
                 }
               </div>
               <div class="difficulty">
@@ -48,19 +48,19 @@
       </ion-card>
       <ion-card class="basicCard difficultyCard">
         <ion-card-content>
-          <app-radar-score [scores]="getSelectedNotesDifficulty()" [size]="200"> </app-radar-score>
+          <app-radar-score [scores]="GetSelectedNotesDifficulty()" [size]="200"> </app-radar-score>
         </ion-card-content>
       </ion-card>
       }
     </ion-menu>
 
     <div id="music-list">
-      <ion-searchbar [value]="searchQuery" [debounce]="1000" (ionInput)="onSearch($event)" show-clear-button="focus" style="background-color:white" class="search-input" (ionFocus)="isFocusOnSearchInput = true" (ionBlur)="isFocusOnSearchInput = false"></ion-searchbar>
+      <ion-searchbar [value]="searchQuery" [debounce]="1000" (ionInput)="OnSearch($event)" show-clear-button="focus" style="background-color:white" class="search-input" (ionFocus)="isFocusOnSearchInput = true" (ionBlur)="isFocusOnSearchInput = false"></ion-searchbar>
       <div style="height: 95%;overflow-y: scroll;" class="ion-content-scroll-host">
         <div class="cardList">
           <!-- Edited music -->
           @for (music of storedMusics(); track $index) {
-          <ion-card #musicCard (click)="onSelectMusic($index)" class="basicCard music-card stored-card" [ngClass]="selectedMusic?.id === music.id ? 'selectedCard' : ''">
+          <ion-card #musicCard (click)="OnSelectMusic($index)" class="basicCard music-card stored-card" [ngClass]="selectedMusic?.id === music.id ? 'selectedCard' : ''">
             <ion-img [src]="'https://'+music.jacket"></ion-img>
             <ion-card-header>
               <ion-card-title>{{ music.title }}</ion-card-title>
@@ -74,7 +74,7 @@
 
           <!-- Music cards -->
           @for (music of dbMusics(); track $index) {
-          <ion-card #musicCard (click)="onSelectMusic($index + storedMusics.length)" class="basicCard music-card" [ngClass]="selectedMusic?.id === music.id ? 'selectedCard' : ''">
+          <ion-card #musicCard (click)="OnSelectMusic($index + storedMusics.length)" class="basicCard music-card" [ngClass]="selectedMusic?.id === music.id ? 'selectedCard' : ''">
             <ion-img [src]="'https://'+music.jacket"></ion-img>
             <ion-card-header>
               <ion-card-title>{{ music.title }}</ion-card-title>
@@ -86,7 +86,7 @@
           </ion-card>
           }
         </div>
-        <ion-infinite-scroll (ionInfinite)="onIonInfinite($event)">
+        <ion-infinite-scroll (ionInfinite)="OnIonInfinite($event)">
           <ion-infinite-scroll-content></ion-infinite-scroll-content>
         </ion-infinite-scroll>
       </div>

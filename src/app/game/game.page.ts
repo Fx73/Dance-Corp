@@ -72,7 +72,7 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
       return
     }
 
-    const music = this.musicCacheService.getMusic(musicId)
+    const music = this.musicCacheService.GetMusic(musicId)
     if (!music) {
       console.error(`Music with ID ${musicId} not found. Your cache might be corrupted.`)
       this.router.navigate(['/home'])
@@ -81,19 +81,19 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
     this.music = music
 
     // Prepare Music Player
-    this.musicOrigin = MusicPlayerCommon.pickMusicPlayer(this.music.music!)
+    this.musicOrigin = MusicPlayerCommon.PickMusicPlayer(this.music.music!)
     if (this.musicOrigin == null) {
-      AppComponent.presentWarningToast("Error loading music in player !")
+      AppComponent.PresentWarningToast("Error loading music in player !")
       this.router.navigate(['/home'])
       return
     }
 
     const players = this.userConfigService.players
-    const isTrainingMode: boolean = this.userConfigService.getConfig()["trainingMode"] ?? false
+    const isTrainingMode: boolean = this.userConfigService.GetConfig()["trainingMode"] ?? false
     this.game = new GameManager(this.music, players, selectedNotes, isTrainingMode, this.userCacheService, this.announcerService)
-    this.announcerService.pickPreferredAnnouncer()
+    this.announcerService.PickPreferredAnnouncer()
 
-    this.discordRpcService.update("Dancing on lvl " + this.music.noteData[0].meter, this.music.title + " - " + this.music.artist)
+    this.discordRpcService.Update("Dancing on lvl " + this.music.noteData[0].meter, this.music.title + " - " + this.music.artist)
   }
 
   @ViewChildren(PlayerDisplayComponent) playerDisplaysQuery!: QueryList<PlayerDisplayComponent>
@@ -102,47 +102,47 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
     this.playerDisplays = this.playerDisplaysQuery.toArray()
     console.log("Player Displays initialized:", this.playerDisplays, this.musicPlayer)
     if (this.musicPlayer && this.playerDisplays.length > 0)
-      this.initGame()
+      this.InitGame()
   }
 
   private musicPlayer!: IMusicPlayer
-  onPlayerReady(mPlayer: IMusicPlayer) {
+  OnPlayerReady(mPlayer: IMusicPlayer) {
     this.musicPlayer = mPlayer
     console.log("Music Player is ready:", this.musicPlayer, this.playerDisplays)
     if (this.musicPlayer && this.playerDisplays.length > 0)
-      this.initGame()
+      this.InitGame()
   }
 
   private hasGameBeenInitialized = false
-  initGame() {
+  InitGame() {
     if (this.hasGameBeenInitialized) return
     this.hasGameBeenInitialized = true
 
-    this.game!.registerExternalComponents(this.musicPlayer, /*this.playerDisplays*/)
+    this.game!.RegisterExternalComponents(this.musicPlayer, /*this.playerDisplays*/)
 
-    this.waitingScreen.startCountdown()
-    this.announcerService.playCountdownFromAnnouncer()
+    this.waitingScreen.StartCountdown()
+    this.announcerService.PlayCountdownFromAnnouncer()
 
     this.cdr.detectChanges()
   }
 
-  handleCountdownFinished() {
+  HandleCountdownFinished() {
     this.loadingMusic = false
-    this.game?.startGame()
+    this.game?.StartGame()
   }
 
   ngOnDestroy(): void {
     try {
-      this.game?.musicPlayer.stop()
+      this.game?.musicPlayer.Stop()
     } catch (e) {
       console.warn("Error stopping music player on game destroy:", e)
     }
-    this.game?.destroyGame()
+    this.game?.DestroyGame()
     this.game = null
     console.log("Game destroyed")
   }
 
-  goBack(): void {
+  GoBack(): void {
     this.location.back()
   }
 

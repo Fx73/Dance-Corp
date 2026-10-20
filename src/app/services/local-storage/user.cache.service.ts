@@ -22,23 +22,23 @@ export class UserCacheService {
     constructor() {
         effect(() => {
             const user = this.userFirestoreService.user
-            this.onUserDataChange(user)
+            this.OnUserDataChange(user)
         })
 
     }
 
-    onUserDataChange(user: UserDto | null) {
+    OnUserDataChange(user: UserDto | null) {
         if (user) {
             console.log(`User logged in: ${user.name} (${user.id}). Checking cache...`)
             const lastUser = localStorage.getItem(this.USER_KEY)
             this.isSessionOnly = false
 
             if (lastUser === user.id) {
-                this.initCacheFromStorage()
+                this.InitCacheFromStorage()
             } else {
-                this.clearCache()
+                this.ClearCache()
                 localStorage.setItem(this.USER_KEY, user.id)
-                this.initCacheFromFirestore(user.id)
+                this.InitCacheFromFirestore(user.id)
             }
         } else {
             console.log("User logged out, clearing cache.")
@@ -48,7 +48,7 @@ export class UserCacheService {
         }
     }
 
-    initCacheFromStorage() {
+    InitCacheFromStorage() {
         this.registry = new Set(JSON.parse(localStorage.getItem(this.USERMUSIC_REGISTRY_KEY) || '[]'))
         this.userMusics = []
         for (const musicId of this.registry) {
@@ -60,10 +60,10 @@ export class UserCacheService {
         console.log(`Loaded ${this.userMusics.length} musics from localStorage.`)
     }
 
-    private async initCacheFromFirestore(userId: string) {
+    private async InitCacheFromFirestore(userId: string) {
         console.log("Loading user music registry from Firestore...")
 
-        const musics = await this.userFirestoreService.getAllUserMusics(userId)
+        const musics = await this.userFirestoreService.GetAllUserMusics(userId)
 
         this.registry.clear()
         this.userMusics = []
@@ -79,7 +79,7 @@ export class UserCacheService {
         console.log(`Loaded ${musics.length} musics from Firestore.`)
     }
 
-    clearCache() {
+    ClearCache() {
         localStorage.removeItem(this.USER_KEY)
         localStorage.removeItem(this.USERMUSIC_REGISTRY_KEY)
         for (const musicId of this.registry) {
@@ -89,14 +89,14 @@ export class UserCacheService {
         this.userMusics = []
     }
 
-    public getMusicStats(musicId: string): UserMusicDto {
+    public GetMusicStats(musicId: string): UserMusicDto {
         if (this.registry.has(musicId) === false)
             return new UserMusicDto(musicId)
 
         return this.userMusics.find(music => music.id === musicId) || new UserMusicDto(musicId)
     }
 
-    public updateUserStatsFromRound(musicId: string, noteId: string, gameRound: GameRound) {
+    public UpdateUserStatsFromRound(musicId: string, noteId: string, gameRound: GameRound) {
         console.log(this.userMusics)
         // 1. Ensure registry entry exists
         let music = this.userMusics.find(m => m.id === musicId)
@@ -136,7 +136,7 @@ export class UserCacheService {
 
         // 7. Update Firestore
         console.log(music)
-        this.userFirestoreService.updateUserStatsFromRound(music, gameRound)
+        this.userFirestoreService.UpdateUserStatsFromRound(music, gameRound)
     }
 
 }

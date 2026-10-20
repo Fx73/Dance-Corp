@@ -7,6 +7,6 @@ export enum ArrowState {
 export type DancePadInput = [ArrowState, ArrowState, ArrowState, ArrowState, ArrowState]
 
 export interface IDancePad {
-    getRefreshedState(): DancePadInput
+    GetRefreshedState(): DancePadInput
     lastExposedState: DancePadInput
 }

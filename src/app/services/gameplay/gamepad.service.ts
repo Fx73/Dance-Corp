@@ -15,13 +15,13 @@ export class GamepadService {
     constructor() {
         this.gamepads = [{ index: -1, id: "Keyboard" }]
 
-        this.onGamepadConnect = this.onGamepadConnect.bind(this)
-        this.onGamepadDisconnect = this.onGamepadDisconnect.bind(this)
-        window.addEventListener("gamepadconnected", this.onGamepadConnect)
-        window.addEventListener("gamepaddisconnected", this.onGamepadDisconnect)
+        this.OnGamepadConnect = this.OnGamepadConnect.bind(this)
+        this.OnGamepadDisconnect = this.OnGamepadDisconnect.bind(this)
+        window.addEventListener("gamepadconnected", this.OnGamepadConnect)
+        window.addEventListener("gamepaddisconnected", this.OnGamepadDisconnect)
     }
 
-    onGamepadConnect(event: GamepadEvent) {
+    OnGamepadConnect(event: GamepadEvent) {
         const gamepad = event.gamepad
         console.log('Gamepad connected : ' + gamepad.id)
         this.gamepads.push(gamepad)
@@ -29,17 +29,17 @@ export class GamepadService {
         const assignedIndex = this.userConfigService.players.findIndex(player => player.gamepad?.id === gamepad.id)
         const assignedPlayer = this.userConfigService.players[assignedIndex]
         if (assignedPlayer) {
-            this.userConfigService.updatePlayer('gamepad', assignedIndex, { index: gamepad.index, id: gamepad.id })
-            AppComponent.presentOkToast(`Reassigning to player ${assignedPlayer.name} gamepad ${gamepad.id} `)
+            this.userConfigService.UpdatePlayer('gamepad', assignedIndex, { index: gamepad.index, id: gamepad.id })
+            AppComponent.PresentOkToast(`Reassigning to player ${assignedPlayer.name} gamepad ${gamepad.id} `)
         }
     }
 
-    onGamepadDisconnect(event: GamepadEvent) {
+    OnGamepadDisconnect(event: GamepadEvent) {
         console.log('Gamepad disconnected : ' + event.gamepad.id)
         this.gamepads = this.gamepads.filter(g => g.id !== event.gamepad.id)
     }
 
-    getGamepads(): IGamepadReference[] {
+    GetGamepads(): IGamepadReference[] {
         return this.gamepads
     }
 

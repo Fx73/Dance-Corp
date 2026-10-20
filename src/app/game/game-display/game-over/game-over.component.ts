@@ -43,22 +43,22 @@ export class GameOverComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.getPrecisionCounts()
-    this.grade = Color.gradeFromScore(this.getScore(), this.gameRound.isFailed)
+    this.GetPrecisionCounts()
+    this.grade = Color.GradeFromScore(this.GetScore(), this.gameRound.isFailed)
 
   }
 
-  getScore() {
+  GetScore() {
     return Math.round(this.gameRound.score)
   }
 
-  getScoreFormatted() {
-    return this.getScore()
+  GetScoreFormatted() {
+    return this.GetScore()
       .toLocaleString('fr-FR')
       .replace(/\u202F/g, '\u202F\u202F')
   }
 
-  getPrecisionCounts() {
+  GetPrecisionCounts() {
     const counts = { ...this.precisionCounts() }
 
     for (const arrow of this.gameRound.arrowManager.arrowMap.values()) {
@@ -70,11 +70,11 @@ export class GameOverComponent implements OnInit {
     this.precisionCounts.set(counts)
   }
 
-  getPrecisionColor(precision: Precision): string {
-    return Color.precisionGradient(precision)
+  GetPrecisionColor(precision: Precision): string {
+    return Color.PrecisionGradient(precision)
   }
 
-  goToMainMenu(): void {
+  GoToMainMenu(): void {
     this.mainMenu.emit()
   }
 }

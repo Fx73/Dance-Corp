@@ -26,11 +26,11 @@ export class MusicPlayerLocalComponent extends MusicPlayerCommon implements IMus
 
   async ngOnInit(): Promise<void> {
     const url = this.musicUrl.replace("local:", "")
-    const localUri = await this.createMusicUri(url)
+    const localUri = await this.CreateMusicUri(url)
     console.log("Created local music URI:", localUri)
     this.audio = new Audio()
     this.audio.src = localUri
-    this.audio.volume = this.getVolume()
+    this.audio.volume = this.GetVolume()
     this.audio.preload = 'auto'
     
     if (this.startOffset)
@@ -50,14 +50,14 @@ export class MusicPlayerLocalComponent extends MusicPlayerCommon implements IMus
 
   }
 
-  async createMusicUri(path: string): Promise<string> {
-    const mimeType = guessMimeType(path)
+  async CreateMusicUri(path: string): Promise<string> {
+    const mimeType = GuessMimeType(path)
 
     const bytes = await readFile(path, { baseDir: BaseDirectory.AppData })
     const blob = new Blob([bytes], { type: mimeType })
     return URL.createObjectURL(blob)
 
-    function guessMimeType(path: string): string {
+    function GuessMimeType(path: string): string {
       const ext = path.split('.').pop()?.toLowerCase()
 
       switch (ext) {
@@ -72,34 +72,34 @@ export class MusicPlayerLocalComponent extends MusicPlayerCommon implements IMus
     }
   }
 
-  play(): void {
+  Play(): void {
     this.audio.play()
     this.isPlaying = true
   }
 
-  stop(): void {
+  Stop(): void {
     this.audio.pause()
     this.isPlaying = false
 
   }
 
-  getCurrentTime(): number {
+  GetCurrentTime(): number {
     return (this.audio?.currentTime ?? 0) - (this.startOffset ?? 0)
   }
 
-  getDuration(): number {
+  GetDuration(): number {
     return (this.audio?.duration ?? 0) - (this.startOffset ?? 0)
   }
 
-  setToTime(time: number): void {
+  SetToTime(time: number): void {
     this.audio.currentTime = time + (this.startOffset ?? 0)
   }
 
-  onSeekInput(event: Event): void {
-    this.setToTime(Number((event.target as HTMLInputElement).value))
+  OnSeekInput(event: Event): void {
+    this.SetToTime(Number((event.target as HTMLInputElement).value))
   }
 
-  formatTime(sec: number): string {
+  FormatTime(sec: number): string {
     if (!sec) return '0:00'
     const m = Math.floor(sec / 60)
     const s = Math.floor(sec % 60).toString().padStart(2, '0')

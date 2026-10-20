@@ -115,7 +115,7 @@ export class BeatManager {
         this.timeline = timeline
     }
 
-    private findTimeSection(elapsedTime: number): TimeSection {
+    private FindTimeSection(elapsedTime: number): TimeSection {
         let low = 0
         let high = this.timeline.length - 1
 
@@ -139,8 +139,8 @@ export class BeatManager {
         return this.timeline[this.timeline.length - 1]
     }
 
-    getBeatAtTime(elapsedTime: number): number {
-        const section = this.findTimeSection(elapsedTime)
+    GetBeatAtTime(elapsedTime: number): number {
+        const section = this.FindTimeSection(elapsedTime)
 
         if (section instanceof StopSection) {
             return section.beatStart
@@ -149,13 +149,13 @@ export class BeatManager {
         return section.beatStart + (elapsedTime - section.timeStart) * section.bps
     }
 
-    getBpsAtTime(elapsedTime: number): number {
-        const section = this.findTimeSection(elapsedTime)
+    GetBpsAtTime(elapsedTime: number): number {
+        const section = this.FindTimeSection(elapsedTime)
         return section.bps
     }
 
-    getBeatAndBpsAtTime(elapsedTime: number): { beat: number, bps: number } {
-        const section = this.findTimeSection(elapsedTime)
+    GetBeatAndBpsAtTime(elapsedTime: number): { beat: number, bps: number } {
+        const section = this.FindTimeSection(elapsedTime)
         if (section instanceof StopSection) {
             return {
                 beat: section.beatStart,

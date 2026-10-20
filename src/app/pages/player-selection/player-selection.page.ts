@@ -33,40 +33,40 @@ export class PlayerSelectionPage {
 
   //TODO handle multiple connections
 
-  getPlayers(): Player[] {
+  GetPlayers(): Player[] {
     return this.userConfigService.players
   }
 
-  addPlayer(): void {
-    this.userConfigService.addPlayer()
+  AddPlayer(): void {
+    this.userConfigService.AddPlayer()
   }
 
-  removePlayer(index: number): void {
-    this.userConfigService.removePlayerAt(index)
+  RemovePlayer(index: number): void {
+    this.userConfigService.RemovePlayerAt(index)
   }
 
-  updateGamepad(playerIndex: number, gamepadId: string): void {
+  UpdateGamepad(playerIndex: number, gamepadId: string): void {
     if (gamepadId === "Keyboard") {
-      this.userConfigService.updatePlayer('gamepad', playerIndex, { index: -1, id: "Keyboard" })
+      this.userConfigService.UpdatePlayer('gamepad', playerIndex, { index: -1, id: "Keyboard" })
 
     } else {
       const gamepad = navigator.getGamepads().filter(g => g !== null).find(g => g.id === gamepadId)
       if (gamepad)
-        this.userConfigService.updatePlayer("gamepad", playerIndex, { index: gamepad.index, id: gamepad.id })
+        this.userConfigService.UpdatePlayer("gamepad", playerIndex, { index: gamepad.index, id: gamepad.id })
       else
-        AppComponent.presentWarningToast(`Gamepad not found. Please ensure it is connected.`)
+        AppComponent.PresentWarningToast(`Gamepad not found. Please ensure it is connected.`)
     }
   }
 
-  updateUser(playerIndex: number, userId: string | null) {
-    this.userConfigService.updatePlayer('userId', playerIndex, userId)
+  UpdateUser(playerIndex: number, userId: string | null) {
+    this.userConfigService.UpdatePlayer('userId', playerIndex, userId)
   }
 
   get allPlayersReady(): boolean {
     return this.userConfigService.players.every(player => player.gamepad?.id && player.gamepad.index !== null)
   }
 
-  getPlayerStatus(): string {
+  GetPlayerStatus(): string {
     const players = this.userConfigService.players
 
     if (this.allPlayersReady) {
@@ -89,8 +89,8 @@ export class PlayerSelectionPage {
     return statusMessage || "🔍 Waiting for configuration..."
   }
 
-  onStartClick() {
-    this.announcerService.playAnnouncer("ready")
+  OnStartClick() {
+    this.announcerService.PlayAnnouncer("ready")
   }
 
 }

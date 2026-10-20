@@ -36,29 +36,29 @@ export class MusicEditableFieldAutocompleteComponent<T extends string | null | u
   public isDirty = false
 
   ngOnChanges() {
-    this.isDirty = this.isEditing && this.normalize(this.value) !== this.normalize(this.valueDb)
+    this.isDirty = this.isEditing && this.Normalize(this.value) !== this.Normalize(this.valueDb)
   }
 
-  onInputChange(ev: InputCustomEvent<InputChangeEventDetail>) {
+  OnInputChange(ev: InputCustomEvent<InputChangeEventDetail>) {
     const rawValue = ev.detail.value
     const newValue = SanitizeSscInput(rawValue == null ? null : String(rawValue))
 
-    this.isDirty = this.isEditing && this.normalize(newValue) !== this.normalize(this.valueDb)
+    this.isDirty = this.isEditing && this.Normalize(newValue) !== this.Normalize(this.valueDb)
     // SanitizeSscInput returns a string (or null), emitted as is
     this.valueChange.emit(newValue as T)
   }
 
   get isChanged(): boolean {
-    return this.isEditing && this.normalize(this.value) !== this.normalize(this.valueDb)
+    return this.isEditing && this.Normalize(this.value) !== this.Normalize(this.valueDb)
   }
 
-  private normalize(v: unknown): string {
+  private Normalize(v: unknown): string {
     if (v === undefined || v === null) return ""
     return String(v).trim()
   }
 
   filteredGenres: string[] = []
-  onInput(event: Event) {
+  OnInput(event: Event) {
     const value = String((event.target as HTMLIonInputElement).value || '').toLowerCase()
 
     const parts = value.split(',')
@@ -75,7 +75,7 @@ export class MusicEditableFieldAutocompleteComponent<T extends string | null | u
     
   }
 
-  selectGenre(g: string) {
+  SelectGenre(g: string) {
     const current = this.value || ''
     console.log(' value   genre:', g)
 
@@ -90,14 +90,14 @@ export class MusicEditableFieldAutocompleteComponent<T extends string | null | u
     }, 0)
   }
 
-  onFocus() {
+  OnFocus() {
     if (!this.value) return
     if (!this.value.trim().endsWith(',')) {
       this.value = this.value.trim() + ', ' as T
     }
   }
 
-  onBlur() {
+  OnBlur() {
     setTimeout(() => {
       this.filteredGenres = []
 

@@ -34,13 +34,13 @@ export class MusicDto {
   additionalFields?: Record<string, string>
 
   get id(): string {
-    function sanitize(s: string) {
+    function Sanitize(s: string) {
       return s.trim().toLowerCase()
         .replace(/\//g, '\\')   // replace slash with backslash
         .replace(/\s+/g, '_')  // replace spaces with underscores
     }
 
-    return `${sanitize(this.artist!)}-${sanitize(this.title!)}`
+    return `${Sanitize(this.artist!)}-${Sanitize(this.title!)}`
   }
 
   constructor(tokenMapWithNotes?: SscTokenMap) {
@@ -85,32 +85,32 @@ export class MusicDto {
     delete tokenMap["samplestart"]
     this.sampleLength = parseFloat(tokenMap["samplelength"])
     delete tokenMap["samplelength"]
-    this.stops = this.parseChanges<StopChange>(tokenMap["stops"], v => parseFloat(v)) ?? []
+    this.stops = this.ParseChanges<StopChange>(tokenMap["stops"], v => parseFloat(v)) ?? []
     delete tokenMap["stops"]
-    this.warps = this.parseChanges<WarpChange>(tokenMap["warps"], v => parseFloat(v)) ?? []
+    this.warps = this.ParseChanges<WarpChange>(tokenMap["warps"], v => parseFloat(v)) ?? []
     delete tokenMap["warps"]
-    this.speeds = this.parseChanges<SpeedChange>(tokenMap["speeds"], v => parseFloat(v)) ?? []
+    this.speeds = this.ParseChanges<SpeedChange>(tokenMap["speeds"], v => parseFloat(v)) ?? []
     delete tokenMap["speeds"]
-    this.scrolls = this.parseChanges<ScrollChange>(tokenMap["scrolls"], v => parseFloat(v)) ?? []
+    this.scrolls = this.ParseChanges<ScrollChange>(tokenMap["scrolls"], v => parseFloat(v)) ?? []
     delete tokenMap["scrolls"]
-    this.bpms = this.parseChanges<BpmChange>(tokenMap["bpms"], v => parseFloat(v))!
+    this.bpms = this.ParseChanges<BpmChange>(tokenMap["bpms"], v => parseFloat(v))!
     delete tokenMap["bpms"]
     const bgChange0 = tokenMap["background"]
-    this.bgChanges = this.parseChanges<BackgroundChange>(tokenMap["bgchanges"], v => v) ?? []
+    this.bgChanges = this.ParseChanges<BackgroundChange>(tokenMap["bgchanges"], v => v) ?? []
     if (bgChange0)
       this.bgChanges.unshift(new BackgroundChange(0, bgChange0))
     delete tokenMap["background"]
     delete tokenMap["bgchanges"]
     const fgChange0 = tokenMap["foreground"]
-    this.fgChanges = this.parseChanges<BackgroundChange>(tokenMap["fgchanges"], v => v) ?? []
+    this.fgChanges = this.ParseChanges<BackgroundChange>(tokenMap["fgchanges"], v => v) ?? []
     if (fgChange0)
       this.fgChanges.unshift(new BackgroundChange(0, fgChange0))
     delete tokenMap["foreground"]
     delete tokenMap["fgchanges"]
-    this.labels = this.parseChanges<LabelChange>(tokenMap["labels"], v => v) ?? []
+    this.labels = this.ParseChanges<LabelChange>(tokenMap["labels"], v => v) ?? []
     delete tokenMap["labels"]
 
-    const parsedDelays = this.parseChanges<StopChange>(tokenMap["delays"], v => parseFloat(v)) ?? []
+    const parsedDelays = this.ParseChanges<StopChange>(tokenMap["delays"], v => parseFloat(v)) ?? []
     delete tokenMap["delays"]
 
     Object.keys(tokenMap).forEach(key => {
@@ -138,7 +138,7 @@ export class MusicDto {
     this.additionalFields = { ...leftTokens }
   }
 
-  private parseChanges<T extends ITimedChange>(token: string, parsefun: (value: string) => T['value']): T[] | undefined {
+  private ParseChanges<T extends ITimedChange>(token: string, parsefun: (value: string) => T['value']): T[] | undefined {
     if (!token) return undefined
     const changes = token.split(',')
     const array: T[] = []
@@ -152,16 +152,16 @@ export class MusicDto {
     return array
   }
 
-  deepClone(): MusicDto {
-    return MusicDto.fromJSON(JSON.parse(JSON.stringify(this)))
+  DeepClone(): MusicDto {
+    return MusicDto.FromJSON(JSON.parse(JSON.stringify(this)))
   }
 
   //#region Statics
-  static fromJSON(obj: Record<string, unknown>): MusicDto {
+  static FromJSON(obj: Record<string, unknown>): MusicDto {
     const instance = Object.assign(new MusicDto(), obj)
     const noteData = obj["noteData"]
     instance.noteData = Array.isArray(noteData)
-      ? noteData.map((n: Record<string, unknown>) => NoteDataDto.fromJSON(n))
+      ? noteData.map((n: Record<string, unknown>) => NoteDataDto.FromJSON(n))
       : []
     return instance
   }
@@ -203,16 +203,16 @@ export class NoteDataDto {
       measureInstance.steps = measure.trim().split('\n').map(line => line.trim().split('').map(step => parseInt(step)))
       return measureInstance
     })
-    this.difficultyCriterias = tokenMap["difficultycriterias"] ? DifficultyCriteria.parseCriteria(tokenMap["difficultycriterias"]) : undefined
+    this.difficultyCriterias = tokenMap["difficultycriterias"] ? DifficultyCriteria.ParseCriteria(tokenMap["difficultycriterias"]) : undefined
 
   }
 
   //#region Statics
-  static fromJSON(obj: Record<string, unknown>): NoteDataDto {
+  static FromJSON(obj: Record<string, unknown>): NoteDataDto {
     const instance = Object.assign(new NoteDataDto(), obj)
     const stepChart = obj["stepChart"]
     instance.stepChart = Array.isArray(stepChart)
-      ? stepChart.map((n: Record<string, unknown>) => Measures.fromJSON(n))
+      ? stepChart.map((n: Record<string, unknown>) => Measures.FromJSON(n))
       : []
     return instance
   }
@@ -223,7 +223,7 @@ export class Measures {
   steps: number[][] = []
 
   //#region Statics
-  static fromJSON(obj: Record<string, unknown>): Measures {
+  static FromJSON(obj: Record<string, unknown>): Measures {
     const instance = Object.assign(new Measures(), obj)
     const steps = obj["steps"]
     instance.steps = Array.isArray(steps) ? steps.map((row: unknown) => Array.isArray(row) ? row.map(Number) : []) : []

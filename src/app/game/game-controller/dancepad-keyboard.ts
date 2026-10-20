@@ -16,30 +16,30 @@ export class DancePadKeyboard implements IDancePad {
         this.lastExposedState = [0, 0, 0, 0, 0]
 
         // Listen for keyboard events
-        window.addEventListener('keydown', (event) => this.handleKeyDown(event))
-        window.addEventListener('keyup', (event) => this.handleKeyUp(event))
+        window.addEventListener('keydown', (event) => this.HandleKeyDown(event))
+        window.addEventListener('keyup', (event) => this.HandleKeyUp(event))
     }
 
-    private handleKeyDown(event: KeyboardEvent): void {
+    private HandleKeyDown(event: KeyboardEvent): void {
         if (!event.repeat && this.keyBinding.has(event.key)) {
             this.currentState.add(this.keyBinding.get(event.key)!)
         }
     }
 
-    private handleKeyUp(event: KeyboardEvent): void {
+    private HandleKeyUp(event: KeyboardEvent): void {
         if (this.keyBinding.has(event.key)) {
             this.currentState.delete(this.keyBinding.get(event.key)!)
         }
     }
 
     // Update keyboard state and return DancePadInput
-    public getRefreshedState(): DancePadInput {
+    public GetRefreshedState(): DancePadInput {
         this.lastExposedState = [
-            this.getArrowInput(ArrowDirection.Left),
-            this.getArrowInput(ArrowDirection.Down),
-            this.getArrowInput(ArrowDirection.Up),
-            this.getArrowInput(ArrowDirection.Right),
-            this.getArrowInput(ArrowDirection.Start)
+            this.GetArrowInput(ArrowDirection.Left),
+            this.GetArrowInput(ArrowDirection.Down),
+            this.GetArrowInput(ArrowDirection.Up),
+            this.GetArrowInput(ArrowDirection.Right),
+            this.GetArrowInput(ArrowDirection.Start)
         ] as DancePadInput
 
         this.previousState = new Set(this.currentState)
@@ -47,10 +47,10 @@ export class DancePadKeyboard implements IDancePad {
         return this.lastExposedState
     }
 
-    private getArrowInput(direction: ArrowDirection): ArrowState {
-        if (this.isButtonJustPressed(direction)) {
+    private GetArrowInput(direction: ArrowDirection): ArrowState {
+        if (this.IsButtonJustPressed(direction)) {
             return ArrowState.Press
-        } else if (this.isButtonDown(direction)) {
+        } else if (this.IsButtonDown(direction)) {
             return ArrowState.Hold
         } else {
             return ArrowState.Empty
@@ -58,17 +58,17 @@ export class DancePadKeyboard implements IDancePad {
     }
 
     // Check if a button is currently pressed
-    private isButtonDown(buttonIndex: number): boolean {
+    private IsButtonDown(buttonIndex: number): boolean {
         return this.currentState.has(buttonIndex)
     }
 
     // Check if a button was just pressed
-    private isButtonJustPressed(buttonIndex: number): boolean {
+    private IsButtonJustPressed(buttonIndex: number): boolean {
         return this.currentState.has(buttonIndex) && !this.previousState.has(buttonIndex)
     }
 
     // Check if a button was just released
-    private isButtonJustReleased(buttonIndex: number): boolean {
+    private IsButtonJustReleased(buttonIndex: number): boolean {
         return !this.currentState.has(buttonIndex) && this.previousState.has(buttonIndex)
     }
 }

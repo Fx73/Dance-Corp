@@ -37,7 +37,7 @@ export class MusicEditableListComponent<T extends ITimedChange = ITimedChange> i
     this.isDirty = this.isChanged
   }
 
-  onFieldChange() {
+  OnFieldChange() {
     this.isDirty = this.isChanged
     this.value = this.value.map(row => ({
       ...row,
@@ -49,13 +49,13 @@ export class MusicEditableListComponent<T extends ITimedChange = ITimedChange> i
     this.valueChange.emit(this.value)
   }
 
-  private normalize(v: unknown, type: 'string' | 'number'): string {
+  private Normalize(v: unknown, type: 'string' | 'number'): string {
     if (v === undefined || v === null) return ""
     if (type === 'number') return String(Number(v))
     return String(v).trim()
   }
 
-  isRowChanged(i: number): boolean {
+  IsRowChanged(i: number): boolean {
     if (!this.isEditing) return false
 
     const row = this.value[i]
@@ -63,18 +63,18 @@ export class MusicEditableListComponent<T extends ITimedChange = ITimedChange> i
     if (!rowDb) return true
 
     return (
-      this.normalize(row.time, 'number') !== this.normalize(rowDb.time, 'number') ||
-      this.normalize(row.value, this.valueType) !== this.normalize(rowDb.value, this.valueType)
+      this.Normalize(row.time, 'number') !== this.Normalize(rowDb.time, 'number') ||
+      this.Normalize(row.value, this.valueType) !== this.Normalize(rowDb.value, this.valueType)
     )
   }
 
   get isChanged(): boolean {
     if (!this.isEditing) return false
     if (this.value.length !== this.valueDb?.length) return true
-    return this.value.some((_, i) => this.isRowChanged(i))
+    return this.value.some((_, i) => this.IsRowChanged(i))
   }
 
-  addRow() {
+  AddRow() {
     this.value.push({
       time: 0,
       value: this.valueType === 'number' ? 0 : ''
@@ -84,14 +84,14 @@ export class MusicEditableListComponent<T extends ITimedChange = ITimedChange> i
     this.valueChange.emit(this.value)
   }
 
-  removeRow(i: number) {
+  RemoveRow(i: number) {
     this.value.splice(i, 1)
 
     this.isDirty = this.isChanged
     this.valueChange.emit(this.value)
   }
 
-  formatRow(row: T | undefined): string {
+  FormatRow(row: T | undefined): string {
     if (!row) return ''
     return Object.entries(row)
       .map(([k, v]) => `${k}: ${v}`)

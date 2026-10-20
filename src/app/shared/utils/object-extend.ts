@@ -1,4 +1,4 @@
-export function deepEqual(a: unknown, b: unknown): boolean {
+export function DeepEqual(a: unknown, b: unknown): boolean {
     if (a === b) return true
 
     if (typeof a !== typeof b) return false
@@ -6,7 +6,7 @@ export function deepEqual(a: unknown, b: unknown): boolean {
     if (a && b && typeof a === 'object') {
         if (Array.isArray(a)) {
             if (!Array.isArray(b) || a.length !== b.length) return false
-            return a.every((v, i) => deepEqual(v, b[i]))
+            return a.every((v, i) => DeepEqual(v, b[i]))
         }
 
         const objA = a as Record<string, unknown>
@@ -15,7 +15,7 @@ export function deepEqual(a: unknown, b: unknown): boolean {
         const keysB = Object.keys(objB)
         if (keysA.length !== keysB.length) return false
 
-        return keysA.every(k => deepEqual(objA[k], objB[k]))
+        return keysA.every(k => DeepEqual(objA[k], objB[k]))
     }
 
     return false

@@ -17,8 +17,8 @@ export class Player {
     keyBindingKeyboard: Map<string, ArrowDirection>
 
     constructor() {
-        this.keyBindingGamepad = Player.defaultGamepadBinding()
-        this.keyBindingKeyboard = Player.defaultKeyboardBinding()
+        this.keyBindingGamepad = Player.DefaultGamepadBinding()
+        this.keyBindingKeyboard = Player.DefaultKeyboardBinding()
     }
 
     toJSON(): IPlayerJSON {
@@ -32,7 +32,7 @@ export class Player {
     }
 
     //#region Statics
-    static fromJSON(json: IPlayerJSON): Player {
+    static FromJSON(json: IPlayerJSON): Player {
         const player = new Player()
         player.userId = json.userId
         player.gamepad = json.gamepad
@@ -41,7 +41,7 @@ export class Player {
         return player
     }
 
-    static defaultGamepadBinding(): Map<number, ArrowDirection> {
+    static DefaultGamepadBinding(): Map<number, ArrowDirection> {
         return new Map<number, ArrowDirection>([
             [0, ArrowDirection.Left],  // Button 0 -> Left
             [1, ArrowDirection.Down],  // Button 1 -> Down
@@ -50,7 +50,7 @@ export class Player {
         ])
     }
 
-    static defaultKeyboardBinding(): Map<string, ArrowDirection> {
+    static DefaultKeyboardBinding(): Map<string, ArrowDirection> {
         return new Map<string, ArrowDirection>([
             ['ArrowLeft', ArrowDirection.Left],
             ['ArrowDown', ArrowDirection.Down],

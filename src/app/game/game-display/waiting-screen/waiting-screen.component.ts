@@ -20,7 +20,7 @@ export class WaitingScreenComponent {
 
   @Output() countdownFinished: EventEmitter<void> = new EventEmitter()
 
-  startCountdown() {
+  StartCountdown() {
     this.countdown.set(3)
     const interval = setInterval(() => {
       this.countdown.update((prev: number | null) => (prev || 0) - 1)

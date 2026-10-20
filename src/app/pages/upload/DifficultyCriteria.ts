@@ -15,7 +15,7 @@ export class DifficultyCriteria {
   }
 
   //#region Statics
-  static parseCriteria(criteriaString: string): DifficultyCriteria {
+  static ParseCriteria(criteriaString: string): DifficultyCriteria {
     const criteria = new DifficultyCriteria()
     const pairs = criteriaString.split(',')
 
@@ -59,13 +59,13 @@ export class NoteEvaluator {
     this.stepChart = stepChart
   }
 
-  public generateTsvLine(name: string, score: number): string {
+  public GenerateTsvLine(name: string, score: number): string {
     const tsvLine = [name, score, this.totalSteps, this.doubleSteps, this.chainedDoubleSteps, this.avgBpm, this.maxBpm, this.stepWithHoldCount, this.sameArrowRepeatCount, this.offBeatStepCount, this.tripleStepCount, this.mineCount, this.burstVariation].join('\t')
     return tsvLine
 
   }
 
-  getLevelFromCriterias() {
+  GetLevelFromCriterias() {
     const W_ENDURANCE = 0.12
     const W_SPEED = 0.01
     const W_TECHNICAL = 0.06
@@ -74,18 +74,18 @@ export class NoteEvaluator {
     return this.criterias.endurance * W_ENDURANCE + this.criterias.speed * W_SPEED + this.criterias.technical * W_TECHNICAL + this.criterias.burst * W_BURST
   }
 
-  evaluateCriterias(): DifficultyCriteria {
+  EvaluateCriterias(): DifficultyCriteria {
     this.criterias = new DifficultyCriteria()
-    this.criterias.endurance = this.evaluateEndurance()
-    this.criterias.speed = this.evaluateSpeed()
-    this.criterias.technical = this.evaluateTechnical()
-    this.criterias.burst = this.evaluateBurst()
+    this.criterias.endurance = this.EvaluateEndurance()
+    this.criterias.speed = this.EvaluateSpeed()
+    this.criterias.technical = this.EvaluateTechnical()
+    this.criterias.burst = this.EvaluateBurst()
     // Chaos is not implemented yet, but can be added in the future
 
     return this.criterias
   }
 
-  evaluateEndurance(): number {
+  EvaluateEndurance(): number {
     const TOTAL_STEPS_WEIGHT = 0.2
     const DOUBLE_STEP_WEIGHT = 0.05
     const CHAINED_DOUBLE_STEP_WEIGHT = 0.1
@@ -130,7 +130,7 @@ export class NoteEvaluator {
     return criteria
   }
 
-  evaluateSpeed(): number {
+  EvaluateSpeed(): number {
     const AVG_BPM_WEIGHT = 0.8
     const MAX_BPM_WEIGHT = 0.2
 
@@ -179,7 +179,7 @@ export class NoteEvaluator {
     return AVG_BPM_WEIGHT * avgBpm + MAX_BPM_WEIGHT * maxWeighted
   }
 
-  evaluateTechnical(): number {
+  EvaluateTechnical(): number {
     const STEP_WITH_HOLD_WEIGHT = 0.1
     const SAME_ARROW_REPEAT_WEIGHT = 0.001
     const OFF_BEAT_STEP_WEIGHT = 0.1
@@ -247,7 +247,7 @@ export class NoteEvaluator {
     return criteria
   }
 
-  evaluateBurst(): number {
+  EvaluateBurst(): number {
     const BURST_VARIATION_WEIGHT = 1
 
     const intervals: number[] = []

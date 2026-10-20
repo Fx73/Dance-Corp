@@ -25,18 +25,18 @@ export class AppComponent implements OnInit {
     const soundService = inject(SoundService)
 
     AppComponent.appInstance = this
-    announcerService.init()
+    announcerService.Init()
 
-    document.addEventListener('click', () => soundService.initBackgroundMusic(), { once: true })
+    document.addEventListener('click', () => soundService.InitBackgroundMusic(), { once: true })
   }
 
   ngOnInit() {
-    this.musicCacheService.updateCache()
-    this.presenceService.init()
+    this.musicCacheService.UpdateCache()
+    this.presenceService.Init()
   }
 
   //#region Toasts
-  async presentOkToast(message: string) {
+  async PresentOkToast(message: string) {
     const toast = await this.toastController.create({
       message: message,
       duration: 6000,
@@ -45,7 +45,7 @@ export class AppComponent implements OnInit {
     toast.present()
   }
 
-  async presentWarningToast(message: string) {
+  async PresentWarningToast(message: string) {
     const toast = await this.toastController.create({
       message: message,
       duration: 6000,
@@ -54,7 +54,7 @@ export class AppComponent implements OnInit {
     toast.present()
   }
 
-  async presentErrorToast(message: string) {
+  async PresentErrorToast(message: string) {
     const toast = await this.toastController.create({
       message: message,
       duration: 6000,
@@ -65,19 +65,19 @@ export class AppComponent implements OnInit {
   //#endregion
 
   //#region Statics
-  static presentOkToast(message: string) {
+  static PresentOkToast(message: string) {
     console.log(message)
-    AppComponent.appInstance.presentOkToast(message)
+    AppComponent.appInstance.PresentOkToast(message)
   }
 
-  static presentWarningToast(message: string) {
+  static PresentWarningToast(message: string) {
     console.warn(message)
-    AppComponent.appInstance.presentWarningToast(message)
+    AppComponent.appInstance.PresentWarningToast(message)
   }
 
-  static presentErrorToast(message: string) {
+  static PresentErrorToast(message: string) {
     console.error(message)
-    AppComponent.appInstance.presentErrorToast(message)
+    AppComponent.appInstance.PresentErrorToast(message)
   }
   //#endregion
 }
