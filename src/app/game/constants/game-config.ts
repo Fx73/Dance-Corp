@@ -1,4 +1,3 @@
-
 export const CONFIG = {
     APP: {
         DEBUG_MODE: false,

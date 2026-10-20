@@ -90,14 +90,13 @@ export class BrowsePage implements OnInit {
     this.discordRpcService.update("Browsing");
   }
 
-
-
   //#region Input handling
   ionViewWillEnter() {
     window.addEventListener('keydown', this.keyHandler);
     this.isListeningInput = true;
     this.listenInput();
   }
+
   ionViewWillLeave() {
     window.removeEventListener('keydown', this.keyHandler);
     this.isListeningInput = false;
@@ -176,7 +175,6 @@ export class BrowsePage implements OnInit {
     }
   }
 
-
   onSelectMusic(listIndex: number) {
     const music = this.getSelectedMusic(listIndex);
     if (!music) {
@@ -203,6 +201,7 @@ export class BrowsePage implements OnInit {
       }
     });
   }
+
   onSelectNote(noteIdx: number, playerIndex: number = 0) {
     this.selectedNotesIndex()[playerIndex] = noteIdx;
     this.soundService.playSfx(this.SOUND_ARROW_DOWN);
@@ -250,6 +249,7 @@ export class BrowsePage implements OnInit {
     console.info("Congratz, you found the infinite scroll ! But there is no more music to load :)");
     event.target.complete();
   }
+
   onPlayerReady(mPlayer: IMusicPlayer) {
     const music = this.getSelectedMusic(this.selectedMusicIndex());
     if (!music) return;
@@ -260,6 +260,7 @@ export class BrowsePage implements OnInit {
     this.sampleLoopActive = true;
     this.startSampleLoop(mPlayer, start, length);
   }
+
   private async startSampleLoop(player: IMusicPlayer, start: number, length: number, delay: number = 2) {
     function sleep(ms: number) {
       return new Promise(res => setTimeout(res, ms));
@@ -282,9 +283,6 @@ export class BrowsePage implements OnInit {
       }
     }
   }
-
-
-
 
   async runGame(): Promise<void> {
     const selectedMusic = this.getSelectedMusic(this.selectedMusicIndex());
@@ -314,6 +312,7 @@ export class BrowsePage implements OnInit {
     const notes = this.musicNotes().filter((note, index) => this.selectedNotesIndex().includes(index));
     return notes.map(note => note.difficultyCriterias).filter((d): d is DifficultyCriteria => d !== undefined);
   }
+
   getPlayersForNote(noteIndex: number): number[] {
     return this.selectedNotesIndex()
       .map((selectedIdx, player) => selectedIdx === noteIndex ? player : null)
@@ -323,9 +322,11 @@ export class BrowsePage implements OnInit {
   getPlayerColor(playerIndex: number): string {
     return CONFIG.PLAYER_COLORS[playerIndex % CONFIG.PLAYER_COLORS.length].stroke;
   }
+
   getNoteColor(difficulty: NoteDifficulty): string {
     return Color.noteDifficultyColor(difficulty)
   }
+
   getUserNote(chartname: string): UserNoteDto | null {
     return this.musicUserScore()?.notes.find(n => n.id === chartname) ?? null;
   }

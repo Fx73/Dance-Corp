@@ -19,7 +19,6 @@ export class MusicFirestoreService {
     readonly MUSIC_INDEX_DOC = "music_index";
     readonly MUSIC_UPDATES_DOC = "music_updates";
 
-
     readonly firestoreConverterMusic: FirestoreConverter<MusicDto> = new FirestoreConverter(MusicDto, { noteData: NoteDataDto, difficultyCriterias: DifficultyCriteria });
     readonly firestoreConverterNote: FirestoreConverter<NoteDataDto> = new FirestoreConverter(NoteDataDto, { difficultyCriterias: DifficultyCriteria });
 
@@ -34,7 +33,6 @@ export class MusicFirestoreService {
     constructor() {
         this.db = getFirestore()
     }
-
 
     async uploadMusic(dto: MusicDto): Promise<void> {
         try {
@@ -60,7 +58,6 @@ export class MusicFirestoreService {
             if (!this.userFirestoreService.user) throw new Error("User not authenticated");
 
             const musicRef = doc(this.db, this.MUSIC_COLLECTION, dto.id).withConverter(this.firestoreConverterMusic);
-
 
             // check protected fields are not modified
             const current = (await getDoc(musicRef)).data();
@@ -128,7 +125,6 @@ export class MusicFirestoreService {
         }
     }
 
-
     async getAllMusics(): Promise<MusicDto[]> {
         console.log("Querying complete database for music list. This should only happen once per session and will be cached for next calls.");
 
@@ -145,7 +141,6 @@ export class MusicFirestoreService {
         console.log("Musics retrieved count:", musics.length);
         return musics;
     }
-
 
     async getMusicListWithId(ids: string[]): Promise<MusicDto[]> {
         if (ids.length === 0) return [];
@@ -173,7 +168,6 @@ export class MusicFirestoreService {
         return results;
     }
 
-
     async deleteMusic(musicId: string): Promise<void> {
         try {
             const musicRef = doc(this.db, this.MUSIC_COLLECTION, musicId).withConverter(this.firestoreConverterMusic);
@@ -199,7 +193,6 @@ export class MusicFirestoreService {
             throw error;
         }
     }
-
 
     async deleteNote(musicId: string, note: NoteDataDto): Promise<void> {
         try {
@@ -232,7 +225,6 @@ export class MusicFirestoreService {
         }
     }
 
-
     //#region Genres
 
     async addGenres(genres: string): Promise<void> {
@@ -243,7 +235,6 @@ export class MusicFirestoreService {
 
         const ref = doc(this.db, this.METADATA_COLLECTION, this.MUSIC_METADATA_DOC);
         const snap = await getDoc(ref);
-
 
         const existing = snap.data()!['genres'] ?? [];
 
@@ -331,7 +322,6 @@ export class MusicFirestoreService {
         };
     }
 
-
     async updateMusicIndex(musicId: string, isUpdate: boolean = true): Promise<void> {
         const indexRef = doc(this.db, this.METADATA_COLLECTION, this.MUSIC_INDEX_DOC);
         const snap = await getDoc(indexRef);
@@ -376,10 +366,6 @@ export class MusicFirestoreService {
         console.log("Music removed from index:", musicId);
     }
 
-
     //#endregion
 
-
-
 }
-

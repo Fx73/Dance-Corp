@@ -48,12 +48,12 @@ export class MusicEditableListComponent<T extends ITimedChange = ITimedChange> i
 
     this.valueChange.emit(this.value);
   }
+
   private normalize(v: unknown, type: 'string' | 'number'): string {
     if (v === undefined || v === null) return "";
     if (type === 'number') return String(Number(v));
     return String(v).trim();
   }
-
 
   isRowChanged(i: number): boolean {
     if (!this.isEditing) return false;
@@ -74,8 +74,6 @@ export class MusicEditableListComponent<T extends ITimedChange = ITimedChange> i
     return this.value.some((_, i) => this.isRowChanged(i));
   }
 
-
-
   addRow() {
     this.value.push({
       time: 0,
@@ -85,7 +83,6 @@ export class MusicEditableListComponent<T extends ITimedChange = ITimedChange> i
     this.isDirty = this.isChanged
     this.valueChange.emit(this.value);
   }
-
 
   removeRow(i: number) {
     this.value.splice(i, 1);

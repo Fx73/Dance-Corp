@@ -15,7 +15,6 @@ export class ArrowImageManager {
     }
     private static _HOLD_PRELOAD_PRECISION = 4 // part of beat
 
-
     private static arrowImages: HTMLCanvasElement[][] = [];
     private static holdImages: HTMLCanvasElement[] = [];
     private static mineImage: HTMLCanvasElement;
@@ -23,15 +22,16 @@ export class ArrowImageManager {
     public static getArrowImage(color: ArrowColor, direction: ArrowDirection): HTMLCanvasElement {
         return ArrowImageManager.arrowImages[color][direction];
     }
+
     public static getHoldForDistance(distance: number): HTMLCanvasElement {
         const interval = CONFIG.DISPLAY.BEAT_INTERVAL / this._HOLD_PRELOAD_PRECISION;
         const closestIndex = Math.min(Math.round(distance / interval), ArrowImageManager.holdImages.length);
         return ArrowImageManager.holdImages[closestIndex]
     }
+
     public static getMineImage(): HTMLCanvasElement {
         return ArrowImageManager.mineImage;
     }
-
 
     public static setArrowSize(size: number) {
         this._ARROW_SIZE = size;
@@ -75,8 +75,6 @@ export class ArrowImageManager {
             this.holdImages.push(img)
         }
     }
-
-
 
     private static preloadHoldImage(centerImage: HTMLImageElement, capImage: HTMLImageElement, height: number): HTMLCanvasElement {
         const canvas = document.createElement('canvas');

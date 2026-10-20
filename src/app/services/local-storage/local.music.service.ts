@@ -15,7 +15,6 @@ export class MusicLocalService {
 
     musics: MusicDto[] = [];
 
-
     constructor() {
         this.registry = new Set(JSON.parse(localStorage.getItem(this.MUSICEDIT_REGISTRY_KEY) ?? '[]'));
 
@@ -41,7 +40,6 @@ export class MusicLocalService {
     get allLocalMusics(): MusicDto[] {
         return this.musics;
     }
-
 
     addMusic(music: MusicDto) {
         if (this.registry.has(music.id)) {
@@ -72,14 +70,11 @@ export class MusicLocalService {
         this.musics = this.musics.filter(m => m.id !== musicId);
     }
 
-
     public getMusic(musicId: string): MusicDto | null {
         const raw = localStorage.getItem(this.MUSICEDIT_STORAGE_KEY(musicId));
         if (!raw) return null;
         return MusicDto.fromJSON(JSON.parse(raw));
     }
-
-
 
     public async clearAllLocalMusics() {
         this.registry = new Set(JSON.parse(localStorage.getItem(this.MUSICEDIT_REGISTRY_KEY) ?? '[]'));

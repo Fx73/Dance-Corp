@@ -168,7 +168,6 @@ export class MusicDto {
   //#endregion
 }
 
-
 export class NoteDataDto {
   chartName: string = "NoChartNameError";
   stepsType: DanceType = DanceType.DanceSingle;
@@ -232,4 +231,3 @@ export class Measures {
   }
   //#endregion
 }
-

@@ -35,8 +35,6 @@ export class AppComponent implements OnInit {
     this.presenceService.init()
   }
 
-
-
   //#region Toasts
   async presentOkToast(message: string) {
     const toast = await this.toastController.create({
@@ -71,10 +69,12 @@ export class AppComponent implements OnInit {
     console.log(message)
     AppComponent.appInstance.presentOkToast(message)
   }
+
   static presentWarningToast(message: string) {
     console.warn(message)
     AppComponent.appInstance.presentWarningToast(message)
   }
+
   static presentErrorToast(message: string) {
     console.error(message)
     AppComponent.appInstance.presentErrorToast(message)

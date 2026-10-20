@@ -21,7 +21,6 @@ export class AboutPage {
 
   readonly version = AppConfig.version;
 
-
   constructor() {
     addIcons({ logoYoutube, logoSoundcloud, logoHtml5, logoCss3, logoAngular, logoIonic, 'logo-html5': logoHtml5, 'logo-css3': logoCss3 });
 

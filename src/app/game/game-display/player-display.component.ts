@@ -121,7 +121,6 @@ export class PlayerDisplayComponent implements AfterViewInit {
     const canvasWidth = canvas.width;
     this.ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
-
     // Update visible Arrows
     this.updateArrowList(currentBeat)
 
@@ -176,7 +175,6 @@ export class PlayerDisplayComponent implements AfterViewInit {
     }
 
     this.currentVisibleArrows = this.currentVisibleArrows.filter(arrow => !arrow.isValid);
-
 
     // Add new arrows to the queue if they fall within the visible window [currentBeat, currentBeat + 8]
     const arrowMap = this.gameRound.arrowManager.arrowMap;
@@ -265,7 +263,6 @@ export class PlayerDisplayComponent implements AfterViewInit {
     element.style.setProperty('--gradient-color', Color.precisionGradient(precision));
     element.style.setProperty('--rotate-angle', `${randomRotation}deg`);
 
-
     // Trigger the CSS animation
     void element.offsetWidth; // Force reflow to restart animation
     element.classList.remove('show'); // Reset animation if active
@@ -299,7 +296,4 @@ export class PlayerDisplayComponent implements AfterViewInit {
   }
   //#endregion
 
-
 }
-
-

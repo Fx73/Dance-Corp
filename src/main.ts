@@ -22,7 +22,6 @@ getAnalytics(firebaseApp);
 initializeFirestore(firebaseApp, { ignoreUndefinedProperties: true });
 getFirestore(firebaseApp);
 
-
 registerLocaleData(localeFr);
 
 bootstrapApplication(AppComponent, {

@@ -39,6 +39,7 @@ export class Arrow {
             this.isValid = true
         this.precision = Precision.Perfect
     }
+
     public great() {
         if (this.type === ArrowType.Hold)
             this.isPressed = true;
@@ -46,6 +47,7 @@ export class Arrow {
             this.isValid = true
         this.precision = Precision.Great
     }
+
     public good() {
         if (this.type === ArrowType.Hold)
             this.isPressed = true;
@@ -54,6 +56,7 @@ export class Arrow {
 
         this.precision = Precision.Good
     }
+
     public almost() {
         if (this.type === ArrowType.Hold)
             this.isPressed = true;
@@ -62,13 +65,16 @@ export class Arrow {
 
         this.precision = Precision.Almost
     }
+
     public missed() {
         this.isMissed = true
         this.precision = Precision.Missed
     }
+
     public ok() {
         this.isValid = true
     }
+
     public boom() {
         this.isPressed = true
         this.precision = Precision.Boom

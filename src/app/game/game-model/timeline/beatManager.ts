@@ -22,7 +22,6 @@ class StopSection extends TimeSection {
     }
 }
 
-
 export class BeatManager {
     private timeline: TimeSection[] = [];
 
@@ -82,7 +81,6 @@ export class BeatManager {
             new BPMSection(currentTime, currentBeat, Infinity, currentBps)
         );
 
-
         // --- APPLY OFFSET ---
         const offset = music.offset ?? 0;
 
@@ -117,7 +115,6 @@ export class BeatManager {
         this.timeline = timeline;
     }
 
-
     private findTimeSection(elapsedTime: number): TimeSection {
         let low = 0;
         let high = this.timeline.length - 1;
@@ -141,7 +138,6 @@ export class BeatManager {
 
         return this.timeline[this.timeline.length - 1];
     }
-
 
     getBeatAtTime(elapsedTime: number): number {
         const section = this.findTimeSection(elapsedTime);

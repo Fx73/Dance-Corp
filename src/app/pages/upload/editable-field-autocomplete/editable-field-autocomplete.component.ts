@@ -33,7 +33,6 @@ export class MusicEditableFieldAutocompleteComponent<T extends string | null | u
 
   @ViewChild(IonInput) genreInput!: IonInput;
 
-
   public isDirty = false;
 
   ngOnChanges() {
@@ -49,7 +48,6 @@ export class MusicEditableFieldAutocompleteComponent<T extends string | null | u
     this.valueChange.emit(newValue as T);
   }
 
-
   get isChanged(): boolean {
     return this.isEditing && this.normalize(this.value) !== this.normalize(this.valueDb);
   }
@@ -58,7 +56,6 @@ export class MusicEditableFieldAutocompleteComponent<T extends string | null | u
     if (v === undefined || v === null) return "";
     return String(v).trim();
   }
-
 
   filteredGenres: string[] = [];
   onInput(event: Event) {

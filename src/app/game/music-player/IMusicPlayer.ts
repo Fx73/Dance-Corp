@@ -13,7 +13,6 @@ export interface IMusicPlayer {
 
     ready: EventEmitter<IMusicPlayer>;
 
-
 }
 
 @Directive()

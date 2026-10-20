@@ -49,6 +49,7 @@ export class UserConfigService {
         ArrowImageManager.setArrowSize(this.configSubject.value.canvasWidth / 4);
         this.isReady = true
     }
+
     instanciatePlayer(index: number): Player {
         const storedPlayer = localStorage.getItem(this.PLAYERS_STORAGE_KEY(index));
         const player: Player = storedPlayer ? Player.fromJSON(JSON.parse(storedPlayer)) : new Player()
@@ -60,7 +61,6 @@ export class UserConfigService {
         }
         return player
     }
-
 
     getConfig(): UserConfig {
         return this.configSubject.value;
@@ -79,10 +79,12 @@ export class UserConfigService {
 
         this.updateConfig("playerNumber", count)
     }
+
     addPlayer() {
         this.players.push(this.instanciatePlayer(this.players.length));
         this.updateConfig("playerNumber", this.players.length)
     }
+
     removePlayerAt(position: number) {
         if (position > 0) {
             const playerToMove = this.players.splice(position, 1)[0];
@@ -119,7 +121,6 @@ export class UserConfigService {
         localStorage.setItem(this.PLAYERS_STORAGE_KEY(playerIndex), JSON.stringify(player));
     }
 
-
     resetToDefault(): void {
         localStorage.removeItem(this.CONFIG_STORAGE_KEY);
         for (let index = 0; index < 4; index++) {
@@ -131,7 +132,6 @@ export class UserConfigService {
 
 export class UserConfig {
     // General
-
 
     // Gameplay
     playerNumber = 1

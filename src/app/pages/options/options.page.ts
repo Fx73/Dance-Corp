@@ -44,10 +44,10 @@ export class OptionsPage {
   pinFormatter(value: number) {
     return `${value}`;
   }
+
   pinFormatterVolume(value: number) {
     return (value * 100).toFixed(0) + '%';
   }
-
 
   getConfigValue<K extends keyof UserConfig>(key: K): UserConfig[K] {
     return this.userConfigService.getConfig()[key];
@@ -61,7 +61,6 @@ export class OptionsPage {
   updatePlayerNumber(value: RangeChangeEventDetail['value']): void {
     this.userConfigService.updatePlayerCount(value as number);
   }
-
 
   verifySoundVolume(source: keyof UserConfig): void {
     const volume = this.getConfigValue(source);
@@ -87,6 +86,7 @@ export class OptionsPage {
     this.showPlayerDisplay = true;
     this.playerDisplay?.update(0)
   }
+
   getFakeGameRound(): GameRound {
     const arrowMap: Arrow[] = [
       new Arrow(0, 1, ArrowType.Hold, 1.5),
@@ -105,6 +105,7 @@ export class OptionsPage {
       precisionMessage: [] as Arrow[]
     } as unknown as GameRound;
   }
+
   getModalStyle() {
     const w = this.getConfigValue('canvasWidth');
     const h = this.getConfigValue('canvasHeight');
@@ -115,16 +116,16 @@ export class OptionsPage {
     };
   }
 
-
-
   resetAll(): void {
     this.userConfigService.resetToDefault();
     location.reload();
   }
+
   clearMusicCache() {
     this.musicCacheService.clearCache();
     this.userCacheService.clearCache();
   }
+
   clearMusicEditCache() {
     this.localMusicService.clearAllLocalMusics()
 

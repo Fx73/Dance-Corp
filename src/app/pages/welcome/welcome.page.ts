@@ -1,7 +1,6 @@
 import { Component, OnInit, Signal, inject } from '@angular/core';
 import { IonBadge, IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonContent, IonGrid, IonItem, IonLabel, IonRow } from '@ionic/angular';
 
-
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from "src/app/shared/component/header/header.component";
 import { LoginComponent } from "../../shared/user/login/login.component";

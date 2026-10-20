@@ -23,7 +23,6 @@ export class SoundService {
         this.SOUND_BACKGROUND.loop = true;
         this.SOUND_BACKGROUND2.loop = true;
 
-
     }
 
   private handleRouteChange(url: string) {
@@ -39,7 +38,6 @@ export class SoundService {
       this.startBackgroundMusic();
     }
   }
-
 
     initBackgroundMusic() {
         this.router.events.subscribe(event => {
@@ -109,7 +107,6 @@ export class SoundService {
         }, step));
     }
 
-
     // -------------------------
     // SFX
     // -------------------------
@@ -118,8 +115,6 @@ export class SoundService {
         audio.currentTime = 0;
         audio.play();
     }
-
-
     
     // -------------------------
     // Utils
@@ -128,9 +123,11 @@ export class SoundService {
         this.SOUND_BACKGROUND.volume = this.getMusicVolume();
         this.SOUND_BACKGROUND2.volume = this.getMusicVolume();
       }
+
       private getMusicVolume(): number {
         return this.userConfigService.getConfig()["menuMusicVolume"] ?? 0.2;
     }
+
     private getSfxVolume(): number {
         return this.userConfigService.getConfig()["sfxVolume"] ?? 1;
     }

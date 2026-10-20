@@ -13,7 +13,6 @@ export class UserGuard {
     private userFirestoreService = inject(UserFirestoreService);
     private router = inject(Router);
 
-
     async canActivate(): Promise<boolean> {
         if (this.loginFireauthService.getAuthUser() && this.userFirestoreService.user)
             return true

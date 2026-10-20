@@ -1,6 +1,7 @@
 // @ts-check
 const tseslint = require('typescript-eslint');
 const angular = require('angular-eslint');
+const stylistic = require('@stylistic/eslint-plugin');
 
 module.exports = tseslint.config(
   {
@@ -14,7 +15,14 @@ module.exports = tseslint.config(
       ...angular.configs.tsRecommended,
     ],
     processor: angular.processInlineTemplates,
+    plugins: {
+      '@stylistic': stylistic,
+    },
     rules: {
+      // Formatting rules from CLAUDE.md
+      // One blank line at most, and one blank line between methods
+      '@stylistic/no-multiple-empty-lines': ['error', { max: 1, maxBOF: 0, maxEOF: 0 }],
+      '@stylistic/lines-between-class-members': ['error', { enforce: [{ blankLine: 'always', prev: 'method', next: 'method' }] }],
       // Explicit types are kept on variables, even when they could be inferred
       '@typescript-eslint/no-inferrable-types': 'off',
       // Generic type written on the variable: x: Map<A, B> = new Map()

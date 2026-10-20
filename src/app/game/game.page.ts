@@ -61,7 +61,6 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
     addIcons({ arrowBack });
   }
 
-
   ngOnInit() {
     // Get Data
     const musicId = this.route.snapshot.paramMap.get('musicId');
@@ -132,7 +131,6 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
     this.game?.startGame();
   }
 
-
   ngOnDestroy(): void {
     try {
       this.game?.musicPlayer.stop();
@@ -144,10 +142,8 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
     console.log("Game destroyed");
   }
 
-
   goBack(): void {
     this.location.back();
   }
 
 }
-

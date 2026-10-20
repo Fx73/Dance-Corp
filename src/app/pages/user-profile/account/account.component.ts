@@ -14,7 +14,6 @@ import { LoginFireauthService } from 'src/app/services/firestore/login.fireauth.
 export class AccountComponent {
   private loginService = inject(LoginFireauthService);
 
-
   name: string = '';
   email: string = '';
   password: string = '';
@@ -34,13 +33,16 @@ export class AccountComponent {
   saveProfile() {
     this.loginService.updateProfile(this.email, this.name)
   }
+
   savePassword() {
     if (this.password === this.password2)
       this.loginService.updatePassword(this.password)
   }
+
   resendEmail() {
     this.loginService.resendEmail()
   }
+
   logOut() {
     this.loginService.logOut()
   }

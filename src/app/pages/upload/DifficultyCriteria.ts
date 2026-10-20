@@ -134,7 +134,6 @@ export class NoteEvaluator {
     const AVG_BPM_WEIGHT = 0.8;
     const MAX_BPM_WEIGHT = 0.2;
 
-
     const bpmDurations: Map<number, number> = new Map();
 
     for (let i = 0; i < this.bpms.length - 1; i++) {
@@ -150,7 +149,6 @@ export class NoteEvaluator {
     const lastDuration = (60 / last.value) * (totalBeats - last.time);
 
     bpmDurations.set(last.value, (bpmDurations.get(last.value) ?? 0) + lastDuration);
-
 
     let weightedSum = 0;
     let totalDuration = 0;
@@ -180,7 +178,6 @@ export class NoteEvaluator {
 
     return AVG_BPM_WEIGHT * avgBpm + MAX_BPM_WEIGHT * maxWeighted;
   }
-
 
   evaluateTechnical(): number {
     const STEP_WITH_HOLD_WEIGHT = 0.1;

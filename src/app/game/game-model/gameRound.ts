@@ -20,14 +20,12 @@ export class GameRound {
     // Sound
     private mineHitSound = new Audio('assets/Sounds/gameFx/player_mine.mp3');
 
-
     //Game Data
     arrowManager: ArrowManager;
 
     //Player Data
     public player: Player
     dancepad: IDancePad
-
 
     //Game variables
     private isTrainingMode = false;
@@ -65,8 +63,6 @@ export class GameRound {
         }
     }
 
-
-
     private calculateScore() {
         const arrowMap = this.arrowManager.arrowMap
         const holdArrows = arrowMap.filter(arrow => arrow.type === ArrowType.Hold)
@@ -81,12 +77,10 @@ export class GameRound {
         const tapPoints = this.MAX_SCORE * (totalTaps / totalWeight);
         const holdPoints = this.MAX_SCORE * (totalHoldTime / totalWeight);
 
-
         this.scorePerArrow = tapPoints / totalTaps;
         this.scorePerHoldBeat = holdPoints / totalHoldTime;
 
     }
-
 
     public gameLoop(currentBeat: number, tolerance: number): void {
         const arrowMap = this.arrowManager.arrowMap
@@ -107,7 +101,6 @@ export class GameRound {
             }
             currentArrowCheck++
         }
-
 
         // Pass out arrows
         while (arrowMap[this.currentArrowIndex].isOut) {
@@ -199,6 +192,7 @@ export class GameRound {
 
         this.announcerService.changeSatisfaction(2, 4);
     }
+
     arrowGreat(arrow: Arrow) {
         arrow.great()
         this.updatePerformance(1);
@@ -211,6 +205,7 @@ export class GameRound {
         else
             this.announcerService.changeSatisfaction(1, 4);
     }
+
     arrowGood(arrow: Arrow) {
         arrow.good()
         this.updatePerformance(1);
@@ -223,6 +218,7 @@ export class GameRound {
         else
             this.announcerService.changeSatisfaction(1, 2);
     }
+
     arrowAlmost(arrow: Arrow) {
         arrow.almost()
         this.updatePerformance(- 3);
@@ -232,6 +228,7 @@ export class GameRound {
 
         this.announcerService.changeSatisfaction(0, 1);
     }
+
     arrowMissed(arrow: Arrow) {
         arrow.missed()
         this.updatePerformance(-4)
@@ -240,6 +237,7 @@ export class GameRound {
 
         this.announcerService.changeSatisfaction(0, 4);
     }
+
     arrowOk(arrow: Arrow) {
         arrow.ok();
         const arrowLength = arrow.beatEnd! - arrow.beatPosition
@@ -252,6 +250,7 @@ export class GameRound {
         else
             this.announcerService.changeSatisfaction(1, 2);
     }
+
     mineHit(arrow: Arrow) {
         arrow.boom()
         this.updatePerformance(-20)
@@ -263,6 +262,7 @@ export class GameRound {
 
         this.announcerService.changeSatisfaction(0, 10);
     }
+
     minePassed(arrow: Arrow) {
         arrow.ok()
     }
@@ -284,6 +284,7 @@ export class GameRound {
         this.isFailed = true
         this.performance = 1
     }
+
     endVictory() {
         if (this.isFailed) return
         this.isFinished = true;

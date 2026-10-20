@@ -8,12 +8,10 @@ export class UserDto {
     preferedGamepad: string = " - ";
     preferedMusic: string = " - ";
 
-
     constructor(id: string, name: string) {
         this.id = id;
         this.name = name;
     }
-
 
 }
 

@@ -121,7 +121,6 @@ export class RadarScoreComponent implements AfterViewInit, OnChanges {
     ctx.closePath();
     ctx.fill();
 
-
     // 4) Draw one polygon per score set
     for (let scoreIndex = 0; scoreIndex < this.scores.length; scoreIndex++) {
       const score = this.scores[scoreIndex];

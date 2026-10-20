@@ -1,7 +1,6 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { InfiniteScrollCustomEvent, SearchbarCustomEvent, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonIcon, IonImg, IonInfiniteScroll, IonInfiniteScrollContent, IonSearchbar } from '@ionic/angular';
 
-
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from "src/app/shared/component/header/header.component";
 import { MusicCacheService } from 'src/app/services/local-storage/music.cache.service';
@@ -24,7 +23,6 @@ export class BrowseUploadPage implements OnInit {
   private musicCacheService = inject(MusicCacheService);
   private localMusicService = inject(MusicLocalService);
   private discordRpcService = inject(PresenceService);
-
 
   dbMusics = signal<MusicDto[]>([]);
   storedMusics = signal<MusicDto[]>([]);
@@ -63,8 +61,6 @@ export class BrowseUploadPage implements OnInit {
     this.storedMusics.set(updateLocalMusics);
     this.dbMusics.set(updateDbMusics);
   }
-
-
 
   pickMusic(music: MusicDto | null = null) {
     if (music !== null)

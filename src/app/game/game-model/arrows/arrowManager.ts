@@ -11,7 +11,6 @@ export class ArrowManager {
         this.loadArrows(notes);
     }
 
-
     private loadArrows(notes: NoteDataDto): void {
         const activeHolds: (Arrow | null)[] = Array(Object.values(ArrowDirection).length).fill(null);
 
@@ -62,6 +61,5 @@ export class ArrowManager {
             }
         }
     }
-
 
 }

@@ -25,7 +25,6 @@ export class PresenceService {
         }
     }
 
-
     async update(status: string, details: string = "") {
 
         // Discord

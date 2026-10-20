@@ -44,7 +44,6 @@ export class MusicEditableFieldComponent<T extends string | number | null | unde
     this.valueChange.emit(newValue as T);
   }
 
-
   get isChanged(): boolean {
     return this.isEditing && this.normalize(this.value) !== this.normalize(this.valueDb);
   }
@@ -53,6 +52,5 @@ export class MusicEditableFieldComponent<T extends string | number | null | unde
     if (v === undefined || v === null) return "";
     return String(v).trim();
   }
-
 
 }

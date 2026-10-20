@@ -50,14 +50,10 @@ export class GameManager {
         const musicCurrentTime = this.musicPlayer.getCurrentTime();
         this.zeroTimeStamp = Math.round(performance.now()) - (musicCurrentTime * 1000);
 
-
         this.gameGlobalLoop(this.zeroTimeStamp);
 
         console.log("Game has started");
     }
-
-
-
 
     private gameLoopId: number | null = null;
     private gameGlobalLoop(currentTimestamp: DOMHighResTimeStamp): void {
@@ -74,7 +70,6 @@ export class GameManager {
             gameRound.gameLoop(currentBeat, CONFIG.GAME.TOLERANCE_WINDOW * currentBps)
         }
 
-
         if (this.gameRounds.every(gameRound => gameRound.isFailed || gameRound.isFinished)) {
             this.gameOver()
             return; // Stop loop
@@ -86,7 +81,6 @@ export class GameManager {
         // Schedule the next loop iteration
         this.gameLoopId = requestAnimationFrame(this.gameGlobalLoop.bind(this));
     }
-
 
     public getCurrentBackground(): string {
         if (!this.music.bgChanges || this.music.bgChanges.length === 0) {
@@ -104,6 +98,7 @@ export class GameManager {
     private set isGameOver(value: boolean) {
         this._isGameOver = value;
     }
+
     gameOver() {
         console.log('Game Over: All game rounds have failed or finished.');
         console.log(this.music, this.music.id)

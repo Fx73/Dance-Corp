@@ -43,7 +43,6 @@ export class SccReader {
     return musicData;
   }
 
-
   static tokenizeCommon(content: string): string[] {
     // Remove https:// 
     content = content.replace(/https?:\/\//g, '');
@@ -72,7 +71,6 @@ export class SccReader {
     const tokenMap: SscTokenMap = {};
     let currentNoteData: Record<string, string> | null = null;
     let noteDataIndex = 0;
-
 
     tokens.forEach(token => {
       const [key, value] = token.split(/:(.*)/s);
@@ -130,7 +128,6 @@ export class SccReader {
     return tokenMap;
   }
 
-
   /**
    * Converts special characters in the given token according to the specified rules:
    *
@@ -186,7 +183,6 @@ export class SccReader {
         });
       }
 
-
       if (result.title && result.artist && result.jacket) {
         return result;
       }
@@ -196,7 +192,6 @@ export class SccReader {
   }
 
 }
-
 
 export class SccWriter {
   static getOrderedFields(dto: object): [string, unknown][] {

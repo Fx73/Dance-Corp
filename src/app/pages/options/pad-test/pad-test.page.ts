@@ -62,7 +62,6 @@ export class PadTestPage {
     }
   }
 
-
   async openBindPopover(arrowDirection: ArrowDirection): Promise<void> {
     const gamepad = this.playerSelected?.gamepad;
     if (gamepad === undefined || gamepad.index === null) return;
@@ -81,7 +80,6 @@ export class PadTestPage {
     else
       this.waitForKeyboardInput(arrowDirection, alert)
   }
-
 
   waitForGamepadInput(gamepadIndex: number, arrowDirection: ArrowDirection, alert: HTMLIonAlertElement): void {
     const checkInput = () => {
@@ -149,4 +147,3 @@ export class PadTestPage {
   }
 
 }
-

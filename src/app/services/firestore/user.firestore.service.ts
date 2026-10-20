@@ -24,8 +24,6 @@ export class UserFirestoreService {
         return this._userData();
     }
 
-
-
     constructor() {
         const loginFireauthService = inject(LoginFireauthService);
 
@@ -71,7 +69,6 @@ export class UserFirestoreService {
         return musics;
     }
 
-
     public async updateUserStatsFromRound(music: UserMusicDto, gameRound: GameRound): Promise<void> {
         const userId = gameRound.player.userId;
         if (!userId) return;
@@ -89,7 +86,6 @@ export class UserFirestoreService {
         await setDoc(musicRef, music, { merge: true });
     }
 
-
     public async getScoresForMusic(musicId: string, userId: string): Promise<Record<string, number>> {
         const musicRef = doc(this.db, this.USER_COLLECTION, userId, this.USER_MUSIC_COLLECTION, musicId).withConverter(this.firestoreConverterUserMusic);
 
@@ -105,8 +101,6 @@ export class UserFirestoreService {
 
         return scores;
     }
-
-
 
     readonly userConverter: FirestoreDataConverter<UserDto> = {
         toFirestore(user: UserDto): DocumentData {

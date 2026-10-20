@@ -93,5 +93,3 @@ export class BackgroundChange implements ITimedChange {
         this.value = path;
     }
 }
-
-

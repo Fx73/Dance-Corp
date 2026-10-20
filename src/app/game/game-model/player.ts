@@ -16,12 +16,10 @@ export class Player {
     keyBindingGamepad: Map<number, ArrowDirection>;
     keyBindingKeyboard: Map<string, ArrowDirection>;
 
-
     constructor() {
         this.keyBindingGamepad = Player.defaultGamepadBinding();
         this.keyBindingKeyboard = Player.defaultKeyboardBinding();
     }
-
 
     toJSON(): IPlayerJSON {
         return {

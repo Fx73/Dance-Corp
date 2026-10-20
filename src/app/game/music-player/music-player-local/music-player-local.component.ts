@@ -72,8 +72,6 @@ export class MusicPlayerLocalComponent extends MusicPlayerCommon implements IMus
     }
   }
 
-
-
   play(): void {
     this.audio.play();
     this.isPlaying = true;

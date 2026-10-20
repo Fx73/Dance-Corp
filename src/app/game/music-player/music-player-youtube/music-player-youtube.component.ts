@@ -43,8 +43,6 @@ export class MusicPlayerYoutubeComponent extends MusicPlayerCommon implements IM
     this.ready.emit(this);
   }
 
-
-
   play(): void {
     this.player.playVideo();
   }
@@ -67,6 +65,5 @@ export class MusicPlayerYoutubeComponent extends MusicPlayerCommon implements IM
     );
     return match ? match[1] : '';
   }
-
 
 }

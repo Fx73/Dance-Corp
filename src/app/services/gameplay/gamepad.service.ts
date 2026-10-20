@@ -10,8 +10,6 @@ export class GamepadService {
     private userConfigService = inject(UserConfigService);
     private ngZone = inject(NgZone);
 
-
-
     private gamepads: IGamepadReference[] = [];
 
     constructor() {

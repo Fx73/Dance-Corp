@@ -36,7 +36,6 @@ export class UserComponent {
     });
   }
 
-
   async presentPopover(e: Event) {
     let popover: HTMLIonPopoverElement;
     if (this.user()) {
@@ -56,8 +55,6 @@ export class UserComponent {
     await popover.onDidDismiss();
   }
 
-
-
   logout() {
     this.loginService.logOut()
     this.popoverController.dismiss().then(() => {
@@ -66,7 +63,4 @@ export class UserComponent {
     );
   }
 
-
 }
-
-

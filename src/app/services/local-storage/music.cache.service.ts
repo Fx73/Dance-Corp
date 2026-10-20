@@ -37,7 +37,6 @@ export class MusicCacheService {
         return this.musics.filter(m => this.localMusicService.registry.has(m.id) === false);
     }
 
-
     async updateCache() {
         const ts = parseInt(localStorage.getItem(this.MUSIC_REGISTRY_TS_KEY) || '0');
         if (ts === 0) {
@@ -50,7 +49,6 @@ export class MusicCacheService {
             localStorage.setItem(this.MUSIC_REGISTRY_TS_KEY, Date.now().toString());
             return;
         }
-
 
         const updateInfo = await this.musicFirestoreService.getUpdate(ts, this.registry);
         if (!updateInfo) {

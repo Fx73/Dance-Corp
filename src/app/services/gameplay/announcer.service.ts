@@ -20,7 +20,6 @@ export class AnnouncerService {
     private goodSatisfaction = 0;
     private perfectSatisfaction = 0;
 
-
     // --- CHANNELS ---
     private announcerAudio: HTMLAudioElement | null = null;
     private announcerQueue: { announcer: ISoundBank, line: string }[] = [];
@@ -110,6 +109,7 @@ export class AnnouncerService {
             }
         }
     }
+
     playAnnouncerLine(category: string, line: string) {
         if (!this.preferredAnnouncer) return;
 
@@ -168,8 +168,6 @@ export class AnnouncerService {
 
         const order = ["three", "two", "one", "go"];
 
-
-
         this.isQueueBlocked = true;
 
         for (const line of order) {
@@ -187,7 +185,6 @@ export class AnnouncerService {
         this.processAnnouncerQueue();
     }
 
-
     private playAnnouncerDirect(announcer: ISoundBank, line: string, onEndCallback?: () => void) {
         const src = `assets/Sounds/announcers/${announcer.name}/${line}.ogg`;
 
@@ -204,9 +201,6 @@ export class AnnouncerService {
         this.announcerAudio.play();
     }
 
-
-
-
     // -------------------------
     // CROWD / AMBIANCE
     // -------------------------
@@ -222,7 +216,6 @@ export class AnnouncerService {
 
         this.crowdAudio = this.playAudio(src, { volume: this.getAnnouncerVolume(), fadeOutMs });
     }
-
 
     // -------------------------
     // UTILS

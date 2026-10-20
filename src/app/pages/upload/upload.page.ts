@@ -114,7 +114,6 @@ export class UploadPage {
       cardMetadata.some(c => c.isDirty)
     );
 
-
     const dirtyArray = new Array(this.notesCards.length).fill(false);
     for (let index = 0; index < this.notesCards.length; index++) {
       const card = this.notesCards.get(index);
@@ -224,7 +223,6 @@ export class UploadPage {
     }
   }
 
-
   async onPickLocalMusic() {
     const file = await this.pickLocalMusic();
     const uri = await this.saveLocalMusic(file, this.musicData.id);
@@ -253,7 +251,6 @@ export class UploadPage {
     });
   }
 
-
   async saveLocalMusic(file: File, musicId: string): Promise<string> {
     const extension = file.name.split('.').pop() || 'audio';
     const fileName = `${musicId}.${extension}`;
@@ -277,7 +274,6 @@ export class UploadPage {
   isLocalMusic(): boolean {
     return this.musicData?.music !== undefined && this.musicData.music.startsWith("local:");
   }
-
 
   onStartEdit() {
     this.musicData = this.musicDataDb!.deepClone();
@@ -382,8 +378,6 @@ export class UploadPage {
     AppComponent.presentOkToast("Music deleted successfully from database.");
   }
 
-
-
   deleteNote(note: NoteDataDto): void {
     if (!this.musicData) return;
 
@@ -399,7 +393,6 @@ export class UploadPage {
     }
 
   }
-
 
   async deleteLocalMusicFile(musicId: string) {
     try {
@@ -429,7 +422,6 @@ export class UploadPage {
   }
 
   //#endregion
-
 
   getStepCount(stepChart: Measures[], stepType: number): number {
     let count = 0;
@@ -473,7 +465,6 @@ export class UploadPage {
 
   }
 
-
   checkUrl(): Promise<boolean> {
     if (!this.musicData?.music) return Promise.resolve(false);
 
@@ -501,19 +492,18 @@ export class UploadPage {
     await modal.present()
   }
 
-
-
   noNotes(): boolean {
     if (!this.musicDataDb || !this.musicDataDb.noteData) return true;
     return this.musicDataDb.noteData.length === 0;
   }
+
   isNoteMine(note: NoteDataDto): boolean {
     if (!note.creatorId || note.creatorId.trim() === "") return true;
     return note.creatorId === this.userService.user?.id;
   }
+
   getDbNote(chartName: string): NoteDataDto | undefined {
     return this.musicDataDb?.noteData.find(n => n.chartName === chartName);
   }
-
 
 }

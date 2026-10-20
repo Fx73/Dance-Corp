@@ -14,7 +14,6 @@ export class Color {
         }
     }
 
-
     static noteDifficultyColor(difficulty: NoteDifficulty): string {
         switch (difficulty) {
             case NoteDifficulty.Beginner:
@@ -42,7 +41,5 @@ export class Color {
         }
         return { grade: 'E', color: '#808080' };
     }
-
-
 
 }

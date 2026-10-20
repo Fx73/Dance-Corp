@@ -14,12 +14,7 @@ import { UserComponent } from '../../user/user.component';
 export class HeaderComponent {
   popoverController = inject(PopoverController);
 
-
   @Input()
   title: string = "Welcome";
 
-
-
-
 }
-

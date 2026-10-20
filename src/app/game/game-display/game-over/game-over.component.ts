@@ -51,12 +51,12 @@ export class GameOverComponent implements OnInit {
   getScore() {
     return Math.round(this.gameRound.score)
   }
+
   getScoreFormatted() {
     return this.getScore()
       .toLocaleString('fr-FR')
       .replace(/\u202F/g, '\u202F\u202F');
   }
-
 
   getPrecisionCounts() {
     const counts = { ...this.precisionCounts() };
@@ -69,7 +69,6 @@ export class GameOverComponent implements OnInit {
 
     this.precisionCounts.set(counts);
   }
-
 
   getPrecisionColor(precision: Precision): string {
     return Color.precisionGradient(precision)

@@ -25,7 +25,6 @@ export class LoginComponent {
   loginForm: FormGroup;
   passwordRecoveryForm: FormGroup;
 
-
   constructor() {
     addIcons({ keyOutline, logInOutline, personAddOutline, refreshCircleOutline, logoGoogle });
 
@@ -42,7 +41,6 @@ export class LoginComponent {
     });
   }
 
-
   register(email: string, password: string): void {
     this.loginService.register(email, password)
   }
@@ -55,7 +53,6 @@ export class LoginComponent {
     this.loginService.loginWithGoogle();
   }
 
-
   loginWithFacebook() {
     this.loginService.loginWithFacebook();
   }
@@ -63,6 +60,5 @@ export class LoginComponent {
   passwordRecovery(email: string): void {
     this.passwordRecovery(email);
   }
-
 
 }

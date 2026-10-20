@@ -43,8 +43,6 @@ export class MusicPlayerSoundcloudComponent extends MusicPlayerCommon
 
   widgetSC!: ISoundCloudWidget;
 
-
-
   async ngOnInit(): Promise<void> {
     const iframe = document.getElementById('sc-player') as HTMLIFrameElement;
     this.widgetSC = SC.Widget(iframe);
@@ -87,12 +85,10 @@ export class MusicPlayerSoundcloudComponent extends MusicPlayerCommon
     clearInterval(this.polling);
   }
 
-
   getCurrentTime(): number {
     return this.lastKnownTime - (this.startOffset ?? 0);
   }
   //#endregion
-
 
   setToTime(time: number): void {
     this.widgetSC.seekTo((time + (this.startOffset ?? 0)) * 1000);

@@ -45,6 +45,7 @@ export class FirestoreConverter<T extends object> {
         const dto = new this.type()
         return this.fromFirestoreRecurse(data, dto) as T;
     }
+
     fromFirestoreRecurse(data: DocumentData, dto: object = {}): object {
         Object.keys(data).forEach((key) => {
             let value = data[key]
@@ -90,7 +91,6 @@ export class SimpleFirestoreConverter<T extends object> {
         this.type = type
     }
 
-
     toFirestore(dto: T): DocumentData {
         const data: DocumentData = {};
         Object.keys(dto).forEach((key) => {
@@ -103,7 +103,6 @@ export class SimpleFirestoreConverter<T extends object> {
         });
         return data;
     }
-
 
     fromFirestore(snapshot: QueryDocumentSnapshot<T>): T {
         const data = snapshot.data();

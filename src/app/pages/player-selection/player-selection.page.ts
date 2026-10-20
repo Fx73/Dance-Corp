@@ -25,7 +25,6 @@ export class PlayerSelectionPage {
   gamepadService = inject(GamepadService);
   private announcerService = inject(AnnouncerService);
 
-
   userList: { id: string | null, name: string }[] = []
 
   constructor() {
@@ -33,7 +32,6 @@ export class PlayerSelectionPage {
   }
 
   //TODO handle multiple connections
-
 
   getPlayers(): Player[] {
     return this.userConfigService.players
