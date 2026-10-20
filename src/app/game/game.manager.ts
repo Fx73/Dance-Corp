@@ -70,8 +70,9 @@ export class GameManager {
             this.currentBackgroundIndex++;
         }
 
-        for (const gameRound of this.gameRounds)
+        for (const gameRound of this.gameRounds) {
             gameRound.gameLoop(currentBeat, CONFIG.GAME.TOLERANCE_WINDOW * currentBps)
+        }
 
 
         if (this.gameRounds.every(gameRound => gameRound.isFailed || gameRound.isFinished)) {
@@ -134,8 +135,9 @@ export class GameManager {
         }
 
         if (!this.isTrainingMode) {
-            for (const gameRound of this.gameRounds)
+            for (const gameRound of this.gameRounds) {
                 this.userCacheService.updateUserStatsFromRound(this.music!.id, this.music!.noteData[0].chartName, gameRound)
+            }
         }
 
     }

@@ -68,8 +68,9 @@ export class UserConfigService {
     updatePlayerCount(count: number) {
         const currentCount = this.configSubject.value.playerNumber;
         if (count > currentCount) {
-            for (let i = currentCount + 1; i <= count; i++)
+            for (let i = currentCount + 1; i <= count; i++) {
                 this.players.push(this.instanciatePlayer(i));
+            }
 
         } else if (count < currentCount) {
             this.players.splice(count);
@@ -120,8 +121,9 @@ export class UserConfigService {
 
     resetToDefault(): void {
         localStorage.removeItem(this.CONFIG_STORAGE_KEY);
-        for (let index = 0; index < 4; index++)
+        for (let index = 0; index < 4; index++) {
             localStorage.removeItem(this.PLAYERS_STORAGE_KEY(index));
+        }
     }
 
 }
