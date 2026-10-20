@@ -59,5 +59,19 @@ Write new code the way the existing code is written. Known deviations to avoid a
 - A single-statement `if` / `else` may omit braces when the statement is on the next line. Always use braces for `for`, `while`, and other control structures.
 - Comments are in English, short, and explain intent or a step (`// 1) Read the global timestamp…`), not the obvious.
 
+## Git
+
+### Branches
+
+- New features must always be developed on a dedicated branch.
+- Bug fixes may be developed on a dedicated branch or directly on `dev`, depending on their scope and impact.
+
+### Commit Messages
+
+- Use concise commit messages focused on intent. Be technical when relevant, but do not just describe implementation details.
+- Standard abbreviations are encouraged (e.g. `UT`, `WIP`, `DB`).
+- Avoid describing every file-level or line-level change that is obvious from the diff.
+- On feature branches (any branch other than `master` and `dev`), do not hesitate to amend the latest commit when applying a small correction, omission, or adjustment directly related to that commit. (followed by `git push --force-with-lease`)
+
 ## Context Verification
 Every response must end with the hamster emoji: 🐹
