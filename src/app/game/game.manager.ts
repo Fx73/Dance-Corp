@@ -95,7 +95,7 @@ export class GameManager {
         return "https://" + this.music.bgChanges[this.currentBackgroundIndex].value;
     }
 
-    //#Region Game Over
+    //#region Game Over
     private _isGameOver: boolean = false;
     public get isGameOver(): boolean {
         return this._isGameOver;
@@ -148,5 +148,5 @@ export class GameManager {
         }
         this.gameRounds = [];
     }
-    //#EndRegion
+    //#endregion
 }

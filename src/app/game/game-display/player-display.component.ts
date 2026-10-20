@@ -250,7 +250,7 @@ export class PlayerDisplayComponent implements AfterViewInit {
     this.ctx.drawImage(mineImage, x - mineImage.width / 2, y - mineImage.height / 2);
   }
 
-  //#region 
+  //#endregion
 
   //#region Player Precision
   showPrecisionMessage(precision: Precision, direction: ArrowDirection): void {
