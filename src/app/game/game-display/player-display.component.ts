@@ -260,7 +260,7 @@ export class PlayerDisplayComponent implements AfterViewInit {
 
     const element = this.precisionTextElement[direction];
     element.textContent = precision;
-    const randomRotation = (Math.random() * 40 - 20).toFixed(2); // Rotation between -20° et +20°
+    const randomRotation = (Math.random() * 40 - 20).toFixed(2); // Rotation between -20° and +20°
     element.style.setProperty('transform', `translate(-50%, -50%) scale(1) rotate(${randomRotation}deg)`);
     element.style.setProperty('--gradient-color', Color.precisionGradient(precision));
     element.style.setProperty('--rotate-angle', `${randomRotation}deg`);

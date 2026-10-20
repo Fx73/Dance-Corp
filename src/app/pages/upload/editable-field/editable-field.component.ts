@@ -40,7 +40,7 @@ export class MusicEditableFieldComponent<T extends string | number | null | unde
     const newValue = SanitizeSscInput(rawValue == null ? null : String(rawValue));
 
     this.isDirty = this.isEditing && this.normalize(newValue) !== this.normalize(this.valueDb);
-    // SanitizeSscInput renvoie une string (ou null), émise telle quelle même si le champ lié est un number
+    // SanitizeSscInput returns a string (or null), emitted as is even if the bound field is a number
     this.valueChange.emit(newValue as T);
   }
 

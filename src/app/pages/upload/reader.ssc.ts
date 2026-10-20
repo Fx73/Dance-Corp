@@ -3,7 +3,7 @@ import { Measures, MusicDto } from "src/app/game/game-model/music.dto";
 
 import { NoteEvaluator } from "./DifficultyCriteria";
 
-/** Tokens d'un fichier SM/SSC : valeur texte, ou sous-map de tokens pour chaque bloc notedataN */
+/** Tokens of an SM/SSC file: text value, or a sub-map of tokens for each notedataN block */
 export type SscTokenMap = Record<string, string | Record<string, string>>;
 
 export class SccReader {

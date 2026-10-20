@@ -1,6 +1,6 @@
 import { ArrowDirection } from "src/app/game/constants/arrow-direction.enum";
 
-/** Forme sérialisée d'un Player (localStorage) */
+/** Serialized form of a Player (localStorage) */
 export interface PlayerJSON {
     name: string | undefined;
     userId: string | null;

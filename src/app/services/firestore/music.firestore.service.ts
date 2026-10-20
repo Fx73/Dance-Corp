@@ -182,7 +182,7 @@ export class MusicFirestoreService {
 
             const music = snap.data();
 
-            // Vérifier s'il reste des notes embed
+            // Check whether embedded notes remain
             if (music.noteData && music.noteData.length > 0) {
                 console.warn("Cannot delete, notes are still present on music:", musicId);
                 throw new Error("Cannot delete music with existing notes");
@@ -217,10 +217,10 @@ export class MusicFirestoreService {
             if (notedata[idx].creatorId !== userId)
                 throw new Error("User is not the creator of this note");
 
-            // Supprimer la note
+            // Remove the note
             notedata.splice(idx, 1);
 
-            // Réécrire le document complet
+            // Rewrite the whole document
             await updateDoc(musicRef, { noteData: notedata });
 
             this.updateMusicIndex(musicId, false);

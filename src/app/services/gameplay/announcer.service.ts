@@ -1,7 +1,7 @@
 import { Injectable, inject } from "@angular/core";
 import { UserConfigService } from "../userconfig.service";
 
-/** Contenu des fichiers assets/Sounds/announcers/*.json */
+/** Content of the assets/Sounds/announcers/*.json files */
 interface SoundBank {
     type: string;
     name: string;
@@ -249,7 +249,7 @@ export class AnnouncerService {
 
         audio.play();
 
-        // Si pas de fade-out → on s'arrête là
+        // No fade-out: stop here
         if (!options.fadeOutMs) return audio;
 
         const fadeDuration = options.fadeOutMs;
@@ -269,7 +269,7 @@ export class AnnouncerService {
                     audio.currentTime = 0;
                 }
             }, stepTime);
-        }, audio.duration * 1000 - fadeDuration); // commence le fade-out avant la fin
+        }, audio.duration * 1000 - fadeDuration); // start the fade-out before the end
 
         return audio;
     }

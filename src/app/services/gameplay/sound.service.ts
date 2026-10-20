@@ -74,7 +74,7 @@ export class SoundManager {
         const step = 50;
         const increment = step / duration;
 
-        // Si volume déjà > 0, on repart de là (permet d'inverser un fadeOut)
+        // If volume is already > 0, start from there (allows reversing a fadeOut)
         audio.volume = Math.max(0, audio.volume);
 
         this.fadeIntervals.set(audio, setInterval(() => {

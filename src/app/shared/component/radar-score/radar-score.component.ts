@@ -107,7 +107,7 @@ export class RadarScoreComponent implements AfterViewInit, OnChanges {
     ctx.setLineDash([])
     // 5) Fill background
     ctx.beginPath();
-    ctx.fillStyle = "rgba(200, 200, 200, 0.04)"; // gris très léger
+    ctx.fillStyle = "rgba(200, 200, 200, 0.04)"; // very light grey
 
     for (let i = 0; i < this.labels.length; i++) {
       const angle = i * angleStep - Math.PI / 2;

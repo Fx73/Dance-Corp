@@ -10,7 +10,7 @@ import { IMusicPlayer, MusicPlayerCommon } from '../IMusicPlayer';
 
 //import { Soundcloud } from 'soundcloud.ts';
 
-/** Sous-ensemble utilisé de l'API du widget SoundCloud (https://developers.soundcloud.com/docs/api/html5-widget) */
+/** Subset of the SoundCloud widget API in use (https://developers.soundcloud.com/docs/api/html5-widget) */
 interface SoundCloudWidget {
   load(url: string): void;
   bind(eventName: string, listener: () => void): void;

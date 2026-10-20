@@ -45,7 +45,7 @@ export class MusicEditableFieldAutocompleteComponent<T extends string | null | u
     const newValue = SanitizeSscInput(rawValue == null ? null : String(rawValue));
 
     this.isDirty = this.isEditing && this.normalize(newValue) !== this.normalize(this.valueDb);
-    // SanitizeSscInput renvoie une string (ou null), émise telle quelle
+    // SanitizeSscInput returns a string (or null), emitted as is
     this.valueChange.emit(newValue as T);
   }
 

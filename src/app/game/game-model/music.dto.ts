@@ -45,7 +45,7 @@ export class MusicDto {
 
   constructor(tokenMapWithNotes?: SscTokenMap) {
     if (tokenMapWithNotes === undefined) return
-    // Les blocs notedataN (sous-maps) sont lus à part, plus bas
+    // notedataN blocks (sub-maps) are read separately, below
     const tokenMap = tokenMapWithNotes as Record<string, string>;
 
     this.title = tokenMap["title"];

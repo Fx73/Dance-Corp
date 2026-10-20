@@ -53,7 +53,7 @@ export class OptionsPage {
     return this.userConfigService.getConfig()[key];
   }
 
-  // Valeur brute des composants Ionic : ion-input renvoie une string (ex: canvasWidth), conservée telle quelle
+  // Raw value from Ionic components: ion-input returns a string (e.g. canvasWidth), kept as is
   updateConfigValue<K extends keyof UserConfig>(key: K, value: UserConfig[K] | InputChangeEventDetail['value'] | RangeChangeEventDetail['value']): void {
     this.userConfigService.updateConfig(key, value as UserConfig[K]);
   }

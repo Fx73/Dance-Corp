@@ -44,7 +44,7 @@ export class MusicEditableListComponent<T extends ITimedChange = ITimedChange> i
       value: this.valueType === 'string'
         ? SanitizeSscInput(String(row.value ?? ""))
         : row.value
-    }) as T); // la valeur sanitisée (string ou null) remplace la valeur du champ
+    }) as T); // the sanitized value (string or null) replaces the field value
 
     this.valueChange.emit(this.value);
   }
