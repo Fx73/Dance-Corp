@@ -29,7 +29,7 @@ export class PlayerDisplayComponent implements AfterViewInit {
 
   @Input() gameRound!: GameRound;
 
-  //#region Displayed Elemments
+  //#region Displayed Elements
   @ViewChild('gameCanvas', { static: true }) canvasRef!: ElementRef<HTMLCanvasElement>
   private ctx!: CanvasRenderingContext2D;
   arrowTargets: Map<ArrowDirection, HTMLElement> = new Map();

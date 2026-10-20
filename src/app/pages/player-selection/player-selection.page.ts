@@ -32,7 +32,7 @@ export class PlayerSelectionPage {
     addIcons({ addCircle });
   }
 
-  //TODO handle mutliple connexion
+  //TODO handle multiple connections
 
 
   getPlayers(): Player[] {

@@ -56,7 +56,7 @@ export class SpeedChange implements ITimedChange {
 }
 
 /* -----------------------------------------
- * SCROLL Change (visual only, scroll spacement)
+ * SCROLL Change (visual only, scroll spacing)
  * ----------------------------------------- */
 export class ScrollChange implements ITimedChange {
     time: number = 0;      // Beat

@@ -453,7 +453,7 @@ export class UploadPage {
     url = url.replace(/^https?:\/\/www\./, "");
     url = url.split("?")[0];
 
-    // exctract start time if any
+    // extract start time if any
     const startMatch = url.match(/[?&](?:t|start)=(\d+)/);
     const start = startMatch ? Number(startMatch[1]) : null;
     url = url.replace(/[?&](?:t|start)=(\d+)/, "");
