@@ -76,7 +76,6 @@ Bugs found but not fixed yet, and deprecations to migrate. Remove an entry once 
 ## Code style to harmonize
 
 - **Semicolons**: about 85% of statements end with one, while the target style is semicolon-free. Convert with `@stylistic/eslint-plugin` (`semi: ['error', 'never']`, auto-fixable) and enable `no-unexpected-multiline` to catch lines that would be joined to the previous one.
-- **Class member order**: most classes put `inject()` fields before the `Constants` region, and static methods are not grouped at the bottom (`MusicDto.fromJSON`, toasts in `AppComponent`). Reorder to: Constants region, `inject()` fields, the rest, `Statics` region.
 - **Blank lines**: runs of 3–4 empty lines between methods. Use a single blank line.
 - **Magic numbers**: scoring and announcer values (`0.8`, `0.6`, `-4`, `-20`, `30`…) are inline while `CONFIG` exists. Move tunable gameplay values to `CONFIG`.
 - **Non-null assertions**: the assertions that were unnecessary for the type checker are removed. The remaining `!` are on values typed as nullable, some of which can really be null at runtime (`player.gamepad!.index`). Each one needs a guard or a type fix, which changes behavior: handle them with the related bugs.

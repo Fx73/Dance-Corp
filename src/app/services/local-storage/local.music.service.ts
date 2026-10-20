@@ -6,9 +6,10 @@ import { MusicDto } from "src/app/game/game-model/music.dto";
 
 @Injectable({ providedIn: 'root' })
 export class musicLocalService {
-
+    //#region Constants
     private readonly MUSICEDIT_REGISTRY_KEY = 'REGISTRY_MUSICEDIT';
     public readonly MUSICEDIT_STORAGE_KEY = (musicId: string) => `MUSICEDIT_${musicId}`;
+    //#endregion
 
     public registry: Set<string> = new Set();
 

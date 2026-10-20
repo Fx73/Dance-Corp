@@ -39,6 +39,15 @@ import { SoundManager } from './../../services/gameplay/sound.service';
   imports: [IonBadge, IonSplitPane, IonCardSubtitle, IonMenu, IonText, IonCardContent, IonCardTitle, IonInfiniteScrollContent, IonImg, IonInfiniteScroll, IonSearchbar, IonCard, IonCardHeader, IonContent, NgStyle, NgClass, FormsModule, HeaderComponent, GradeComponent, RadarScoreComponent, MusicPlayerYoutubeComponent, MusicPlayerLocalComponent, MusicPlayerSoundcloudComponent]
 })
 export class BrowsePage implements OnInit {
+  //#region Constants
+  readonly SOUND_ARROW_UP = new Audio('assets/Sounds/menuFx/arrow_up.ogg');
+  readonly SOUND_ARROW_DOWN = new Audio('assets/Sounds/menuFx/arrow_down.ogg');
+
+  readonly MusicOrigin = MusicOrigin;
+  readonly DanceType = DanceType;
+  pickMusicPlayer = MusicPlayerCommon.pickMusicPlayer;
+  //#endregion
+
   private router = inject(Router);
   private cd = inject(ChangeDetectorRef);
   private localMusicService = inject(musicLocalService);
@@ -49,13 +58,6 @@ export class BrowsePage implements OnInit {
   private announcerService = inject(AnnouncerService);
   private discordRpcService = inject(PresenceService);
   private soundManager = inject(SoundManager);
-
-  readonly SOUND_ARROW_UP = new Audio('assets/Sounds/menuFx/arrow_up.ogg');
-  readonly SOUND_ARROW_DOWN = new Audio('assets/Sounds/menuFx/arrow_down.ogg');
-
-  readonly MusicOrigin = MusicOrigin;
-  readonly DanceType = DanceType;
-  pickMusicPlayer = MusicPlayerCommon.pickMusicPlayer;
 
   dbMusics = signal<MusicDto[]>([]);
   storedMusics = signal<MusicDto[]>([]);

@@ -1,8 +1,11 @@
 import { DocumentData, QueryDocumentSnapshot, Timestamp } from "firebase/firestore";
 
 export class FirestoreConverter<T extends object> {
+    //#region Constants
     readonly IGNORE_UNDEFINED: boolean = true
     readonly IGNORED_FIELDS: Set<string> = new Set(["additionalFields"])
+    //#endregion
+
     readonly type;
     readonly subtypes: Record<string, new () => object> = {};
 
@@ -76,9 +79,12 @@ export class FirestoreConverter<T extends object> {
 }
 
 export class SimpleFirestoreConverter<T extends object> {
-    readonly type;
+    //#region Constants
     readonly IGNORE_UNDEFINED: boolean = true
     readonly IGNORED_FIELDS: Set<string> = new Set(["additionalFields"])
+    //#endregion
+
+    readonly type;
 
     constructor(type: new() => T) {
         this.type = type

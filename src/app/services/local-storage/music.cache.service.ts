@@ -7,12 +7,14 @@ import { MusicFirestoreService } from "../firestore/music.firestore.service";
 
 @Injectable({ providedIn: 'root' })
 export class MusicCacheService {
-    private musicFirestoreService = inject(MusicFirestoreService);
-    private localMusicService = inject(musicLocalService);
-
+    //#region Constants
     private readonly MUSIC_STORAGE_KEY = (musicId: string) => `MUSIC_${musicId}`;
     private readonly MUSIC_REGISTRY_KEY = 'REGISTRY_MUSIC';
     private readonly MUSIC_REGISTRY_TS_KEY = 'REGISTRY_MUSIC_TS';
+    //#endregion
+
+    private musicFirestoreService = inject(MusicFirestoreService);
+    private localMusicService = inject(musicLocalService);
 
     private registry: Set<string> = new Set();
 

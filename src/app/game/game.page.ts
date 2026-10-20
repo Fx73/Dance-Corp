@@ -31,6 +31,11 @@ import { MusicPlayerYoutubeComponent } from "./music-player/music-player-youtube
   imports: [IonIcon, IonCard, IonContent, IonHeader, IonTitle, IonToolbar, FormsModule, PlayerDisplayComponent, GameOverComponent, WaitingScreenComponent, MusicPlayerYoutubeComponent, MusicPlayerSoundcloudComponent, MusicPlayerLocalComponent, IonButton]
 })
 export class GamePage implements OnInit, OnDestroy, AfterViewInit {
+  //#region App Constants
+  readonly ArrowDirection = ArrowDirection;
+  readonly MusicOrigin = MusicOrigin;
+  //#endregion
+
   private cdr = inject(ChangeDetectorRef);
   private route = inject(ActivatedRoute);
   private userConfigService = inject(UserConfigService);
@@ -40,11 +45,6 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
   private location = inject(Location);
   private announcerService = inject(AnnouncerService);
   private discordRpcService = inject(PresenceService);
-
-  //#region App Constants
-  readonly ArrowDirection = ArrowDirection;
-  readonly MusicOrigin = MusicOrigin;
-  //#endregion
 
   //#region Loading
   loadingMusic: boolean = true;

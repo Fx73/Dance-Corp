@@ -9,12 +9,13 @@ import { UserFirestoreService } from './firestore/user.firestore.service';
     providedIn: 'root',
 })
 export class UserConfigService {
-    private userFirestoreService = inject(UserFirestoreService);
-
     //#region Constants
     private readonly CONFIG_STORAGE_KEY = "userConfig"
     private readonly PLAYERS_STORAGE_KEY = (index: number) => `playersConfig${index}`;
     //#endregion
+
+    private userFirestoreService = inject(UserFirestoreService);
+
     public isReady = false;
 
     private configSubject: BehaviorSubject<UserConfig> = new BehaviorSubject<UserConfig>(new UserConfig());

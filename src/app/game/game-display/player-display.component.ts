@@ -18,14 +18,14 @@ import { ArrowImageManager } from './arrowImageManager';
   imports: [CommonModule]
 })
 export class PlayerDisplayComponent implements AfterViewInit {
-  private userConfigService = inject(UserConfigService);
-  private cd = inject(ChangeDetectorRef);
-
   //#region App Constants
   readonly ArrowDirection = ArrowDirection;
   ARROW_SIZE = ArrowImageManager.ARROW_SIZE //px
   ARROW_CORRECTED_SIZE = signal<number>(ArrowImageManager.ARROW_SIZE / Math.sqrt(2)) //px
   //#endregion
+
+  private userConfigService = inject(UserConfigService);
+  private cd = inject(ChangeDetectorRef);
 
   @Input() gameRound!: GameRound;
 

@@ -20,13 +20,14 @@ import { UserConfigService } from 'src/app/services/userconfig.service';
   imports: [MusicPlayerYoutubeComponent, MusicPlayerSoundcloudComponent, PlayerDisplayComponent]
 })
 export class TestNoteComponent implements OnInit, OnDestroy {
-  private modalController = inject(ModalController);
-  private userConfigService = inject(UserConfigService);
-
   //#region App Constants
   readonly ArrowDirection = ArrowDirection;
   readonly MusicOrigin = MusicOrigin;
   //#endregion
+
+  private modalController = inject(ModalController);
+  private userConfigService = inject(UserConfigService);
+
   @Input() noteData!: NoteDataDto;
   @Input() music!: MusicDto;
   musicOrigin: MusicOrigin | null = null

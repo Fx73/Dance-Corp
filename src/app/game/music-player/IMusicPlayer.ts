@@ -23,7 +23,11 @@ export class MusicPlayerCommon {
     @Input()
     size: { width: number | string; height: number | string } = { width: '1', height: '1' };
 
+    public getVolume(): number {
+        return this.userConfig.getConfig()["musicVolume"] ?? 1;
+    }
 
+    //#region Statics
     public static pickMusicPlayer(uri: string): MusicOrigin | null {
         if (!uri) return null;
 
@@ -49,10 +53,7 @@ export class MusicPlayerCommon {
                 return false;
         }
     }
-
-    public getVolume(): number {
-        return this.userConfig.getConfig()["musicVolume"] ?? 1;
-    }
+    //#endregion
 }
 
 export enum MusicOrigin {

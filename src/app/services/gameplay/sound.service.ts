@@ -5,12 +5,15 @@ import { UserConfigService } from 'src/app/services/userconfig.service';
 
 @Injectable({ providedIn: 'root' })
 export class SoundManager {
-    private userConfigService = inject(UserConfigService);
-    private router = inject(Router);
-    private fadeIntervals: Map<HTMLAudioElement, ReturnType<typeof setInterval>> = new Map();
-
+    //#region Constants
     readonly SOUND_BACKGROUND = new Audio('assets/Sounds/music/GGJ2024_Main.mp3');
     readonly SOUND_BACKGROUND2 = new Audio('assets/Sounds/music/GGJ2024_Main2.mp3');
+    //#endregion
+
+    private userConfigService = inject(UserConfigService);
+    private router = inject(Router);
+
+    private fadeIntervals: Map<HTMLAudioElement, ReturnType<typeof setInterval>> = new Map();
 
     isPlaying = false;
 

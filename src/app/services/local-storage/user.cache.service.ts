@@ -6,11 +6,13 @@ import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.
 
 @Injectable({ providedIn: 'root' })
 export class UserCacheService {
-    private userFirestoreService = inject(UserFirestoreService);
-
+    //#region Constants
     private readonly USER_KEY = "LAST_LOGGED_IN_USER";
     private readonly USERMUSIC_REGISTRY_KEY = 'REGISTRY_USER_MUSIC';
     private readonly USERMUSIC_STORAGE_KEY = (musicId: string) => `USER_MUSIC_${musicId}`;
+    //#endregion
+
+    private userFirestoreService = inject(UserFirestoreService);
 
     private registry: Set<string> = new Set();
     private userMusics: UserMusicDto[] = [];

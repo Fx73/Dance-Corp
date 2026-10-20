@@ -64,7 +64,9 @@ export class AppComponent implements OnInit {
     });
     toast.present();
   }
+  //#endregion
 
+  //#region Statics
   static presentOkToast(message: string) {
     console.log(message)
     AppComponent.appInstance.presentOkToast(message)

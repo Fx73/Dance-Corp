@@ -152,6 +152,11 @@ export class MusicDto {
     return array;
   }
 
+  deepClone(): MusicDto {
+    return MusicDto.fromJSON(JSON.parse(JSON.stringify(this)));
+  }
+
+  //#region Statics
   static fromJSON(obj: Record<string, unknown>): MusicDto {
     const instance = Object.assign(new MusicDto(), obj);
     const noteData = obj["noteData"];
@@ -160,10 +165,7 @@ export class MusicDto {
       : [];
     return instance;
   }
-
-  deepClone(): MusicDto {
-    return MusicDto.fromJSON(JSON.parse(JSON.stringify(this)));
-  }
+  //#endregion
 }
 
 
@@ -206,6 +208,7 @@ export class NoteDataDto {
 
   }
 
+  //#region Statics
   static fromJSON(obj: Record<string, unknown>): NoteDataDto {
     const instance = Object.assign(new NoteDataDto(), obj);
     const stepChart = obj["stepChart"];
@@ -214,18 +217,19 @@ export class NoteDataDto {
       : [];
     return instance;
   }
-
-
+  //#endregion
 }
 
 export class Measures {
   steps: number[][] = [];
 
+  //#region Statics
   static fromJSON(obj: Record<string, unknown>): Measures {
     const instance = Object.assign(new Measures(), obj);
     const steps = obj["steps"];
     instance.steps = Array.isArray(steps) ? steps.map((row: unknown) => Array.isArray(row) ? row.map(Number) : []) : [];
     return instance;
   }
+  //#endregion
 }
 

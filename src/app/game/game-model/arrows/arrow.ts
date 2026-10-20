@@ -74,6 +74,7 @@ export class Arrow {
         this.precision = Precision.Boom
     }
 
+    //#region Statics
     private static determineArrowColor(beat: number): ArrowColor {
         if (beat % 1 === 0) {
             return ArrowColor.Orange; // On the beat
@@ -85,5 +86,5 @@ export class Arrow {
             return ArrowColor.Violet; // Otherwise
         }
     }
-
+    //#endregion
 }

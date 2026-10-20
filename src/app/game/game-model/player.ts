@@ -33,6 +33,7 @@ export class Player {
         };
     }
 
+    //#region Statics
     static fromJSON(json: PlayerJSON): Player {
         const player = new Player();
         player.userId = json.userId;
@@ -41,7 +42,6 @@ export class Player {
         player.keyBindingKeyboard = new Map<string, ArrowDirection>(Object.entries(json.keyBindingKeyboard));
         return player;
     }
-
 
     static defaultGamepadBinding(): Map<number, ArrowDirection> {
         return new Map<number, ArrowDirection>([
@@ -60,4 +60,5 @@ export class Player {
             ['ArrowRight', ArrowDirection.Right]
         ]);
     }
+    //#endregion
 }

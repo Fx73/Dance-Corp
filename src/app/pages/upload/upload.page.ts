@@ -38,6 +38,15 @@ import { TestNoteComponent } from './test-note/test-note.component';
   imports: [IonSpinner, MusicEditableFieldComponent, MusicEditableFieldAutocompleteComponent, MusicEditableListComponent, IonCardSubtitle, IonImg, IonCol, IonRow, IonGrid, IonInput, IonItem, IonLabel, IonList, FormsModule, IonIcon, IonButton, IonCardTitle, IonCardContent, IonCardHeader, IonCard, IonContent, CommonModule, FormsModule, HeaderComponent, IonButton, MusicPlayerYoutubeComponent, MusicPlayerSoundcloudComponent, MusicPlayerLocalComponent, RadarScoreComponent, MusicSelectComponent]
 })
 export class UploadPage {
+  //#region Constants
+  public static readonly MUSICEDIT_STORAGE_KEY = (musicId: string) => `MUSICEDIT_${musicId}`;
+  pickMusicPlayer = MusicPlayerCommon.pickMusicPlayer;
+  MusicOrigin = MusicOrigin;
+  isDesktop = isTauri;
+  readonly DanceTypeList = Object.values(DanceType);
+  readonly NoteDifficultyList = Object.values(NoteDifficulty);
+  //#endregion
+
   private modalController = inject(ModalController);
   private route = inject(ActivatedRoute);
   private fireStoreService = inject(MusicFirestoreService);
@@ -47,15 +56,6 @@ export class UploadPage {
   private cd = inject(ChangeDetectorRef);
   private location = inject(Location);
   private router = inject(Router);
-
-  //#region Constants
-  public static readonly MUSICEDIT_STORAGE_KEY = (musicId: string) => `MUSICEDIT_${musicId}`;
-  pickMusicPlayer = MusicPlayerCommon.pickMusicPlayer;
-  MusicOrigin = MusicOrigin;
-  isDesktop = isTauri;
-  readonly DanceTypeList = Object.values(DanceType);
-  readonly NoteDifficultyList = Object.values(NoteDifficulty);
-  //#endregion
 
   musicData: MusicDto = new MusicDto();
   musicDataDb: MusicDto | null = null;

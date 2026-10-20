@@ -14,6 +14,7 @@ export class DifficultyCriteria {
     return `e=${this.endurance},s=${this.speed},t=${this.technical},b=${this.burst},c=${this.chaos}`;
   }
 
+  //#region Statics
   static parseCriteria(criteriaString: string): DifficultyCriteria {
     const criteria = new DifficultyCriteria();
     const pairs = criteriaString.split(',');
@@ -33,6 +34,7 @@ export class DifficultyCriteria {
 
     return criteria;
   }
+  //#endregion
 }
 
 export class NoteEvaluator {

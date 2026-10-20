@@ -12,8 +12,6 @@ import { UserFirestoreService } from './user.firestore.service';
     providedIn: 'root'
 })
 export class MusicFirestoreService {
-    private userFirestoreService = inject(UserFirestoreService);
-
     //#region Constants
     readonly MUSIC_COLLECTION = "musics"
     readonly METADATA_COLLECTION = "metadata";
@@ -28,6 +26,9 @@ export class MusicFirestoreService {
     readonly protectedFields: (keyof MusicDto)[] = ['artist', 'title', 'offset', 'music', 'stops'];
 
     //#endregion
+
+    private userFirestoreService = inject(UserFirestoreService);
+
     db: Firestore
 
     constructor() {
