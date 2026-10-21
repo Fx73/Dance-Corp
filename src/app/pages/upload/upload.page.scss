@@ -37,3 +37,9 @@ input[type="file"] {
     }
   }
 }
+
+.preview-image {
+  display: block;
+  width: 100%;
+  object-fit: contain;
+}

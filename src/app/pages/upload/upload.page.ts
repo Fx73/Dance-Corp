@@ -1,7 +1,7 @@
 import { CommonModule, Location } from '@angular/common'
 import { ChangeDetectorRef, Component, ElementRef, QueryList, ViewChild, ViewChildren, inject, signal } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonGrid, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonList, IonRow, IonSpinner, ModalController } from '@ionic/angular'
+import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonGrid, IonIcon, IonInput, IonItem, IonLabel, IonList, IonRow, IonSpinner, ModalController } from '@ionic/angular'
 import { BaseDirectory, mkdir, readDir, remove, writeFile } from '@tauri-apps/plugin-fs'
 import { addOutline, checkmarkCircle, closeCircle, folder, logoSoundcloud, logoYoutube, removeOutline, trashOutline } from 'ionicons/icons'
 import { Measures, MusicDto, NoteDataDto } from 'src/app/game/game-model/music.dto'
@@ -35,7 +35,7 @@ import { TestNoteComponent } from './test-note/test-note.component'
   templateUrl: './upload.page.html',
   styleUrls: ['./upload.page.scss'],
   standalone: true,
-  imports: [IonSpinner, MusicEditableFieldComponent, MusicEditableFieldAutocompleteComponent, MusicEditableListComponent, IonCardSubtitle, IonImg, IonCol, IonRow, IonGrid, IonInput, IonItem, IonLabel, IonList, FormsModule, IonIcon, IonButton, IonCardTitle, IonCardContent, IonCardHeader, IonCard, IonContent, CommonModule, FormsModule, HeaderComponent, IonButton, MusicPlayerYoutubeComponent, MusicPlayerSoundcloudComponent, MusicPlayerLocalComponent, RadarScoreComponent, MusicSelectComponent]
+  imports: [IonSpinner, MusicEditableFieldComponent, MusicEditableFieldAutocompleteComponent, MusicEditableListComponent, IonCardSubtitle, IonCol, IonRow, IonGrid, IonInput, IonItem, IonLabel, IonList, FormsModule, IonIcon, IonButton, IonCardTitle, IonCardContent, IonCardHeader, IonCard, IonContent, CommonModule, FormsModule, HeaderComponent, IonButton, MusicPlayerYoutubeComponent, MusicPlayerSoundcloudComponent, MusicPlayerLocalComponent, RadarScoreComponent, MusicSelectComponent]
 })
 export class UploadPage {
   //#region Constants

@@ -50,10 +50,6 @@ Bugs found but not fixed yet, and deprecations to migrate. Remove an entry once 
 - **Music offset fallback is dead code**
   In the `MusicDto` constructor, `parseFloat(tokenMap["offset"]) ?? parseFloat(tokenMap["beat0OffsetInSeconds"])` never uses the fallback (`parseFloat` returns `NaN`, not `null`), and the whole expression is guarded by `tokenMap["offset"]` being truthy.
 
-## Deprecations
-
-- **`<ion-img>`**: deprecated in Ionic 9, removed in Ionic 10 (runtime warning on every page). Replace with a native `<img loading="lazy">`.
-
 ## Maintenance
 
 - **`npm audit`**: 6 vulnerabilities (5 high, 1 moderate), accepted for now. Do not run `npm audit fix --force`: it downgrades `firebase` to 9.14.0 and `@angular/build` to 22.1.9.

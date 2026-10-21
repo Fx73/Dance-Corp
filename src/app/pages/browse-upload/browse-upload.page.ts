@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, inject } from '@angular/core'
-import { InfiniteScrollCustomEvent, SearchbarCustomEvent, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonIcon, IonImg, IonInfiniteScroll, IonInfiniteScrollContent, IonSearchbar } from '@ionic/angular'
+import { InfiniteScrollCustomEvent, SearchbarCustomEvent, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonSearchbar } from '@ionic/angular'
 
 import { FormsModule } from '@angular/forms'
 import { HeaderComponent } from "src/app/shared/component/header/header.component"
@@ -16,7 +16,7 @@ import { MusicLocalService } from 'src/app/services/local-storage/local.music.se
   templateUrl: './browse-upload.page.html',
   styleUrls: ['./browse-upload.page.scss'],
   standalone: true,
-  imports: [IonBadge, IonIcon, IonCardSubtitle, IonCardContent, IonCardTitle, IonInfiniteScrollContent, IonImg, IonInfiniteScroll, IonSearchbar, IonCard, IonCardHeader, IonContent, FormsModule, HeaderComponent]
+  imports: [IonBadge, IonIcon, IonCardSubtitle, IonCardContent, IonCardTitle, IonInfiniteScrollContent, IonInfiniteScroll, IonSearchbar, IonCard, IonCardHeader, IonContent, FormsModule, HeaderComponent]
 })
 export class BrowseUploadPage implements OnInit {
   private router = inject(Router)

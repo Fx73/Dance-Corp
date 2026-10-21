@@ -1,6 +1,6 @@
 import { NgClass, NgStyle, } from '@angular/common'
 import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren, inject, signal } from '@angular/core'
-import { InfiniteScrollCustomEvent, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonImg, IonInfiniteScroll, IonInfiniteScrollContent, IonMenu, IonSearchbar, IonSplitPane, IonText, SearchbarCustomEvent } from '@ionic/angular'
+import { InfiniteScrollCustomEvent, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonInfiniteScroll, IonInfiniteScrollContent, IonMenu, IonSearchbar, IonSplitPane, IonText, SearchbarCustomEvent } from '@ionic/angular'
 import { MusicDto, NoteDataDto } from 'src/app/game/game-model/music.dto'
 import { IMusicPlayer, MusicOrigin, MusicPlayerCommon } from 'src/app/game/music-player/IMusicPlayer'
 import { UserMusicDto, UserNoteDto } from '../user-profile/user.dto'
@@ -36,7 +36,7 @@ import { SoundService } from './../../services/gameplay/sound.service'
   templateUrl: './browse.page.html',
   styleUrls: ['./browse.page.scss'],
   standalone: true,
-  imports: [IonBadge, IonSplitPane, IonCardSubtitle, IonMenu, IonText, IonCardContent, IonCardTitle, IonInfiniteScrollContent, IonImg, IonInfiniteScroll, IonSearchbar, IonCard, IonCardHeader, IonContent, NgStyle, NgClass, FormsModule, HeaderComponent, GradeComponent, RadarScoreComponent, MusicPlayerYoutubeComponent, MusicPlayerLocalComponent, MusicPlayerSoundcloudComponent]
+  imports: [IonBadge, IonSplitPane, IonCardSubtitle, IonMenu, IonText, IonCardContent, IonCardTitle, IonInfiniteScrollContent, IonInfiniteScroll, IonSearchbar, IonCard, IonCardHeader, IonContent, NgStyle, NgClass, FormsModule, HeaderComponent, GradeComponent, RadarScoreComponent, MusicPlayerYoutubeComponent, MusicPlayerLocalComponent, MusicPlayerSoundcloudComponent]
 })
 export class BrowsePage implements OnInit {
   //#region Constants

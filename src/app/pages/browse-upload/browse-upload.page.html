@@ -16,7 +16,7 @@
       <!-- Edited music -->
       @for (music of storedMusics(); track $index) {
       <ion-card (click)="PickMusic(music)" class="basicCard stored-card">
-        <ion-img [src]="'https://'+music.jacket"></ion-img>
+        <img [src]="'https://'+music.jacket" [alt]="music.title" loading="lazy" />
 
         <ion-card-header>
           <ion-card-title>{{ music.title }}</ion-card-title>
@@ -32,7 +32,7 @@
       <!-- Music cards -->
       @for (music of dbMusics(); track $index) {
       <ion-card (click)="PickMusic(music)" class="basicCard">
-        <ion-img [src]="'https://'+music.jacket"></ion-img>
+        <img [src]="'https://'+music.jacket" [alt]="music.title" loading="lazy" />
         <ion-card-header>
           <ion-card-title>{{ music.title }}</ion-card-title>
           <ion-card-subtitle>{{ music.artist }}</ion-card-subtitle>
