@@ -106,13 +106,13 @@ export class GameManager {
         console.log(this.music, this.music.id)
         this.isGameOver = true
 
-        // At least one player finished and has a score of MAX_SCORE
-        if (this.gameRounds.some(gr => gr.isFinished && gr.score >= gr.MAX_SCORE)) {
+        // At least one player finished with the max score
+        if (this.gameRounds.some(gr => gr.isFinished && gr.score >= CONFIG.SCORE.MAX)) {
             this.announcerService.PlayAnnouncer("victory")
             this.announcerService.PlayCrowdOneShot("special")
         }
         // At least one player finished and has a score of A
-        else if (this.gameRounds.some(gr => gr.isFinished && gr.score >= gr.MAX_SCORE * 0.9)) {
+        else if (this.gameRounds.some(gr => gr.isFinished && gr.score >= CONFIG.SCORE.MAX * CONFIG.SCORE.APPLAUSE_HEAVY_RATIO)) {
             this.announcerService.PlayAnnouncer("victory")
             this.announcerService.PlayCrowdOneShot("applause_heavy")
         }
