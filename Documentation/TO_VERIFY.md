@@ -290,3 +290,13 @@ Link: https://github.com/Fx73/Dance-Corp/commit/560619692a1d338379dab7c23d6924fb
   - 2 players with different charts: each player gets their own chart
   - After the game: score and "passed" are shown on the played chart in browse
   - Chart name with spaces or special characters: the game starts
+
+## Commit: Move scoring, judgment and announcer values to CONFIG
+Link: https://github.com/Fx73/Dance-Corp/commit/00ded672f5b371cda855cf60ba988da1b0479f07
+
+- src/app/game/constants/game-config.ts: `JUDGMENT`, `SCORE`, `PERFORMANCE` and `ANNOUNCER` sections, same values as before
+- src/app/game/game-model/gameRound.ts, src/app/services/gameplay/announcer.service.ts, src/app/game/game.manager.ts: inline values replaced by `CONFIG`; `SatisfactionType` enum instead of `0` / `1` / `2`; `GameRound.MAX_SCORE` moved to `CONFIG.SCORE.MAX`
+
+→ To verify:
+  - A game plays as before: judgments, score, performance bar, fail
+  - Announcer combo lines and end of game applause still trigger
