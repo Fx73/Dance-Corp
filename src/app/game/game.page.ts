@@ -64,9 +64,9 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
   ngOnInit() {
     // Get Data
     const musicId = this.route.snapshot.paramMap.get('musicId')
-    const selectedNotes = this.route.snapshot.queryParamMap.getAll('notes').map(n => +n)
+    const chartNames = this.route.snapshot.queryParamMap.getAll('notes')
 
-    if (!musicId || selectedNotes.length === 0) {
+    if (!musicId || chartNames.length === 0) {
       console.error("Music data is missing or incomplete.")
       this.router.navigate(['/home'])
       return
@@ -79,6 +79,13 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
       return
     }
     this.music = music
+
+    const selectedNotes = chartNames.map(name => music.noteData.findIndex(n => n.chartName === name))
+    if (selectedNotes.includes(-1)) {
+      console.error(`Chart not found in music ${musicId}: ${chartNames.join(', ')}`)
+      this.router.navigate(['/home'])
+      return
+    }
 
     // Prepare Music Player
     this.musicOrigin = MusicPlayerCommon.PickMusicPlayer(this.music.music!)

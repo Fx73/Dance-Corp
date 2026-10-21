@@ -291,6 +291,9 @@ export class BrowsePage implements OnInit, OnDestroy {
   async RunGame(): Promise<void> {
     const selectedMusic = this.GetSelectedMusic(this.selectedMusicIndex())
     if (!selectedMusic) return
+    // Charts are sent by name: selectedNotesIndex indexes the filtered and sorted musicNotes, not music.noteData
+    const chartNames = this.selectedNotesIndex().map(index => this.musicNotes()[index]?.chartName)
+    if (chartNames.some(name => !name)) return
     console.log("Selected music for game:", selectedMusic, "with notes:", this.musicNotes())
     await this.musicCacheService.UpdateCacheMusic(selectedMusic.id)
 
@@ -305,7 +308,7 @@ export class BrowsePage implements OnInit, OnDestroy {
 
     this.router.navigate(['/play/game', selectedMusic.id], {
       queryParams: {
-        notes: this.selectedNotesIndex(),
+        notes: chartNames,
       }
     })
   }

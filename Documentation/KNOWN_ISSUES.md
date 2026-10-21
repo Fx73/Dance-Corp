@@ -10,10 +10,6 @@ Bugs found but not fixed yet, and deprecations to migrate. Remove an entry once 
   `OnBlur` clears the suggestion list when the input loses focus, so pressing Tab to reach a suggestion closes the list first.
   Possible fix: arrow up/down + Enter navigation from the input, with `aria-activedescendant`.
 
-- **Selected chart index differs between browse and game**
-  `browse.page.ts` indexes into `musicNotes()`, which is filtered (single player → `DanceSingle` only) and re-sorted, but `game.page.ts` / `GameManager` index into the raw `music.noteData`. When a music has a double chart, a single player can be sent a different chart than the one selected.
-  Possible fix: pass the `chartName` instead of an index, or resolve the index against the same filtered list.
-
 ## Maintenance
 
 - **`npm audit`**: 6 vulnerabilities (5 high, 1 moderate), accepted for now. Do not run `npm audit fix --force`: it downgrades `firebase` to 9.14.0 and `@angular/build` to 22.1.9.
@@ -23,7 +19,7 @@ Bugs found but not fixed yet, and deprecations to migrate. Remove an entry once 
 ## Improvements
 
 - **Pass identifiers, not indexes, across pages and layers**
-  Chart, music and player indexes travel between browse, the URL and the game (`selectedNotesIndex`, `selectedMusicIndex` over two concatenated lists). Three of the bugs above come from this. Prefer `chartName` / `music.id`.
+  Charts now travel by `chartName` from browse to the game, but music and player indexes still do (`selectedMusicIndex` over two concatenated lists, `noteSelected` in `GameManager`). Prefer `music.id` / `chartName`.
 
 - **Floating promises**
   Async calls are often fired without `await` (`AddGenres()`, `UpdateMusicIndex()`, `UpdateCache()` in `catch` blocks, `DeleteNoteInBase()` followed by `LoadDbMusic()`). Await them, or mark intentional ones with `void`. The ESLint rule `@typescript-eslint/no-floating-promises` would list them all. Also review the 4 empty `catch { }` blocks that swallow errors.
