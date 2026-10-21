@@ -178,3 +178,59 @@ Link: https://github.com/Fx73/Dance-Corp/commit/9540ad00c393c2b7c5df0696aa55dc26
 → To verify:
   - Start a game from browse: `/play/game/:musicId` opens (guard returns true)
   - Log in: the user profile (name, avatar, level, stats) loads from Firestore
+
+## Commit: Replace deprecated ion-img with native img
+Link: https://github.com/Fx73/Dance-Corp/commit/734e63312300ae8be977662c74dac822c5626f0c
+
+- browse, browse-upload, upload, user-profile pages and header: `<ion-img>` replaced by `<img>`, with `display: block` / `object-fit: contain` to keep the `ion-img` rendering; jackets use `loading="lazy"`
+
+→ To verify:
+  - Browse and browse-upload: jackets are not stretched and keep their black background; single/double icon on the chart cards
+  - Upload: background and jacket previews take the card width
+  - User profile: the avatar stays round
+  - Header: logo size, clicking it goes to home
+  - The `ion-img` deprecation warning is gone from the console
+
+## Commit: Fix user music converter key so notes become UserNoteDto
+Link: https://github.com/Fx73/Dance-Corp/commit/9858943905c305871b6b089d1fb253fa41d6cdb4
+
+- src/app/services/firestore/user.firestore.service.ts: **bug fix**, subtype key `"notes:"` renamed to `notes`
+
+→ To verify:
+  - Log in: the user stats per chart (passed, times played, high score) load as before in browse and the profile
+
+## Commit: Read every player's chart index from the game URL
+Link: https://github.com/Fx73/Dance-Corp/commit/557c6dcbe9c7bab2cc1234ed972cc53979e6e60b
+
+- src/app/game/game.page.ts: **bug fix**, `queryParamMap.getAll('notes')` instead of `get('notes')?.split(',')`
+
+→ To verify:
+  - 1 player: a game starts with the selected chart
+  - 2 players with different charts: each player gets their own chart
+
+## Commit: Save each player's stats against the chart they played
+Link: https://github.com/Fx73/Dance-Corp/commit/aecd1f1dcaee60e6d4f782d9fe83790be461f896
+
+- src/app/game/game.manager.ts: **bug fix**, `GameOver()` saves each round under its selected chart instead of `noteData[0]`
+- src/app/game/game.page.ts: **bug fix**, the Discord presence shows the level of the selected chart
+
+→ To verify:
+  - Play a chart that is not the first one of the music: the score and "passed" are shown on that chart in browse
+  - Tauri: the Discord presence shows the played level
+
+## Commit: Replace re-uploaded notes in the music cache instead of duplicating
+Link: https://github.com/Fx73/Dance-Corp/commit/410da919b78436478a601e3a1facf51220db21a8
+
+- src/app/services/local-storage/music.cache.service.ts: **bug fix**, `UploadNotesInBase()` replaces notes with the same `chartName` instead of appending them
+
+→ To verify:
+  - Upload: re-upload an existing note, then open browse without a full refresh: the chart is listed once, with the new content
+  - Upload a new note: it is added to the list
+
+## Commit: Start the crowd sound fade-out once its duration is known
+Link: https://github.com/Fx73/Dance-Corp/commit/a08a8da908cb49eee344a5fe127ac317b1f3ed3d
+
+- src/app/services/gameplay/announcer.service.ts: **bug fix**, the crowd fade-out is scheduled on `loadedmetadata`, as `audio.duration` is `NaN` right after `play()`
+
+→ To verify:
+  - End of a game: applause or boos now play until 4 s before their end, then fade out (they were cut almost at once before)
