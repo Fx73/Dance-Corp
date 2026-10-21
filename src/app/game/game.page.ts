@@ -64,9 +64,9 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
   ngOnInit() {
     // Get Data
     const musicId = this.route.snapshot.paramMap.get('musicId')
-    const selectedNotes = this.route.snapshot.queryParamMap.get('notes')?.split(',').map(n => +n)
+    const selectedNotes = this.route.snapshot.queryParamMap.getAll('notes').map(n => +n)
 
-    if (!musicId || !selectedNotes || selectedNotes.length === 0) {
+    if (!musicId || selectedNotes.length === 0) {
       console.error("Music data is missing or incomplete.")
       this.router.navigate(['/home'])
       return
