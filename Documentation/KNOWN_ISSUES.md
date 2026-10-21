@@ -18,10 +18,6 @@ Bugs found but not fixed yet, and deprecations to migrate. Remove an entry once 
   `browse.page.ts` indexes into `musicNotes()`, which is filtered (single player → `DanceSingle` only) and re-sorted, but `game.page.ts` / `GameManager` index into the raw `music.noteData`. When a music has a double chart, a single player can be sent a different chart than the one selected.
   Possible fix: pass the `chartName` instead of an index, or resolve the index against the same filtered list.
 
-- **Scores saved against the wrong chart**
-  `GameManager.GameOver()` calls `UpdateUserStatsFromRound(music.id, music.noteData[0].chartName, gameRound)` for every round, so all players' stats go to the first chart of the music instead of the one they played. Same `noteData[0]` shortcut in the Discord presence of `game.page.ts`.
-  Possible fix: use each `gameRound`'s own note data.
-
 - **`UserGuard`: user data fetch is never awaited**
   `canActivate()` calls `GuardWaitForUserDataFetch()` without `await`; a Promise is always truthy, so `!isUserFetched` is never true and the check is skipped.
 

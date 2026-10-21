@@ -93,7 +93,7 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
     this.game = new GameManager(this.music, players, selectedNotes, isTrainingMode, this.userCacheService, this.announcerService)
     this.announcerService.PickPreferredAnnouncer()
 
-    this.discordRpcService.Update("Dancing on lvl " + this.music.noteData[0].meter, this.music.title + " - " + this.music.artist)
+    this.discordRpcService.Update("Dancing on lvl " + this.music.noteData[selectedNotes[0]].meter, this.music.title + " - " + this.music.artist)
   }
 
   @ViewChildren(PlayerDisplayComponent) playerDisplaysQuery!: QueryList<PlayerDisplayComponent>
