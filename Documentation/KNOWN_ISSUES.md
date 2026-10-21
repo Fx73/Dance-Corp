@@ -14,9 +14,6 @@ Bugs found but not fixed yet, and deprecations to migrate. Remove an entry once 
   `browse.page.ts` indexes into `musicNotes()`, which is filtered (single player → `DanceSingle` only) and re-sorted, but `game.page.ts` / `GameManager` index into the raw `music.noteData`. When a music has a double chart, a single player can be sent a different chart than the one selected.
   Possible fix: pass the `chartName` instead of an index, or resolve the index against the same filtered list.
 
-- **Music offset fallback is dead code**
-  In the `MusicDto` constructor, `parseFloat(tokenMap["offset"]) ?? parseFloat(tokenMap["beat0OffsetInSeconds"])` never uses the fallback (`parseFloat` returns `NaN`, not `null`), and the whole expression is guarded by `tokenMap["offset"]` being truthy.
-
 ## Maintenance
 
 - **`npm audit`**: 6 vulnerabilities (5 high, 1 moderate), accepted for now. Do not run `npm audit fix --force`: it downgrades `firebase` to 9.14.0 and `@angular/build` to 22.1.9.
