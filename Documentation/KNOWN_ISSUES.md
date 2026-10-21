@@ -56,8 +56,9 @@ Bugs found but not fixed yet, and deprecations to migrate. Remove an entry once 
 
 ## Maintenance
 
-- **`npm audit`**: 4 high severity vulnerabilities not addressed (`npm audit fix --force` may introduce breaking changes).
-- **`.browserslistrc`**: targets Chrome/Edge/Firefox ≥ 112, while Angular 22 only supports them from version 119.
+- **`npm audit`**: 6 vulnerabilities (5 high, 1 moderate), accepted for now. Do not run `npm audit fix --force`: it downgrades `firebase` to 9.14.0 and `@angular/build` to 22.1.9.
+  - `@grpc/grpc-js` 1.9.16, pulled by `@firebase/firestore` (`~1.9.0`): only used by the Node build of Firestore, the browser build uses WebChannel. Not in the bundle. Wait for a Firebase update.
+  - `vite` 8.3.0, pinned by `@angular/build` 22.2.3: only used by `ng serve` (`ng build` uses esbuild). Dev only. Wait for `@angular/build` 22.2.4.
 
 ## Improvements
 
