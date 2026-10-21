@@ -234,3 +234,13 @@ Link: https://github.com/Fx73/Dance-Corp/commit/a08a8da908cb49eee344a5fe127ac317
 
 → To verify:
   - End of a game: applause or boos now play until 4 s before their end, then fade out (they were cut almost at once before)
+
+## Commit: Make UserGuard wait for the session and the user document
+Link: https://github.com/Fx73/Dance-Corp/commit/703b1b1f9744906d4650054aefbe3c794efd2e42
+
+- src/app/shared/guard/user.guard.ts: **bug fix**, waits for `authStateReady()` instead of a 500 ms timeout, then for `userData` to be set (5 s timeout, it was never awaited); redirects with a `UrlTree`
+
+→ To verify:
+  - Logged out: `/upload`, `/browse-upload` and `/user-profile` redirect to home
+  - Logged in: navigating to these pages from the menu opens them
+  - Logged in: reloading these pages (F5) opens them with the user loaded (profile shows name and stats, upload works with no "User not authenticated")
