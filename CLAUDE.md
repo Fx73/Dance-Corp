@@ -9,6 +9,14 @@ Always write commit messages in English.
 
 If you identify a bug, error, code smell, or unexpected behavior that is not related to the current task, add an entry to [Documentation/KNOWN_ISSUES.md](Documentation/KNOWN_ISSUES.md). Do not expand the scope of the ongoing work to fix unrelated issues unless explicitly instructed to do so.
 
+## Missing Features
+
+If you identify a missing feature (an unsupported part of a file format, a game mechanic, some content), add an entry to [Documentation/MISSING_FEATURES.md](Documentation/MISSING_FEATURES.md):
+- **High priority** if its absence blocks part of the game (some songs or charts cannot be played correctly).
+- **Low priority** if it is optional content that blocks nothing.
+
+Do not implement it unless explicitly instructed to do so.
+
 ## Tracking Untested Changes
 For each commit, for every modification that may have runtime impact and that you were unable to verify yourself, add a verification entry to [Documentation/TO_VERIFY.md](Documentation/TO_VERIFY.md) using the following format:
 
