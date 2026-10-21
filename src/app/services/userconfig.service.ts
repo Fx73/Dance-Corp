@@ -16,8 +16,6 @@ export class UserConfigService {
 
     private userFirestoreService = inject(UserFirestoreService)
 
-    public isReady = false
-
     private configSubject: BehaviorSubject<UserConfig> = new BehaviorSubject<UserConfig>(new UserConfig())
     config$ = this.configSubject.asObservable()
 
@@ -47,7 +45,6 @@ export class UserConfigService {
         })
 
         ArrowImageManager.SetArrowSize(this.configSubject.value.canvasWidth / 4)
-        this.isReady = true
     }
 
     InstanciatePlayer(index: number): Player {
@@ -95,6 +92,10 @@ export class UserConfigService {
             localStorage.setItem(this.PLAYERS_STORAGE_KEY(this.players.length), JSON.stringify(playerToMove))
         }
         this.UpdateConfig("playerNumber", this.players.length)
+    }
+
+    ArePlayersReady(): boolean {
+        return this.players.every(player => !!player.gamepad?.id && player.gamepad.index !== null)
     }
 
     UpdateConfig<K extends keyof UserConfig>(option: K, value: UserConfig[K]): void {

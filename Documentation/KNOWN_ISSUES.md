@@ -6,10 +6,6 @@ Bugs found but not fixed yet, and deprecations to migrate. Remove an entry once 
 
 ## Bugs
 
-- **`/play/browse` crashes without a configured player**
-  Reloading the page or opening it from a direct link (without going through player selection) throws `Cannot read properties of undefined (reading 'index')` in `InitPlayerInput` (`browse.page.ts`, `player.gamepad!.index`), then a second error on `musicCards.toArray()` in a `setTimeout`.
-  Possible fix: guard with `?.` and redirect to player selection when no player is configured.
-
 - **Genre autocomplete: suggestions unreachable with the keyboard**
   `OnBlur` clears the suggestion list when the input loses focus, so pressing Tab to reach a suggestion closes the list first.
   Possible fix: arrow up/down + Enter navigation from the input, with `aria-activedescendant`.
@@ -51,5 +47,5 @@ Bugs found but not fixed yet, and deprecations to migrate. Remove an entry once 
 ## Code style to harmonize
 
 - **Magic numbers**: scoring and announcer values (`0.8`, `0.6`, `-4`, `-20`, `30`…) are inline while `CONFIG` exists. Move tunable gameplay values to `CONFIG`.
-- **Non-null assertions**: the assertions that were unnecessary for the type checker are removed. The remaining `!` are on values typed as nullable, some of which can really be null at runtime (`player.gamepad!.index`). Each one needs a guard or a type fix, which changes behavior: handle them with the related bugs.
+- **Non-null assertions**: the assertions that were unnecessary for the type checker are removed. The remaining `!` are on values typed as nullable, some of which can really be null at runtime. Each one needs a guard or a type fix, which changes behavior: handle them with the related bugs.
 - **Optional chains on non-nullable types**: about 10 `?.` are on values typed as non-nullable (reported by `@typescript-eslint/no-unnecessary-condition`). They were kept on purpose, as data read from Firestore or localStorage may not match its type.
