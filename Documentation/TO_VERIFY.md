@@ -278,3 +278,15 @@ Link: https://github.com/Fx73/Dance-Corp/commit/9faed688d302786b1c89fd359001ceee
   - `/upload?music=<unknown id>`: error toast, then the file picker is shown
   - Database-only music: shown read only, "Edit Music" makes it editable
   - Local music (with or without a database version): opens in edit mode as before
+
+## Commit: Send the selected charts to the game by chartName
+Link: https://github.com/Fx73/Dance-Corp/commit/560619692a1d338379dab7c23d6924fb5a5e4b62
+
+- src/app/pages/browse/browse.page.ts: **bug fix**, `RunGame()` sends the selected `chartName`s in the `notes` query param instead of indexes into the filtered list
+- src/app/game/game.page.ts: **bug fix**, chart names resolved in `music.noteData`; unknown chart name redirects to home
+
+→ To verify:
+  - 1 player, music with single and double charts: each selected chart is the one played (level, notes), for several charts of the list
+  - 2 players with different charts: each player gets their own chart
+  - After the game: score and "passed" are shown on the played chart in browse
+  - Chart name with spaces or special characters: the game starts
