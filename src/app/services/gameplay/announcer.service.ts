@@ -88,7 +88,6 @@ export class AnnouncerService {
             this.goodSatisfaction /= 2
         }
 
-        console.log(`Satisfaction - Fail: ${this.failSatisfaction}, Good: ${this.goodSatisfaction}, Perfect: ${this.perfectSatisfaction}`)
     }
 
     PlayAnnouncer(category: string) {
@@ -160,7 +159,6 @@ export class AnnouncerService {
     }
 
     async PlayCountdownFromAnnouncer(delayMs: number = 1000) {
-        console.log("Request to play countdown from announcer received")
         if (!this.preferredAnnouncer || this.isQueueBlocked) return
 
         const announcer = this.preferredAnnouncer.lines["countdown"] ? this.preferredAnnouncer : this.announcers.find(ann => ann.lines["countdown"])

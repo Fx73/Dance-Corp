@@ -26,6 +26,7 @@ import { HeaderComponent } from "src/app/shared/component/header/header.componen
 import { RadarScoreComponent } from "src/app/shared/component/radar-score/radar-score.component"
 import { MusicCacheService } from '../../services/local-storage/music.cache.service'
 import { PresenceService } from '../../services/thirdpartyapp/presence.service'
+import { productionConsole } from 'src/app/shared/console-output'
 import { GradeComponent } from "../../shared/component/grade/grade.component"
 import { DifficultyCriteria } from '../upload/DifficultyCriteria'
 import { UserFirestoreService } from './../../services/firestore/user.firestore.service'
@@ -250,7 +251,7 @@ export class BrowsePage implements OnInit, OnDestroy {
   }
 
   OnIonInfinite(event: InfiniteScrollCustomEvent) {
-    console.info("Congratz, you found the infinite scroll ! But there is no more music to load :)")
+    productionConsole.info("Congratz, you found the infinite scroll ! But there is no more music to load :)")
     event.target.complete()
   }
 
@@ -294,7 +295,6 @@ export class BrowsePage implements OnInit, OnDestroy {
     // Charts are sent by name: selectedNotesIndex indexes the filtered and sorted musicNotes, not music.noteData
     const chartNames = this.selectedNotesIndex().map(index => this.musicNotes()[index]?.chartName)
     if (chartNames.some(name => !name)) return
-    console.log("Selected music for game:", selectedMusic, "with notes:", this.musicNotes())
     await this.musicCacheService.UpdateCacheMusic(selectedMusic.id)
 
     for (let i = 0; i < this.selectedNotesIndex().length; i++) {

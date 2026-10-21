@@ -103,7 +103,6 @@ export class GameManager {
 
     GameOver() {
         console.log('Game Over: All game rounds have failed or finished.')
-        console.log(this.music, this.music.id)
         this.isGameOver = true
 
         // At least one player finished with the max score

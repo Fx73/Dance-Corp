@@ -194,7 +194,6 @@ export class NoteDataDto {
     this.creatorId = tokenMap["creatorid"]
     const creationDateValue = tokenMap["creationdate"]
     this.creationDate = creationDateValue ? new Date(creationDateValue) : new Date()
-    console.log("Parsed chart name:", tokenMap["chartname"])
     this.chartName = tokenMap["chartname"]?.trim() || `${this.difficulty}_${this.meter}_${this.stepsType === DanceType.DanceSingle ? 'S' : 'D'}_${this.creationDate.toISOString().split('T')[0]}`
 
     this.stepChart = tokenMap["notes"].split(',').map(measure => {

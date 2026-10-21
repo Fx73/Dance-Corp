@@ -63,8 +63,6 @@ export class OptionsPage {
   }
 
   VerifySoundVolume(source: keyof UserConfig): void {
-    const volume = this.GetConfigValue(source)
-    console.log(`Testing volume for ${source} at ${volume}`)
     switch (source) {
       case 'menuMusicVolume':
         this.soundService.RefreshMusicVolume()
@@ -82,7 +80,6 @@ export class OptionsPage {
   }
 
   VerifyDisplay(): void {
-    console.log("Updating player display with current config...", this.showPlayerDisplay)
     this.showPlayerDisplay = true
     this.playerDisplay?.Update(0)
   }

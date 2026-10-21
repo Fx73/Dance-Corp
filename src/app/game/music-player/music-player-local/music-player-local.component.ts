@@ -27,7 +27,6 @@ export class MusicPlayerLocalComponent extends MusicPlayerCommon implements IMus
   async ngOnInit(): Promise<void> {
     const url = this.musicUrl.replace("local:", "")
     const localUri = await this.CreateMusicUri(url)
-    console.log("Created local music URI:", localUri)
     this.audio = new Audio()
     this.audio.src = localUri
     this.audio.volume = this.GetVolume()

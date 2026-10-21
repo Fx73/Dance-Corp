@@ -122,11 +122,9 @@ export class GameRound {
         if (arrow.type === ArrowType.Mine) {
             if (!arrow.isPressed && padArrowState === ArrowState.Press) {
                 this.MineHit(arrow)
-                console.log(`Hit mine at beat ${arrow.beatPosition}.`)
             } else {
                 if (currentBeat > arrow.beatPosition + CONFIG.JUDGMENT.MINE_PASS_DELAY) {
                     this.MinePassed(arrow)
-                    console.log(`Missed mine at beat ${arrow.beatPosition}.`)
                 }
             }
 
@@ -152,14 +150,12 @@ export class GameRound {
         if (currentBeat > arrow.beatPosition + (CONFIG.JUDGMENT.MISS_WINDOW * tolerance)) {
             arrow.isMissed = true
             this.ArrowMissed(arrow)
-            console.log(`Missed arrow at beat ${arrow.beatPosition}.`)
             return
         }
 
         if (padArrowState === ArrowState.Press) {
             if (currentBeat > arrow.beatPosition + tolerance) {
                 this.ArrowAlmost(arrow)
-                console.log(`Almost arrow at beat ${arrow.beatPosition}.`)
                 return
             }
             const difference = Math.abs(arrow.beatPosition - currentBeat)
@@ -167,17 +163,14 @@ export class GameRound {
             if (difference <= tolerance * CONFIG.JUDGMENT.PERFECT_WINDOW) {
                 // Perfect: Very close to the beat
                 this.ArrowPerfect(arrow)
-                console.log(`Perfect arrow at beat ${arrow.beatPosition}.`)
                 return
             } else if (difference <= tolerance * CONFIG.JUDGMENT.GREAT_WINDOW) {
                 // Great: Slightly off but close enough
                 this.ArrowGreat(arrow)
-                console.log(`Great arrow at beat ${arrow.beatPosition}.`)
                 return
             } else if (difference <= tolerance) {
                 // Good: Further off but still acceptable
                 this.ArrowGood(arrow)
-                console.log(`Good arrow at beat ${arrow.beatPosition}.`)
                 return
             }
         }

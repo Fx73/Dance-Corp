@@ -10,6 +10,7 @@ import { Router } from '@angular/router'
 import { addCircleOutline } from 'ionicons/icons'
 import { addIcons } from 'ionicons'
 import { MusicLocalService } from 'src/app/services/local-storage/local.music.service'
+import { productionConsole } from 'src/app/shared/console-output'
 
 @Component({
   selector: 'app-browse-upload',
@@ -75,7 +76,7 @@ export class BrowseUploadPage implements OnInit {
   }
 
   OnIonInfinite(event: InfiniteScrollCustomEvent) {
-    console.info("Congratz, you found the infinite scroll ! But there is no more music to load :)")
+    productionConsole.info("Congratz, you found the infinite scroll ! But there is no more music to load :)")
     event.target.complete()
   }
 }

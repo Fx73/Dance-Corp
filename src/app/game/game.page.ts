@@ -107,7 +107,6 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
   private playerDisplays: PlayerDisplayComponent[] = []
   ngAfterViewInit() {
     this.playerDisplays = this.playerDisplaysQuery.toArray()
-    console.log("Player Displays initialized:", this.playerDisplays, this.musicPlayer)
     if (this.musicPlayer && this.playerDisplays.length > 0)
       this.InitGame()
   }
@@ -115,7 +114,6 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
   private musicPlayer!: IMusicPlayer
   OnPlayerReady(mPlayer: IMusicPlayer) {
     this.musicPlayer = mPlayer
-    console.log("Music Player is ready:", this.musicPlayer, this.playerDisplays)
     if (this.musicPlayer && this.playerDisplays.length > 0)
       this.InitGame()
   }

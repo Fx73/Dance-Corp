@@ -3,6 +3,7 @@ import { PreloadAllModules, RouteReuseStrategy, provideRouter, withPreloading } 
 import { getFirestore, initializeFirestore } from 'firebase/firestore'
 
 import { AppComponent } from './app/app.component'
+import { SilenceConsole } from './app/shared/console-output'
 import { bootstrapApplication } from '@angular/platform-browser'
 import { enableProdMode } from '@angular/core'
 import { environment } from './environments/environment'
@@ -15,6 +16,7 @@ import { routes } from './app/app.routes'
 
 if (environment.production) {
   enableProdMode()
+  SilenceConsole()
 }
 
 const firebaseApp = initializeApp(firebaseConfig)

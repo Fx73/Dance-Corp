@@ -27,9 +27,6 @@ Bugs found but not fixed yet, and deprecations to migrate. Remove an entry once 
 - **Duplicated persistence block in `MusicCacheService`**
   "update `musics` + `localStorage.setItem` + `registry.add` + save registry" is repeated about 8 times. Extract a `PersistMusic(music)` / `RemoveMusic(id)` helper.
 
-- **Logging**
-  60 `console.log`, some in per-frame or per-arrow paths (`GameRound.CheckArrowPress`, `AnnouncerService.ChangeSatisfaction`, chart name parsing, protected field check). Replace with a small logger that can be silenced, or remove debug traces.
-
 ## Code style to harmonize
 
 - **Non-null assertions**: the assertions that were unnecessary for the type checker are removed. The remaining `!` are on values typed as nullable, some of which can really be null at runtime. Each one needs a guard or a type fix, which changes behavior: handle them with the related bugs.

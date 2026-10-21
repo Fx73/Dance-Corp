@@ -94,7 +94,6 @@ export class UploadPage {
     this.fireStoreService.GetGenres().then(genres => this.genreOptions = genres)
 
     const musicId = this.route.snapshot.queryParamMap.get('music')
-    console.log("UploadPage initialized with musicId:", musicId)
     if (musicId) {
       this.StartLoad(musicId)
     }
@@ -109,7 +108,6 @@ export class UploadPage {
       ...this.selects.filter(s => this.metadataCard.nativeElement.contains(s.elementRef.nativeElement)),
     ]
 
-    console.log("Metadata dirty check:", cardMetadata.map(c => ({ label: c.label, isDirty: c.isDirty })))
     this.metadataDirty.set(
       cardMetadata.some(c => c.isDirty)
     )
@@ -486,7 +484,6 @@ export class UploadPage {
       },
       cssClass: 'large-modal'
     })
-    console.log("TestNoteComponent created with noteData:", modal)
     await modal.present()
   }
 
