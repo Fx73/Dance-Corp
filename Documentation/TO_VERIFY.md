@@ -256,3 +256,15 @@ Link: https://github.com/Fx73/Dance-Corp/commit/40d60f76012fedc3f50e51431978a308
   - Keyboard player: reload `/play/browse`, it stays on browse
   - Gamepad player: reload `/play/browse`, it redirects to player selection; press a button, Start goes back to browse
   - Normal flow: player selection → browse → game → back to browse
+
+## Commit: Remove DancePadKeyboard window listeners when the pad is destroyed
+Link: https://github.com/Fx73/Dance-Corp/commit/09555de9bbe67b939110580e0b20b5d2e4362627
+
+- src/app/game/game-controller/*: **bug fix**, `IDancePad.Destroy()` added; `DancePadKeyboard` removes its `keydown` / `keyup` listeners, `DancePadGamepad` has nothing to release
+- src/app/game/game.manager.ts: `DestroyGame()` destroys each round's pad
+- src/app/pages/browse/browse.page.ts: `ngOnDestroy()` destroys the browse pads
+
+→ To verify:
+  - Keyboard player: browse navigation with the arrows, play a game, back to browse, play again: inputs work every time
+  - Upload: the note test works with the keyboard, close it and reopen it
+  - Gamepad player: same flow, inputs still work
