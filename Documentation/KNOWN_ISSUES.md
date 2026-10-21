@@ -14,10 +14,6 @@ Bugs found but not fixed yet, and deprecations to migrate. Remove an entry once 
   `OnBlur` clears the suggestion list when the input loses focus, so pressing Tab to reach a suggestion closes the list first.
   Possible fix: arrow up/down + Enter navigation from the input, with `aria-activedescendant`.
 
-- **User music converter: notes never converted to `UserNoteDto`**
-  In `user.firestore.service.ts`, the converter subtype key is `"notes:"` (with a colon) while the `UserMusicDto` field is `notes`, so the subtype never matches. Notes read from Firestore stay plain objects: `UserNoteDto` default values (`passed = false`, `highScore = 0`…) are not applied when a field is missing in the document.
-  Possible fix: rename the key to `notes`.
-
 - **Selected chart index differs between browse and game**
   `browse.page.ts` indexes into `musicNotes()`, which is filtered (single player → `DanceSingle` only) and re-sorted, but `game.page.ts` / `GameManager` index into the raw `music.noteData`. When a music has a double chart, a single player can be sent a different chart than the one selected.
   Possible fix: pass the `chartName` instead of an index, or resolve the index against the same filtered list.

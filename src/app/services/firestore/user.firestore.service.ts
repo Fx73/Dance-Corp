@@ -14,7 +14,7 @@ export class UserFirestoreService {
     //#region Constants
     private readonly USER_COLLECTION = "users"
     private readonly USER_MUSIC_COLLECTION = "user_musics"
-    private readonly firestoreConverterUserMusic: FirestoreConverter<UserMusicDto> = new FirestoreConverter(UserMusicDto, { "notes:": UserNoteDto })
+    private readonly firestoreConverterUserMusic: FirestoreConverter<UserMusicDto> = new FirestoreConverter(UserMusicDto, { notes: UserNoteDto })
     //#endregion
 
     private db: Firestore
