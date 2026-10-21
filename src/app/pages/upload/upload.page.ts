@@ -1,34 +1,34 @@
-import { CommonModule, Location } from '@angular/common';
-import { ChangeDetectorRef, Component, ElementRef, QueryList, ViewChild, ViewChildren, inject, signal } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonGrid, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonList, IonRow, IonSpinner, ModalController } from '@ionic/angular';
-import { BaseDirectory, mkdir, readDir, remove, writeFile } from '@tauri-apps/plugin-fs';
-import { addOutline, checkmarkCircle, closeCircle, folder, logoSoundcloud, logoYoutube, removeOutline, trashOutline } from 'ionicons/icons';
-import { Measures, MusicDto, NoteDataDto } from 'src/app/game/game-model/music.dto';
-import { MusicOrigin, MusicPlayerCommon } from 'src/app/game/music-player/IMusicPlayer';
-import { IMusicEditableField, MUSIC_EDITABLE_FIELD_TOKEN } from './editable-field.interface';
-import { SccReader, SccWriter } from './reader.ssc';
+import { CommonModule, Location } from '@angular/common'
+import { ChangeDetectorRef, Component, ElementRef, QueryList, ViewChild, ViewChildren, inject, signal } from '@angular/core'
+import { ActivatedRoute, Router } from '@angular/router'
+import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonGrid, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonList, IonRow, IonSpinner, ModalController } from '@ionic/angular'
+import { BaseDirectory, mkdir, readDir, remove, writeFile } from '@tauri-apps/plugin-fs'
+import { addOutline, checkmarkCircle, closeCircle, folder, logoSoundcloud, logoYoutube, removeOutline, trashOutline } from 'ionicons/icons'
+import { Measures, MusicDto, NoteDataDto } from 'src/app/game/game-model/music.dto'
+import { MusicOrigin, MusicPlayerCommon } from 'src/app/game/music-player/IMusicPlayer'
+import { IMusicEditableField, MUSIC_EDITABLE_FIELD_TOKEN } from './editable-field.interface'
+import { SccReader, SccWriter } from './reader.ssc'
 
-import { FormsModule } from '@angular/forms';
-import { addIcons } from 'ionicons';
-import { AppComponent } from 'src/app/app.component';
-import { MusicPlayerLocalComponent } from "src/app/game/music-player/music-player-local/music-player-local.component";
-import { MusicFirestoreService } from 'src/app/services/firestore/music.firestore.service';
-import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.service';
-import { musicLocalService } from 'src/app/services/local-storage/local.music.service';
-import { MusicCacheService } from 'src/app/services/local-storage/music.cache.service';
-import { HeaderComponent } from 'src/app/shared/component/header/header.component';
-import { RadarScoreComponent } from "src/app/shared/component/radar-score/radar-score.component";
-import isTauri from 'src/app/shared/utils/tauri';
-import { MusicPlayerSoundcloudComponent } from "../../game/music-player/music-player-soundcloud/music-player-soundcloud.component";
-import { MusicPlayerYoutubeComponent } from "../../game/music-player/music-player-youtube/music-player-youtube.component";
-import { DanceType } from './../../game/constants/dance-type.enum';
-import { NoteDifficulty } from './../../game/constants/note-difficulty.enum';
-import { MusicEditableFieldAutocompleteComponent } from './editable-field-autocomplete/editable-field-autocomplete.component';
-import { MusicEditableFieldComponent } from './editable-field/editable-field.component';
-import { MusicEditableListComponent } from './editable-list/editable-list.component';
-import { MusicSelectComponent } from './select/select.component';
-import { TestNoteComponent } from './test-note/test-note.component';
+import { FormsModule } from '@angular/forms'
+import { addIcons } from 'ionicons'
+import { AppComponent } from 'src/app/app.component'
+import { MusicPlayerLocalComponent } from "src/app/game/music-player/music-player-local/music-player-local.component"
+import { MusicFirestoreService } from 'src/app/services/firestore/music.firestore.service'
+import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.service'
+import { MusicLocalService } from 'src/app/services/local-storage/local.music.service'
+import { MusicCacheService } from 'src/app/services/local-storage/music.cache.service'
+import { HeaderComponent } from 'src/app/shared/component/header/header.component'
+import { RadarScoreComponent } from "src/app/shared/component/radar-score/radar-score.component"
+import isTauri from 'src/app/shared/utils/tauri'
+import { MusicPlayerSoundcloudComponent } from "../../game/music-player/music-player-soundcloud/music-player-soundcloud.component"
+import { MusicPlayerYoutubeComponent } from "../../game/music-player/music-player-youtube/music-player-youtube.component"
+import { DanceType } from './../../game/constants/dance-type.enum'
+import { NoteDifficulty } from './../../game/constants/note-difficulty.enum'
+import { MusicEditableFieldAutocompleteComponent } from './editable-field-autocomplete/editable-field-autocomplete.component'
+import { MusicEditableFieldComponent } from './editable-field/editable-field.component'
+import { MusicEditableListComponent } from './editable-list/editable-list.component'
+import { MusicSelectComponent } from './select/select.component'
+import { TestNoteComponent } from './test-note/test-note.component'
 
 @Component({
   selector: 'app-upload',
@@ -38,447 +38,438 @@ import { TestNoteComponent } from './test-note/test-note.component';
   imports: [IonSpinner, MusicEditableFieldComponent, MusicEditableFieldAutocompleteComponent, MusicEditableListComponent, IonCardSubtitle, IonImg, IonCol, IonRow, IonGrid, IonInput, IonItem, IonLabel, IonList, FormsModule, IonIcon, IonButton, IonCardTitle, IonCardContent, IonCardHeader, IonCard, IonContent, CommonModule, FormsModule, HeaderComponent, IonButton, MusicPlayerYoutubeComponent, MusicPlayerSoundcloudComponent, MusicPlayerLocalComponent, RadarScoreComponent, MusicSelectComponent]
 })
 export class UploadPage {
-  private modalController = inject(ModalController);
-  private route = inject(ActivatedRoute);
-  private fireStoreService = inject(MusicFirestoreService);
-  private userService = inject(UserFirestoreService);
-  private localMusicService = inject(musicLocalService);
-  private musicCacheService = inject(MusicCacheService);
-  private cd = inject(ChangeDetectorRef);
-  private location = inject(Location);
-  private router = inject(Router);
-
   //#region Constants
-  public static readonly MUSICEDIT_STORAGE_KEY = (musicId: string) => `MUSICEDIT_${musicId}`;
-  pickMusicPlayer = MusicPlayerCommon.pickMusicPlayer;
-  MusicOrigin = MusicOrigin;
-  isDesktop = isTauri;
-  readonly DanceTypeList = Object.values(DanceType);
-  readonly NoteDifficultyList = Object.values(NoteDifficulty);
+  public static readonly MUSICEDIT_STORAGE_KEY = (musicId: string) => `MUSICEDIT_${musicId}`
+  pickMusicPlayer = MusicPlayerCommon.PickMusicPlayer
+  MusicOrigin = MusicOrigin
+  isDesktop = isTauri
+  readonly DanceTypeList = Object.values(DanceType)
+  readonly NoteDifficultyList = Object.values(NoteDifficulty)
   //#endregion
 
-  musicData: MusicDto = new MusicDto();
-  musicDataDb: MusicDto | null = null;
-  isEditDB = signal(false);
-  isEditLocal = signal(false);
+  private modalController = inject(ModalController)
+  private route = inject(ActivatedRoute)
+  private fireStoreService = inject(MusicFirestoreService)
+  private userService = inject(UserFirestoreService)
+  private localMusicService = inject(MusicLocalService)
+  private musicCacheService = inject(MusicCacheService)
+  private cd = inject(ChangeDetectorRef)
+  private location = inject(Location)
+  private router = inject(Router)
 
-  isLoading = false;
+  musicData: MusicDto = new MusicDto()
+  musicDataDb: MusicDto | null = null
+  isEditDB = signal(false)
+  isEditLocal = signal(false)
 
-  genreOptions: string[] = [];
+  isLoading = false
+
+  genreOptions: string[] = []
 
   @ViewChild('metadataCard', { read: ElementRef })
-  metadataCard!: ElementRef;
+  metadataCard!: ElementRef
   @ViewChildren('notesCard', { read: ElementRef })
-  notesCards!: QueryList<ElementRef>;
+  notesCards!: QueryList<ElementRef>
 
   @ViewChildren(MUSIC_EDITABLE_FIELD_TOKEN)
-  editableFields!: QueryList<IMusicEditableField>;
+  editableFields!: QueryList<IMusicEditableField>
   @ViewChildren(MusicEditableListComponent)
-  editableLists!: QueryList<MusicEditableListComponent>;
+  editableLists!: QueryList<MusicEditableListComponent>
   @ViewChildren(MusicSelectComponent)
-  selects!: QueryList<MusicSelectComponent>;
+  selects!: QueryList<MusicSelectComponent>
 
-  metadataDirty = signal(false);
-  notesDirty = signal<boolean[]>([]);
+  metadataDirty = signal(false)
+  notesDirty = signal<boolean[]>([])
 
   constructor() {
-    addIcons({ logoYoutube, logoSoundcloud, folder, trashOutline, removeOutline, addOutline, checkmarkCircle, closeCircle });
+    addIcons({ logoYoutube, logoSoundcloud, folder, trashOutline, removeOutline, addOutline, checkmarkCircle, closeCircle })
 
   }
 
   ionViewWillEnter() {
-    this.musicData = new MusicDto();
-    this.musicDataDb = null;
-    this.isEditDB.set(false);
-    this.isEditLocal.set(false);
-    this.fireStoreService.getGenres().then(genres => this.genreOptions = genres);
+    this.musicData = new MusicDto()
+    this.musicDataDb = null
+    this.isEditDB.set(false)
+    this.isEditLocal.set(false)
+    this.fireStoreService.GetGenres().then(genres => this.genreOptions = genres)
 
-    const musicId = this.route.snapshot.queryParamMap.get('music');
-    console.log("UploadPage initialized with musicId:", musicId);
+    const musicId = this.route.snapshot.queryParamMap.get('music')
+    console.log("UploadPage initialized with musicId:", musicId)
     if (musicId) {
-      this.startLoad(musicId);
+      this.StartLoad(musicId)
     }
   }
 
   //#region Dirty state management
 
-  updateGlobalDirty() {
+  UpdateGlobalDirty() {
     const cardMetadata = [
       ...this.editableFields.filter(f => this.metadataCard.nativeElement.contains(f.elementRef.nativeElement)),
       ...this.editableLists.filter(l => this.metadataCard.nativeElement.contains(l.elementRef.nativeElement)),
       ...this.selects.filter(s => this.metadataCard.nativeElement.contains(s.elementRef.nativeElement)),
-    ];
+    ]
 
-    console.log("Metadata dirty check:", cardMetadata.map(c => ({ label: c.label, isDirty: c.isDirty })));
+    console.log("Metadata dirty check:", cardMetadata.map(c => ({ label: c.label, isDirty: c.isDirty })))
     this.metadataDirty.set(
       cardMetadata.some(c => c.isDirty)
-    );
+    )
 
-
-    const dirtyArray = new Array(this.notesCards.length).fill(false);
+    const dirtyArray = new Array(this.notesCards.length).fill(false)
     for (let index = 0; index < this.notesCards.length; index++) {
-      const card = this.notesCards.get(index);
-      if (!card) continue;
+      const card = this.notesCards.get(index)
+      if (!card) continue
       const cardNote = [
         ...this.editableFields.filter(f => card.nativeElement.contains(f.elementRef.nativeElement)),
         ...this.editableLists.filter(l => card.nativeElement.contains(l.elementRef.nativeElement)),
         ...this.selects.filter(s => card.nativeElement.contains(s.elementRef.nativeElement)),
-      ];
+      ]
 
       dirtyArray[index] = cardNote.some(c => c.isDirty)
     }
 
-    this.notesDirty.set(dirtyArray);
+    this.notesDirty.set(dirtyArray)
   }
 
-  anyNoteDirty(): boolean {
-    return this.notesDirty().some(d => d);
+  AnyNoteDirty(): boolean {
+    return this.notesDirty().some(d => d)
   }
   //#endregion
 
   //#region Load
-  async startLoad(musicId: string) {
-    this.isLoading = true;
-    this.loadLocalMusic(musicId);
-    await this.loadDbMusic(musicId);
+  async StartLoad(musicId: string) {
+    this.isLoading = true
+    this.LoadLocalMusic(musicId)
+    await this.LoadDbMusic(musicId)
 
     if (!this.musicData) {
       if (!this.musicDataDb) {
-        AppComponent.presentErrorToast("Music not found in local storage or database.");
-        return;
+        AppComponent.PresentErrorToast("Music not found in local storage or database.")
+        return
       }
-      this.musicData = this.musicDataDb.deepClone();
+      this.musicData = this.musicDataDb.DeepClone()
     }
   }
 
-  async loadDbMusic(musicId: string) {
-    const data = await this.musicCacheService.getMusicWithCheck(musicId);
+  async LoadDbMusic(musicId: string) {
+    const data = await this.musicCacheService.GetMusicWithCheck(musicId)
     if (data) {
-      this.musicDataDb = data;
-      this.isEditDB.set(true);
-      this.isLoading = false;
+      this.musicDataDb = data
+      this.isEditDB.set(true)
+      this.isLoading = false
 
-      this.cd.markForCheck();
+      this.cd.markForCheck()
 
       setTimeout(() => {
-        this.updateGlobalDirty();
-        this.cd.markForCheck();
-      });
+        this.UpdateGlobalDirty()
+        this.cd.markForCheck()
+      })
     }
   }
 
-  loadLocalMusic(musicId: string) {
-    const data = this.localMusicService.getMusic(musicId);
+  LoadLocalMusic(musicId: string) {
+    const data = this.localMusicService.GetMusic(musicId)
     if (data) {
-      this.musicData = data;
-      this.isEditLocal.set(true);
-      this.isLoading = false;
+      this.musicData = data
+      this.isEditLocal.set(true)
+      this.isLoading = false
 
       if (this.musicDataDb)
-        this.updateGlobalDirty();
+        this.UpdateGlobalDirty()
 
       this.cd.markForCheck()
 
     }
   }
 
-  switchToDbPage() {
+  SwitchToDbPage() {
     this.router.navigate(['/upload'], {
       queryParams: { music: this.musicData.id },
       replaceUrl: true,
-    });
-    this.startLoad(this.musicData.id);
+    })
+    this.StartLoad(this.musicData.id)
   }
   //#endregion
 
   //#region New Music
 
-  onFileSelected(event: Event): void {
-    const file: File | undefined = (event.target as HTMLInputElement).files?.[0];
+  OnFileSelected(event: Event): void {
+    const file: File | undefined = (event.target as HTMLInputElement).files?.[0]
     if (file) {
-      const reader = new FileReader();
+      const reader = new FileReader()
       reader.onload = async (e) => {
-        const content = e.target?.result as string;
-        this.musicData = SccReader.parseFile(file.name, content);
-        this.localMusicService.updateMusic(this.musicData!);
-        this.isEditLocal.set(true);
-        AppComponent.presentOkToast("Music loaded successfully : " + this.musicData.id);
+        const content = e.target?.result as string
+        this.musicData = SccReader.ParseFile(file.name, content)
+        this.localMusicService.UpdateMusic(this.musicData)
+        this.isEditLocal.set(true)
+        AppComponent.PresentOkToast("Music loaded successfully : " + this.musicData.id)
 
-        const dbMusic = await this.musicCacheService.getMusic(this.musicData.id);
+        const dbMusic = await this.musicCacheService.GetMusic(this.musicData.id)
         if (dbMusic) {
           for (const field of this.fireStoreService.protectedFields) {
-            Object.assign(this.musicData, { [field]: dbMusic[field] });
+            Object.assign(this.musicData, { [field]: dbMusic[field] })
           }
-          this.localMusicService.updateMusic(this.musicData!);
+          this.localMusicService.UpdateMusic(this.musicData)
 
-          AppComponent.presentWarningToast("This music already exists in the database. You are now editing the local version. Uploading will overwrite the database version.");
-          this.switchToDbPage();
+          AppComponent.PresentWarningToast("This music already exists in the database. You are now editing the local version. Uploading will overwrite the database version.")
+          this.SwitchToDbPage()
         } else {
           setTimeout(() => {
-            this.updateGlobalDirty();
-            this.cd.markForCheck();
-          });
+            this.UpdateGlobalDirty()
+            this.cd.markForCheck()
+          })
         }
-      };
-      reader.readAsText(file);
+      }
+      reader.readAsText(file)
     }
   }
 
+  async OnPickLocalMusic() {
+    const file = await this.PickLocalMusic()
+    const uri = await this.SaveLocalMusic(file, this.musicData.id)
 
-  async onPickLocalMusic() {
-    const file = await this.pickLocalMusic();
-    const uri = await this.saveLocalMusic(file, this.musicData.id);
-
-    this.musicData.music = "local:" + uri;
-    this.localMusicService.updateMusic(this.musicData!);
+    this.musicData.music = "local:" + uri
+    this.localMusicService.UpdateMusic(this.musicData)
 
     this.cd.markForCheck()
 
-    AppComponent.presentOkToast("Music file saved successfully!");
+    AppComponent.PresentOkToast("Music file saved successfully!")
   }
 
-  pickLocalMusic() {
+  PickLocalMusic() {
     return new Promise<File>((resolve, reject) => {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = 'audio/*';
+      const input = document.createElement('input')
+      input.type = 'file'
+      input.accept = 'audio/*'
 
       input.onchange = () => {
-        const file = input.files?.[0];
-        if (file) resolve(file);
-        else reject('No file selected');
-      };
+        const file = input.files?.[0]
+        if (file) resolve(file)
+        else reject('No file selected')
+      }
 
-      input.click();
-    });
+      input.click()
+    })
   }
 
-
-  async saveLocalMusic(file: File, musicId: string): Promise<string> {
-    const extension = file.name.split('.').pop() || 'audio';
-    const fileName = `${musicId}.${extension}`;
-    const path = `music/${fileName}`;
+  async SaveLocalMusic(file: File, musicId: string): Promise<string> {
+    const extension = file.name.split('.').pop() || 'audio'
+    const fileName = `${musicId}.${extension}`
+    const path = `music/${fileName}`
 
     await mkdir("music", {
       baseDir: BaseDirectory.AppData,
       recursive: true
-    });
+    })
 
-    const arrayBuffer = await file.arrayBuffer();
-    const bytes = new Uint8Array(arrayBuffer);
+    const arrayBuffer = await file.arrayBuffer()
+    const bytes = new Uint8Array(arrayBuffer)
 
     await writeFile(path, bytes, {
       baseDir: BaseDirectory.AppData
-    });
+    })
 
-    return path;
+    return path
   }
 
-  isLocalMusic(): boolean {
-    return this.musicData?.music !== undefined && this.musicData.music.startsWith("local:");
+  IsLocalMusic(): boolean {
+    return this.musicData?.music !== undefined && this.musicData.music.startsWith("local:")
   }
 
-
-  onStartEdit() {
-    this.musicData = this.musicDataDb!.deepClone();
-    this.isEditLocal.set(true);
+  OnStartEdit() {
+    this.musicData = this.musicDataDb!.DeepClone()
+    this.isEditLocal.set(true)
     this.cd.detectChanges()
 
   }
 
-  exportEssc(): void {
-    const esscContent = SccWriter.writeSscFile(this.isEditLocal() ? this.musicData! : this.musicDataDb!);
-    function pick(translit?: string | null, normal?: string | null): string {
-      const t = translit?.trim();
-      return t ? t : (normal?.trim() ?? "");
+  ExportEssc(): void {
+    const esscContent = SccWriter.WriteSscFile(this.isEditLocal() ? this.musicData : this.musicDataDb!)
+    function Pick(translit?: string | null, normal?: string | null): string {
+      const t = translit?.trim()
+      return t ? t : (normal?.trim() ?? "")
     }
 
-    const artist = pick(this.isEditLocal() ? this.musicData.artisttranslit : this.musicDataDb?.artisttranslit, this.isEditLocal() ? this.musicData.artist : this.musicDataDb?.artist);
-    const title = pick(this.isEditLocal() ? this.musicData.titletranslit : this.musicDataDb?.titletranslit, this.isEditLocal() ? this.musicData.title : this.musicDataDb?.title);
-    const filename = `${artist}_${title}.essc`;
+    const artist = Pick(this.isEditLocal() ? this.musicData.artisttranslit : this.musicDataDb?.artisttranslit, this.isEditLocal() ? this.musicData.artist : this.musicDataDb?.artist)
+    const title = Pick(this.isEditLocal() ? this.musicData.titletranslit : this.musicDataDb?.titletranslit, this.isEditLocal() ? this.musicData.title : this.musicDataDb?.title)
+    const filename = `${artist}_${title}.essc`
 
-    const blob = new Blob([esscContent], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
+    const blob = new Blob([esscContent], { type: "text/plain" })
+    const url = URL.createObjectURL(blob)
 
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    const a = document.createElement("a")
+    a.href = url
+    a.download = filename
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
 
   }
   //#endregion
 
   //#region Upload
-  async uploadMusic(): Promise<void> {
-    if (this.musicData === null || this.isEditDB()) return;
+  async UploadMusic(): Promise<void> {
+    if (this.musicData === null || this.isEditDB()) return
 
-    await this.musicCacheService.createMusicInBase(this.musicData)
-    this.isEditDB.set(true);
-    AppComponent.presentOkToast("Music uploaded successfully!");
-    this.switchToDbPage();
+    await this.musicCacheService.CreateMusicInBase(this.musicData)
+    this.isEditDB.set(true)
+    AppComponent.PresentOkToast("Music uploaded successfully!")
+    this.SwitchToDbPage()
   }
 
-  async updateMusic(): Promise<void> {
-    if (this.musicData === null || !this.isEditDB()) return;
+  async UpdateMusic(): Promise<void> {
+    if (this.musicData === null || !this.isEditDB()) return
 
-    await this.musicCacheService.updateMusicInBase(this.musicData)
-    AppComponent.presentOkToast("Music updated successfully!");
+    await this.musicCacheService.UpdateMusicInBase(this.musicData)
+    AppComponent.PresentOkToast("Music updated successfully!")
 
-    await this.loadDbMusic(this.musicData.id);
-    if (!this.anyNoteDirty()) {
-      this.deleteFile(true)
+    await this.LoadDbMusic(this.musicData.id)
+    if (!this.AnyNoteDirty()) {
+      this.DeleteFile(true)
     }
   }
 
-  async uploadAllNotes(): Promise<void> {
-    if (this.musicData === null || !this.isEditDB()) return;
-    await this.musicCacheService.uploadNotesInBase(this.musicData.id, this.musicData.noteData)
-    AppComponent.presentOkToast("All notes uploaded successfully!");
+  async UploadAllNotes(): Promise<void> {
+    if (this.musicData === null || !this.isEditDB()) return
+    await this.musicCacheService.UploadNotesInBase(this.musicData.id, this.musicData.noteData)
+    AppComponent.PresentOkToast("All notes uploaded successfully!")
 
-    await this.loadDbMusic(this.musicData.id)
+    await this.LoadDbMusic(this.musicData.id)
     if (!this.metadataDirty()) {
-      this.deleteFile(true)
+      this.DeleteFile(true)
     }
   }
 
-  async uploadNote(note: NoteDataDto): Promise<void> {
-    if (this.musicData === null || !this.isEditDB()) return;
-    await this.musicCacheService.uploadNotesInBase(this.musicData.id, [note])
-    AppComponent.presentOkToast("Note uploaded successfully!");
-    await this.loadDbMusic(this.musicData.id)
+  async UploadNote(note: NoteDataDto): Promise<void> {
+    if (this.musicData === null || !this.isEditDB()) return
+    await this.musicCacheService.UploadNotesInBase(this.musicData.id, [note])
+    AppComponent.PresentOkToast("Note uploaded successfully!")
+    await this.LoadDbMusic(this.musicData.id)
 
   }
   //#endregion
 
   //#region Delete
-  deleteFile(silent = false) {
-    if (this.musicData === null) return;
-    const musicId = this.musicData.id;
-    this.localMusicService.deleteMusic(musicId);
-    this.musicData = new MusicDto();
-    this.isEditLocal.set(false);
+  DeleteFile(silent = false) {
+    if (this.musicData === null) return
+    const musicId = this.musicData.id
+    this.localMusicService.DeleteMusic(musicId)
+    this.musicData = new MusicDto()
+    this.isEditLocal.set(false)
 
     if (!this.isEditDB()) {
-      this.deleteLocalMusicFile(musicId);
-      this.location.back();
-      if (!silent) AppComponent.presentOkToast("Music has been discarded");
+      this.DeleteLocalMusicFile(musicId)
+      this.location.back()
+      if (!silent) AppComponent.PresentOkToast("Music has been discarded")
 
     } else {
-      this.musicCacheService.updateCache().then(() => this.loadDbMusic(musicId));
-      if (!silent) AppComponent.presentOkToast("Music changes have been removed")
+      this.musicCacheService.UpdateCache().then(() => this.LoadDbMusic(musicId))
+      if (!silent) AppComponent.PresentOkToast("Music changes have been removed")
     }
 
   }
 
-  async deleteMusic() {
-    if (!this.musicDataDb) return;
-    await this.musicCacheService.deleteMusicInBase(this.musicDataDb.id);
-    this.musicDataDb = null;
-    this.isEditDB.set(false);
+  async DeleteMusic() {
+    if (!this.musicDataDb) return
+    await this.musicCacheService.DeleteMusicInBase(this.musicDataDb.id)
+    this.musicDataDb = null
+    this.isEditDB.set(false)
     this.cd.detectChanges()
-    AppComponent.presentOkToast("Music deleted successfully from database.");
+    AppComponent.PresentOkToast("Music deleted successfully from database.")
   }
 
-
-
-  deleteNote(note: NoteDataDto): void {
-    if (!this.musicData) return;
+  DeleteNote(note: NoteDataDto): void {
+    if (!this.musicData) return
 
     if (this.musicDataDb && this.musicDataDb.noteData.some(n => n.chartName === note.chartName)) {
-      this.musicCacheService.deleteNoteInBase(this.musicData.id, note)
-      this.loadDbMusic(this.musicData.id)
-      AppComponent.presentOkToast("Note deleted successfully from database.");
+      this.musicCacheService.DeleteNoteInBase(this.musicData.id, note)
+      this.LoadDbMusic(this.musicData.id)
+      AppComponent.PresentOkToast("Note deleted successfully from database.")
 
     } else {
       this.musicData.noteData = this.musicData.noteData.filter(n => n.chartName !== note.chartName)
-      this.localMusicService.updateMusic(this.musicData!);
+      this.localMusicService.UpdateMusic(this.musicData)
 
     }
 
   }
 
-
-  async deleteLocalMusicFile(musicId: string) {
+  async DeleteLocalMusicFile(musicId: string) {
     try {
       const list = await readDir("music", {
         baseDir: BaseDirectory.AppData
-      });
-      const toDelete = list.filter(f => f.name?.startsWith(musicId));
+      })
+      const toDelete = list.filter(f => f.name?.startsWith(musicId))
 
       for (const file of toDelete) {
         await remove(`music/${file.name}`, {
           baseDir: BaseDirectory.AppData
-        });
-        console.log("Deleted local:", file.name);
+        })
+        console.log("Deleted local:", file.name)
       }
 
     } catch (err) {
-      console.warn("Error while deleting local music files:", err);
+      console.warn("Error while deleting local music files:", err)
     }
   }
 
   //#endregion
 
   //#region Local editing
-  onEndEditing() {
-    this.localMusicService.updateMusic(this.musicData!);
-    this.updateGlobalDirty();
+  OnEndEditing() {
+    this.localMusicService.UpdateMusic(this.musicData)
+    this.UpdateGlobalDirty()
   }
 
   //#endregion
 
-
-  getStepCount(stepChart: Measures[], stepType: number): number {
-    let count = 0;
+  GetStepCount(stepChart: Measures[], stepType: number): number {
+    let count = 0
     stepChart.forEach(measure => {
       measure.steps.forEach(row => {
         row.forEach(step => {
           if (step === stepType)
-            count++;
+            count++
 
-        });
-      });
-    });
-    return count;
+        })
+      })
+    })
+    return count
   }
 
-  verifyMusicUrl() {
-    let url = this.musicData.music;
+  VerifyMusicUrl() {
+    let url = this.musicData.music
     if (!url) return
 
     // remove https and www for easier processing, and query parameters for cleaner look
-    url = url.replace(/^https?:\/\/www\./, "");
-    url = url.split("?")[0];
+    url = url.replace(/^https?:\/\/www\./, "")
+    url = url.split("?")[0]
 
-    // exctract start time if any
-    const startMatch = url.match(/[?&](?:t|start)=(\d+)/);
-    const start = startMatch ? Number(startMatch[1]) : null;
-    url = url.replace(/[?&](?:t|start)=(\d+)/, "");
+    // extract start time if any
+    const startMatch = url.match(/[?&](?:t|start)=(\d+)/)
+    const start = startMatch ? Number(startMatch[1]) : null
+    url = url.replace(/[?&](?:t|start)=(\d+)/, "")
 
-    const isYoutubeUrl = url.startsWith('youtube.com') || url.startsWith('youtu.be');
-    const isSoundcloudUrl = url.startsWith('soundcloud.com');
+    const isYoutubeUrl = url.startsWith('youtube.com') || url.startsWith('youtu.be')
+    const isSoundcloudUrl = url.startsWith('soundcloud.com')
 
     if (!isYoutubeUrl && !isSoundcloudUrl) {
-      AppComponent.presentWarningToast("URL is not a valid YouTube or SoundCloud link.");
-      return;
+      AppComponent.PresentWarningToast("URL is not a valid YouTube or SoundCloud link.")
+      return
     }
 
-    this.musicData.music = url;
+    this.musicData.music = url
     if (start) {
-      this.musicData.musicoffset = start;
+      this.musicData.musicoffset = start
     }
 
   }
 
-
-  checkUrl(): Promise<boolean> {
-    if (!this.musicData?.music) return Promise.resolve(false);
+  CheckUrl(): Promise<boolean> {
+    if (!this.musicData?.music) return Promise.resolve(false)
 
     return new Promise((resolve, reject) => {
-      fetch(this.musicData!.music!, {
+      fetch(this.musicData.music!, {
         method: "HEAD"
       }).then(response => {
         resolve(response.status.toString()[0] === "2")
@@ -496,24 +487,23 @@ export class UploadPage {
         music: this.musicData,
       },
       cssClass: 'large-modal'
-    });
-    console.log("TestNoteComponent created with noteData:", modal);
+    })
+    console.log("TestNoteComponent created with noteData:", modal)
     await modal.present()
   }
 
-
-
-  noNotes(): boolean {
-    if (!this.musicDataDb || !this.musicDataDb.noteData) return true;
-    return this.musicDataDb.noteData.length === 0;
-  }
-  isNoteMine(note: NoteDataDto): boolean {
-    if (!note.creatorId || note.creatorId.trim() === "") return true;
-    return note.creatorId === this.userService.user?.id;
-  }
-  getDbNote(chartName: string): NoteDataDto | undefined {
-    return this.musicDataDb?.noteData.find(n => n.chartName === chartName);
+  NoNotes(): boolean {
+    if (!this.musicDataDb || !this.musicDataDb.noteData) return true
+    return this.musicDataDb.noteData.length === 0
   }
 
+  IsNoteMine(note: NoteDataDto): boolean {
+    if (!note.creatorId || note.creatorId.trim() === "") return true
+    return note.creatorId === this.userService.user?.id
+  }
+
+  GetDbNote(chartName: string): NoteDataDto | undefined {
+    return this.musicDataDb?.noteData.find(n => n.chartName === chartName)
+  }
 
 }

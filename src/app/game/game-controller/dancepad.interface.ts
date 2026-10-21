@@ -4,9 +4,9 @@ export enum ArrowState {
     Hold = 2   // Key is being held down
 }
 
-export type DancePadInput = [ArrowState, ArrowState, ArrowState, ArrowState, ArrowState];
+export type DancePadInput = [ArrowState, ArrowState, ArrowState, ArrowState, ArrowState]
 
 export interface IDancePad {
-    getRefreshedState(): DancePadInput
+    GetRefreshedState(): DancePadInput
     lastExposedState: DancePadInput
 }

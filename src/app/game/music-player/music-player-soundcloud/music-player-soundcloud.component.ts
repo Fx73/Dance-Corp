@@ -5,25 +5,28 @@ import {
   OnDestroy,
   OnInit,
   Output
-} from '@angular/core';
-import { IMusicPlayer, MusicPlayerCommon } from '../IMusicPlayer';
+} from '@angular/core'
+import { IMusicPlayer, MusicPlayerCommon } from '../IMusicPlayer'
 
 //import { Soundcloud } from 'soundcloud.ts';
 
-/** Sous-ensemble utilisé de l'API du widget SoundCloud (https://developers.soundcloud.com/docs/api/html5-widget) */
-interface SoundCloudWidget {
-  load(url: string): void;
-  bind(eventName: string, listener: () => void): void;
-  play(): void;
-  pause(): void;
-  seekTo(milliseconds: number): void;
-  setVolume(volume: number): void;
-  getPosition(callback: (milliseconds: number) => void): void;
+/** Subset of the SoundCloud widget API in use (https://developers.soundcloud.com/docs/api/html5-widget) */
+// External API names: kept as declared by SoundCloud
+/* eslint-disable @typescript-eslint/naming-convention */
+interface ISoundCloudWidget {
+  load(url: string): void
+  bind(eventName: string, listener: () => void): void
+  play(): void
+  pause(): void
+  seekTo(milliseconds: number): void
+  setVolume(volume: number): void
+  getPosition(callback: (milliseconds: number) => void): void
 }
+/* eslint-enable @typescript-eslint/naming-convention */
 
 declare const SC: {
-  Widget: ((iframe: HTMLIFrameElement) => SoundCloudWidget) & { Events: { READY: string } };
-};
+  Widget: ((iframe: HTMLIFrameElement) => ISoundCloudWidget) & { Events: { READY: string } }
+}
 
 @Component({
   selector: 'app-music-player-soundcloud',
@@ -35,70 +38,66 @@ export class MusicPlayerSoundcloudComponent extends MusicPlayerCommon
   implements IMusicPlayer, OnInit, OnDestroy {
 
   @Input()
-  musicUrl!: string;
+  musicUrl!: string
   @Input()
-  startOffset?: number;
+  startOffset?: number
   @Output()
-  ready: EventEmitter<IMusicPlayer> = new EventEmitter<IMusicPlayer>();
+  ready: EventEmitter<IMusicPlayer> = new EventEmitter<IMusicPlayer>()
 
-  widgetSC!: SoundCloudWidget;
-
-
+  widgetSC!: ISoundCloudWidget
 
   async ngOnInit(): Promise<void> {
-    const iframe = document.getElementById('sc-player') as HTMLIFrameElement;
-    this.widgetSC = SC.Widget(iframe);
-    this.widgetSC.load(this.musicUrl);
+    const iframe = document.getElementById('sc-player') as HTMLIFrameElement
+    this.widgetSC = SC.Widget(iframe)
+    this.widgetSC.load(this.musicUrl)
     if (this.startOffset !== undefined) {
-      this.widgetSC.seekTo(this.startOffset * 1000);
+      this.widgetSC.seekTo(this.startOffset * 1000)
     }
     this.widgetSC.bind(SC.Widget.Events.READY, () => {
-      this.widgetSC.setVolume(this.getVolume() * 100);
+      this.widgetSC.setVolume(this.GetVolume() * 100)
       if (this.startOffset !== undefined)
-        this.widgetSC.seekTo(this.startOffset * 1000);
-      this.ready.emit(this);
-    });
+        this.widgetSC.seekTo(this.startOffset * 1000)
+      this.ready.emit(this)
+    })
   }
 
-  play() {
-    this.widgetSC.play();
-    this.startPolling();
+  Play() {
+    this.widgetSC.play()
+    this.StartPolling()
   }
 
-  stop() {
+  Stop() {
     try {
-      this.widgetSC.pause();
+      this.widgetSC.pause()
     } catch { }
-    this.stopPolling();
+    this.StopPolling()
   }
 
   //#region CurrentTime management
-  private polling?: ReturnType<typeof setInterval>;
-  private lastKnownTime = 0;
-  startPolling() {
+  private polling?: ReturnType<typeof setInterval>
+  private lastKnownTime = 0
+  StartPolling() {
     this.polling = setInterval(() => {
       this.widgetSC.getPosition((ms: number) => {
-        this.lastKnownTime = ms / 1000;
-      });
-    }, 100);
+        this.lastKnownTime = ms / 1000
+      })
+    }, 100)
   }
 
-  stopPolling() {
-    clearInterval(this.polling);
+  StopPolling() {
+    clearInterval(this.polling)
   }
 
-
-  getCurrentTime(): number {
-    return this.lastKnownTime - (this.startOffset ?? 0);
+  GetCurrentTime(): number {
+    return this.lastKnownTime - (this.startOffset ?? 0)
   }
   //#endregion
 
-
-  setToTime(time: number): void {
-    this.widgetSC.seekTo((time + (this.startOffset ?? 0)) * 1000);
+  SetToTime(time: number): void {
+    this.widgetSC.seekTo((time + (this.startOffset ?? 0)) * 1000)
   }
 
   ngOnDestroy() {
-    this.stopPolling();
+    this.StopPolling()
   }
 }

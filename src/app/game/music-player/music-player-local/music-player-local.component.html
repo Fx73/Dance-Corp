@@ -1,13 +1,13 @@
 <div class="local-player" [style.height.px]="size.height" [style.width.px]="size.width">
-  <button (click)="isPlaying ? stop() : play()">
+  <button (click)="isPlaying ? Stop() : Play()">
     {{ isPlaying ? '⏸ Pause' : '▶️ Play' }}
   </button>
 
   <div class="timeline">
-    <input type="range" [value]="currentTime()" [max]="duration()" (input)="onSeekInput($event)" />
+    <input type="range" [value]="currentTime()" [max]="duration()" (input)="OnSeekInput($event)" />
   </div>
 
   <div class="time">
-    {{ formatTime(currentTime()) }} / {{ formatTime(duration()) }}
+    {{ FormatTime(currentTime()) }} / {{ FormatTime(duration()) }}
   </div>
 </div>

@@ -22,10 +22,10 @@
       </ion-card-header>
       <ion-card-content>
         <ion-item>
-          <ion-range label="Player Number" aria-label="Player Number" label-placement="fixed" [ticks]="true" [snaps]="true" [min]="1" [max]="4" [pin]="true" [pinFormatter]="pinFormatter" [value]="this.getConfigValue('playerNumber')" (ionChange)="updatePlayerNumber($event.detail.value)"></ion-range>
+          <ion-range label="Player Number" aria-label="Player Number" label-placement="fixed" [ticks]="true" [snaps]="true" [min]="1" [max]="4" [pin]="true" [pinFormatter]="PinFormatter" [value]="this.GetConfigValue('playerNumber')" (ionChange)="UpdatePlayerNumber($event.detail.value)"></ion-range>
         </ion-item>
         <ion-item>
-          <ion-toggle aria-label="Training Mode" helperText="Disable fail and stats" [checked]="this.getConfigValue('trainingMode')" (ionChange)="updateConfigValue('trainingMode',$event.detail.checked)">
+          <ion-toggle aria-label="Training Mode" helperText="Disable fail and stats" [checked]="this.GetConfigValue('trainingMode')" (ionChange)="UpdateConfigValue('trainingMode',$event.detail.checked)">
             Training Mode
           </ion-toggle>
         </ion-item>
@@ -39,22 +39,22 @@
       </ion-card-header>
       <ion-card-content>
         <ion-item>
-          <ion-toggle label="" [checked]="this.getConfigValue('showBars')" (ionChange)="updateConfigValue('showBars',$event.detail.checked)">Show Bars</ion-toggle>
+          <ion-toggle label="" [checked]="this.GetConfigValue('showBars')" (ionChange)="UpdateConfigValue('showBars',$event.detail.checked)">Show Bars</ion-toggle>
         </ion-item>
         <ion-item>
-          <ion-input label="Game Width" type="number" [value]="this.getConfigValue('canvasWidth')" (ionChange)="updateConfigValue('canvasWidth', $event.detail.value)">
+          <ion-input label="Game Width" type="number" [value]="this.GetConfigValue('canvasWidth')" (ionChange)="UpdateConfigValue('canvasWidth', $event.detail.value)">
           </ion-input>
         </ion-item>
         <ion-item>
-          <ion-input label="Game height" type="number" [value]="this.getConfigValue('canvasHeight')" (ionChange)="updateConfigValue('canvasHeight', $event.detail.value)">
+          <ion-input label="Game height" type="number" [value]="this.GetConfigValue('canvasHeight')" (ionChange)="UpdateConfigValue('canvasHeight', $event.detail.value)">
           </ion-input>
         </ion-item>
         <ion-item>
-          <ion-input label="Arrow size" type="number" [value]="this.getConfigValue('canvasArrowSize')" (ionChange)="updateConfigValue('canvasArrowSize', $event.detail.value)">
+          <ion-input label="Arrow size" type="number" [value]="this.GetConfigValue('canvasArrowSize')" (ionChange)="UpdateConfigValue('canvasArrowSize', $event.detail.value)">
           </ion-input>
         </ion-item>
         <ion-item>
-          <ion-button expand="full" (click)="verifyDisplay()">Verify display</ion-button>
+          <ion-button expand="full" (click)="VerifyDisplay()">Verify display</ion-button>
         </ion-item>
       </ion-card-content>
     </ion-card>
@@ -66,16 +66,16 @@
       </ion-card-header>  
       <ion-card-content>
         <ion-item>
-          <ion-range label="Music Volume" aria-label="Music Volume" label-placement="fixed"  [min]="0" [max]="1" [step]="0.01" [pinFormatter]="pinFormatterVolume" [pin]="true" [value]="this.getConfigValue('musicVolume')" (ionChange)="updateConfigValue('musicVolume',$event.detail.value); verifySoundVolume('musicVolume')"></ion-range>
+          <ion-range label="Music Volume" aria-label="Music Volume" label-placement="fixed"  [min]="0" [max]="1" [step]="0.01" [pinFormatter]="PinFormatterVolume" [pin]="true" [value]="this.GetConfigValue('musicVolume')" (ionChange)="UpdateConfigValue('musicVolume',$event.detail.value); VerifySoundVolume('musicVolume')"></ion-range>
         </ion-item>
         <ion-item>
-          <ion-range label="Menu Music Volume" aria-label="Menu Music Volume" label-placement="fixed"  [min]="0" [max]="1" [step]="0.01" [pinFormatter]="pinFormatterVolume" [pin]="true" [value]="this.getConfigValue('menuMusicVolume')" (ionChange)="updateConfigValue('menuMusicVolume',$event.detail.value); verifySoundVolume('menuMusicVolume')"></ion-range>
+          <ion-range label="Menu Music Volume" aria-label="Menu Music Volume" label-placement="fixed"  [min]="0" [max]="1" [step]="0.01" [pinFormatter]="PinFormatterVolume" [pin]="true" [value]="this.GetConfigValue('menuMusicVolume')" (ionChange)="UpdateConfigValue('menuMusicVolume',$event.detail.value); VerifySoundVolume('menuMusicVolume')"></ion-range>
         </ion-item>
         <ion-item>
-          <ion-range label="Announcers Volume" aria-label="Announcers Volume" label-placement="fixed"  [min]="0" [max]="1" [step]="0.01" [pinFormatter]="pinFormatterVolume" [pin]="true" [value]="this.getConfigValue('announcersVolume')" (ionChange)="updateConfigValue('announcersVolume',$event.detail.value); verifySoundVolume('announcersVolume')"></ion-range>
+          <ion-range label="Announcers Volume" aria-label="Announcers Volume" label-placement="fixed"  [min]="0" [max]="1" [step]="0.01" [pinFormatter]="PinFormatterVolume" [pin]="true" [value]="this.GetConfigValue('announcersVolume')" (ionChange)="UpdateConfigValue('announcersVolume',$event.detail.value); VerifySoundVolume('announcersVolume')"></ion-range>
         </ion-item>
         <ion-item>
-          <ion-range label="SFX Volume" aria-label="SFX Volume" label-placement="fixed" [ticks]="true"  [min]="0" [max]="1" [step]="0.01" [pinFormatter]="pinFormatterVolume" [pin]="true" [value]="this.getConfigValue('sfxVolume')" (ionChange)="updateConfigValue('sfxVolume',$event.detail.value); verifySoundVolume('sfxVolume')"></ion-range>
+          <ion-range label="SFX Volume" aria-label="SFX Volume" label-placement="fixed" [ticks]="true"  [min]="0" [max]="1" [step]="0.01" [pinFormatter]="PinFormatterVolume" [pin]="true" [value]="this.GetConfigValue('sfxVolume')" (ionChange)="UpdateConfigValue('sfxVolume',$event.detail.value); VerifySoundVolume('sfxVolume')"></ion-range>
         </ion-item>
 
       </ion-card-content>
@@ -89,7 +89,7 @@
           data.</ion-card-subtitle>
       </ion-card-header>
       <ion-card-content>
-        <ion-button expand="block" color="danger" (click)="resetAll()">
+        <ion-button expand="block" color="danger" (click)="ResetAll()">
           Reset to Default
         </ion-button>
       </ion-card-content>
@@ -109,14 +109,14 @@
 
         <ion-item> <ion-label>Cache is used to store song data for offline access and faster loading. Clear cache to ensure you have the latest data. You will have to reload the app to see the changes.</ion-label>
         </ion-item>
-        <ion-button expand="block" color="danger" (click)="clearMusicCache()">
+        <ion-button expand="block" color="danger" (click)="ClearMusicCache()">
           Clear All Cached Game Songs
         </ion-button>
 
         <ion-item>
           <ion-label>Editor cache stores songs you've edited. Clearing it will remove all your unsaved edits. WARNING: THIS IS A DESTRUCTIVE ACTION AND CANNOT BE UNDONE!</ion-label>
         </ion-item>
-        <ion-button expand="block" color="danger" (click)="clearMusicEditCache()">
+        <ion-button expand="block" color="danger" (click)="ClearMusicEditCache()">
           Clear All Edited Songs
         </ion-button>
       </ion-card-content>
@@ -126,7 +126,7 @@
   </div>
   <ion-modal [isOpen]="showPlayerDisplay" (didDismiss)="showPlayerDisplay = false" style="--width: auto; --height: auto">
     <ng-template>
-      <app-player-display [gameRound]="getFakeGameRound()"></app-player-display>
+      <app-player-display [gameRound]="GetFakeGameRound()"></app-player-display>
     </ng-template>
   </ion-modal>
 </ion-content>

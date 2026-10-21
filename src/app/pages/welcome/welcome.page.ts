@@ -1,14 +1,13 @@
-import { Component, OnInit, Signal, inject } from '@angular/core';
-import { IonBadge, IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonContent, IonGrid, IonItem, IonLabel, IonRow } from '@ionic/angular';
+import { Component, OnInit, Signal, inject } from '@angular/core'
+import { IonBadge, IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonContent, IonGrid, IonItem, IonLabel, IonRow } from '@ionic/angular'
 
-
-import { FormsModule } from '@angular/forms';
-import { HeaderComponent } from "src/app/shared/component/header/header.component";
-import { LoginComponent } from "../../shared/user/login/login.component";
-import { PresenceService } from '../../services/thirdpartyapp/presence.service';
-import { RouterModule } from '@angular/router';
-import { UserDto } from '../user-profile/user.dto';
-import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.service';
+import { FormsModule } from '@angular/forms'
+import { HeaderComponent } from "src/app/shared/component/header/header.component"
+import { LoginComponent } from "../../shared/user/login/login.component"
+import { PresenceService } from '../../services/thirdpartyapp/presence.service'
+import { RouterModule } from '@angular/router'
+import { UserDto } from '../user-profile/user.dto'
+import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.service'
 
 @Component({
   selector: 'app-welcome',
@@ -18,18 +17,18 @@ import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.
   imports: [IonCol, IonRow, IonGrid, IonBadge, IonLabel, IonItem, IonCardHeader, IonCardTitle, IonCardContent, IonCard, IonButton, IonContent, FormsModule, HeaderComponent, RouterModule, LoginComponent]
 })
 export class WelcomePage implements OnInit {
-  private discordRpcService = inject(PresenceService);
+  private discordRpcService = inject(PresenceService)
 
-  user: Signal<UserDto | null>;
+  user: Signal<UserDto | null>
 
   constructor() {
-    const userService = inject(UserFirestoreService);
+    const userService = inject(UserFirestoreService)
 
-    this.user = userService.userData;
+    this.user = userService.userData
   }
 
   ngOnInit() {
-    this.discordRpcService.update("Let's dance")
+    this.discordRpcService.Update("Let's dance")
   }
 
 }

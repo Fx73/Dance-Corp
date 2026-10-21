@@ -93,7 +93,7 @@
   transform-origin: center;
 }
 
-/* Décalage pour un effet plus vivant */
+/* Offset for a livelier effect */
 .score-digit span:nth-child(0) { animation-delay: 0s; }
 .score-digit span:nth-child(1) { animation-delay: 0.1s; }
 .score-digit span:nth-child(2) { animation-delay: 0.2s; }

@@ -5,14 +5,14 @@
     @if(filteredGenres.length > 0){
     <ul id="genre-list" role="listbox" class="suggestions">
       @for (g of filteredGenres; track $index) {
-      <li role="option" aria-selected="false" tabindex="0" (click)="selectGenre(g)" (keydown.enter)="selectGenre(g)">
+      <li role="option" aria-selected="false" tabindex="0" (click)="SelectGenre(g)" (keydown.enter)="SelectGenre(g)">
         {{ g }}
       </li>
       }
     </ul>
     }
 
-    <ion-input [label]="label" [value]="value" (ionInput)="onInput($event)" (ionChange)="onInputChange($event)" (ionFocus)="onFocus()" (ionBlur)="onBlur()" role="combobox" [attr.aria-expanded]="filteredGenres.length > 0" aria-owns="genre-list" aria-autocomplete="list">
+    <ion-input [label]="label" [value]="value" (ionInput)="OnInput($event)" (ionChange)="OnInputChange($event)" (ionFocus)="OnFocus()" (ionBlur)="OnBlur()" role="combobox" [attr.aria-expanded]="filteredGenres.length > 0" aria-owns="genre-list" aria-autocomplete="list">
       <ng-content></ng-content><!-- Child component -->
 
     </ion-input>

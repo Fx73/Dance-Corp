@@ -9,7 +9,7 @@
     <div class="score-submain">
       <ion-card-subtitle>{{ gameRound.player.name }}</ion-card-subtitle>
       <ion-label color="primary" class="score-digit">
-        @for (scoreNumber of getScoreFormatted(); track $index) {
+        @for (scoreNumber of GetScoreFormatted(); track $index) {
         <span>{{ scoreNumber }}</span>
         }
       </ion-label>
@@ -24,35 +24,35 @@
         <ion-item>
           <ion-icon slot="start" name="checkmark-circle-outline" color="success"></ion-icon>
           <ion-label>Perfect:</ion-label>
-          <ion-badge slot="end" [style.backgroundColor]="getPrecisionColor(Precision.Perfect)" class="precision-badge">{{ precisionCounts().Perfect }}</ion-badge>
+          <ion-badge slot="end" [style.backgroundColor]="GetPrecisionColor(Precision.Perfect)" class="precision-badge">{{ precisionCounts().Perfect }}</ion-badge>
         </ion-item>
 
         <!-- Great -->
         <ion-item>
           <ion-icon slot="start" name="checkmark-circle-outline" color="info"></ion-icon>
           <ion-label>Great:</ion-label>
-          <ion-badge slot="end" [style.backgroundColor]="getPrecisionColor(Precision.Great)" class="precision-badge">{{ precisionCounts().Great }}</ion-badge>
+          <ion-badge slot="end" [style.backgroundColor]="GetPrecisionColor(Precision.Great)" class="precision-badge">{{ precisionCounts().Great }}</ion-badge>
         </ion-item>
 
         <!-- Almost -->
         <ion-item>
           <ion-icon slot="start" name="checkmark-circle-outline" color="info"></ion-icon>
           <ion-label>Good:</ion-label>
-          <ion-badge slot="end" [style.backgroundColor]="getPrecisionColor(Precision.Good)" class="precision-badge">{{ precisionCounts().Good }}</ion-badge>
+          <ion-badge slot="end" [style.backgroundColor]="GetPrecisionColor(Precision.Good)" class="precision-badge">{{ precisionCounts().Good }}</ion-badge>
         </ion-item>
 
         <!-- Almost -->
         <ion-item>
           <ion-icon slot="start" name="close-circle-outline" color="danger"></ion-icon>
           <ion-label>Almost:</ion-label>
-          <ion-badge slot="end" [style.backgroundColor]="getPrecisionColor(Precision.Almost)" class="precision-badge">{{ precisionCounts().Almost }}</ion-badge>
+          <ion-badge slot="end" [style.backgroundColor]="GetPrecisionColor(Precision.Almost)" class="precision-badge">{{ precisionCounts().Almost }}</ion-badge>
         </ion-item>
 
         <!-- Missed -->
         <ion-item>
           <ion-icon slot="start" name="close-circle-outline" color="danger"></ion-icon>
           <ion-label>Missed:</ion-label>
-          <ion-badge slot="end" [style.backgroundColor]="getPrecisionColor(Precision.Missed)" class="precision-badge">{{ precisionCounts().Missed }}</ion-badge>
+          <ion-badge slot="end" [style.backgroundColor]="GetPrecisionColor(Precision.Missed)" class="precision-badge">{{ precisionCounts().Missed }}</ion-badge>
         </ion-item>
 
         <!-- Personal titles -->

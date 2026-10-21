@@ -26,4 +26,4 @@ export const difficultyMap: Record<string, NoteDifficulty> = {
     // Challenge
     "challenge": NoteDifficulty.Challenge,
     "edit": NoteDifficulty.Challenge
-};
+}

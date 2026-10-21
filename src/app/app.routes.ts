@@ -1,6 +1,6 @@
-import { Routes } from '@angular/router';
-import { UserGuard } from './shared/guard/user.guard';
-import { gameGuard } from './shared/guard/game.guard';
+import { Routes } from '@angular/router'
+import { UserGuard } from './shared/guard/user.guard'
+import { gameGuard } from './shared/guard/game.guard'
 
 export const routes: Routes = [
   {
@@ -52,4 +52,4 @@ export const routes: Routes = [
     path: 'about',
     loadComponent: () => import('./pages/about/about.page').then(m => m.AboutPage)
   },
-];
+]

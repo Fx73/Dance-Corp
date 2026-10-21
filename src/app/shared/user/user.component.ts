@@ -1,14 +1,14 @@
-import { Component, ViewChild, signal, inject } from '@angular/core';
-import { IonButton, IonContent, IonIcon, IonItem, IonLabel, IonPopover, PopoverController } from '@ionic/angular';
-import { logoGoogle, person } from 'ionicons/icons';
+import { Component, ViewChild, signal, inject } from '@angular/core'
+import { IonButton, IonContent, IonIcon, IonItem, IonLabel, IonPopover, PopoverController } from '@ionic/angular'
+import { logoGoogle, person } from 'ionicons/icons'
 
-import { LoginComponent } from './login/login.component';
-import { LoginFireauthService } from 'src/app/services/firestore/login.fireauth.service';
-import { Router } from '@angular/router';
-import { User } from 'firebase/auth';
-import { addIcons } from 'ionicons';
+import { LoginComponent } from './login/login.component'
+import { LoginFireauthService } from 'src/app/services/firestore/login.fireauth.service'
+import { Router } from '@angular/router'
+import { User } from 'firebase/auth'
+import { addIcons } from 'ionicons'
 
-export const currentUser = signal<User | null>(null);
+export const currentUser = signal<User | null>(null)
 
 @Component({
   selector: 'app-user',
@@ -18,27 +18,26 @@ export const currentUser = signal<User | null>(null);
   imports: [IonButton, IonContent, IonIcon, IonItem, IonLabel, IonPopover],
 })
 export class UserComponent {
-  private router = inject(Router);
-  private popoverController = inject(PopoverController);
-  private loginService = inject(LoginFireauthService);
+  private router = inject(Router)
+  private popoverController = inject(PopoverController)
+  private loginService = inject(LoginFireauthService)
 
-  @ViewChild('userpopover', { static: false }) userpopover!: HTMLIonPopoverElement;
+  @ViewChild('userpopover', { static: false }) userpopover!: HTMLIonPopoverElement
 
-  user = currentUser;
+  user = currentUser
 
   constructor() {
-    const loginService = this.loginService;
+    const loginService = this.loginService
 
-    loginService.listenForUserChanges(user => currentUser.set(user))
+    loginService.ListenForUserChanges(user => currentUser.set(user))
     addIcons({
       'person': person,
       'logoGoogle': logoGoogle
-    });
+    })
   }
 
-
-  async presentPopover(e: Event) {
-    let popover: HTMLIonPopoverElement;
+  async PresentPopover(e: Event) {
+    let popover: HTMLIonPopoverElement
     if (this.user()) {
       popover = this.userpopover
       popover.event = e
@@ -49,24 +48,19 @@ export class UserComponent {
           isSmall: true
         },
         event: e,
-      });
+      })
     }
 
-    await popover.present();
-    await popover.onDidDismiss();
+    await popover.present()
+    await popover.onDidDismiss()
   }
 
-
-
-  logout() {
-    this.loginService.logOut()
+  Logout() {
+    this.loginService.LogOut()
     this.popoverController.dismiss().then(() => {
       this.router.navigateByUrl('home')
     }
-    );
+    )
   }
 
-
 }
-
-
