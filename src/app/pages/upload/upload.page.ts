@@ -141,12 +141,10 @@ export class UploadPage {
     this.LoadLocalMusic(musicId)
     await this.LoadDbMusic(musicId)
 
-    if (!this.musicData) {
-      if (!this.musicDataDb) {
-        AppComponent.PresentErrorToast("Music not found in local storage or database.")
-        return
-      }
-      this.musicData = this.musicDataDb.DeepClone()
+    if (!this.isEditLocal() && !this.musicDataDb) {
+      this.isLoading = false
+      this.cd.markForCheck()
+      AppComponent.PresentErrorToast("Music not found in local storage or database.")
     }
   }
 
