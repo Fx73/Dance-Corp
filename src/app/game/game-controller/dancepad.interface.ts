@@ -8,5 +8,6 @@ export type DancePadInput = [ArrowState, ArrowState, ArrowState, ArrowState, Arr
 
 export interface IDancePad {
     GetRefreshedState(): DancePadInput
+    Destroy(): void
     lastExposedState: DancePadInput
 }

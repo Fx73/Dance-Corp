@@ -16,17 +16,22 @@ export class DancePadKeyboard implements IDancePad {
         this.lastExposedState = [0, 0, 0, 0, 0]
 
         // Listen for keyboard events
-        window.addEventListener('keydown', (event) => this.HandleKeyDown(event))
-        window.addEventListener('keyup', (event) => this.HandleKeyUp(event))
+        window.addEventListener('keydown', this.HandleKeyDown)
+        window.addEventListener('keyup', this.HandleKeyUp)
     }
 
-    private HandleKeyDown(event: KeyboardEvent): void {
+    public Destroy(): void {
+        window.removeEventListener('keydown', this.HandleKeyDown)
+        window.removeEventListener('keyup', this.HandleKeyUp)
+    }
+
+    private HandleKeyDown = (event: KeyboardEvent): void => {
         if (!event.repeat && this.keyBinding.has(event.key)) {
             this.currentState.add(this.keyBinding.get(event.key)!)
         }
     }
 
-    private HandleKeyUp(event: KeyboardEvent): void {
+    private HandleKeyUp = (event: KeyboardEvent): void => {
         if (this.keyBinding.has(event.key)) {
             this.currentState.delete(this.keyBinding.get(event.key)!)
         }

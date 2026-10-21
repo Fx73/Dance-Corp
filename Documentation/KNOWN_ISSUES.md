@@ -14,10 +14,6 @@ Bugs found but not fixed yet, and deprecations to migrate. Remove an entry once 
   `browse.page.ts` indexes into `musicNotes()`, which is filtered (single player → `DanceSingle` only) and re-sorted, but `game.page.ts` / `GameManager` index into the raw `music.noteData`. When a music has a double chart, a single player can be sent a different chart than the one selected.
   Possible fix: pass the `chartName` instead of an index, or resolve the index against the same filtered list.
 
-- **`DancePadKeyboard` listeners are never removed**
-  The constructor adds `keydown`/`keyup` listeners on `window` with no way to remove them. A new instance is created on each browse page init and each `GameRound`, so listeners accumulate during a session.
-  Possible fix: add a `destroy()` to `IDancePad` and call it on leave.
-
 - **Upload page: DB fallback never runs in `StartLoad()`**
   `musicData` is initialised with `new MusicDto()` and never set to `null`, so `if (!this.musicData)` is always false and the `musicDataDb.DeepClone()` fallback is dead code.
 

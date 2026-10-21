@@ -1,5 +1,5 @@
 import { NgClass, NgStyle, } from '@angular/common'
-import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren, inject, signal } from '@angular/core'
+import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, QueryList, ViewChildren, inject, signal } from '@angular/core'
 import { InfiniteScrollCustomEvent, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonInfiniteScroll, IonInfiniteScrollContent, IonMenu, IonSearchbar, IonSplitPane, IonText, SearchbarCustomEvent } from '@ionic/angular'
 import { MusicDto, NoteDataDto } from 'src/app/game/game-model/music.dto'
 import { IMusicPlayer, MusicOrigin, MusicPlayerCommon } from 'src/app/game/music-player/IMusicPlayer'
@@ -38,7 +38,7 @@ import { SoundService } from './../../services/gameplay/sound.service'
   standalone: true,
   imports: [IonBadge, IonSplitPane, IonCardSubtitle, IonMenu, IonText, IonCardContent, IonCardTitle, IonInfiniteScrollContent, IonInfiniteScroll, IonSearchbar, IonCard, IonCardHeader, IonContent, NgStyle, NgClass, FormsModule, HeaderComponent, GradeComponent, RadarScoreComponent, MusicPlayerYoutubeComponent, MusicPlayerLocalComponent, MusicPlayerSoundcloudComponent]
 })
-export class BrowsePage implements OnInit {
+export class BrowsePage implements OnInit, OnDestroy {
   //#region Constants
   readonly SOUND_ARROW_UP = new Audio('assets/Sounds/menuFx/arrow_up.ogg')
   readonly SOUND_ARROW_DOWN = new Audio('assets/Sounds/menuFx/arrow_down.ogg')
@@ -101,6 +101,10 @@ export class BrowsePage implements OnInit {
     window.removeEventListener('keydown', this.KeyHandler)
     this.isListeningInput = false
     this.sampleLoopActive = false
+  }
+
+  ngOnDestroy() {
+    this.dancepad.forEach(pad => pad.Destroy())
   }
 
   InitPlayerInput() {

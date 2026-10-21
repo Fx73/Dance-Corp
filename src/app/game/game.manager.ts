@@ -143,6 +143,7 @@ export class GameManager {
         if (this.gameLoopId !== null) {
             cancelAnimationFrame(this.gameLoopId)
         }
+        this.gameRounds.forEach(gameRound => gameRound.dancepad.Destroy())
         this.gameRounds = []
     }
     //#endregion
