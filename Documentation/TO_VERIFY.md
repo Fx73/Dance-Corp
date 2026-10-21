@@ -300,3 +300,17 @@ Link: https://github.com/Fx73/Dance-Corp/commit/00ded672f5b371cda855cf60ba988da1
 → To verify:
   - A game plays as before: judgments, score, performance bar, fail
   - Announcer combo lines and end of game applause still trigger
+
+## Commit: Remove debug logs and silence the console in production
+Link: https://github.com/Fx73/Dance-Corp/commit/21354a2e0ac4aaaa6d0cec79fbff19dcd3cf3df5
+
+- 14 files: debug `console.log` removed (object dumps, per-arrow judgments, satisfaction, protected field check, chart name parsing, token maps, email on register error)
+- src/app/shared/console-output.ts: `SilenceConsole()` and `productionConsole`
+- src/main.ts: `SilenceConsole()` called in production
+- src/app/app.component.ts: toasts log through `productionConsole`
+- browse and browse-upload pages: infinite scroll easter egg logs through `productionConsole`
+
+→ To verify:
+  - `ionic serve` (development): the remaining logs show (loading, cache sync, game start and game over)
+  - Production build (`npm run build`, then serve `website/www`): only toasts, errors and the infinite scroll message show in the console
+  - Tauri build: same as production
