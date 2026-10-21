@@ -250,7 +250,7 @@ export class AnnouncerService {
         const stepTime = fadeDuration / fadeSteps
         const volumeStep = audio.volume / fadeSteps
 
-        setTimeout(() => {
+        const ScheduleFadeOut = () => setTimeout(() => {
             let currentStep = 0
             const fadeInterval = setInterval(() => {
                 currentStep++
@@ -263,6 +263,10 @@ export class AnnouncerService {
                 }
             }, stepTime)
         }, audio.duration * 1000 - fadeDuration) // start the fade-out before the end
+
+        // duration is NaN until the metadata is loaded
+        if (audio.readyState >= HTMLMediaElement.HAVE_METADATA) ScheduleFadeOut()
+        else audio.addEventListener("loadedmetadata", ScheduleFadeOut, { once: true })
 
         return audio
     }

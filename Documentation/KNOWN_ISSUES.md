@@ -28,10 +28,6 @@ Bugs found but not fixed yet, and deprecations to migrate. Remove an entry once 
 - **Upload page: DB fallback never runs in `StartLoad()`**
   `musicData` is initialised with `new MusicDto()` and never set to `null`, so `if (!this.musicData)` is always false and the `musicDataDb.DeepClone()` fallback is dead code.
 
-- **Crowd sound fade-out starts immediately (unverified)**
-  `AnnouncerService.PlayAudio()` schedules the fade with `audio.duration * 1000 - fadeDuration` right after `audio.play()`, when `duration` is usually still `NaN` (metadata not loaded); `setTimeout(NaN)` runs at once.
-  Possible fix: schedule the fade on `loadedmetadata`.
-
 - **Music offset fallback is dead code**
   In the `MusicDto` constructor, `parseFloat(tokenMap["offset"]) ?? parseFloat(tokenMap["beat0OffsetInSeconds"])` never uses the fallback (`parseFloat` returns `NaN`, not `null`), and the whole expression is guarded by `tokenMap["offset"]` being truthy.
 
