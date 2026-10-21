@@ -1,73 +1,39 @@
-import { getAuth, onAuthStateChanged } from 'firebase/auth'
+import { catchError, filter, firstValueFrom, of, timeout } from 'rxjs'
 
 import { Injectable, inject } from '@angular/core'
-import { LoginFireauthService } from 'src/app/services/firestore/login.fireauth.service'
-import { Router } from '@angular/router'
+import { toObservable } from '@angular/core/rxjs-interop'
+import { Router, UrlTree } from '@angular/router'
+import { getAuth } from 'firebase/auth'
 import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.service'
 
 @Injectable({
     providedIn: 'root'
 })
 export class UserGuard {
-    private loginFireauthService = inject(LoginFireauthService)
+    //#region Constants
+    private readonly USER_FETCH_TIMEOUT_MS = 5000
+    //#endregion
+
     private userFirestoreService = inject(UserFirestoreService)
     private router = inject(Router)
+    private userData$ = toObservable(this.userFirestoreService.userData)
 
-    async canActivate(): Promise<boolean> {
-        if (this.loginFireauthService.GetAuthUser() && this.userFirestoreService.user)
+    async canActivate(): Promise<boolean | UrlTree> {
+        if (this.userFirestoreService.user)
             return true
-        try {
-            const isLogged = await this.GuardWaitForAuth()
-            if (!isLogged) {
-                this.router.navigate(['/home'])
-                return false
-            }
 
-            const isUserFetched = this.GuardWaitForUserDataFetch()
-            if (!isUserFetched) {
-                this.router.navigate(['/home'])
-                return false
-            }
+        // Wait for Firebase to restore the persisted session
+        const auth = getAuth()
+        await auth.authStateReady()
+        if (!auth.currentUser)
+            return this.router.createUrlTree(['/home'])
 
-            return true
-        } catch (error) {
-            console.error('Error in Editor Guard:', error)
-            return false
-        }
+        // Wait for the user document to be fetched from Firestore
+        const user = await firstValueFrom(this.userData$.pipe(
+            filter(u => u !== null),
+            timeout({ first: this.USER_FETCH_TIMEOUT_MS }),
+            catchError(() => of(null))
+        ))
+        return user ? true : this.router.createUrlTree(['/home'])
     }
-
-    private GuardWaitForAuth(): Promise<boolean> {
-        const timeout = 500
-        let timeoutId: NodeJS.Timeout
-
-        return new Promise<boolean>((resolve) => {
-            const unsubscribeFun = onAuthStateChanged(getAuth(), (_user) => {
-                clearTimeout(timeoutId)
-                unsubscribeFun()
-                resolve(!!_user)
-            })
-
-            timeoutId = setTimeout(() => {
-                unsubscribeFun()
-                resolve(false)
-            }, timeout)
-        })
-    }
-
-    private GuardWaitForUserDataFetch(): Promise<boolean> {
-        const timeout = 500
-        let timeoutId: NodeJS.Timeout
-
-        return new Promise<boolean>((resolve) => {
-            if (this.userFirestoreService.user) {
-                clearTimeout(timeoutId)
-                resolve(true)
-            }
-
-            timeoutId = setTimeout(() => {
-                resolve(false)
-            }, timeout)
-        })
-    }
-
 }
