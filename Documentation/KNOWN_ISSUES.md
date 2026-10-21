@@ -25,9 +25,6 @@ Bugs found but not fixed yet, and deprecations to migrate. Remove an entry once 
   The constructor adds `keydown`/`keyup` listeners on `window` with no way to remove them. A new instance is created on each browse page init and each `GameRound`, so listeners accumulate during a session.
   Possible fix: add a `destroy()` to `IDancePad` and call it on leave.
 
-- **Note upload duplicates notes in the local music cache**
-  `MusicCacheService.UploadNotesInBase()` does `music.noteData.concat(notes)`, while Firestore replaces notes with the same `chartName`. Re-uploading an existing note leaves a duplicate in the cache until the next full refresh.
-
 - **Upload page: DB fallback never runs in `StartLoad()`**
   `musicData` is initialised with `new MusicDto()` and never set to `null`, so `if (!this.musicData)` is always false and the `musicDataDb.DeepClone()` fallback is dead code.
 
