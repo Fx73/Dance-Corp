@@ -268,3 +268,13 @@ Link: https://github.com/Fx73/Dance-Corp/commit/09555de9bbe67b939110580e0b20b5d2
   - Keyboard player: browse navigation with the arrows, play a game, back to browse, play again: inputs work every time
   - Upload: the note test works with the keyboard, close it and reopen it
   - Gamepad player: same flow, inputs still work
+
+## Commit: Stop the upload page loading forever when the music is not found
+Link: https://github.com/Fx73/Dance-Corp/commit/9faed688d302786b1c89fd359001ceee56dcd330
+
+- src/app/pages/upload/upload.page.ts: **bug fix**, `StartLoad()` stops loading and shows the "Music not found" toast when the music is neither local nor in the database; dead `DeepClone()` fallback removed
+
+→ To verify:
+  - `/upload?music=<unknown id>`: error toast, then the file picker is shown
+  - Database-only music: shown read only, "Edit Music" makes it editable
+  - Local music (with or without a database version): opens in edit mode as before
