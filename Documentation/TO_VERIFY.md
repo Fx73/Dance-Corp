@@ -244,3 +244,15 @@ Link: https://github.com/Fx73/Dance-Corp/commit/703b1b1f9744906d4650054aefbe3c79
   - Logged out: `/upload`, `/browse-upload` and `/user-profile` redirect to home
   - Logged in: navigating to these pages from the menu opens them
   - Logged in: reloading these pages (F5) opens them with the user loaded (profile shows name and stats, upload works with no "User not authenticated")
+
+## Commit: Redirect browse and game to player selection when players are not ready
+Link: https://github.com/Fx73/Dance-Corp/commit/40d60f76012fedc3f50e51431978a308af35b3ae
+
+- src/app/shared/guard/players.guard.ts: **bug fix**, `gameGuard` replaced by `playersGuard` on `/play/browse` and `/play/game/:musicId`, redirects to `/play/player-selection` when a player has no gamepad or an undetected one
+- src/app/services/userconfig.service.ts: `ArePlayersReady()` shared with the player selection page; `isReady` removed (always true)
+
+→ To verify:
+  - Fresh profile (localStorage cleared): open `/play/browse` directly, it redirects to player selection with no console error
+  - Keyboard player: reload `/play/browse`, it stays on browse
+  - Gamepad player: reload `/play/browse`, it redirects to player selection; press a button, Start goes back to browse
+  - Normal flow: player selection → browse → game → back to browse
