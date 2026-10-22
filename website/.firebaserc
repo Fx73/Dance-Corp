@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "dance-corp"
+    "default": "dance-corp",
+    "prod": "dance-corp",
+    "dev": "dance-corp-dev"
   }
 }
