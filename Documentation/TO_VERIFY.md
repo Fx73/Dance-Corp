@@ -360,3 +360,20 @@ Tested: `cargo check` and `npx tauri build` (MSI and NSIS bundles) pass locally.
   - Desktop app: upload a music (folder created, file written), it shows in the local list, plays, and can be deleted
   - Discord presence shows "Let's dance !"
   - Steam presence, when launched through Steam
+
+## Commit: Store charts in a notes subcollection so only their creator can change them
+Link: https://github.com/Fx73/Dance-Corp/commit/71e589939151b69b7fd92c4f3a2475040202d89d
+
+Tested: 29 allow/deny cases in the Firestore emulator (chart creation, edit and deletion by creator and others, index tampering, music deletion, bpms lock, legacy noteData). Dev migrated and read anonymously with the client SDK: 65 musics, 276 charts, no orphan, every index matches its subcollection.
+
+- website/firestore.rules: notes subcollection rules, chart index consistency, collectionGroup read
+- src/app/services/firestore/music.firestore.service.ts: charts read from and written to the subcollection, `MusicDto.noteData` rebuilt on read
+- src/app/pages/upload/upload.page.ts: `GetProtectedFields` takes the chart count
+- tools/migrate-notes-to-subcollection.mjs, copy-prod-to-dev.mjs: migration, and the copy follows the subcollections
+
+→ To verify (on the PR preview, against dance-corp-dev):
+  - Clear the site data, reload: every music shows its charts
+  - Upload a chart, edit it, delete it; another account cannot edit or delete it
+  - Deleting a music is refused while it has charts, then works once they are gone
+  - Changing the bpms is refused once the music has a chart
+  - Another browser with a warm cache picks up an added and a deleted chart
