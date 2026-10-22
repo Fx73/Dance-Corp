@@ -314,3 +314,49 @@ Link: https://github.com/Fx73/Dance-Corp/commit/21354a2e0ac4aaaa6d0cec79fbff19dc
   - `ionic serve` (development): the remaining logs show (loading, cache sync, game start and game over)
   - Production build (`npm run build`, then serve `website/www`): only toasts, errors and the infinite scroll message show in the console
   - Tauri build: same as production
+
+## Commit: Add a dev Firebase project and split CI from deployment
+Link: https://github.com/Fx73/Dance-Corp/commit/74bdcf4bcc92c2329414404b33c319684c1a4e55
+
+Tested: `ng build --configuration=dev` only contains `dance-corp-dev`, `ng build --configuration=production` only contains `dance-corp`.
+
+- src/environments/environment.ts, environment.prod.ts: Firebase config moved here from src/app.config.ts, dev project by default
+- src/main.ts: Analytics only starts when a `measurementId` is set
+- angular.json: new `dev` build configuration
+- src-tauri/tauri.dev.conf.json: separate "DanceCorp Dev" desktop app for dev builds
+- .github/workflows/ci.yml, deploy.yml: replace build_deploy_web.yml and build_desktop.yml
+
+→ To verify:
+  - The CI workflow passes on a PR: lint, build, preview URL comment, desktop build
+  - A push to `dev` deploys to dance-corp-dev, a push to `master` to dance-corp
+  - The desktop artifact contains the `.msi` and `.exe` installers
+  - The "DanceCorp Dev" app installs next to the release app and keeps its own AppData
+  - Production still records Analytics
+
+## Commit: Deploy the Firestore rules from the repo and tighten them
+Link: https://github.com/Fx73/Dance-Corp/commit/9106f353e00a06c5580a637dc4ac780ec91d544f
+
+Tested: 32 allow/deny cases in the Firestore emulator (protected fields, bpms with and without notes, delete, metadata shape and index guard, fresh DB). Rules deployed to dance-corp-dev.
+
+- website/firestore.rules: delete blocked while notes remain, bpms protected once notes exist, metadata writes restricted and checked
+- src/app/services/firestore/music.firestore.service.ts: `GetProtectedFields()` adds `bpms` when the music has notes; `AddGenres` creates `musicdata` if missing
+- src/app/pages/upload/upload.page.ts: uses `GetProtectedFields()`
+- .github/workflows/deploy.yml: deploys the rules and indexes
+
+→ To verify:
+  - Upload a music, add notes, edit it, delete its notes then the music, on the dev site
+  - Changing the bpms of a music without notes works; with notes, the client refuses it with a clear message
+  - The Deploy workflow deploys the rules (the service account may need the Firebase Rules Admin role)
+
+## Commit: Update Tauri crates to match the npm packages
+Link: https://github.com/Fx73/Dance-Corp/commit/5e545eb43484fab8b1c9b2182db9573161d122ed
+
+Tested: `cargo check` and `npx tauri build` (MSI and NSIS bundles) pass locally.
+
+- src-tauri/Cargo.toml, Cargo.lock: tauri 2.12.5, tauri-build 2.7.4, tauri-plugin-fs 2.7.1, tauri-plugin-log 2.10.1
+- package.json: `@tauri-apps/cli` 2.12.4
+
+→ To verify:
+  - Desktop app: upload a music (folder created, file written), it shows in the local list, plays, and can be deleted
+  - Discord presence shows "Let's dance !"
+  - Steam presence, when launched through Steam

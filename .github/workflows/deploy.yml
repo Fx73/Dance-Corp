@@ -1,0 +1,81 @@
+name: Deploy
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "dev"
+      - "master"
+
+concurrency:
+  group: deploy-${{ github.ref_name }}
+  cancel-in-progress: false
+
+env:
+  # master deploys to production, every other branch to the dev project
+  IS_PROD: ${{ github.ref_name == 'master' }}
+
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Npm setup
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+
+      - name: Build
+        run: npx ng build --configuration=${{ env.IS_PROD == 'true' && 'production' || 'dev' }}
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ env.IS_PROD == 'true' && secrets.FIREBASE_SERVICE_ACCOUNT_DANCE_CORP || secrets.FIREBASE_SERVICE_ACCOUNT_DANCE_CORP_DEV }}
+
+      - name: Deploy Firestore rules and indexes
+        working-directory: website
+        run: npx firebase-tools@15 deploy --only firestore --non-interactive --project ${{ env.IS_PROD == 'true' && 'dance-corp' || 'dance-corp-dev' }}
+
+      - name: Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ env.IS_PROD == 'true' && secrets.FIREBASE_SERVICE_ACCOUNT_DANCE_CORP || secrets.FIREBASE_SERVICE_ACCOUNT_DANCE_CORP_DEV }}
+          projectId: ${{ env.IS_PROD == 'true' && 'dance-corp' || 'dance-corp-dev' }}
+          entryPoint: website
+          channelId: live
+
+  desktop:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Npm setup
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Build with Tauri
+        run: npx tauri build ${{ env.IS_PROD == 'true' && ' ' || '--config src-tauri/tauri.dev.conf.json' }}
+
+      - name: Upload installers
+        uses: actions/upload-artifact@v6
+        with:
+          name: desktop-${{ github.ref_name }}
+          path: |
+            src-tauri/target/release/bundle/msi/*.msi
+            src-tauri/target/release/bundle/nsis/*.exe
+          if-no-files-found: error

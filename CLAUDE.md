@@ -70,6 +70,13 @@ Write new code the way the existing code is written. Known deviations to avoid a
 - A single-statement `if` / `else` may omit braces when the statement is on the next line. Always use braces for `for`, `while`, and other control structures.
 - Comments are in English, short, and explain intent or a step (`// 1) Read the global timestamp…`), not the obvious.
 
+## Firebase
+
+- Two projects: `dance-corp-dev` (`ng serve`, `tauri dev`, the `dev` build configuration, the `dev` branch and PR previews) and `dance-corp` (production, `master` only). Their config lives in `src/environments/`.
+- Firestore rules and indexes are code: [website/firestore.rules](website/firestore.rules) and [website/firestore.indexes.json](website/firestore.indexes.json), deployed by the Deploy workflow. Never edit them in the Firebase console: the next deploy overwrites it.
+- Rules duplicate some client checks (protected music fields): keep both sides in sync.
+- [tools/copy-prod-to-dev.mjs](tools/copy-prod-to-dev.mjs) refreshes the dev catalog (`musics`, `metadata`) from prod. Never copy `users` to dev.
+
 ## Git
 
 ### Branches

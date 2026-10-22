@@ -1,0 +1,79 @@
+rules_version = '2';
+
+// Source of truth for the Firestore rules of every project: edit here, never in the console.
+// Deployed by the Deploy workflow (dev -> dance-corp-dev, master -> dance-corp).
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function noteCount(data) {
+      return data.get('noteData', []).size();
+    }
+
+    // Keep in sync with protectedFields / notesProtectedFields in music.firestore.service.ts
+    function protectedFields() {
+      return noteCount(resource.data) > 0
+        ? ['title', 'artist', 'offset', 'music', 'stops', 'bpms']
+        : ['title', 'artist', 'offset', 'music', 'stops'];
+    }
+
+    match /musics/{musicId} {
+      allow read: if true;
+      allow create: if isSignedIn();
+      // Anyone signed in can edit a music, except its protected fields (bpms is protected once it has notes)
+      allow update: if isSignedIn()
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(protectedFields());
+      // A music can only be deleted once all its notes are gone
+      allow delete: if isSignedIn() && noteCount(resource.data) == 0;
+    }
+
+    // Not used yet: notes are still embedded in musics/{musicId}.noteData
+    match /musics/{musicId}/notes/{noteId} {
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update, delete: if request.auth.uid == resource.data.creatorId;
+    }
+
+    match /users/{userId}/{subCollection=**} {
+      allow read, write: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    match /metadata/{docId} {
+      allow read: if true;
+    }
+
+    // { genres: string[] }
+    match /metadata/musicdata {
+      allow create, update: if isSignedIn()
+        && request.resource.data.keys().hasOnly(['genres'])
+        && request.resource.data.genres is list;
+    }
+
+    // { ids: string[], updatedAt: number }
+    // An update adds or removes at most one id, so the index cannot be wiped in one write
+    match /metadata/music_index {
+      allow create: if isSignedIn() && isValidMusicIndex();
+      allow update: if isSignedIn() && isValidMusicIndex()
+        && request.resource.data.ids.size() >= resource.data.ids.size() - 1
+        && request.resource.data.ids.size() <= resource.data.ids.size() + 1;
+
+      function isValidMusicIndex() {
+        return request.resource.data.keys().hasOnly(['ids', 'updatedAt'])
+          && request.resource.data.ids is list
+          && request.resource.data.updatedAt is number;
+      }
+    }
+
+    // { [musicId]: timestamp } — one music is touched per write
+    match /metadata/music_updates {
+      allow create: if isSignedIn() && request.resource.data.size() <= 1;
+      allow update: if isSignedIn()
+        && request.resource.data.diff(resource.data).affectedKeys().size() <= 1
+        && request.resource.data.diff(resource.data).removedKeys().size() == 0;
+    }
+  }
+}

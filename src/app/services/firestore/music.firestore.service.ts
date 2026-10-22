@@ -22,7 +22,9 @@ export class MusicFirestoreService {
     readonly firestoreConverterMusic: FirestoreConverter<MusicDto> = new FirestoreConverter(MusicDto, { noteData: NoteDataDto, difficultyCriterias: DifficultyCriteria })
     readonly firestoreConverterNote: FirestoreConverter<NoteDataDto> = new FirestoreConverter(NoteDataDto, { difficultyCriterias: DifficultyCriteria })
 
+    // Keep in sync with protectedFields() in website/firestore.rules
     readonly protectedFields: (keyof MusicDto)[] = ['artist', 'title', 'offset', 'music', 'stops']
+    readonly notesProtectedFields: (keyof MusicDto)[] = ['bpms']
 
     //#endregion
 
@@ -62,7 +64,7 @@ export class MusicFirestoreService {
             // check protected fields are not modified
             const current = (await getDoc(musicRef)).data()
             if (!current) throw new Error("Music not found")
-            for (const field of this.protectedFields) {
+            for (const field of this.GetProtectedFields(current)) {
                 if (!DeepEqual(dto[field], current[field]))
                     throw new Error(`Field "${field}" cannot be modified after upload.`)
             }
@@ -78,6 +80,13 @@ export class MusicFirestoreService {
             AppComponent.PresentWarningToast("Error updating music: " + error)
             throw error
         }
+    }
+
+    /** Fields that cannot change once uploaded; bpms are also locked as soon as the music has notes */
+    GetProtectedFields(music: MusicDto): (keyof MusicDto)[] {
+        return music.noteData?.length > 0
+            ? [...this.protectedFields, ...this.notesProtectedFields]
+            : this.protectedFields
     }
 
     async UploadNotes(musicId: string, notes: NoteDataDto[]): Promise<void> {
@@ -235,14 +244,15 @@ export class MusicFirestoreService {
         const ref = doc(this.db, this.METADATA_COLLECTION, this.MUSIC_METADATA_DOC)
         const snap = await getDoc(ref)
 
-        const existing = snap.data()!['genres'] ?? []
+        const existing = snap.data()?.['genres'] ?? []
 
         if (normalized.every((g: string) => existing.includes(g))) {
             return
         }
         const merged = Array.from(new Set([...existing, ...normalized]))
 
-        await updateDoc(ref, { genres: merged })
+        // setDoc creates the document on a fresh database
+        await setDoc(ref, { genres: merged })
     }
 
     async GetGenres(): Promise<string[]> {

@@ -6,11 +6,21 @@ Bugs found but not fixed yet, and deprecations to migrate. Remove an entry once 
 
 ## Bugs
 
+- **Charts can be edited or deleted by any signed-in user**
+  Notes are embedded in `musics/{id}.noteData`, and Firestore rules cannot check each array element, so the "only the creator edits their chart" check exists only on the client. The `musics/{id}/notes` rule already enforces `creatorId`, but nothing uses that subcollection yet.
+  Possible fix: move the notes to the `notes` subcollection (data migration + `MusicFirestoreService` + cache).
+
+- **`UploadMusic` on an existing music drops its notes**
+  `setDoc` without `merge` replaces the whole document, and `noteData` is stripped from the written data, so re-uploading a music that already exists removes all its charts. The rules allow it, since `noteData` is not a protected field.
+
 - **Genre autocomplete: suggestions unreachable with the keyboard**
   `OnBlur` clears the suggestion list when the input loses focus, so pressing Tab to reach a suggestion closes the list first.
   Possible fix: arrow up/down + Enter navigation from the input, with `aria-activedescendant`.
 
 ## Maintenance
+
+- **Leftover `musics/{id}/notes` documents in production**
+  265 documents in 61 `notes` subcollections, last written on 2026-03-31, from the data model before notes were embedded in `noteData`. Nothing reads them anymore, and they were not copied to dance-corp-dev. Delete them, or reuse that layout if the charts move back to a subcollection (see "Charts can be edited or deleted by any signed-in user").
 
 - **`npm audit`**: 6 vulnerabilities (5 high, 1 moderate), accepted for now. Do not run `npm audit fix --force`: it downgrades `firebase` to 9.14.0 and `@angular/build` to 22.1.9.
   - `@grpc/grpc-js` 1.9.16, pulled by `@firebase/firestore` (`~1.9.0`): only used by the Node build of Firestore, the browser build uses WebChannel. Not in the bundle. Wait for a Firebase update.

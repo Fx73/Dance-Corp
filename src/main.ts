@@ -7,7 +7,6 @@ import { SilenceConsole } from './app/shared/console-output'
 import { bootstrapApplication } from '@angular/platform-browser'
 import { enableProdMode } from '@angular/core'
 import { environment } from './environments/environment'
-import { firebaseConfig } from './app.config'
 import { getAnalytics } from 'firebase/analytics'
 import { initializeApp } from 'firebase/app'
 import localeFr from '@angular/common/locales/fr'
@@ -19,8 +18,11 @@ if (environment.production) {
   SilenceConsole()
 }
 
-const firebaseApp = initializeApp(firebaseConfig)
-getAnalytics(firebaseApp)
+const firebaseApp = initializeApp(environment.firebase)
+// Analytics is only enabled on the production project
+if (environment.firebase.measurementId) {
+  getAnalytics(firebaseApp)
+}
 initializeFirestore(firebaseApp, { ignoreUndefinedProperties: true })
 getFirestore(firebaseApp)
 
