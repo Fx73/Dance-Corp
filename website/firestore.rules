@@ -1,0 +1,30 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+   match /musics/{musicId} {
+        allow read: if true;																				// ✅ Everyone can read
+        allow create: if request.auth != null;											// ✅ Any logged-in user can add new music
+        allow update: if request.auth != null &&										
+          (!request.resource.data.diff(resource.data).affectedKeys().hasAny([ "title","artist","bpms", "offset", "music", "stops"]));
+																																		// ✅ Prevent updates if restricted fields are modified
+        allow delete: if request.auth.uid != null;									// ✅ Allow delete only if no notes exist
+    }
+      
+    match /musics/{musicId}/notes/{noteId} {
+        allow read: if true; 																					// ✅ Everyone can read
+        allow create: if request.auth != null; 												// ✅ Any logged-in user can add new notes
+        allow update: if request.auth.uid == resource.data.creatorId; // ✅ Only creator can modify
+        allow delete: if request.auth.uid == resource.data.creatorId; // ✅ Only creator can delete
+    }
+
+		match /users/{userId}/{subCollection=**} {
+  		allow read, write: if request.auth != null && request.auth.uid == userId;
+		}
+
+		match /metadata/{docId} {
+    	allow read: if true;
+      allow update: if request.auth != null;
+    }
+  }
+}
