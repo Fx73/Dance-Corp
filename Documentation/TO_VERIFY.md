@@ -347,3 +347,16 @@ Tested: 32 allow/deny cases in the Firestore emulator (protected fields, bpms wi
   - Upload a music, add notes, edit it, delete its notes then the music, on the dev site
   - Changing the bpms of a music without notes works; with notes, the client refuses it with a clear message
   - The Deploy workflow deploys the rules (the service account may need the Firebase Rules Admin role)
+
+## Commit: Update Tauri crates to match the npm packages
+Link: https://github.com/Fx73/Dance-Corp/commit/5e545eb43484fab8b1c9b2182db9573161d122ed
+
+Tested: `cargo check` and `npx tauri build` (MSI and NSIS bundles) pass locally.
+
+- src-tauri/Cargo.toml, Cargo.lock: tauri 2.12.5, tauri-build 2.7.4, tauri-plugin-fs 2.7.1, tauri-plugin-log 2.10.1
+- package.json: `@tauri-apps/cli` 2.12.4
+
+→ To verify:
+  - Desktop app: upload a music (folder created, file written), it shows in the local list, plays, and can be deleted
+  - Discord presence shows "Let's dance !"
+  - Steam presence, when launched through Steam
