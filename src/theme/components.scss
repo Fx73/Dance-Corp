@@ -108,7 +108,10 @@ ion-col{
   align-items: center;
   width: 28vw;
   height: 50vh;
-  ion-img{
+  img{
+    display: block;
+    width: 100%;
+    object-fit: contain;
     min-height: 86%;
     max-height: 86%;
     overflow-y: hidden;

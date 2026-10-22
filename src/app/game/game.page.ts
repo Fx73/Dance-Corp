@@ -64,9 +64,9 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
   ngOnInit() {
     // Get Data
     const musicId = this.route.snapshot.paramMap.get('musicId')
-    const selectedNotes = this.route.snapshot.queryParamMap.get('notes')?.split(',').map(n => +n)
+    const chartNames = this.route.snapshot.queryParamMap.getAll('notes')
 
-    if (!musicId || !selectedNotes || selectedNotes.length === 0) {
+    if (!musicId || chartNames.length === 0) {
       console.error("Music data is missing or incomplete.")
       this.router.navigate(['/home'])
       return
@@ -79,6 +79,13 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
       return
     }
     this.music = music
+
+    const selectedNotes = chartNames.map(name => music.noteData.findIndex(n => n.chartName === name))
+    if (selectedNotes.includes(-1)) {
+      console.error(`Chart not found in music ${musicId}: ${chartNames.join(', ')}`)
+      this.router.navigate(['/home'])
+      return
+    }
 
     // Prepare Music Player
     this.musicOrigin = MusicPlayerCommon.PickMusicPlayer(this.music.music!)
@@ -93,14 +100,13 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
     this.game = new GameManager(this.music, players, selectedNotes, isTrainingMode, this.userCacheService, this.announcerService)
     this.announcerService.PickPreferredAnnouncer()
 
-    this.discordRpcService.Update("Dancing on lvl " + this.music.noteData[0].meter, this.music.title + " - " + this.music.artist)
+    this.discordRpcService.Update("Dancing on lvl " + this.music.noteData[selectedNotes[0]].meter, this.music.title + " - " + this.music.artist)
   }
 
   @ViewChildren(PlayerDisplayComponent) playerDisplaysQuery!: QueryList<PlayerDisplayComponent>
   private playerDisplays: PlayerDisplayComponent[] = []
   ngAfterViewInit() {
     this.playerDisplays = this.playerDisplaysQuery.toArray()
-    console.log("Player Displays initialized:", this.playerDisplays, this.musicPlayer)
     if (this.musicPlayer && this.playerDisplays.length > 0)
       this.InitGame()
   }
@@ -108,7 +114,6 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
   private musicPlayer!: IMusicPlayer
   OnPlayerReady(mPlayer: IMusicPlayer) {
     this.musicPlayer = mPlayer
-    console.log("Music Player is ready:", this.musicPlayer, this.playerDisplays)
     if (this.musicPlayer && this.playerDisplays.length > 0)
       this.InitGame()
   }

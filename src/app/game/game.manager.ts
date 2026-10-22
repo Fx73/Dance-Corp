@@ -14,10 +14,12 @@ export class GameManager {
     music: MusicDto
     isTrainingMode: boolean = false
     mainUserStats: UserNoteDto | null = null
+    private noteSelected: number[]
 
     constructor(music: MusicDto, players: Player[], noteSelected: number[], isTrainingMode: boolean, private userCacheService: UserCacheService, private announcerService: AnnouncerService) {
         this.music = music
         this.isTrainingMode = isTrainingMode
+        this.noteSelected = noteSelected
 
         for (let index = 0; index < players.length; index++) {
             const player = players[index]
@@ -101,16 +103,15 @@ export class GameManager {
 
     GameOver() {
         console.log('Game Over: All game rounds have failed or finished.')
-        console.log(this.music, this.music.id)
         this.isGameOver = true
 
-        // At least one player finished and has a score of MAX_SCORE
-        if (this.gameRounds.some(gr => gr.isFinished && gr.score >= gr.MAX_SCORE)) {
+        // At least one player finished with the max score
+        if (this.gameRounds.some(gr => gr.isFinished && gr.score >= CONFIG.SCORE.MAX)) {
             this.announcerService.PlayAnnouncer("victory")
             this.announcerService.PlayCrowdOneShot("special")
         }
         // At least one player finished and has a score of A
-        else if (this.gameRounds.some(gr => gr.isFinished && gr.score >= gr.MAX_SCORE * 0.9)) {
+        else if (this.gameRounds.some(gr => gr.isFinished && gr.score >= CONFIG.SCORE.MAX * CONFIG.SCORE.APPLAUSE_HEAVY_RATIO)) {
             this.announcerService.PlayAnnouncer("victory")
             this.announcerService.PlayCrowdOneShot("applause_heavy")
         }
@@ -130,9 +131,9 @@ export class GameManager {
         }
 
         if (!this.isTrainingMode) {
-            for (const gameRound of this.gameRounds) {
-                this.userCacheService.UpdateUserStatsFromRound(this.music.id, this.music.noteData[0].chartName, gameRound)
-            }
+            this.gameRounds.forEach((gameRound, index) => {
+                this.userCacheService.UpdateUserStatsFromRound(this.music.id, this.music.noteData[this.noteSelected[index]].chartName, gameRound)
+            })
         }
 
     }
@@ -141,6 +142,7 @@ export class GameManager {
         if (this.gameLoopId !== null) {
             cancelAnimationFrame(this.gameLoopId)
         }
+        this.gameRounds.forEach(gameRound => gameRound.dancepad.Destroy())
         this.gameRounds = []
     }
     //#endregion

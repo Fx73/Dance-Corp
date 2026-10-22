@@ -220,7 +220,11 @@ export class MusicCacheService {
         }
         const music = this.musics.find(m => m.id === musicId)
         if (!music) return
-        music.noteData = music.noteData.concat(notes)
+        for (const note of notes) {
+            const idx = music.noteData.findIndex(n => n.chartName === note.chartName)
+            if (idx >= 0) music.noteData[idx] = note
+            else music.noteData.push(note)
+        }
         localStorage.setItem(this.MUSIC_STORAGE_KEY(music.id), JSON.stringify(music))
     }
 

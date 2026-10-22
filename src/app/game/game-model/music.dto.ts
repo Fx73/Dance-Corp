@@ -76,9 +76,8 @@ export class MusicDto {
     delete tokenMap["cdtitle"]
     this.music = tokenMap["music"]
     delete tokenMap["music"]
-    this.offset = tokenMap["offset"] ? parseFloat(tokenMap["offset"]) ?? parseFloat(tokenMap["beat0OffsetInSeconds"]) : 0
+    this.offset = tokenMap["offset"] ? parseFloat(tokenMap["offset"]) : 0
     delete tokenMap["offset"]
-    delete tokenMap["beat0OffsetInSeconds"]
     this.musicoffset = tokenMap["musicoffset"] ? parseFloat(tokenMap["musicoffset"]) : undefined
     delete tokenMap["musicoffset"]
     this.sampleStart = parseFloat(tokenMap["samplestart"])
@@ -195,7 +194,6 @@ export class NoteDataDto {
     this.creatorId = tokenMap["creatorid"]
     const creationDateValue = tokenMap["creationdate"]
     this.creationDate = creationDateValue ? new Date(creationDateValue) : new Date()
-    console.log("Parsed chart name:", tokenMap["chartname"])
     this.chartName = tokenMap["chartname"]?.trim() || `${this.difficulty}_${this.meter}_${this.stepsType === DanceType.DanceSingle ? 'S' : 'D'}_${this.creationDate.toISOString().split('T')[0]}`
 
     this.stepChart = tokenMap["notes"].split(',').map(measure => {

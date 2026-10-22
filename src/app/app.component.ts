@@ -6,6 +6,7 @@ import { MusicCacheService } from './services/local-storage/music.cache.service'
 import { PresenceService } from './services/thirdpartyapp/presence.service'
 import { SoundService } from './services/gameplay/sound.service'
 import { ToastController } from '@ionic/angular'
+import { productionConsole } from './shared/console-output'
 
 @Component({
   selector: 'app-root',
@@ -66,17 +67,17 @@ export class AppComponent implements OnInit {
 
   //#region Statics
   static PresentOkToast(message: string) {
-    console.log(message)
+    productionConsole.log(message)
     AppComponent.appInstance.PresentOkToast(message)
   }
 
   static PresentWarningToast(message: string) {
-    console.warn(message)
+    productionConsole.warn(message)
     AppComponent.appInstance.PresentWarningToast(message)
   }
 
   static PresentErrorToast(message: string) {
-    console.error(message)
+    productionConsole.error(message)
     AppComponent.appInstance.PresentErrorToast(message)
   }
   //#endregion

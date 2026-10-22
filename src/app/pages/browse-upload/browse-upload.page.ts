@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, inject } from '@angular/core'
-import { InfiniteScrollCustomEvent, SearchbarCustomEvent, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonIcon, IonImg, IonInfiniteScroll, IonInfiniteScrollContent, IonSearchbar } from '@ionic/angular'
+import { InfiniteScrollCustomEvent, SearchbarCustomEvent, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonSearchbar } from '@ionic/angular'
 
 import { FormsModule } from '@angular/forms'
 import { HeaderComponent } from "src/app/shared/component/header/header.component"
@@ -10,13 +10,14 @@ import { Router } from '@angular/router'
 import { addCircleOutline } from 'ionicons/icons'
 import { addIcons } from 'ionicons'
 import { MusicLocalService } from 'src/app/services/local-storage/local.music.service'
+import { productionConsole } from 'src/app/shared/console-output'
 
 @Component({
   selector: 'app-browse-upload',
   templateUrl: './browse-upload.page.html',
   styleUrls: ['./browse-upload.page.scss'],
   standalone: true,
-  imports: [IonBadge, IonIcon, IonCardSubtitle, IonCardContent, IonCardTitle, IonInfiniteScrollContent, IonImg, IonInfiniteScroll, IonSearchbar, IonCard, IonCardHeader, IonContent, FormsModule, HeaderComponent]
+  imports: [IonBadge, IonIcon, IonCardSubtitle, IonCardContent, IonCardTitle, IonInfiniteScrollContent, IonInfiniteScroll, IonSearchbar, IonCard, IonCardHeader, IonContent, FormsModule, HeaderComponent]
 })
 export class BrowseUploadPage implements OnInit {
   private router = inject(Router)
@@ -75,7 +76,7 @@ export class BrowseUploadPage implements OnInit {
   }
 
   OnIonInfinite(event: InfiniteScrollCustomEvent) {
-    console.info("Congratz, you found the infinite scroll ! But there is no more music to load :)")
+    productionConsole.info("Congratz, you found the infinite scroll ! But there is no more music to load :)")
     event.target.complete()
   }
 }

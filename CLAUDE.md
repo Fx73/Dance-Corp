@@ -9,6 +9,14 @@ Always write commit messages in English.
 
 If you identify a bug, error, code smell, or unexpected behavior that is not related to the current task, add an entry to [Documentation/KNOWN_ISSUES.md](Documentation/KNOWN_ISSUES.md). Do not expand the scope of the ongoing work to fix unrelated issues unless explicitly instructed to do so.
 
+## Missing Features
+
+If you identify a missing feature (an unsupported part of a file format, a game mechanic, some content), add an entry to [Documentation/MISSING_FEATURES.md](Documentation/MISSING_FEATURES.md):
+- **High priority** if its absence blocks part of the game (some songs or charts cannot be played correctly).
+- **Low priority** if it is optional content that blocks nothing.
+
+Do not implement it unless explicitly instructed to do so.
+
 ## Tracking Untested Changes
 For each commit, for every modification that may have runtime impact and that you were unable to verify yourself, add a verification entry to [Documentation/TO_VERIFY.md](Documentation/TO_VERIFY.md) using the following format:
 
@@ -52,6 +60,7 @@ Write new code the way the existing code is written. Known deviations to avoid a
 - DTOs are classes, not interfaces: default values on fields, an optional constructor that parses raw input, a `static FromJSON()` that rebuilds nested instances, and `DeepClone()` when copies are needed.
 - Keep the three layers: Firestore service (remote access) → cache service (localStorage + in-memory) → page. Pages never call Firestore directly when a cache service exists.
 - Firestore service methods check authentication first, wrap the call in `try/catch`, show a toast on success and on error, and rethrow.
+- Logging: `console.log` only for informative traces at strategic points (loading, sync, game lifecycle), with useful data. Never in per-frame or per-arrow paths: add those only temporarily to track a specific bug. In production (`environment.production`), `SilenceConsole()` mutes everything except `console.error` and `productionConsole` (used by the toasts, and for messages meant for the end user).
 - User feedback goes through the static helpers `AppComponent.PresentOkToast()` / `PresentWarningToast()` / `PresentErrorToast()`, usable from any layer. Avoid showing a second toast in the page for an action whose service already shows one.
 - State shared with templates uses Angular signals. Components are standalone; dependencies are injected with `inject()` (see member order above), not through the constructor.
 

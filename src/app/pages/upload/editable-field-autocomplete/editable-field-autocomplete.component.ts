@@ -77,7 +77,6 @@ export class MusicEditableFieldAutocompleteComponent<T extends string | null | u
 
   SelectGenre(g: string) {
     const current = this.value || ''
-    console.log(' value   genre:', g)
 
     const parts = current.split(',')
     parts[parts.length - 1] = ' ' + g

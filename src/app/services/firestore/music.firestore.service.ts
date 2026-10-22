@@ -63,7 +63,6 @@ export class MusicFirestoreService {
             const current = (await getDoc(musicRef)).data()
             if (!current) throw new Error("Music not found")
             for (const field of this.protectedFields) {
-                console.log(`Checking field "${field}" : `, current[field], dto[field])
                 if (!DeepEqual(dto[field], current[field]))
                     throw new Error(`Field "${field}" cannot be modified after upload.`)
             }
@@ -239,7 +238,6 @@ export class MusicFirestoreService {
         const existing = snap.data()!['genres'] ?? []
 
         if (normalized.every((g: string) => existing.includes(g))) {
-            console.log("No new genres to add")
             return
         }
         const merged = Array.from(new Set([...existing, ...normalized]))
@@ -309,8 +307,6 @@ export class MusicFirestoreService {
         const toUpdateMusicIds = Object.entries(updates).filter(([, ts]) => ts > lastUpdateTimestamp).map(([id]) => id)
 
         // 5) Find new musics and deleted musics by comparing the list of ids
-        console.log("Remote IDs:", remoteIds)
-        console.log("Known IDs:", Array.from(knownIds))
         const newMusicIds = remoteIds.filter(id => !knownIds.has(id))
         const toDeleteMusicIds = Array.from(knownIds).filter(id => !remoteIds.includes(id))
 

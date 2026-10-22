@@ -10,11 +10,11 @@ import { DancePadGamepad } from "../game-controller/dancepad-gamepad"
 import { DancePadKeyboard } from '../game-controller/dancepad-keyboard'
 import { NoteDataDto } from "./music.dto"
 import { Player } from "./player"
+import { SatisfactionType } from "../constants/satisfaction-type.enum"
 
 export class GameRound {
     //#region App Constants
     readonly ArrowDirection = ArrowDirection
-    readonly MAX_SCORE = 1000000
     //#endregion
 
     // Sound
@@ -30,7 +30,7 @@ export class GameRound {
     //Game variables
     private isTrainingMode = false
     public score: number = 0
-    public performance: number = 50
+    public performance: number = CONFIG.PERFORMANCE.START
     public currentArrowIndex: number = 0 // Tracks the last note out of game
     public isFailed = false
     public isFinished = false
@@ -59,7 +59,7 @@ export class GameRound {
 
         if (isTrainingMode) {
             this.isTrainingMode = true
-            this.performance = 100
+            this.performance = CONFIG.PERFORMANCE.MAX
         }
     }
 
@@ -74,8 +74,8 @@ export class GameRound {
         const totalWeight = totalTaps + totalHoldTime
 
         // Point attribution
-        const tapPoints = this.MAX_SCORE * (totalTaps / totalWeight)
-        const holdPoints = this.MAX_SCORE * (totalHoldTime / totalWeight)
+        const tapPoints = CONFIG.SCORE.MAX * (totalTaps / totalWeight)
+        const holdPoints = CONFIG.SCORE.MAX * (totalHoldTime / totalWeight)
 
         this.scorePerArrow = tapPoints / totalTaps
         this.scorePerHoldBeat = holdPoints / totalHoldTime
@@ -122,11 +122,9 @@ export class GameRound {
         if (arrow.type === ArrowType.Mine) {
             if (!arrow.isPressed && padArrowState === ArrowState.Press) {
                 this.MineHit(arrow)
-                console.log(`Hit mine at beat ${arrow.beatPosition}.`)
             } else {
-                if (currentBeat > arrow.beatPosition + 1) {
+                if (currentBeat > arrow.beatPosition + CONFIG.JUDGMENT.MINE_PASS_DELAY) {
                     this.MinePassed(arrow)
-                    console.log(`Missed mine at beat ${arrow.beatPosition}.`)
                 }
             }
 
@@ -149,35 +147,30 @@ export class GameRound {
             return
         }
 
-        if (currentBeat > arrow.beatPosition + (2 * tolerance)) {
+        if (currentBeat > arrow.beatPosition + (CONFIG.JUDGMENT.MISS_WINDOW * tolerance)) {
             arrow.isMissed = true
             this.ArrowMissed(arrow)
-            console.log(`Missed arrow at beat ${arrow.beatPosition}.`)
             return
         }
 
         if (padArrowState === ArrowState.Press) {
             if (currentBeat > arrow.beatPosition + tolerance) {
                 this.ArrowAlmost(arrow)
-                console.log(`Almost arrow at beat ${arrow.beatPosition}.`)
                 return
             }
             const difference = Math.abs(arrow.beatPosition - currentBeat)
 
-            if (difference <= tolerance * 0.25) {
+            if (difference <= tolerance * CONFIG.JUDGMENT.PERFECT_WINDOW) {
                 // Perfect: Very close to the beat
                 this.ArrowPerfect(arrow)
-                console.log(`Perfect arrow at beat ${arrow.beatPosition}.`)
                 return
-            } else if (difference <= tolerance * 0.5) {
+            } else if (difference <= tolerance * CONFIG.JUDGMENT.GREAT_WINDOW) {
                 // Great: Slightly off but close enough
                 this.ArrowGreat(arrow)
-                console.log(`Great arrow at beat ${arrow.beatPosition}.`)
                 return
             } else if (difference <= tolerance) {
                 // Good: Further off but still acceptable
                 this.ArrowGood(arrow)
-                console.log(`Good arrow at beat ${arrow.beatPosition}.`)
                 return
             }
         }
@@ -185,82 +178,82 @@ export class GameRound {
 
     ArrowPerfect(arrow: Arrow) {
         arrow.Perfect()
-        this.UpdatePerformance(2)
+        this.UpdatePerformance(CONFIG.PERFORMANCE.PERFECT)
         this.score += this.scorePerArrow
         this.comboCount++
         this.precisionMessage.push(arrow)
 
-        this.announcerService.ChangeSatisfaction(2, 4)
+        this.announcerService.ChangeSatisfaction(SatisfactionType.Perfect, CONFIG.ANNOUNCER.SATISFACTION.PERFECT)
     }
 
     ArrowGreat(arrow: Arrow) {
         arrow.Great()
-        this.UpdatePerformance(1)
-        this.score += this.scorePerArrow * 0.8
+        this.UpdatePerformance(CONFIG.PERFORMANCE.GREAT)
+        this.score += this.scorePerArrow * CONFIG.SCORE.GREAT_RATIO
         this.comboCount++
         this.precisionMessage.push(arrow)
 
-        if (this.comboCount >= 10)
-            this.announcerService.ChangeSatisfaction(2, 2)
+        if (this.comboCount >= CONFIG.ANNOUNCER.GREAT_COMBO)
+            this.announcerService.ChangeSatisfaction(SatisfactionType.Perfect, CONFIG.ANNOUNCER.SATISFACTION.GREAT_IN_COMBO)
         else
-            this.announcerService.ChangeSatisfaction(1, 4)
+            this.announcerService.ChangeSatisfaction(SatisfactionType.Good, CONFIG.ANNOUNCER.SATISFACTION.GREAT)
     }
 
     ArrowGood(arrow: Arrow) {
         arrow.Good()
-        this.UpdatePerformance(1)
-        this.score += this.scorePerArrow * 0.6
+        this.UpdatePerformance(CONFIG.PERFORMANCE.GOOD)
+        this.score += this.scorePerArrow * CONFIG.SCORE.GOOD_RATIO
         this.comboCount++
         this.precisionMessage.push(arrow)
 
-        if (this.comboCount >= 20)
-            this.announcerService.ChangeSatisfaction(2, 1)
+        if (this.comboCount >= CONFIG.ANNOUNCER.GOOD_COMBO)
+            this.announcerService.ChangeSatisfaction(SatisfactionType.Perfect, CONFIG.ANNOUNCER.SATISFACTION.GOOD_IN_COMBO)
         else
-            this.announcerService.ChangeSatisfaction(1, 2)
+            this.announcerService.ChangeSatisfaction(SatisfactionType.Good, CONFIG.ANNOUNCER.SATISFACTION.GOOD)
     }
 
     ArrowAlmost(arrow: Arrow) {
         arrow.Almost()
-        this.UpdatePerformance(- 3)
-        this.score += this.scorePerArrow * 0.2
+        this.UpdatePerformance(CONFIG.PERFORMANCE.ALMOST)
+        this.score += this.scorePerArrow * CONFIG.SCORE.ALMOST_RATIO
         this.comboCount = 0
         this.precisionMessage.push(arrow)
 
-        this.announcerService.ChangeSatisfaction(0, 1)
+        this.announcerService.ChangeSatisfaction(SatisfactionType.Fail, CONFIG.ANNOUNCER.SATISFACTION.ALMOST)
     }
 
     ArrowMissed(arrow: Arrow) {
         arrow.Missed()
-        this.UpdatePerformance(-4)
+        this.UpdatePerformance(CONFIG.PERFORMANCE.MISS)
         this.comboCount = 0
         this.precisionMessage.push(arrow)
 
-        this.announcerService.ChangeSatisfaction(0, 4)
+        this.announcerService.ChangeSatisfaction(SatisfactionType.Fail, CONFIG.ANNOUNCER.SATISFACTION.MISS)
     }
 
     ArrowOk(arrow: Arrow) {
         arrow.Ok()
         const arrowLength = arrow.beatEnd! - arrow.beatPosition
-        this.performance = Math.min(100, this.performance + arrowLength)
+        this.performance = Math.min(CONFIG.PERFORMANCE.MAX, this.performance + arrowLength)
         this.score += arrowLength * this.scorePerHoldBeat
         this.precisionMessage.push(arrow)
 
-        if (this.comboCount >= 10)
-            this.announcerService.ChangeSatisfaction(2, 1)
+        if (this.comboCount >= CONFIG.ANNOUNCER.HOLD_COMBO)
+            this.announcerService.ChangeSatisfaction(SatisfactionType.Perfect, CONFIG.ANNOUNCER.SATISFACTION.HOLD_IN_COMBO)
         else
-            this.announcerService.ChangeSatisfaction(1, 2)
+            this.announcerService.ChangeSatisfaction(SatisfactionType.Good, CONFIG.ANNOUNCER.SATISFACTION.HOLD)
     }
 
     MineHit(arrow: Arrow) {
         arrow.Boom()
-        this.UpdatePerformance(-20)
+        this.UpdatePerformance(CONFIG.PERFORMANCE.MINE_HIT)
         this.comboCount = 0
         this.precisionMessage.push(arrow)
 
         this.mineHitSound.currentTime = 0
         this.mineHitSound.play()
 
-        this.announcerService.ChangeSatisfaction(0, 10)
+        this.announcerService.ChangeSatisfaction(SatisfactionType.Fail, CONFIG.ANNOUNCER.SATISFACTION.MINE_HIT)
     }
 
     MinePassed(arrow: Arrow) {
@@ -273,8 +266,8 @@ export class GameRound {
 
         this.performance += amount
 
-        if (this.performance > 100)
-            this.performance = 100
+        if (this.performance > CONFIG.PERFORMANCE.MAX)
+            this.performance = CONFIG.PERFORMANCE.MAX
         else if (this.performance < 0)
             this.performance = 0
 

@@ -71,4 +71,8 @@ export class DancePadGamepad implements IDancePad {
         return !this.currentState.has(buttonIndex) && this.previousState.has(buttonIndex)
     }
 
+    public Destroy(): void {
+        // Nothing to release: the gamepad is polled
+    }
+
 }

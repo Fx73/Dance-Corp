@@ -1,6 +1,6 @@
 import { NgClass, NgStyle, } from '@angular/common'
-import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren, inject, signal } from '@angular/core'
-import { InfiniteScrollCustomEvent, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonImg, IonInfiniteScroll, IonInfiniteScrollContent, IonMenu, IonSearchbar, IonSplitPane, IonText, SearchbarCustomEvent } from '@ionic/angular'
+import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, QueryList, ViewChildren, inject, signal } from '@angular/core'
+import { InfiniteScrollCustomEvent, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonInfiniteScroll, IonInfiniteScrollContent, IonMenu, IonSearchbar, IonSplitPane, IonText, SearchbarCustomEvent } from '@ionic/angular'
 import { MusicDto, NoteDataDto } from 'src/app/game/game-model/music.dto'
 import { IMusicPlayer, MusicOrigin, MusicPlayerCommon } from 'src/app/game/music-player/IMusicPlayer'
 import { UserMusicDto, UserNoteDto } from '../user-profile/user.dto'
@@ -26,6 +26,7 @@ import { HeaderComponent } from "src/app/shared/component/header/header.componen
 import { RadarScoreComponent } from "src/app/shared/component/radar-score/radar-score.component"
 import { MusicCacheService } from '../../services/local-storage/music.cache.service'
 import { PresenceService } from '../../services/thirdpartyapp/presence.service'
+import { productionConsole } from 'src/app/shared/console-output'
 import { GradeComponent } from "../../shared/component/grade/grade.component"
 import { DifficultyCriteria } from '../upload/DifficultyCriteria'
 import { UserFirestoreService } from './../../services/firestore/user.firestore.service'
@@ -36,9 +37,9 @@ import { SoundService } from './../../services/gameplay/sound.service'
   templateUrl: './browse.page.html',
   styleUrls: ['./browse.page.scss'],
   standalone: true,
-  imports: [IonBadge, IonSplitPane, IonCardSubtitle, IonMenu, IonText, IonCardContent, IonCardTitle, IonInfiniteScrollContent, IonImg, IonInfiniteScroll, IonSearchbar, IonCard, IonCardHeader, IonContent, NgStyle, NgClass, FormsModule, HeaderComponent, GradeComponent, RadarScoreComponent, MusicPlayerYoutubeComponent, MusicPlayerLocalComponent, MusicPlayerSoundcloudComponent]
+  imports: [IonBadge, IonSplitPane, IonCardSubtitle, IonMenu, IonText, IonCardContent, IonCardTitle, IonInfiniteScrollContent, IonInfiniteScroll, IonSearchbar, IonCard, IonCardHeader, IonContent, NgStyle, NgClass, FormsModule, HeaderComponent, GradeComponent, RadarScoreComponent, MusicPlayerYoutubeComponent, MusicPlayerLocalComponent, MusicPlayerSoundcloudComponent]
 })
-export class BrowsePage implements OnInit {
+export class BrowsePage implements OnInit, OnDestroy {
   //#region Constants
   readonly SOUND_ARROW_UP = new Audio('assets/Sounds/menuFx/arrow_up.ogg')
   readonly SOUND_ARROW_DOWN = new Audio('assets/Sounds/menuFx/arrow_down.ogg')
@@ -101,6 +102,10 @@ export class BrowsePage implements OnInit {
     window.removeEventListener('keydown', this.KeyHandler)
     this.isListeningInput = false
     this.sampleLoopActive = false
+  }
+
+  ngOnDestroy() {
+    this.dancepad.forEach(pad => pad.Destroy())
   }
 
   InitPlayerInput() {
@@ -246,7 +251,7 @@ export class BrowsePage implements OnInit {
   }
 
   OnIonInfinite(event: InfiniteScrollCustomEvent) {
-    console.info("Congratz, you found the infinite scroll ! But there is no more music to load :)")
+    productionConsole.info("Congratz, you found the infinite scroll ! But there is no more music to load :)")
     event.target.complete()
   }
 
@@ -287,7 +292,9 @@ export class BrowsePage implements OnInit {
   async RunGame(): Promise<void> {
     const selectedMusic = this.GetSelectedMusic(this.selectedMusicIndex())
     if (!selectedMusic) return
-    console.log("Selected music for game:", selectedMusic, "with notes:", this.musicNotes())
+    // Charts are sent by name: selectedNotesIndex indexes the filtered and sorted musicNotes, not music.noteData
+    const chartNames = this.selectedNotesIndex().map(index => this.musicNotes()[index]?.chartName)
+    if (chartNames.some(name => !name)) return
     await this.musicCacheService.UpdateCacheMusic(selectedMusic.id)
 
     for (let i = 0; i < this.selectedNotesIndex().length; i++) {
@@ -301,7 +308,7 @@ export class BrowsePage implements OnInit {
 
     this.router.navigate(['/play/game', selectedMusic.id], {
       queryParams: {
-        notes: this.selectedNotesIndex(),
+        notes: chartNames,
       }
     })
   }

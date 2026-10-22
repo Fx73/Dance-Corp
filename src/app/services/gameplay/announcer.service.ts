@@ -1,5 +1,7 @@
 import { Injectable, inject } from "@angular/core"
 import { UserConfigService } from "../userconfig.service"
+import { CONFIG } from "src/app/game/constants/game-config"
+import { SatisfactionType } from "src/app/game/constants/satisfaction-type.enum"
 
 /** Content of the assets/Sounds/announcers/*.json files */
 interface ISoundBank {
@@ -45,19 +47,18 @@ export class AnnouncerService {
         this.preferredAnnouncer = this.Random(this.announcers)
     }
 
-    ChangeSatisfaction( type: number, amount: number) {
-        // type: 0 = fail, 1 = good, 2 = perfect
-        if (type === 0) {
+    ChangeSatisfaction(type: SatisfactionType, amount: number) {
+        if (type === SatisfactionType.Fail) {
             this.failSatisfaction += amount
             this.goodSatisfaction -=1
             this.perfectSatisfaction -=2
         }
-        else if (type === 1) {
+        else if (type === SatisfactionType.Good) {
             this.goodSatisfaction += amount
             this.failSatisfaction -=1
             this.perfectSatisfaction -=1
         }
-        else if (type === 2) {
+        else if (type === SatisfactionType.Perfect) {
             this.perfectSatisfaction += amount
             this.failSatisfaction -=2
             this.goodSatisfaction -=1
@@ -67,27 +68,26 @@ export class AnnouncerService {
         this.goodSatisfaction = Math.max(0, this.goodSatisfaction)
         this.perfectSatisfaction = Math.max(0, this.perfectSatisfaction)
 
-        if (this.failSatisfaction > 30) {
+        if (this.failSatisfaction > CONFIG.ANNOUNCER.COMBO_LINE_THRESHOLD) {
             this.PlayAnnouncer("combo_fail")
             this.failSatisfaction = 0
             this.goodSatisfaction /= 2
             this.perfectSatisfaction /= 2
         }
-        else if (this.goodSatisfaction > 30) {
+        else if (this.goodSatisfaction > CONFIG.ANNOUNCER.COMBO_LINE_THRESHOLD) {
             this.PlayAnnouncer("combo_good")
             this.goodSatisfaction = 0
             this.failSatisfaction /= 2
             this.perfectSatisfaction /= 2
         }
-        else if (this.perfectSatisfaction > 30) {
+        else if (this.perfectSatisfaction > CONFIG.ANNOUNCER.COMBO_LINE_THRESHOLD) {
             this.PlayAnnouncer("combo_perfect")
-            this.PlayCrowdOneShot("applause_light", 4000)
+            this.PlayCrowdOneShot("applause_light")
             this.perfectSatisfaction = 0
             this.failSatisfaction /= 2
             this.goodSatisfaction /= 2
         }
 
-        console.log(`Satisfaction - Fail: ${this.failSatisfaction}, Good: ${this.goodSatisfaction}, Perfect: ${this.perfectSatisfaction}`)
     }
 
     PlayAnnouncer(category: string) {
@@ -159,7 +159,6 @@ export class AnnouncerService {
     }
 
     async PlayCountdownFromAnnouncer(delayMs: number = 1000) {
-        console.log("Request to play countdown from announcer received")
         if (!this.preferredAnnouncer || this.isQueueBlocked) return
 
         const announcer = this.preferredAnnouncer.lines["countdown"] ? this.preferredAnnouncer : this.announcers.find(ann => ann.lines["countdown"])
@@ -204,7 +203,7 @@ export class AnnouncerService {
     // -------------------------
     // CROWD / AMBIANCE
     // -------------------------
-    PlayCrowdOneShot(type: string, fadeOutMs: number = 4000) {
+    PlayCrowdOneShot(type: string, fadeOutMs: number = CONFIG.ANNOUNCER.CROWD_FADE_OUT_MS) {
         const list = this.crowd.lines[type]
         if (!list) return
 
@@ -250,7 +249,7 @@ export class AnnouncerService {
         const stepTime = fadeDuration / fadeSteps
         const volumeStep = audio.volume / fadeSteps
 
-        setTimeout(() => {
+        const ScheduleFadeOut = () => setTimeout(() => {
             let currentStep = 0
             const fadeInterval = setInterval(() => {
                 currentStep++
@@ -263,6 +262,10 @@ export class AnnouncerService {
                 }
             }, stepTime)
         }, audio.duration * 1000 - fadeDuration) // start the fade-out before the end
+
+        // duration is NaN until the metadata is loaded
+        if (audio.readyState >= HTMLMediaElement.HAVE_METADATA) ScheduleFadeOut()
+        else audio.addEventListener("loadedmetadata", ScheduleFadeOut, { once: true })
 
         return audio
     }

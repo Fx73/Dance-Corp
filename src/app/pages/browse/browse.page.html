@@ -26,7 +26,7 @@
           @let userNote = GetUserNote(note.chartName);
           <ion-card class="note-card" (mouseenter)="OnSelectNote($index)" (click)="RunGame()" [style.backgroundColor]="GetNoteColor(note.difficulty)">
             <ion-card-content>
-              <ion-img class="player-number-icon" [src]="note.stepsType === DanceType.DanceSingle ? 'assets/Icons/SingleDance.png' : 'assets/Icons/DoubleDance.png'"></ion-img>
+              <img class="player-number-icon" [src]="note.stepsType === DanceType.DanceSingle ? 'assets/Icons/SingleDance.png' : 'assets/Icons/DoubleDance.png'" [alt]="note.stepsType" />
               <div class="badge-container" [style.--badge-left]="'4vw'">
                 @for (playerIndex of GetPlayersForNote($index); track playerIndex) {
                 <ion-badge slot="end" class="player-badge" [style.backgroundColor]="GetPlayerColor(playerIndex)">{{ playerIndex + 1 }}</ion-badge>
@@ -61,7 +61,7 @@
           <!-- Edited music -->
           @for (music of storedMusics(); track $index) {
           <ion-card #musicCard (click)="OnSelectMusic($index)" class="basicCard music-card stored-card" [ngClass]="selectedMusic?.id === music.id ? 'selectedCard' : ''">
-            <ion-img [src]="'https://'+music.jacket"></ion-img>
+            <img [src]="'https://'+music.jacket" [alt]="music.title" loading="lazy" />
             <ion-card-header>
               <ion-card-title>{{ music.title }}</ion-card-title>
               <ion-card-subtitle>{{ music.artist }}</ion-card-subtitle>
@@ -75,7 +75,7 @@
           <!-- Music cards -->
           @for (music of dbMusics(); track $index) {
           <ion-card #musicCard (click)="OnSelectMusic($index + storedMusics.length)" class="basicCard music-card" [ngClass]="selectedMusic?.id === music.id ? 'selectedCard' : ''">
-            <ion-img [src]="'https://'+music.jacket"></ion-img>
+            <img [src]="'https://'+music.jacket" [alt]="music.title" loading="lazy" />
             <ion-card-header>
               <ion-card-title>{{ music.title }}</ion-card-title>
               <ion-card-subtitle>{{ music.artist }}</ion-card-subtitle>

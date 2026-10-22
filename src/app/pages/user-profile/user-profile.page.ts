@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core'
-import { IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonContent, IonImg, IonItem, IonLabel, IonText } from '@ionic/angular'
+import { IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonContent, IonItem, IonLabel, IonText } from '@ionic/angular'
 
 import { AccountComponent } from "./account/account.component"
 
@@ -15,7 +15,7 @@ import { UserDto } from './user.dto'
   templateUrl: './user-profile.page.html',
   styleUrls: ['./user-profile.page.scss'],
   standalone: true,
-  imports: [IonLabel, IonImg, IonCardContent, IonCardTitle, IonCardHeader, IonItem, IonBadge, IonCard, IonText, IonContent, FormsModule, AccountComponent, HeaderComponent]
+  imports: [IonLabel, IonCardContent, IonCardTitle, IonCardHeader, IonItem, IonBadge, IonCard, IonText, IonContent, FormsModule, AccountComponent, HeaderComponent]
 })
 export class UserProfilePage {
   userAuth: User

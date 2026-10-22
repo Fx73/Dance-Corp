@@ -97,10 +97,8 @@ export class UserCacheService {
     }
 
     public UpdateUserStatsFromRound(musicId: string, noteId: string, gameRound: GameRound) {
-        console.log(this.userMusics)
         // 1. Ensure registry entry exists
         let music = this.userMusics.find(m => m.id === musicId)
-        console.log("found", musicId, music)
         if (!music) {
             music = new UserMusicDto(musicId)
             this.userMusics.push(music)
@@ -109,7 +107,6 @@ export class UserCacheService {
                 localStorage.setItem(this.USERMUSIC_REGISTRY_KEY, JSON.stringify(Array.from(this.registry)))
             }
         }
-        console.log(music)
 
         // 3. Ensure note exists
         let note = music.notes.find(n => n.id === noteId)
@@ -117,11 +114,9 @@ export class UserCacheService {
             note = new UserNoteDto(noteId)
             music.notes.push(note)
         }
-        console.log(music)
 
         // 4. Update music stats
         music.timesPlayed += 1
-        console.log(music)
 
         note.passed = note.passed || gameRound.isFinished
         note.timesPlayed += 1
@@ -135,7 +130,6 @@ export class UserCacheService {
         localStorage.setItem(this.USERMUSIC_STORAGE_KEY(musicId), JSON.stringify(music))
 
         // 7. Update Firestore
-        console.log(music)
         this.userFirestoreService.UpdateUserStatsFromRound(music, gameRound)
     }
 

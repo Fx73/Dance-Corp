@@ -1,7 +1,7 @@
 import { CommonModule, Location } from '@angular/common'
 import { ChangeDetectorRef, Component, ElementRef, QueryList, ViewChild, ViewChildren, inject, signal } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonGrid, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonList, IonRow, IonSpinner, ModalController } from '@ionic/angular'
+import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonGrid, IonIcon, IonInput, IonItem, IonLabel, IonList, IonRow, IonSpinner, ModalController } from '@ionic/angular'
 import { BaseDirectory, mkdir, readDir, remove, writeFile } from '@tauri-apps/plugin-fs'
 import { addOutline, checkmarkCircle, closeCircle, folder, logoSoundcloud, logoYoutube, removeOutline, trashOutline } from 'ionicons/icons'
 import { Measures, MusicDto, NoteDataDto } from 'src/app/game/game-model/music.dto'
@@ -35,7 +35,7 @@ import { TestNoteComponent } from './test-note/test-note.component'
   templateUrl: './upload.page.html',
   styleUrls: ['./upload.page.scss'],
   standalone: true,
-  imports: [IonSpinner, MusicEditableFieldComponent, MusicEditableFieldAutocompleteComponent, MusicEditableListComponent, IonCardSubtitle, IonImg, IonCol, IonRow, IonGrid, IonInput, IonItem, IonLabel, IonList, FormsModule, IonIcon, IonButton, IonCardTitle, IonCardContent, IonCardHeader, IonCard, IonContent, CommonModule, FormsModule, HeaderComponent, IonButton, MusicPlayerYoutubeComponent, MusicPlayerSoundcloudComponent, MusicPlayerLocalComponent, RadarScoreComponent, MusicSelectComponent]
+  imports: [IonSpinner, MusicEditableFieldComponent, MusicEditableFieldAutocompleteComponent, MusicEditableListComponent, IonCardSubtitle, IonCol, IonRow, IonGrid, IonInput, IonItem, IonLabel, IonList, FormsModule, IonIcon, IonButton, IonCardTitle, IonCardContent, IonCardHeader, IonCard, IonContent, CommonModule, FormsModule, HeaderComponent, IonButton, MusicPlayerYoutubeComponent, MusicPlayerSoundcloudComponent, MusicPlayerLocalComponent, RadarScoreComponent, MusicSelectComponent]
 })
 export class UploadPage {
   //#region Constants
@@ -94,7 +94,6 @@ export class UploadPage {
     this.fireStoreService.GetGenres().then(genres => this.genreOptions = genres)
 
     const musicId = this.route.snapshot.queryParamMap.get('music')
-    console.log("UploadPage initialized with musicId:", musicId)
     if (musicId) {
       this.StartLoad(musicId)
     }
@@ -109,7 +108,6 @@ export class UploadPage {
       ...this.selects.filter(s => this.metadataCard.nativeElement.contains(s.elementRef.nativeElement)),
     ]
 
-    console.log("Metadata dirty check:", cardMetadata.map(c => ({ label: c.label, isDirty: c.isDirty })))
     this.metadataDirty.set(
       cardMetadata.some(c => c.isDirty)
     )
@@ -141,12 +139,10 @@ export class UploadPage {
     this.LoadLocalMusic(musicId)
     await this.LoadDbMusic(musicId)
 
-    if (!this.musicData) {
-      if (!this.musicDataDb) {
-        AppComponent.PresentErrorToast("Music not found in local storage or database.")
-        return
-      }
-      this.musicData = this.musicDataDb.DeepClone()
+    if (!this.isEditLocal() && !this.musicDataDb) {
+      this.isLoading = false
+      this.cd.markForCheck()
+      AppComponent.PresentErrorToast("Music not found in local storage or database.")
     }
   }
 
@@ -488,7 +484,6 @@ export class UploadPage {
       },
       cssClass: 'large-modal'
     })
-    console.log("TestNoteComponent created with noteData:", modal)
     await modal.present()
   }
 

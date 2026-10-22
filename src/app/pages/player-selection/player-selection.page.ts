@@ -63,7 +63,7 @@ export class PlayerSelectionPage {
   }
 
   get allPlayersReady(): boolean {
-    return this.userConfigService.players.every(player => player.gamepad?.id && player.gamepad.index !== null)
+    return this.userConfigService.ArePlayersReady()
   }
 
   GetPlayerStatus(): string {

@@ -36,8 +36,7 @@ export class SccReader {
       }
     }
     if (tsvLines.length > 0) {
-      console.log("Analysis: title | targetScore | totalSteps | doubleSteps | chainedDoubleSteps | avgBpm | maxBpm | stepWithHoldCount | sameArrowRepeatCount | offBeatStepCount | tripleStepCount | mineCount | burstVariation ", tsvLines)
-      console.log(tsvLines.join('\n'))
+      console.log("Analysis: title | targetScore | totalSteps | doubleSteps | chainedDoubleSteps | avgBpm | maxBpm | stepWithHoldCount | sameArrowRepeatCount | offBeatStepCount | tripleStepCount | mineCount | burstVariation\n" + tsvLines.join('\n'))
     }
 
     return musicData
@@ -60,8 +59,6 @@ export class SccReader {
       const innerToken = match[1].trim()
       tokens.push(innerToken)
     }
-
-    //console.log("Tokens:", tokens);
 
     return tokens
   }
@@ -90,8 +87,6 @@ export class SccReader {
         tokenMap[lowerKey] = value
       }
     })
-
-    console.log("Token Map:", tokenMap)
 
     return tokenMap
   }
@@ -122,8 +117,6 @@ export class SccReader {
         tokenMap[lowerKey] = value
       }
     })
-
-    console.log("Token Map:", tokenMap)
 
     return tokenMap
   }
