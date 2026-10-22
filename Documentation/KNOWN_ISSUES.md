@@ -6,6 +6,13 @@ Bugs found but not fixed yet, and deprecations to migrate. Remove an entry once 
 
 ## Bugs
 
+- **Charts can be edited or deleted by any signed-in user**
+  Notes are embedded in `musics/{id}.noteData`, and Firestore rules cannot check each array element, so the "only the creator edits their chart" check exists only on the client. The `musics/{id}/notes` rule already enforces `creatorId`, but nothing uses that subcollection yet.
+  Possible fix: move the notes to the `notes` subcollection (data migration + `MusicFirestoreService` + cache).
+
+- **`UploadMusic` on an existing music drops its notes**
+  `setDoc` without `merge` replaces the whole document, and `noteData` is stripped from the written data, so re-uploading a music that already exists removes all its charts. The rules allow it, since `noteData` is not a protected field.
+
 - **Genre autocomplete: suggestions unreachable with the keyboard**
   `OnBlur` clears the suggestion list when the input loses focus, so pressing Tab to reach a suggestion closes the list first.
   Possible fix: arrow up/down + Enter navigation from the input, with `aria-activedescendant`.
