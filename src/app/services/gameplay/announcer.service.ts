@@ -60,7 +60,7 @@ export class AnnouncerService {
             this.failSatisfaction -=1
             this.perfectSatisfaction -=1
         }
-        else if (type === SatisfactionType.Perfect) {
+        else {
             this.perfectSatisfaction += amount
             this.failSatisfaction -=2
             this.goodSatisfaction -=1
@@ -224,7 +224,7 @@ export class AnnouncerService {
     // UTILS
     // -------------------------
     private GetAnnouncerVolume(): number {
-        return this.userConfigService.GetConfig()["announcersVolume"] ?? 1
+        return this.userConfigService.GetConfig()["announcersVolume"]
     }
 
     private Random<T>(arr: T[]): T {

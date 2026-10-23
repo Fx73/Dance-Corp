@@ -17,14 +17,15 @@ export class RadarScoreComponent implements AfterViewInit, OnChanges {
 
   @Input() size: number = 200
 
-  @ViewChild('radar') radar!: ElementRef<HTMLCanvasElement>
+  // Undefined until the view is created: ngOnChanges runs first
+  @ViewChild('radar') radar?: ElementRef<HTMLCanvasElement>
 
   ngAfterViewInit() {
     this.DrawRadar()
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['size'] || changes['scores']) {
+    if ('size' in changes || 'scores' in changes) {
       this.DrawRadar()
     }
   }
@@ -125,7 +126,7 @@ export class RadarScoreComponent implements AfterViewInit, OnChanges {
     for (let scoreIndex = 0; scoreIndex < this.scores.length; scoreIndex++) {
       const score = this.scores[scoreIndex]
       const values = this.labels.map((label, index) => {
-        const rawValue = score[label.toLowerCase() as CriteriaKey] ?? 0
+        const rawValue = score[label.toLowerCase() as CriteriaKey]
         const factor = this.normalizationFactor[index] ?? 1
         return Math.max(rawValue / factor, 0)
       })

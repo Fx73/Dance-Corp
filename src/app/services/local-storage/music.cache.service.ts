@@ -96,7 +96,7 @@ export class MusicCacheService {
     async UpdateCacheMusic(musicId: string) {
         try {
             const musics = await this.musicFirestoreService.GetMusicListWithId([musicId])
-            const music = musics[0]
+            const music = musics.at(0)
             if (!music) return
 
             this.PersistMusic(music)

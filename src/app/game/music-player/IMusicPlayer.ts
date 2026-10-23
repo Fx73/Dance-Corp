@@ -23,7 +23,7 @@ export class MusicPlayerCommon {
     size: { width: number | string, height: number | string } = { width: '1', height: '1' }
 
     public GetVolume(): number {
-        return this.userConfig.GetConfig()["musicVolume"] ?? 1
+        return this.userConfig.GetConfig()["musicVolume"]
     }
 
     //#region Statics

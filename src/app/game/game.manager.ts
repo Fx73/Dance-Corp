@@ -79,7 +79,7 @@ export class GameManager {
 
         const { beat: currentBeat, bps: currentBps } = this.beatManager.GetBeatAndBpsAtTime(elapsedTime)
 
-        if (this.music.bgChanges && this.music.bgChanges[this.currentBackgroundIndex + 1] && currentBeat >= this.music.bgChanges[this.currentBackgroundIndex + 1].time) {
+        if (this.currentBackgroundIndex + 1 < this.music.bgChanges.length && currentBeat >= this.music.bgChanges[this.currentBackgroundIndex + 1].time) {
             this.currentBackgroundIndex++
         }
 
@@ -100,7 +100,7 @@ export class GameManager {
     }
 
     public GetCurrentBackground(): string {
-        if (!this.music.bgChanges || this.music.bgChanges.length === 0) {
+        if (this.music.bgChanges.length === 0) {
             return CONFIG.GAME.DEFAULT_BACKGROUND
         }
         return "https://" + this.music.bgChanges[this.currentBackgroundIndex].value

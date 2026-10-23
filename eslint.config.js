@@ -51,6 +51,8 @@ module.exports = tseslint.config(
       '@typescript-eslint/no-unused-vars': ['warn', { ignoreRestSiblings: true }],
       // Async calls are awaited, or marked with void when they are fire-and-forget on purpose
       '@typescript-eslint/no-floating-promises': 'error',
+      // A check on a value that cannot be missing is removed; if the value can be missing, its type must say so
+      '@typescript-eslint/no-unnecessary-condition': 'error',
       '@angular-eslint/component-class-suffix': [
         'error',
         {

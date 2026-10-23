@@ -28,4 +28,4 @@ Nothing for now.
 ## Code style to harmonize
 
 - **Non-null assertions**: the assertions that were unnecessary for the type checker are removed. The remaining `!` are on values typed as nullable, some of which can really be null at runtime. Each one needs a guard or a type fix, which changes behavior: handle them with the related bugs.
-- **Unnecessary conditions**: `@typescript-eslint/no-unnecessary-condition` (not enabled) reports 29 conditions on values typed as always present: `??` defaults on `UserConfig` values and on DTO fields, truthy checks on `Record` lookups and on `SimpleChanges`. For each one, either the type tells the truth and the check can go, or the value can really be missing and the type must say so (`Partial<Record<…>>`, `| undefined`). Enable the rule once they are all handled.
+- **`ITimedChange.value` can be null**: `MusicEditableListComponent` writes the result of `SanitizeSscInput()` (`string | null`) back into values typed as `string | number`. Typing it `string | number | null` reaches every timed change: done with an `eslint-disable` for now.

@@ -264,12 +264,15 @@ export class BrowsePage implements OnInit, OnDestroy {
 
       const endTime = start + length
 
+      // sampleLoopActive changes during the await, which the type checker does not see
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       while (this.sampleLoopActive && player.GetCurrentTime() < endTime) {
         await Sleep(100)
       }
       player.Stop()
 
       let waited = 0
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       while (this.sampleLoopActive && waited < delay * 1000) {
         await Sleep(100)
         waited += 100
@@ -286,7 +289,7 @@ export class BrowsePage implements OnInit, OnDestroy {
     await this.musicCacheService.UpdateCacheMusic(selectedMusic.id)
 
     for (let i = 0; i < this.selectedNotesIndex().length; i++) {
-      const newDifficulty: NoteDifficulty = this.musicNotes()[this.selectedNotesIndex()[i]]?.difficulty
+      const newDifficulty = this.musicNotes().at(this.selectedNotesIndex()[i])?.difficulty
       const lastDifficulty = this.lastDifficultyPlayed[i]
       if (newDifficulty && newDifficulty !== lastDifficulty) {
         this.lastDifficultyPlayed[i] = newDifficulty

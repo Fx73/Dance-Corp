@@ -490,7 +490,7 @@ export class UploadPage {
   }
 
   NoNotes(): boolean {
-    if (!this.musicDataDb || !this.musicDataDb.noteData) return true
+    if (!this.musicDataDb) return true
     return this.musicDataDb.noteData.length === 0
   }
 

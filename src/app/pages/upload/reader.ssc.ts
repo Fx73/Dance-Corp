@@ -31,7 +31,7 @@ export class SccReader {
         evaluator.EvaluateCriterias()
         noteData.difficultyCriterias = evaluator.criterias
         console.log(noteData.meter, evaluator.criterias, evaluator.GetLevelFromCriterias())
-        tsvLines.push(evaluator.GenerateTsvLine(musicData.title ?? "", noteData.meter ?? 0))
+        tsvLines.push(evaluator.GenerateTsvLine(musicData.title ?? "", noteData.meter))
         noteData.meter = Math.round(evaluator.GetLevelFromCriterias())
       }
     }
