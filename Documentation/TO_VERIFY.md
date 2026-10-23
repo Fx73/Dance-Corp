@@ -448,3 +448,18 @@ Link: https://github.com/Fx73/Dance-Corp/commit/712590e559db82f8493536bdaabef72f
   - First load with an empty cache (Options, clear the music cache, reload): the whole catalog appears in browse
   - Play a music: it stays at the same place in the browse list
   - Upload, update and delete a music, upload and delete a chart: the browse lists follow, also after a reload
+
+## Commit: Remove unnecessary optional chains, type missing values truthfully
+Link: https://github.com/Fx73/Dance-Corp/commit/820fecd7d29bd013082e80c61626a091e38c2e56
+
+- src/app/game/game-model/music.dto.ts: SSC token maps typed as partial; a missing `#SAMPLESTART` / `#SAMPLELENGTH` gives `undefined` instead of `NaN`; a chart without `#DIFFICULTY`, `#METER` or `#NOTES` no longer throws (Challenge, 0, empty chart)
+- src/app/pages/upload/reader.ssc.ts: an empty `#BPMS` tag no longer throws
+- src/app/game/music-player/music-player-local/music-player-local.component.ts: the audio element is created with the component, its source is set in `ngOnInit`
+- src/app/services/gameplay/announcer.service.ts: announcer lines typed as partial, a random line skips a category without lines
+- src/app/pages/upload/upload.page.ts, src/app/services/firestore/music.firestore.service.ts: optional chains and null checks on values always present removed
+
+→ To verify:
+  - Upload a `.sm` and a `.ssc` file, with and without `#SAMPLESTART`: the browse sample starts at the given time, or at 0
+  - Upload page: the genre suggestions load
+  - Desktop: a local song plays in browse and in game
+  - Announcers still speak during a game and in the menus
