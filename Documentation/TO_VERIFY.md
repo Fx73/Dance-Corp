@@ -426,3 +426,15 @@ Link: https://github.com/Fx73/Dance-Corp/commit/17548287a100f9c411a4e3de4f018254
   - Leave the game during the countdown or the wait: no toast and no navigation afterwards
   - Open the app and play with a pad only, without any click: the music starts, or the game goes back to browse after 15 s
   - Upload page, chart test with an unavailable music: error toast, the modal closes
+
+## Commit: Pass charts instead of indexes to the game, keep the browse chart selection valid
+Link: https://github.com/Fx73/Dance-Corp/commit/6654a7d8eb9ce4a23c6449dabcb85d66c2af3b76
+
+- src/app/game/game.manager.ts, src/app/game/game.page.ts: `GameManager` takes the selected `NoteDataDto` instead of indexes in `music.noteData`
+- src/app/pages/upload/test-note/test-note.component.ts: the chart test plays the tested chart (it always played the first one), with the real `UserCacheService` and `AnnouncerService` (null before, which made `GameManager` throw)
+- src/app/pages/browse/browse.page.ts: on a music change, each player's chart selection is clamped to the new music's charts; unused `TrySetSelectedMusicById` removed
+
+→ To verify:
+  - A game in single and multiplayer plays the selected charts, and the score is saved on the right chart
+  - Upload page: testing a chart other than the first plays that chart; the announcer may now react during the test
+  - Browse: select the last chart of a music with many charts, move to a music with fewer: its last chart is selected, and Enter starts the game
