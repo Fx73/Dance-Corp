@@ -23,8 +23,7 @@ Bugs found but not fixed yet, and deprecations to migrate. Remove an entry once 
 
 ## Improvements
 
-- **Duplicated persistence block in `MusicCacheService`**
-  "update `musics` + `localStorage.setItem` + `registry.add` + save registry" is repeated about 8 times. Extract a `PersistMusic(music)` / `RemoveMusic(id)` helper.
+Nothing for now.
 
 ## Code style to harmonize
 
