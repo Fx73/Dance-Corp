@@ -23,14 +23,7 @@ Bugs found but not fixed yet, and deprecations to migrate. Remove an entry once 
 
 ## Improvements
 
-- **Pass identifiers, not indexes, across pages and layers**
-  Charts now travel by `chartName` from browse to the game, but music and player indexes still do (`selectedMusicIndex` over two concatenated lists, `noteSelected` in `GameManager`). Prefer `music.id` / `chartName`.
-
-- **Floating promises**
-  Async calls are often fired without `await` (`AddGenres()`, `UpdateMusicIndex()`, `UpdateCache()` in `catch` blocks, `DeleteNoteInBase()` followed by `LoadDbMusic()`). Await them, or mark intentional ones with `void`. The ESLint rule `@typescript-eslint/no-floating-promises` would list them all. Also review the 4 empty `catch { }` blocks that swallow errors.
-
-- **Duplicated persistence block in `MusicCacheService`**
-  "update `musics` + `localStorage.setItem` + `registry.add` + save registry" is repeated about 8 times. Extract a `PersistMusic(music)` / `RemoveMusic(id)` helper.
+Nothing for now.
 
 ## Code style to harmonize
 

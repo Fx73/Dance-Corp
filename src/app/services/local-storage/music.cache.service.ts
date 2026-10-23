@@ -24,11 +24,8 @@ export class MusicCacheService {
         this.registry = new Set(JSON.parse(localStorage.getItem(this.MUSIC_REGISTRY_KEY) ?? '[]'))
 
         for (const id of this.registry) {
-            const raw = localStorage.getItem(this.MUSIC_STORAGE_KEY(id))
-            if (!raw) continue
-            try {
-                this.musics.push(MusicDto.FromJSON(JSON.parse(raw)))
-            } catch { }
+            const music = this.ReadCachedMusic(id)
+            if (music) this.musics.push(music)
         }
 
     }
@@ -37,15 +34,24 @@ export class MusicCacheService {
         return this.musics.filter(m => this.localMusicService.registry.has(m.id) === false)
     }
 
+    /** Never throws: a failed update is reported with a toast, and the cache keeps its previous state */
     async UpdateCache() {
+        try {
+            await this.FetchCacheUpdate()
+        } catch (error) {
+            AppComponent.PresentErrorToast("Failed to update the music list: " + error)
+        }
+    }
+
+    private async FetchCacheUpdate() {
         const ts = parseInt(localStorage.getItem(this.MUSIC_REGISTRY_TS_KEY) || '0')
         if (ts === 0) {
-            this.musics = await this.musicFirestoreService.GetAllMusics()
-            for (const music of this.musics) {
-                localStorage.setItem(this.MUSIC_STORAGE_KEY(music.id), JSON.stringify(music))
-                this.registry.add(music.id)
+            const allMusics = await this.musicFirestoreService.GetAllMusics()
+            this.musics = []
+            for (const music of allMusics) {
+                this.PersistMusic(music)
             }
-            localStorage.setItem(this.MUSIC_REGISTRY_KEY, JSON.stringify(Array.from(this.registry)))
+            this.SaveRegistry()
             localStorage.setItem(this.MUSIC_REGISTRY_TS_KEY, Date.now().toString())
             return
         }
@@ -62,19 +68,14 @@ export class MusicCacheService {
         }
 
         for (const musicId of updateInfo.toDeleteMusicIds) {
-            localStorage.removeItem(this.MUSIC_STORAGE_KEY(musicId))
-            this.musics = this.musics.filter(m => m.id !== musicId)
-            this.registry.delete(musicId)
+            this.RemoveMusic(musicId)
         }
 
         if (updateInfo.toUpdateMusicIds.length > 0) {
             const updatedMusics = await this.musicFirestoreService.GetMusicListWithId(updateInfo.toUpdateMusicIds)
 
             for (const music of updatedMusics) {
-                this.musics = this.musics.filter(m => m.id !== music.id)
-                this.musics.push(music)
-                localStorage.setItem(this.MUSIC_STORAGE_KEY(music.id), JSON.stringify(music))
-                this.registry.add(music.id)
+                this.PersistMusic(music)
             }
         }
 
@@ -82,13 +83,11 @@ export class MusicCacheService {
             const newMusics = await this.musicFirestoreService.GetMusicListWithId(updateInfo.newMusicIds)
 
             for (const music of newMusics) {
-                this.musics.push(music)
-                localStorage.setItem(this.MUSIC_STORAGE_KEY(music.id), JSON.stringify(music))
-                this.registry.add(music.id)
+                this.PersistMusic(music)
             }
         }
 
-        localStorage.setItem(this.MUSIC_REGISTRY_KEY, JSON.stringify(Array.from(this.registry)))
+        this.SaveRegistry()
         localStorage.setItem(this.MUSIC_REGISTRY_TS_KEY, updateInfo.updatedAt.toString())
 
         AppComponent.PresentOkToast(`Music list updated: ${updateInfo.newMusicIds.length} new, ${updateInfo.toUpdateMusicIds.length} updated, ${updateInfo.toDeleteMusicIds.length} deleted.`)
@@ -100,11 +99,8 @@ export class MusicCacheService {
             const music = musics[0]
             if (!music) return
 
-            this.musics = this.musics.filter(m => m.id !== music.id)
-            this.musics.push(music)
-            localStorage.setItem(this.MUSIC_STORAGE_KEY(music.id), JSON.stringify(music))
-            this.registry.add(music.id)
-            localStorage.setItem(this.MUSIC_REGISTRY_KEY, JSON.stringify(Array.from(this.registry)))
+            this.PersistMusic(music)
+            this.SaveRegistry()
             console.log(`Music ${musicId} updated in cache.`)
 
         } catch (e) {
@@ -113,14 +109,8 @@ export class MusicCacheService {
     }
 
     GetMusic(musicId: string): MusicDto | null {
-        const cacheKey = this.MUSIC_STORAGE_KEY(musicId)
-
-        const raw = localStorage.getItem(cacheKey)
-        if (raw) {
-            try {
-                return MusicDto.FromJSON(JSON.parse(raw))
-            } catch { }
-        }
+        const music = this.ReadCachedMusic(musicId)
+        if (music) return music
 
         console.error(`Music ${musicId} not found in cache`)
         return null
@@ -137,27 +127,19 @@ export class MusicCacheService {
 
     }
 
-    async GetMusicWithDbNoUpdate(musicId: string): Promise<MusicDto | null> {
-        const cacheKey = this.MUSIC_STORAGE_KEY(musicId)
+    /** A corrupted entry is removed from the cache and the registry, so that it is fetched again with the next catalog change */
+    private ReadCachedMusic(musicId: string): MusicDto | null {
+        const raw = localStorage.getItem(this.MUSIC_STORAGE_KEY(musicId))
+        if (!raw) return null
 
-        const raw = localStorage.getItem(cacheKey)
-        if (raw) {
-            try {
-                return MusicDto.FromJSON(JSON.parse(raw))
-            } catch { }
+        try {
+            return MusicDto.FromJSON(JSON.parse(raw))
+        } catch (error) {
+            console.error(`Music ${musicId} is corrupted in cache, removing it:`, error)
+            this.RemoveMusic(musicId)
+            this.SaveRegistry()
+            return null
         }
-
-        console.error(`Music ${musicId} not found in cache, fetching from server...`)
-
-        const music = (await this.musicFirestoreService.GetMusicListWithId([musicId]))[0]
-        if (!music) return null
-
-        localStorage.setItem(this.MUSIC_STORAGE_KEY(musicId), JSON.stringify(music))
-
-        this.registry.add(musicId)
-        localStorage.setItem(this.MUSIC_REGISTRY_KEY, JSON.stringify(Array.from(this.registry)))
-
-        return music
     }
 
     ClearCache(): void {
@@ -173,49 +155,42 @@ export class MusicCacheService {
         try {
             await this.musicFirestoreService.UploadMusic(music)
         } catch (e) {
-            this.UpdateCache()
+            await this.UpdateCache()
             throw e
         }
         music.noteData = []
-        this.musics.push(music)
-        localStorage.setItem(this.MUSIC_STORAGE_KEY(music.id), JSON.stringify(music))
-        this.registry.add(music.id)
-        localStorage.setItem(this.MUSIC_REGISTRY_KEY, JSON.stringify(Array.from(this.registry)))
+        this.PersistMusic(music)
+        this.SaveRegistry()
     }
 
     async UpdateMusicInBase(music: MusicDto): Promise<void> {
         try {
             await this.musicFirestoreService.UpdateMusic(music)
         } catch (e) {
-            this.UpdateCache()
+            await this.UpdateCache()
             throw e
         }
-        this.musics = this.musics.filter(m => m.id !== music.id)
-        this.musics.push(music)
-        localStorage.setItem(this.MUSIC_STORAGE_KEY(music.id), JSON.stringify(music))
-        this.registry.add(music.id)
-        localStorage.setItem(this.MUSIC_REGISTRY_KEY, JSON.stringify(Array.from(this.registry)))
+        this.PersistMusic(music)
+        this.SaveRegistry()
     }
 
     async DeleteMusicInBase(musicId: string): Promise<void> {
         try {
             await this.musicFirestoreService.DeleteMusic(musicId)
         } catch (e) {
-            this.UpdateCache()
+            await this.UpdateCache()
             throw e
         }
 
-        this.musics = this.musics.filter(m => m.id !== musicId)
-        this.registry.delete(musicId)
-        localStorage.removeItem(this.MUSIC_STORAGE_KEY(musicId))
-        localStorage.setItem(this.MUSIC_REGISTRY_KEY, JSON.stringify(Array.from(this.registry)))
+        this.RemoveMusic(musicId)
+        this.SaveRegistry()
     }
 
     async UploadNotesInBase(musicId: string, notes: NoteDataDto[]): Promise<void> {
         try {
             await this.musicFirestoreService.UploadNotes(musicId, notes)
         } catch (e) {
-            this.UpdateCache()
+            await this.UpdateCache()
             throw e
         }
         const music = this.musics.find(m => m.id === musicId)
@@ -225,19 +200,42 @@ export class MusicCacheService {
             if (idx >= 0) music.noteData[idx] = note
             else music.noteData.push(note)
         }
-        localStorage.setItem(this.MUSIC_STORAGE_KEY(music.id), JSON.stringify(music))
+        this.PersistMusic(music)
     }
 
     async DeleteNoteInBase(musicId: string, note: NoteDataDto): Promise<void> {
         try {
             await this.musicFirestoreService.DeleteNote(musicId, note)
         } catch (e) {
-            this.UpdateCache()
+            await this.UpdateCache()
             throw e
         }
         const music = this.musics.find(m => m.id === musicId)
         if (!music) return
         music.noteData = music.noteData.filter(n => n.chartName !== note.chartName)
-        localStorage.setItem(this.MUSIC_STORAGE_KEY(music.id), JSON.stringify(music))
+        this.PersistMusic(music)
     }
+
+    //#region Persistence
+    /** Adds or replaces the music in memory and in localStorage, keeping its position in the list. The registry is saved by SaveRegistry() */
+    private PersistMusic(music: MusicDto) {
+        const index = this.musics.findIndex(m => m.id === music.id)
+        if (index >= 0) this.musics[index] = music
+        else this.musics.push(music)
+
+        localStorage.setItem(this.MUSIC_STORAGE_KEY(music.id), JSON.stringify(music))
+        this.registry.add(music.id)
+    }
+
+    /** Removes the music from memory and from localStorage. The registry is saved by SaveRegistry() */
+    private RemoveMusic(musicId: string) {
+        this.musics = this.musics.filter(m => m.id !== musicId)
+        localStorage.removeItem(this.MUSIC_STORAGE_KEY(musicId))
+        this.registry.delete(musicId)
+    }
+
+    private SaveRegistry() {
+        localStorage.setItem(this.MUSIC_REGISTRY_KEY, JSON.stringify(Array.from(this.registry)))
+    }
+    //#endregion
 }

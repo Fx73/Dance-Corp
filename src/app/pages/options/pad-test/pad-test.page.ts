@@ -87,7 +87,7 @@ export class PadTestPage {
       if (!gamepad) {
         AppComponent.PresentWarningToast(`Gamepad disconnected. Please reconnect.`)
         this.waitingForInput = false
-        alert.dismiss()
+        void alert.dismiss()
         return
       }
 
@@ -97,7 +97,7 @@ export class PadTestPage {
           // Bind the action to the pressed button
           this.gampadBindings.set(arrowDirection, i)
           this.waitingForInput = false
-          alert.dismiss()
+          void alert.dismiss()
           return
         }
       }
@@ -117,7 +117,7 @@ export class PadTestPage {
       // Bind the action to the pressed button
       this.keyboardBindings.set(arrowDirection, event.key)
       this.waitingForInput = false
-      alert.dismiss()
+      void alert.dismiss()
       window.removeEventListener('keydown', checkKeyboardInput)
     }
     window.addEventListener('keydown', checkKeyboardInput)

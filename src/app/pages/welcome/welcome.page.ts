@@ -28,7 +28,7 @@ export class WelcomePage implements OnInit {
   }
 
   ngOnInit() {
-    this.discordRpcService.Update("Let's dance")
+    void this.discordRpcService.Update("Let's dance")
   }
 
 }

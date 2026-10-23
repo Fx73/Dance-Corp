@@ -69,7 +69,9 @@ export class MusicPlayerSoundcloudComponent extends MusicPlayerCommon
   Stop() {
     try {
       this.widgetSC.pause()
-    } catch { }
+    } catch (error) {
+      console.warn("Failed to pause the SoundCloud widget:", error)
+    }
     this.StopPolling()
   }
 

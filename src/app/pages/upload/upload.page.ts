@@ -91,11 +91,13 @@ export class UploadPage {
     this.musicDataDb = null
     this.isEditDB.set(false)
     this.isEditLocal.set(false)
-    this.fireStoreService.GetGenres().then(genres => this.genreOptions = genres)
+    this.fireStoreService.GetGenres()
+      .then(genres => this.genreOptions = genres)
+      .catch(error => console.error("Failed to load the genres:", error))
 
     const musicId = this.route.snapshot.queryParamMap.get('music')
     if (musicId) {
-      this.StartLoad(musicId)
+      void this.StartLoad(musicId)
     }
   }
 
@@ -177,12 +179,13 @@ export class UploadPage {
     }
   }
 
-  SwitchToDbPage() {
-    this.router.navigate(['/upload'], {
+  async SwitchToDbPage() {
+    // Same page: ionViewWillEnter does not run again, the music is loaded here
+    void this.router.navigate(['/upload'], {
       queryParams: { music: this.musicData.id },
       replaceUrl: true,
     })
-    this.StartLoad(this.musicData.id)
+    await this.StartLoad(this.musicData.id)
   }
   //#endregion
 
@@ -199,7 +202,7 @@ export class UploadPage {
         this.isEditLocal.set(true)
         AppComponent.PresentOkToast("Music loaded successfully : " + this.musicData.id)
 
-        const dbMusic = await this.musicCacheService.GetMusic(this.musicData.id)
+        const dbMusic = this.musicCacheService.GetMusic(this.musicData.id)
         if (dbMusic) {
           for (const field of this.fireStoreService.GetProtectedFields(dbMusic.noteData.length)) {
             Object.assign(this.musicData, { [field]: dbMusic[field] })
@@ -207,7 +210,7 @@ export class UploadPage {
           this.localMusicService.UpdateMusic(this.musicData)
 
           AppComponent.PresentWarningToast("This music already exists in the database. You are now editing the local version. Uploading will overwrite the database version.")
-          this.SwitchToDbPage()
+          await this.SwitchToDbPage()
         } else {
           setTimeout(() => {
             this.UpdateGlobalDirty()
@@ -310,7 +313,7 @@ export class UploadPage {
     await this.musicCacheService.CreateMusicInBase(this.musicData)
     this.isEditDB.set(true)
     AppComponent.PresentOkToast("Music uploaded successfully!")
-    this.SwitchToDbPage()
+    await this.SwitchToDbPage()
   }
 
   async UpdateMusic(): Promise<void> {
@@ -321,7 +324,7 @@ export class UploadPage {
 
     await this.LoadDbMusic(this.musicData.id)
     if (!this.AnyNoteDirty()) {
-      this.DeleteFile(true)
+      await this.DeleteFile(true)
     }
   }
 
@@ -332,7 +335,7 @@ export class UploadPage {
 
     await this.LoadDbMusic(this.musicData.id)
     if (!this.metadataDirty()) {
-      this.DeleteFile(true)
+      await this.DeleteFile(true)
     }
   }
 
@@ -346,7 +349,7 @@ export class UploadPage {
   //#endregion
 
   //#region Delete
-  DeleteFile(silent = false) {
+  async DeleteFile(silent = false) {
     if (this.musicData === null) return
     const musicId = this.musicData.id
     this.localMusicService.DeleteMusic(musicId)
@@ -354,12 +357,13 @@ export class UploadPage {
     this.isEditLocal.set(false)
 
     if (!this.isEditDB()) {
-      this.DeleteLocalMusicFile(musicId)
+      await this.DeleteLocalMusicFile(musicId)
       this.location.back()
       if (!silent) AppComponent.PresentOkToast("Music has been discarded")
 
     } else {
-      this.musicCacheService.UpdateCache().then(() => this.LoadDbMusic(musicId))
+      await this.musicCacheService.UpdateCache()
+      await this.LoadDbMusic(musicId)
       if (!silent) AppComponent.PresentOkToast("Music changes have been removed")
     }
 
@@ -374,12 +378,12 @@ export class UploadPage {
     AppComponent.PresentOkToast("Music deleted successfully from database.")
   }
 
-  DeleteNote(note: NoteDataDto): void {
+  async DeleteNote(note: NoteDataDto): Promise<void> {
     if (!this.musicData) return
 
     if (this.musicDataDb && this.musicDataDb.noteData.some(n => n.chartName === note.chartName)) {
-      this.musicCacheService.DeleteNoteInBase(this.musicData.id, note)
-      this.LoadDbMusic(this.musicData.id)
+      await this.musicCacheService.DeleteNoteInBase(this.musicData.id, note)
+      await this.LoadDbMusic(this.musicData.id)
       AppComponent.PresentOkToast("Note deleted successfully from database.")
 
     } else {

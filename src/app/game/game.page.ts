@@ -17,7 +17,7 @@ import { ArrowDirection } from "./constants/arrow-direction.enum"
 import { GameOverComponent } from "./game-display/game-over/game-over.component"
 import { PlayerDisplayComponent } from "./game-display/player-display.component"
 import { WaitingScreenComponent } from "./game-display/waiting-screen/waiting-screen.component"
-import { MusicDto } from "./game-model/music.dto"
+import { MusicDto, NoteDataDto } from "./game-model/music.dto"
 import { GameManager } from './game.manager'
 import { MusicPlayerLocalComponent } from "./music-player/music-player-local/music-player-local.component"
 import { MusicPlayerSoundcloudComponent } from './music-player/music-player-soundcloud/music-player-soundcloud.component'
@@ -68,22 +68,24 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
 
     if (!musicId || chartNames.length === 0) {
       console.error("Music data is missing or incomplete.")
-      this.router.navigate(['/home'])
+      void this.router.navigate(['/home'])
       return
     }
 
     const music = this.musicCacheService.GetMusic(musicId)
     if (!music) {
       console.error(`Music with ID ${musicId} not found. Your cache might be corrupted.`)
-      this.router.navigate(['/home'])
+      void this.router.navigate(['/home'])
       return
     }
     this.music = music
 
-    const selectedNotes = chartNames.map(name => music.noteData.findIndex(n => n.chartName === name))
-    if (selectedNotes.includes(-1)) {
+    const selectedNotes = chartNames
+      .map(name => music.noteData.find(n => n.chartName === name))
+      .filter((note): note is NoteDataDto => note !== undefined)
+    if (selectedNotes.length !== chartNames.length) {
       console.error(`Chart not found in music ${musicId}: ${chartNames.join(', ')}`)
-      this.router.navigate(['/home'])
+      void this.router.navigate(['/home'])
       return
     }
 
@@ -91,7 +93,7 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
     this.musicOrigin = MusicPlayerCommon.PickMusicPlayer(this.music.music!)
     if (this.musicOrigin == null) {
       AppComponent.PresentWarningToast("Error loading music in player !")
-      this.router.navigate(['/home'])
+      void this.router.navigate(['/home'])
       return
     }
 
@@ -100,7 +102,7 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
     this.game = new GameManager(this.music, players, selectedNotes, isTrainingMode, this.userCacheService, this.announcerService)
     this.announcerService.PickPreferredAnnouncer()
 
-    this.discordRpcService.Update("Dancing on lvl " + this.music.noteData[selectedNotes[0]].meter, this.music.title + " - " + this.music.artist)
+    void this.discordRpcService.Update("Dancing on lvl " + selectedNotes[0].meter, this.music.title + " - " + this.music.artist)
   }
 
   @ViewChildren(PlayerDisplayComponent) playerDisplaysQuery!: QueryList<PlayerDisplayComponent>
@@ -126,14 +128,17 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
     this.game!.RegisterExternalComponents(this.musicPlayer, /*this.playerDisplays*/)
 
     this.waitingScreen.StartCountdown()
-    this.announcerService.PlayCountdownFromAnnouncer()
+    void this.announcerService.PlayCountdownFromAnnouncer()
 
     this.cdr.detectChanges()
   }
 
   HandleCountdownFinished() {
     this.loadingMusic = false
-    this.game?.StartGame()
+    this.game?.StartGame().catch(error => {
+      AppComponent.PresentErrorToast("The music could not start: " + error)
+      void this.router.navigate(['/play/browse'])
+    })
   }
 
   ngOnDestroy(): void {

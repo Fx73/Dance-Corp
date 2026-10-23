@@ -46,9 +46,9 @@ export class MusicFirestoreService {
             const { noteData: notes, ...mainData } = dto
             await setDoc(musicRef, mainData)
 
-            this.AddGenres(dto.genre ?? "")
+            await this.AddGenres(dto.genre ?? "")
 
-            this.UpdateMusicIndex(dto.id, false)
+            await this.UpdateMusicIndex(dto.id, false)
             AppComponent.PresentOkToast("Music successfully uploaded to firebase!")
         } catch (error) {
             AppComponent.PresentWarningToast("Error uploading music: " + error)
@@ -74,9 +74,9 @@ export class MusicFirestoreService {
             const { noteData: notes, ...mainData } = dto
             await updateDoc(musicRef, mainData)
 
-            this.AddGenres(dto.genre ?? "")
+            await this.AddGenres(dto.genre ?? "")
 
-            this.UpdateMusicIndex(dto.id)
+            await this.UpdateMusicIndex(dto.id)
             AppComponent.PresentOkToast("Music successfully updated to firebase!")
         } catch (error) {
             AppComponent.PresentWarningToast("Error updating music: " + error)
@@ -132,7 +132,7 @@ export class MusicFirestoreService {
                 charts[note.chartName] = user.id
             }
 
-            this.UpdateMusicIndex(musicId)
+            await this.UpdateMusicIndex(musicId)
 
         } catch (error) {
             AppComponent.PresentWarningToast("Error updating music: " + error)
@@ -206,7 +206,7 @@ export class MusicFirestoreService {
 
             await deleteDoc(musicRef)
 
-            this.RemoveMusicFromIndex(musicId)
+            await this.RemoveMusicFromIndex(musicId)
             AppComponent.PresentOkToast("Music successfully deleted from firebase !")
 
         } catch (error) {
@@ -236,7 +236,7 @@ export class MusicFirestoreService {
             await batch.commit()
 
             // Flag the music as updated so that other clients drop the chart from their cache
-            this.UpdateMusicIndex(musicId)
+            await this.UpdateMusicIndex(musicId)
 
         } catch (error) {
             AppComponent.PresentWarningToast("Error deleting note: " + error)

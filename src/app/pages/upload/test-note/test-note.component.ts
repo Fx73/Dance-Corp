@@ -2,6 +2,7 @@ import { Component, Input, OnDestroy, OnInit, ViewChild, inject } from '@angular
 import { IMusicPlayer, MusicOrigin, MusicPlayerCommon } from 'src/app/game/music-player/IMusicPlayer'
 import { MusicDto, NoteDataDto } from 'src/app/game/game-model/music.dto'
 
+import { AppComponent } from 'src/app/app.component'
 import { ArrowDirection } from 'src/app/game/constants/arrow-direction.enum'
 import { GameManager } from 'src/app/game/game.manager'
 import { ModalController } from '@ionic/angular'
@@ -10,6 +11,8 @@ import { MusicPlayerYoutubeComponent } from "../../../game/music-player/music-pl
 
 import { Player } from 'src/app/game/game-model/player'
 import { PlayerDisplayComponent } from "../../../game/game-display/player-display.component"
+import { AnnouncerService } from 'src/app/services/gameplay/announcer.service'
+import { UserCacheService } from 'src/app/services/local-storage/user.cache.service'
 import { UserConfigService } from 'src/app/services/userconfig.service'
 
 @Component({
@@ -27,6 +30,8 @@ export class TestNoteComponent implements OnInit, OnDestroy {
 
   private modalController = inject(ModalController)
   private userConfigService = inject(UserConfigService)
+  private userCacheService = inject(UserCacheService)
+  private announcerService = inject(AnnouncerService)
 
   @Input() noteData!: NoteDataDto
   @Input() music!: MusicDto
@@ -44,13 +49,16 @@ export class TestNoteComponent implements OnInit, OnDestroy {
 
   OnPlayerReady(musicPlayer: IMusicPlayer) {
     const player = this.userConfigService.players[0] || new Player()
-    this.game = new GameManager(this.music, [player], [0], true, null!, null!)
+    this.game = new GameManager(this.music, [player], [this.noteData], true, this.userCacheService, this.announcerService)
     this.game.RegisterExternalComponents(musicPlayer)
-    this.game.StartGame()
+    this.game.StartGame().catch(error => {
+      AppComponent.PresentErrorToast("The music could not start: " + error)
+      this.Dismiss()
+    })
   }
 
   Dismiss() {
-    this.modalController.dismiss()
+    void this.modalController.dismiss()
   }
 
   ngOnDestroy(): void {

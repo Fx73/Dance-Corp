@@ -392,3 +392,59 @@ Tested: `commit-version.sh` on a throwaway branch creates a signed commit with p
   - The bump commit does not start another Deploy run
   - Opening the dev -> master PR bumps dev to 1.1.0, and the PR shows that commit
   - The merged master deploy shows 1.1.0 and creates the v1.1.0 tag
+
+## Commit: Await async calls or mark them as fire-and-forget
+Link: https://github.com/Fx73/Dance-Corp/commit/478f5a59871c7b883cd5ca8c6226eeaaf08ed593
+
+- src/app/services/firestore/music.firestore.service.ts: `AddGenres()`, `UpdateMusicIndex()` and `RemoveMusicFromIndex()` awaited, a failure now shows the error toast instead of the success one
+- src/app/services/local-storage/music.cache.service.ts: `UpdateCache()` no longer throws (error toast), awaited in the `catch` blocks; corrupted cache entries are logged and removed from the cache and the registry
+- src/app/pages/upload/upload.page.ts: `DeleteNote()`, `DeleteFile()` and `SwitchToDbPage()` are async and wait for each step before reloading and showing their toast
+- src/app/services/thirdpartyapp/presence.service.ts: `Update()` and `Clear()` catch their errors
+- src/app/services/firestore/user.firestore.service.ts, src/app/services/local-storage/user.cache.service.ts: toast when the profile, the scores or a new score fail to load or save
+- src/app/app.component.ts: toasts awaited, announcers loading errors logged
+
+→ To verify:
+  - Upload a new music with a genre, update it: one success toast, the music and the genre appear in another browser
+  - Delete a chart from the database: the page reloads without it, the success toast comes after the reload
+  - Discard a local edit of a database music: the database version is reloaded
+  - Load a `.sm` file of a music that already exists in the database: the page switches to the database music
+  - Corrupt a `MUSIC_<id>` entry in localStorage, reload: an error is logged, the app still starts
+  - Desktop: Discord and Steam presence still update when changing pages
+  - Finish a song logged in: the score is saved
+
+## Commit: Leave the game when the music does not start, log blocked sounds
+Link: https://github.com/Fx73/Dance-Corp/commit/17548287a100f9c411a4e3de4f018254e17a6645
+
+- src/app/game/game.manager.ts: `StartGame()` gives up after `MUSIC_START_TIMEOUT` (15 s) if the music time does not move, and stops waiting if the game is destroyed
+- src/app/game/game.page.ts, src/app/pages/upload/test-note/test-note.component.ts: error toast, then back to browse (game) or the modal closes (chart test)
+- src/app/game/music-player/music-player-local/music-player-local.component.ts: `isPlaying` only set once playback has started
+- src/app/services/gameplay/sound.service.ts: `SoundService.PlaySound()` logs a blocked or failed sound; used by the sounds, the announcers and the mine hit
+
+→ To verify:
+  - A normal game starts as before, on YouTube, SoundCloud and a local song (desktop)
+  - A YouTube music whose video is unavailable: after 15 s, error toast and back to browse
+  - Leave the game during the countdown or the wait: no toast and no navigation afterwards
+  - Open the app and play with a pad only, without any click: the music starts, or the game goes back to browse after 15 s
+  - Upload page, chart test with an unavailable music: error toast, the modal closes
+
+## Commit: Pass charts instead of indexes to the game, keep the browse chart selection valid
+Link: https://github.com/Fx73/Dance-Corp/commit/6654a7d8eb9ce4a23c6449dabcb85d66c2af3b76
+
+- src/app/game/game.manager.ts, src/app/game/game.page.ts: `GameManager` takes the selected `NoteDataDto` instead of indexes in `music.noteData`
+- src/app/pages/upload/test-note/test-note.component.ts: the chart test plays the tested chart (it always played the first one), with the real `UserCacheService` and `AnnouncerService` (null before, which made `GameManager` throw)
+- src/app/pages/browse/browse.page.ts: on a music change, each player's chart selection is clamped to the new music's charts; unused `TrySetSelectedMusicById` removed
+
+→ To verify:
+  - A game in single and multiplayer plays the selected charts, and the score is saved on the right chart
+  - Upload page: testing a chart other than the first plays that chart; the announcer may now react during the test
+  - Browse: select the last chart of a music with many charts, move to a music with fewer: its last chart is selected, and Enter starts the game
+
+## Commit: Factor the music cache persistence into helpers
+Link: https://github.com/Fx73/Dance-Corp/commit/712590e559db82f8493536bdaabef72f66a42101
+
+- src/app/services/local-storage/music.cache.service.ts: `PersistMusic()`, `RemoveMusic()` and `SaveRegistry()` replace the repeated block; an updated music keeps its position in `musics` (it moved to the end before, also when played, as `RunGame` refreshes it); unused `GetMusicWithDbNoUpdate()` removed
+
+→ To verify:
+  - First load with an empty cache (Options, clear the music cache, reload): the whole catalog appears in browse
+  - Play a music: it stays at the same place in the browse list
+  - Upload, update and delete a music, upload and delete a chart: the browse lists follow, also after a reload

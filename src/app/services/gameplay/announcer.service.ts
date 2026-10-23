@@ -2,6 +2,7 @@ import { Injectable, inject } from "@angular/core"
 import { UserConfigService } from "../userconfig.service"
 import { CONFIG } from "src/app/game/constants/game-config"
 import { SatisfactionType } from "src/app/game/constants/satisfaction-type.enum"
+import { SoundService } from "./sound.service"
 
 /** Content of the assets/Sounds/announcers/*.json files */
 interface ISoundBank {
@@ -197,7 +198,7 @@ export class AnnouncerService {
             }
         }
 
-        this.announcerAudio.play()
+        SoundService.PlaySound(this.announcerAudio)
     }
 
     // -------------------------
@@ -239,7 +240,7 @@ export class AnnouncerService {
         const audio = new Audio(src)
         audio.volume = options.volume ?? 1
 
-        audio.play()
+        SoundService.PlaySound(audio)
 
         // No fade-out: stop here
         if (!options.fadeOutMs) return audio

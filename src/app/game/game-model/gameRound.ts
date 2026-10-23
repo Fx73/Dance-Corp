@@ -11,6 +11,7 @@ import { DancePadKeyboard } from '../game-controller/dancepad-keyboard'
 import { NoteDataDto } from "./music.dto"
 import { Player } from "./player"
 import { SatisfactionType } from "../constants/satisfaction-type.enum"
+import { SoundService } from 'src/app/services/gameplay/sound.service'
 
 export class GameRound {
     //#region App Constants
@@ -251,7 +252,7 @@ export class GameRound {
         this.precisionMessage.push(arrow)
 
         this.mineHitSound.currentTime = 0
-        this.mineHitSound.play()
+        SoundService.PlaySound(this.mineHitSound)
 
         this.announcerService.ChangeSatisfaction(SatisfactionType.Fail, CONFIG.ANNOUNCER.SATISFACTION.MINE_HIT)
     }

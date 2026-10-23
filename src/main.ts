@@ -37,4 +37,4 @@ bootstrapApplication(AppComponent, {
       withPreloading(PreloadAllModules),
     ),
   ],
-})
+}).catch(error => console.error("Failed to start the app:", error))

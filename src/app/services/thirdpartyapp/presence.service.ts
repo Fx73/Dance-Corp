@@ -25,27 +25,41 @@ export class PresenceService {
         }
     }
 
+    /** Never throws: presence is optional, a failure must not interrupt the app */
     async Update(status: string, details: string = "") {
-
         // Discord
-        if (this.discordReady) {
-            await invoke("update_discord_rpc", { details, status })
+        try {
+            if (this.discordReady)
+                await invoke("update_discord_rpc", { details, status })
+        } catch (e) {
+            console.warn("Discord RPC update failed", e)
         }
 
         // Steam
-        if (this.steamReady) {
-            await invoke("update_steam_rpc", { key: "status", value: status })
-            await invoke("update_steam_rpc", { key: "details", value: details })
+        try {
+            if (this.steamReady) {
+                await invoke("update_steam_rpc", { key: "status", value: status })
+                await invoke("update_steam_rpc", { key: "details", value: details })
+            }
+        } catch (e) {
+            console.warn("Steam update failed", e)
         }
     }
 
+    /** Never throws, like Update */
     async Clear() {
-        if (this.discordReady) {
-            await invoke("clear_discord_rpc")
+        try {
+            if (this.discordReady)
+                await invoke("clear_discord_rpc")
+        } catch (e) {
+            console.warn("Discord RPC clear failed", e)
         }
 
-        if (this.steamReady) {
-            await invoke("clear_steam_rpc")
+        try {
+            if (this.steamReady)
+                await invoke("clear_steam_rpc")
+        } catch (e) {
+            console.warn("Steam clear failed", e)
         }
     }
 }

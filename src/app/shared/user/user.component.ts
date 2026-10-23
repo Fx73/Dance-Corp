@@ -57,8 +57,8 @@ export class UserComponent {
 
   Logout() {
     this.loginService.LogOut()
-    this.popoverController.dismiss().then(() => {
-      this.router.navigateByUrl('home')
+    void this.popoverController.dismiss().then(() => {
+      void this.router.navigateByUrl('home')
     }
     )
   }

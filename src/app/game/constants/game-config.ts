@@ -6,6 +6,7 @@ export const CONFIG = {
         BEAT_PER_MEASURE: 4,
         MAX_MISSED_FRAME_HOLD: 8,
         TOLERANCE_WINDOW: 0.15, //In seconds
+        MUSIC_START_TIMEOUT: 15, // Seconds to wait for the music to start before giving up
         DEFAULT_BACKGROUND: "assets/Splash/Texture.png"
 
     },

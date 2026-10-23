@@ -1,6 +1,7 @@
 import { Injectable, effect, inject } from "@angular/core"
 import { UserDto, UserMusicDto, UserNoteDto } from 'src/app/pages/user-profile/user.dto'
 
+import { AppComponent } from "src/app/app.component"
 import { GameRound } from "src/app/game/game-model/gameRound"
 import { UserFirestoreService } from 'src/app/services/firestore/user.firestore.service'
 
@@ -39,6 +40,7 @@ export class UserCacheService {
                 this.ClearCache()
                 localStorage.setItem(this.USER_KEY, user.id)
                 this.InitCacheFromFirestore(user.id)
+                    .catch(error => AppComponent.PresentWarningToast("Failed to load your scores: " + error))
             }
         } else {
             console.log("User logged out, clearing cache.")
@@ -131,6 +133,7 @@ export class UserCacheService {
 
         // 7. Update Firestore
         this.userFirestoreService.UpdateUserStatsFromRound(music, gameRound)
+            .catch(error => AppComponent.PresentErrorToast("Failed to save your score: " + error))
     }
 
 }

@@ -4,7 +4,7 @@ import { AnnouncerService } from '../services/gameplay/announcer.service'
 import { CONFIG } from "./constants/game-config"
 import { PlayerDisplayComponent } from "./game-display/player-display.component"
 import { GameRound } from './game-model/gameRound'
-import { MusicDto } from './game-model/music.dto'
+import { MusicDto, NoteDataDto } from './game-model/music.dto'
 import { Player } from './game-model/player'
 import { BeatManager } from './game-model/timeline/beatManager'
 import { IMusicPlayer } from "./music-player/IMusicPlayer"
@@ -14,20 +14,20 @@ export class GameManager {
     music: MusicDto
     isTrainingMode: boolean = false
     mainUserStats: UserNoteDto | null = null
-    private noteSelected: number[]
+    private notes: NoteDataDto[]
 
-    constructor(music: MusicDto, players: Player[], noteSelected: number[], isTrainingMode: boolean, private userCacheService: UserCacheService, private announcerService: AnnouncerService) {
+    constructor(music: MusicDto, players: Player[], notes: NoteDataDto[], isTrainingMode: boolean, private userCacheService: UserCacheService, private announcerService: AnnouncerService) {
         this.music = music
         this.isTrainingMode = isTrainingMode
-        this.noteSelected = noteSelected
+        this.notes = notes
 
         for (let index = 0; index < players.length; index++) {
             const player = players[index]
-            this.gameRounds.push(new GameRound(this.music.noteData[noteSelected[index]], player, this.isTrainingMode, announcerService))
+            this.gameRounds.push(new GameRound(notes[index], player, this.isTrainingMode, announcerService))
         }
 
         this.beatManager = new BeatManager(this.music)
-        this.mainUserStats = this.userCacheService.GetMusicStats(this.music.id).notes.find((n: UserNoteDto) => n.id === this.music.noteData[noteSelected[0]].chartName) ?? null
+        this.mainUserStats = this.userCacheService.GetMusicStats(this.music.id).notes.find((n: UserNoteDto) => n.id === notes[0].chartName) ?? null
     }
 
     public gameRounds: GameRound[] = []
@@ -47,7 +47,8 @@ export class GameManager {
         console.log("Waiting for audio to start…")
 
         this.musicPlayer.Play()
-        await new Promise<void>(resolve => { const check = () => { const t = this.musicPlayer.GetCurrentTime(); if (t > 0) { resolve() } else { requestAnimationFrame(check) } }; check() })
+        const hasStarted = await this.WaitForMusicStart()
+        if (!hasStarted) return
 
         const musicCurrentTime = this.musicPlayer.GetCurrentTime()
         this.zeroTimeStamp = Math.round(performance.now()) - (musicCurrentTime * 1000)
@@ -55,6 +56,20 @@ export class GameManager {
         this.GameGlobalLoop(this.zeroTimeStamp)
 
         console.log("Game has started")
+    }
+
+    /** Resolves true once the music time moves, false if the game is destroyed first. Rejects after MUSIC_START_TIMEOUT */
+    private WaitForMusicStart(): Promise<boolean> {
+        const deadline = performance.now() + CONFIG.GAME.MUSIC_START_TIMEOUT * 1000
+        return new Promise<boolean>((resolve, reject) => {
+            const Check = () => {
+                if (this.isDestroyed) return resolve(false)
+                if (this.musicPlayer.GetCurrentTime() > 0) return resolve(true)
+                if (performance.now() > deadline) return reject(new Error(`The music did not start after ${CONFIG.GAME.MUSIC_START_TIMEOUT} seconds`))
+                requestAnimationFrame(Check)
+            }
+            Check()
+        })
     }
 
     private gameLoopId: number | null = null
@@ -132,13 +147,15 @@ export class GameManager {
 
         if (!this.isTrainingMode) {
             this.gameRounds.forEach((gameRound, index) => {
-                this.userCacheService.UpdateUserStatsFromRound(this.music.id, this.music.noteData[this.noteSelected[index]].chartName, gameRound)
+                this.userCacheService.UpdateUserStatsFromRound(this.music.id, this.notes[index].chartName, gameRound)
             })
         }
 
     }
 
+    private isDestroyed = false
     public DestroyGame() {
+        this.isDestroyed = true
         if (this.gameLoopId !== null) {
             cancelAnimationFrame(this.gameLoopId)
         }

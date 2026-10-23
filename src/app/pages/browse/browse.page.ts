@@ -88,7 +88,7 @@ export class BrowsePage implements OnInit, OnDestroy {
     this.InitIonInfinite()
 
     this.InitPlayerInput()
-    this.discordRpcService.Update("Browsing")
+    void this.discordRpcService.Update("Browsing")
   }
 
   //#region Input handling
@@ -125,7 +125,7 @@ export class BrowsePage implements OnInit, OnDestroy {
       event.preventDefault()
     }
     if (event.key === 'Enter') {
-      this.RunGame()
+      void this.RunGame()
     }
   }
 
@@ -165,21 +165,6 @@ export class BrowsePage implements OnInit, OnDestroy {
     return null
   }
 
-  TrySetSelectedMusicById(musicId: string) {
-    let index = this.storedMusics().findIndex((m: { id: string }) => m.id === musicId)
-
-    if (index === -1) {
-      index = this.dbMusics().findIndex((m: { id: string }) => m.id === musicId) + this.storedMusics().length
-    }
-
-    if (index === -1) {
-      this.OnSelectMusic(0)
-    }
-    else {
-      this.OnSelectMusic(index)
-    }
-  }
-
   OnSelectMusic(listIndex: number) {
     const music = this.GetSelectedMusic(listIndex)
     if (!music) {
@@ -191,6 +176,9 @@ export class BrowsePage implements OnInit, OnDestroy {
     const filteredNotes = music.noteData.filter(note => !isSinglePlayer || note.stepsType === DanceType.DanceSingle).sort((a, b) => a.meter - b.meter)
 
     this.musicNotes.set(filteredNotes)
+    // Each player keeps the same chart position if the new music has it, otherwise its last chart
+    const lastNoteIndex = Math.max(0, filteredNotes.length - 1)
+    this.selectedNotesIndex.set(this.selectedNotesIndex().map(noteIndex => Math.min(noteIndex, lastNoteIndex)))
 
     this.selectedMusicIndex.set(listIndex)
     localStorage.setItem('lastMusicSelectedId', music.id)
@@ -252,7 +240,7 @@ export class BrowsePage implements OnInit, OnDestroy {
 
   OnIonInfinite(event: InfiniteScrollCustomEvent) {
     productionConsole.info("Congratz, you found the infinite scroll ! But there is no more music to load :)")
-    event.target.complete()
+    void event.target.complete()
   }
 
   OnPlayerReady(mPlayer: IMusicPlayer) {
@@ -263,7 +251,7 @@ export class BrowsePage implements OnInit, OnDestroy {
     const length = music.sampleLength ?? 5
 
     this.sampleLoopActive = true
-    this.StartSampleLoop(mPlayer, start, length)
+    void this.StartSampleLoop(mPlayer, start, length)
   }
 
   private async StartSampleLoop(player: IMusicPlayer, start: number, length: number, delay: number = 2) {
@@ -306,7 +294,7 @@ export class BrowsePage implements OnInit, OnDestroy {
       }
     }
 
-    this.router.navigate(['/play/game', selectedMusic.id], {
+    void this.router.navigate(['/play/game', selectedMusic.id], {
       queryParams: {
         notes: chartNames,
       }
