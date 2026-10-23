@@ -463,3 +463,19 @@ Link: https://github.com/Fx73/Dance-Corp/commit/820fecd7d29bd013082e80c61626a091
   - Upload page: the genre suggestions load
   - Desktop: a local song plays in browse and in game
   - Announcers still speak during a game and in the menus
+
+## Commit: Remove unnecessary conditions and enable no-unnecessary-condition
+Link: https://github.com/Fx73/Dance-Corp/commit/2e9994fbfdfdac4f6c6cae028d996c6d6c2cc0c1
+
+- src/app/services/gameplay/sound.service.ts, announcer.service.ts, src/app/game/music-player/IMusicPlayer.ts, src/app/game/game.page.ts: `?? default` removed on `GetConfig()`, the `UserConfig` defaults apply
+- src/app/game/game.manager.ts: background change lookup bounded by the list length
+- src/app/game/game.page.ts: `musicPlayer` nullable, the game starts once both the player and the displays are ready
+- src/app/shared/component/radar-score/radar-score.component.ts: `radar` optional until the view exists, changes tested with `in`
+- src/app/services/gameplay/gamepad.service.ts: a reconnected gamepad is reassigned only when a player had it
+- Others: defaults on DTO fields that always have a value removed
+
+→ To verify:
+  - Fresh browser (no saved config): menu music, effects and announcers play at the default volumes
+  - A game starts and changes background on a music with background changes
+  - The difficulty radar draws on the browse page and on the upload page
+  - Disconnect and reconnect an assigned gamepad: it is reassigned to its player
