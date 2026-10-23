@@ -17,7 +17,7 @@ import { ArrowDirection } from "./constants/arrow-direction.enum"
 import { GameOverComponent } from "./game-display/game-over/game-over.component"
 import { PlayerDisplayComponent } from "./game-display/player-display.component"
 import { WaitingScreenComponent } from "./game-display/waiting-screen/waiting-screen.component"
-import { MusicDto } from "./game-model/music.dto"
+import { MusicDto, NoteDataDto } from "./game-model/music.dto"
 import { GameManager } from './game.manager'
 import { MusicPlayerLocalComponent } from "./music-player/music-player-local/music-player-local.component"
 import { MusicPlayerSoundcloudComponent } from './music-player/music-player-soundcloud/music-player-soundcloud.component'
@@ -80,8 +80,10 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
     }
     this.music = music
 
-    const selectedNotes = chartNames.map(name => music.noteData.findIndex(n => n.chartName === name))
-    if (selectedNotes.includes(-1)) {
+    const selectedNotes = chartNames
+      .map(name => music.noteData.find(n => n.chartName === name))
+      .filter((note): note is NoteDataDto => note !== undefined)
+    if (selectedNotes.length !== chartNames.length) {
       console.error(`Chart not found in music ${musicId}: ${chartNames.join(', ')}`)
       void this.router.navigate(['/home'])
       return
@@ -100,7 +102,7 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
     this.game = new GameManager(this.music, players, selectedNotes, isTrainingMode, this.userCacheService, this.announcerService)
     this.announcerService.PickPreferredAnnouncer()
 
-    void this.discordRpcService.Update("Dancing on lvl " + this.music.noteData[selectedNotes[0]].meter, this.music.title + " - " + this.music.artist)
+    void this.discordRpcService.Update("Dancing on lvl " + selectedNotes[0].meter, this.music.title + " - " + this.music.artist)
   }
 
   @ViewChildren(PlayerDisplayComponent) playerDisplaysQuery!: QueryList<PlayerDisplayComponent>

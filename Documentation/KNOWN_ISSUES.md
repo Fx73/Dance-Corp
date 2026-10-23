@@ -23,9 +23,6 @@ Bugs found but not fixed yet, and deprecations to migrate. Remove an entry once 
 
 ## Improvements
 
-- **Pass identifiers, not indexes, across pages and layers**
-  Charts now travel by `chartName` from browse to the game, but music and player indexes still do (`selectedMusicIndex` over two concatenated lists, `noteSelected` in `GameManager`). Prefer `music.id` / `chartName`.
-
 - **Duplicated persistence block in `MusicCacheService`**
   "update `musics` + `localStorage.setItem` + `registry.add` + save registry" is repeated about 8 times. Extract a `PersistMusic(music)` / `RemoveMusic(id)` helper.
 

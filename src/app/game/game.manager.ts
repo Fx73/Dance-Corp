@@ -4,7 +4,7 @@ import { AnnouncerService } from '../services/gameplay/announcer.service'
 import { CONFIG } from "./constants/game-config"
 import { PlayerDisplayComponent } from "./game-display/player-display.component"
 import { GameRound } from './game-model/gameRound'
-import { MusicDto } from './game-model/music.dto'
+import { MusicDto, NoteDataDto } from './game-model/music.dto'
 import { Player } from './game-model/player'
 import { BeatManager } from './game-model/timeline/beatManager'
 import { IMusicPlayer } from "./music-player/IMusicPlayer"
@@ -14,20 +14,20 @@ export class GameManager {
     music: MusicDto
     isTrainingMode: boolean = false
     mainUserStats: UserNoteDto | null = null
-    private noteSelected: number[]
+    private notes: NoteDataDto[]
 
-    constructor(music: MusicDto, players: Player[], noteSelected: number[], isTrainingMode: boolean, private userCacheService: UserCacheService, private announcerService: AnnouncerService) {
+    constructor(music: MusicDto, players: Player[], notes: NoteDataDto[], isTrainingMode: boolean, private userCacheService: UserCacheService, private announcerService: AnnouncerService) {
         this.music = music
         this.isTrainingMode = isTrainingMode
-        this.noteSelected = noteSelected
+        this.notes = notes
 
         for (let index = 0; index < players.length; index++) {
             const player = players[index]
-            this.gameRounds.push(new GameRound(this.music.noteData[noteSelected[index]], player, this.isTrainingMode, announcerService))
+            this.gameRounds.push(new GameRound(notes[index], player, this.isTrainingMode, announcerService))
         }
 
         this.beatManager = new BeatManager(this.music)
-        this.mainUserStats = this.userCacheService.GetMusicStats(this.music.id).notes.find((n: UserNoteDto) => n.id === this.music.noteData[noteSelected[0]].chartName) ?? null
+        this.mainUserStats = this.userCacheService.GetMusicStats(this.music.id).notes.find((n: UserNoteDto) => n.id === notes[0].chartName) ?? null
     }
 
     public gameRounds: GameRound[] = []
@@ -147,7 +147,7 @@ export class GameManager {
 
         if (!this.isTrainingMode) {
             this.gameRounds.forEach((gameRound, index) => {
-                this.userCacheService.UpdateUserStatsFromRound(this.music.id, this.music.noteData[this.noteSelected[index]].chartName, gameRound)
+                this.userCacheService.UpdateUserStatsFromRound(this.music.id, this.notes[index].chartName, gameRound)
             })
         }
 
