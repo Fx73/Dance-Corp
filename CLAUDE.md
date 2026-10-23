@@ -93,6 +93,11 @@ Write new code the way the existing code is written. Known deviations to avoid a
 - `dev`: commit and push only when necessary, and only for bug fixes, one commit per fix. Never develop a feature directly on `dev`.
 - `master`: never commit or push.
 
+### Versioning
+
+- The version in `package.json` is bumped by the CI: patch on each push to `dev` (`deploy.yml`), minor when a `dev` → `master` PR is opened (`release.yml`), and each `master` deploy is tagged `vX.Y.Z`.
+- Never change the version by hand, except for a new major: a version changed in the pushed commits is kept as is.
+
 ### Before Committing
 
 - Always run `npm install` then `ionic serve` right before a commit, and check that the build completes without errors. Do not commit a broken build.

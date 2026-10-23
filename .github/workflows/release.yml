@@ -1,0 +1,40 @@
+name: Release version
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+    branches:
+      - "master"
+
+jobs:
+  # Opening a dev -> master PR bumps the minor version on dev, so the PR carries it to master
+  bump-minor:
+    if: github.head_ref == 'dev' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: dev
+
+      - name: Npm setup
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Bump the minor version on dev
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git fetch --depth=1 origin master
+          RELEASED=$(git show origin/master:package.json | node -p "JSON.parse(require('fs').readFileSync(0, 'utf8')).version")
+          CURRENT=$(node -p "require('./package.json').version")
+          # Already bumped for this release (PR reopened), or set by hand (e.g. a new major)
+          if [ "${CURRENT%.*}" != "${RELEASED%.*}" ]; then
+            echo "dev is $CURRENT, master is $RELEASED: version kept"
+            exit 0
+          fi
+          npm version minor --no-git-tag-version
+          bash .github/scripts/commit-version.sh dev "$(git rev-parse HEAD)"

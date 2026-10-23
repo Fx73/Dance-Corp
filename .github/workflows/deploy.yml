@@ -15,10 +15,58 @@ env:
   IS_PROD: ${{ github.ref_name == 'master' }}
 
 jobs:
+  # dev: bumps the patch version before building. master: tags the release (its minor is bumped by release.yml).
+  version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      sha: ${{ steps.bump.outputs.sha || github.sha }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Npm setup
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Bump the patch version
+        id: bump
+        if: github.event_name == 'push' && github.ref_name == 'dev' && github.event.before != '0000000000000000000000000000000000000000'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          git fetch --depth=1 origin "$BEFORE"
+          PREVIOUS=$(git show "$BEFORE:package.json" | node -p "JSON.parse(require('fs').readFileSync(0, 'utf8')).version")
+          CURRENT=$(node -p "require('./package.json').version")
+          # A version changed by hand in the pushed commits (e.g. a new major) is kept
+          if [ "$PREVIOUS" != "$CURRENT" ]; then
+            echo "Version changed by the push ($PREVIOUS -> $CURRENT), kept"
+            exit 0
+          fi
+          npm version patch --no-git-tag-version
+          echo "sha=$(bash .github/scripts/commit-version.sh dev "$GITHUB_SHA")" >> "$GITHUB_OUTPUT"
+
+      - name: Tag the release
+        if: github.event_name == 'push' && github.ref_name == 'master'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          if git ls-remote --exit-code --tags origin "refs/tags/v$VERSION" > /dev/null; then
+            echo "Tag v$VERSION already exists"
+            exit 0
+          fi
+          gh api "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/tags/v$VERSION" -f sha="$GITHUB_SHA"
+
   web:
+    needs: version
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.version.outputs.sha }}
 
       - name: Npm setup
         uses: actions/setup-node@v6
@@ -49,9 +97,12 @@ jobs:
           channelId: live
 
   desktop:
+    needs: version
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.version.outputs.sha }}
 
       - name: Npm setup
         uses: actions/setup-node@v6
