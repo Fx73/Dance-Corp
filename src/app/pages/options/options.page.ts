@@ -73,7 +73,7 @@ export class OptionsPage {
       case 'sfxVolume':
         const SOUND_ARROW_UP = new Audio('assets/Sounds/menuFx/arrow_up.ogg')
         SOUND_ARROW_UP.volume = this.GetConfigValue('sfxVolume')
-        void SOUND_ARROW_UP.play()
+        SoundService.PlaySound(SOUND_ARROW_UP)
         break
     }
 

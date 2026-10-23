@@ -47,7 +47,8 @@ export class GameManager {
         console.log("Waiting for audio to start…")
 
         this.musicPlayer.Play()
-        await new Promise<void>(resolve => { const check = () => { const t = this.musicPlayer.GetCurrentTime(); if (t > 0) { resolve() } else { requestAnimationFrame(check) } }; check() })
+        const hasStarted = await this.WaitForMusicStart()
+        if (!hasStarted) return
 
         const musicCurrentTime = this.musicPlayer.GetCurrentTime()
         this.zeroTimeStamp = Math.round(performance.now()) - (musicCurrentTime * 1000)
@@ -55,6 +56,20 @@ export class GameManager {
         this.GameGlobalLoop(this.zeroTimeStamp)
 
         console.log("Game has started")
+    }
+
+    /** Resolves true once the music time moves, false if the game is destroyed first. Rejects after MUSIC_START_TIMEOUT */
+    private WaitForMusicStart(): Promise<boolean> {
+        const deadline = performance.now() + CONFIG.GAME.MUSIC_START_TIMEOUT * 1000
+        return new Promise<boolean>((resolve, reject) => {
+            const Check = () => {
+                if (this.isDestroyed) return resolve(false)
+                if (this.musicPlayer.GetCurrentTime() > 0) return resolve(true)
+                if (performance.now() > deadline) return reject(new Error(`The music did not start after ${CONFIG.GAME.MUSIC_START_TIMEOUT} seconds`))
+                requestAnimationFrame(Check)
+            }
+            Check()
+        })
     }
 
     private gameLoopId: number | null = null
@@ -138,7 +153,9 @@ export class GameManager {
 
     }
 
+    private isDestroyed = false
     public DestroyGame() {
+        this.isDestroyed = true
         if (this.gameLoopId !== null) {
             cancelAnimationFrame(this.gameLoopId)
         }

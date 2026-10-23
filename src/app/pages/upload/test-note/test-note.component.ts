@@ -2,6 +2,7 @@ import { Component, Input, OnDestroy, OnInit, ViewChild, inject } from '@angular
 import { IMusicPlayer, MusicOrigin, MusicPlayerCommon } from 'src/app/game/music-player/IMusicPlayer'
 import { MusicDto, NoteDataDto } from 'src/app/game/game-model/music.dto'
 
+import { AppComponent } from 'src/app/app.component'
 import { ArrowDirection } from 'src/app/game/constants/arrow-direction.enum'
 import { GameManager } from 'src/app/game/game.manager'
 import { ModalController } from '@ionic/angular'
@@ -46,7 +47,10 @@ export class TestNoteComponent implements OnInit, OnDestroy {
     const player = this.userConfigService.players[0] || new Player()
     this.game = new GameManager(this.music, [player], [0], true, null!, null!)
     this.game.RegisterExternalComponents(musicPlayer)
-    void this.game.StartGame()
+    this.game.StartGame().catch(error => {
+      AppComponent.PresentErrorToast("The music could not start: " + error)
+      this.Dismiss()
+    })
   }
 
   Dismiss() {

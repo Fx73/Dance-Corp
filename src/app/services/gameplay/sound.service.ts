@@ -70,7 +70,7 @@ export class SoundService {
             clearInterval(this.fadeIntervals.get(audio))
         }
 
-        void audio.play()
+        SoundService.PlaySound(audio)
 
         const step = 50
         const increment = step / duration
@@ -113,7 +113,7 @@ export class SoundService {
     PlaySfx(audio: HTMLAudioElement) {
         audio.volume = this.GetSfxVolume()
         audio.currentTime = 0
-        void audio.play()
+        SoundService.PlaySound(audio)
     }
     
     // -------------------------
@@ -131,4 +131,11 @@ export class SoundService {
     private GetSfxVolume(): number {
         return this.userConfigService.GetConfig()["sfxVolume"] ?? 1
     }
+
+    //#region Statics
+    /** A blocked or failed playback only loses the sound: the browser blocks audio until the first click */
+    static PlaySound(audio: HTMLAudioElement) {
+        audio.play().catch(error => console.warn(`Sound not played: ${audio.src}`, error))
+    }
+    //#endregion
 }

@@ -133,7 +133,10 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
 
   HandleCountdownFinished() {
     this.loadingMusic = false
-    void this.game?.StartGame()
+    this.game?.StartGame().catch(error => {
+      AppComponent.PresentErrorToast("The music could not start: " + error)
+      void this.router.navigate(['/play/browse'])
+    })
   }
 
   ngOnDestroy(): void {

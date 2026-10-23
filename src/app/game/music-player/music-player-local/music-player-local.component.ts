@@ -72,8 +72,10 @@ export class MusicPlayerLocalComponent extends MusicPlayerCommon implements IMus
   }
 
   Play(): void {
-    void this.audio.play()
-    this.isPlaying = true
+    // A failed playback is detected by the game, as the music time does not move
+    this.audio.play()
+      .then(() => this.isPlaying = true)
+      .catch(error => console.warn("Local music not played:", error))
   }
 
   Stop(): void {
