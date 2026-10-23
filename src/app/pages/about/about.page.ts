@@ -2,7 +2,7 @@ import { Component } from '@angular/core'
 import { IonBadge, IonCard, IonCardContent, IonContent, IonIcon } from '@ionic/angular'
 import { logoAngular, logoCss3, logoHtml5, logoIonic, logoSoundcloud, logoYoutube } from 'ionicons/icons'
 
-import { AppConfig } from 'src/app.config'
+import { version as appVersion } from '../../../../package.json'
 
 import { FormsModule } from '@angular/forms'
 import { HeaderComponent } from "src/app/shared/component/header/header.component"
@@ -19,7 +19,7 @@ import isTauri from 'src/app/shared/utils/tauri'
 export class AboutPage {
   isDesktop = isTauri
 
-  readonly version = AppConfig.version
+  readonly version = appVersion
 
   constructor() {
     addIcons({ logoYoutube, logoSoundcloud, logoHtml5, logoCss3, logoAngular, logoIonic, 'logo-html5': logoHtml5, 'logo-css3': logoCss3 })
