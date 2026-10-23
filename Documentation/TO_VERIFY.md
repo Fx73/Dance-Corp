@@ -438,3 +438,13 @@ Link: https://github.com/Fx73/Dance-Corp/commit/6654a7d8eb9ce4a23c6449dabcb85d66
   - A game in single and multiplayer plays the selected charts, and the score is saved on the right chart
   - Upload page: testing a chart other than the first plays that chart; the announcer may now react during the test
   - Browse: select the last chart of a music with many charts, move to a music with fewer: its last chart is selected, and Enter starts the game
+
+## Commit: Factor the music cache persistence into helpers
+Link: https://github.com/Fx73/Dance-Corp/commit/712590e559db82f8493536bdaabef72f66a42101
+
+- src/app/services/local-storage/music.cache.service.ts: `PersistMusic()`, `RemoveMusic()` and `SaveRegistry()` replace the repeated block; an updated music keeps its position in `musics` (it moved to the end before, also when played, as `RunGame` refreshes it); unused `GetMusicWithDbNoUpdate()` removed
+
+→ To verify:
+  - First load with an empty cache (Options, clear the music cache, reload): the whole catalog appears in browse
+  - Play a music: it stays at the same place in the browse list
+  - Upload, update and delete a music, upload and delete a chart: the browse lists follow, also after a reload
