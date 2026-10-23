@@ -34,7 +34,7 @@
 						Use a Third-party credential
 					</ion-title>
 					<ion-card-content>
-						<ion-button (click)="loginWithGoogle()" icon-right expand="block" fill="outline" shape="round"
+						<ion-button (click)="LoginWithGoogle()" icon-right expand="block" fill="outline" shape="round"
 							color="primary">
 							<ion-icon slot="icon-only" size="large" name="logo-google" ios="logo-google"
 								md="logo-google"></ion-icon>
@@ -55,7 +55,7 @@
 					</ion-card-header>
 					<ion-card-content>
 						<form [formGroup]="loginForm"
-							(ngSubmit)="loginForm.valid && login(loginForm.controls['email'].value, loginForm.controls['password'].value)"
+							(ngSubmit)="loginForm.valid && Login(loginForm.controls['email'].value, loginForm.controls['password'].value)"
 							novalidate>
 							<ion-item>
 								<ion-input placeholder="email" formControlName="email"></ion-input>
@@ -96,7 +96,7 @@
 					</ion-card-header>
 					<ion-card-content>
 						<form [formGroup]="registerForm"
-							(ngSubmit)="register(registerForm.controls['email'].value, registerForm.controls['password'].value)">
+							(ngSubmit)="Register(registerForm.controls['email'].value, registerForm.controls['password'].value)">
 							<ion-item>
 								<ion-input placeholder="email" formControlName="email"></ion-input>
 								@if (registerForm.controls['email'].invalid && (registerForm.controls['email'].dirty || registerForm.controls['email'].touched)) {
@@ -137,7 +137,7 @@
 					</ion-card-header>
 					<ion-card-content>
 						<form [formGroup]="passwordRecoveryForm"
-							(ngSubmit)="passwordRecovery(passwordRecoveryForm.controls['email'].value)">
+							(ngSubmit)="PasswordRecovery(passwordRecoveryForm.controls['email'].value)">
 							<ion-item>
 								<ion-input placeholder="email" formControlName="email"></ion-input>
 								@if (passwordRecoveryForm.controls['email'].invalid && (passwordRecoveryForm.controls['email'].dirty || passwordRecoveryForm.controls['email'].touched)) {

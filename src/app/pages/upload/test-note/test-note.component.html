@@ -1,10 +1,10 @@
 @if (musicOrigin === MusicOrigin.Youtube) {
   <app-music-player-youtube [musicUrl]="music.music!"
-    (ready)="onPlayerReady($event)"></app-music-player-youtube>
+    (ready)="OnPlayerReady($event)"></app-music-player-youtube>
 }
 @if (musicOrigin === MusicOrigin.Soundcloud) {
   <app-music-player-soundcloud [musicUrl]="music.music!"
-    (ready)="onPlayerReady($event)"></app-music-player-soundcloud>
+    (ready)="OnPlayerReady($event)"></app-music-player-soundcloud>
 }
 
 @if (game?.gameRounds) {

@@ -1,20 +1,20 @@
-import { Component, ViewChild, inject } from '@angular/core';
-import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonInput, IonItem, IonLabel, IonModal, IonRange, IonToggle, InputChangeEventDetail, RangeChangeEventDetail } from '@ionic/angular';
+import { Component, ViewChild, inject } from '@angular/core'
+import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonInput, IonItem, IonLabel, IonModal, IonRange, IonToggle, InputChangeEventDetail, RangeChangeEventDetail } from '@ionic/angular'
 
-import { AnnouncerService } from 'src/app/services/gameplay/announcer.service';
-import { Arrow } from '../../game/game-model/arrows/arrow';
-import { ArrowType } from '../../game/constants/arrow-type.enum';
+import { AnnouncerService } from 'src/app/services/gameplay/announcer.service'
+import { Arrow } from '../../game/game-model/arrows/arrow'
+import { ArrowType } from '../../game/constants/arrow-type.enum'
 
-import { FormsModule } from '@angular/forms';
-import { GameRound } from '../../game/game-model/gameRound';
-import { HeaderComponent } from "src/app/shared/component/header/header.component";
-import { MusicCacheService } from '../../services/local-storage/music.cache.service';
-import { PlayerDisplayComponent } from '../../game/game-display/player-display.component';
-import { RouterModule } from '@angular/router';
-import { SoundManager } from './../../services/gameplay/sound.service';
-import { UserCacheService } from '../../services/local-storage/user.cache.service';
-import { UserConfig, UserConfigService } from 'src/app/services/userconfig.service';
-import { musicLocalService } from 'src/app/services/local-storage/local.music.service';
+import { FormsModule } from '@angular/forms'
+import { GameRound } from '../../game/game-model/gameRound'
+import { HeaderComponent } from "src/app/shared/component/header/header.component"
+import { MusicCacheService } from '../../services/local-storage/music.cache.service'
+import { PlayerDisplayComponent } from '../../game/game-display/player-display.component'
+import { RouterModule } from '@angular/router'
+import { SoundService } from './../../services/gameplay/sound.service'
+import { UserCacheService } from '../../services/local-storage/user.cache.service'
+import { UserConfig, UserConfigService } from 'src/app/services/userconfig.service'
+import { MusicLocalService } from 'src/app/services/local-storage/local.music.service'
 
 @Component({
   selector: 'app-options',
@@ -24,70 +24,67 @@ import { musicLocalService } from 'src/app/services/local-storage/local.music.se
   imports: [IonRange, IonModal, IonLabel, IonInput, IonToggle, IonCardSubtitle, IonButton, IonItem, IonCardContent, IonCardHeader, IonCardTitle, IonCard, IonModal, IonContent, FormsModule, HeaderComponent, RouterModule, PlayerDisplayComponent]
 })
 export class OptionsPage {
-  private userConfigService = inject(UserConfigService);
-  private localMusicService = inject(musicLocalService);
-  private musicCacheService = inject(MusicCacheService);
-  private userCacheService = inject(UserCacheService);
-  private soundManager = inject(SoundManager);
-  private announcerService = inject(AnnouncerService);
+  private userConfigService = inject(UserConfigService)
+  private localMusicService = inject(MusicLocalService)
+  private musicCacheService = inject(MusicCacheService)
+  private userCacheService = inject(UserCacheService)
+  private soundService = inject(SoundService)
+  private announcerService = inject(AnnouncerService)
 
-  @ViewChild(PlayerDisplayComponent) playerDisplay?: PlayerDisplayComponent;
-  showPlayerDisplay = false;
+  @ViewChild(PlayerDisplayComponent) playerDisplay?: PlayerDisplayComponent
+  showPlayerDisplay = false
 
   constructor() {
     // Initialize player display if needed
-    if (this.userConfigService.getConfig()['showPlayerDisplay']) {
-      this.showPlayerDisplay = true;
+    if (this.userConfigService.GetConfig()['showPlayerDisplay']) {
+      this.showPlayerDisplay = true
     }
   }
 
-  pinFormatter(value: number) {
-    return `${value}`;
-  }
-  pinFormatterVolume(value: number) {
-    return (value * 100).toFixed(0) + '%';
+  PinFormatter(value: number) {
+    return `${value}`
   }
 
-
-  getConfigValue<K extends keyof UserConfig>(key: K): UserConfig[K] {
-    return this.userConfigService.getConfig()[key];
+  PinFormatterVolume(value: number) {
+    return (value * 100).toFixed(0) + '%'
   }
 
-  // Valeur brute des composants Ionic : ion-input renvoie une string (ex: canvasWidth), conservée telle quelle
-  updateConfigValue<K extends keyof UserConfig>(key: K, value: UserConfig[K] | InputChangeEventDetail['value'] | RangeChangeEventDetail['value']): void {
-    this.userConfigService.updateConfig(key, value as UserConfig[K]);
+  GetConfigValue<K extends keyof UserConfig>(key: K): UserConfig[K] {
+    return this.userConfigService.GetConfig()[key]
   }
 
-  updatePlayerNumber(value: RangeChangeEventDetail['value']): void {
-    this.userConfigService.updatePlayerCount(value as number);
+  // Raw value from Ionic components: ion-input returns a string (e.g. canvasWidth), kept as is
+  UpdateConfigValue<K extends keyof UserConfig>(key: K, value: UserConfig[K] | InputChangeEventDetail['value'] | RangeChangeEventDetail['value']): void {
+    this.userConfigService.UpdateConfig(key, value as UserConfig[K])
   }
 
+  UpdatePlayerNumber(value: RangeChangeEventDetail['value']): void {
+    this.userConfigService.UpdatePlayerCount(value as number)
+  }
 
-  verifySoundVolume(source: keyof UserConfig): void {
-    const volume = this.getConfigValue(source);
-    console.log(`Testing volume for ${source} at ${volume}`);
+  VerifySoundVolume(source: keyof UserConfig): void {
     switch (source) {
       case 'menuMusicVolume':
-        this.soundManager.refreshMusicVolume();
-        break;
+        this.soundService.RefreshMusicVolume()
+        break
       case 'announcersVolume':
-        this.announcerService.testAnnouncerSound();
-        break;
+        this.announcerService.TestAnnouncerSound()
+        break
       case 'sfxVolume':
-        const SOUND_ARROW_UP = new Audio('assets/Sounds/menuFx/arrow_up.ogg');
-        SOUND_ARROW_UP.volume = this.getConfigValue('sfxVolume');
-        SOUND_ARROW_UP.play();
-        break;
+        const SOUND_ARROW_UP = new Audio('assets/Sounds/menuFx/arrow_up.ogg')
+        SOUND_ARROW_UP.volume = this.GetConfigValue('sfxVolume')
+        SOUND_ARROW_UP.play()
+        break
     }
 
   }
 
-  verifyDisplay(): void {
-    console.log("Updating player display with current config...", this.showPlayerDisplay);
-    this.showPlayerDisplay = true;
+  VerifyDisplay(): void {
+    this.showPlayerDisplay = true
     this.playerDisplay?.Update(0)
   }
-  getFakeGameRound(): GameRound {
+
+  GetFakeGameRound(): GameRound {
     const arrowMap: Arrow[] = [
       new Arrow(0, 1, ArrowType.Hold, 1.5),
       new Arrow(1, 2, ArrowType.Tap),
@@ -95,7 +92,7 @@ export class OptionsPage {
       new Arrow(3, 4, ArrowType.Mine),
       new Arrow(0, 6, ArrowType.Hold, 8),
       new Arrow(2, 7, ArrowType.Tap),
-    ];
+    ]
 
     return {
       player: this.userConfigService.players[0],
@@ -103,30 +100,31 @@ export class OptionsPage {
       arrowMap: arrowMap,
       currentBeat: 0,
       precisionMessage: [] as Arrow[]
-    } as unknown as GameRound;
+    } as unknown as GameRound
   }
-  getModalStyle() {
-    const w = this.getConfigValue('canvasWidth');
-    const h = this.getConfigValue('canvasHeight');
+
+  GetModalStyle() {
+    const w = this.GetConfigValue('canvasWidth')
+    const h = this.GetConfigValue('canvasHeight')
 
     return {
       'width': `${w}px`,
       'height': `${h}px`
-    };
+    }
   }
 
-
-
-  resetAll(): void {
-    this.userConfigService.resetToDefault();
-    location.reload();
+  ResetAll(): void {
+    this.userConfigService.ResetToDefault()
+    location.reload()
   }
-  clearMusicCache() {
-    this.musicCacheService.clearCache();
-    this.userCacheService.clearCache();
+
+  ClearMusicCache() {
+    this.musicCacheService.ClearCache()
+    this.userCacheService.ClearCache()
   }
-  clearMusicEditCache() {
-    this.localMusicService.clearAllLocalMusics()
+
+  ClearMusicEditCache() {
+    this.localMusicService.ClearAllLocalMusics()
 
   }
 }

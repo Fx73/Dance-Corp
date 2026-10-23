@@ -1,224 +1,230 @@
-import { NgClass, NgStyle, } from '@angular/common';
-import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren, inject, signal } from '@angular/core';
-import { InfiniteScrollCustomEvent, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonImg, IonInfiniteScroll, IonInfiniteScrollContent, IonMenu, IonSearchbar, IonSplitPane, IonText, SearchbarCustomEvent } from '@ionic/angular';
-import { MusicDto, NoteDataDto } from 'src/app/game/game-model/music.dto';
-import { IMusicPlayer, MusicOrigin, MusicPlayerCommon } from 'src/app/game/music-player/IMusicPlayer';
-import { UserMusicDto, UserNoteDto } from '../user-profile/user.dto';
+import { NgClass, NgStyle, } from '@angular/common'
+import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, QueryList, ViewChildren, inject, signal } from '@angular/core'
+import { InfiniteScrollCustomEvent, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonInfiniteScroll, IonInfiniteScrollContent, IonMenu, IonSearchbar, IonSplitPane, IonText, SearchbarCustomEvent } from '@ionic/angular'
+import { MusicDto, NoteDataDto } from 'src/app/game/game-model/music.dto'
+import { IMusicPlayer, MusicOrigin, MusicPlayerCommon } from 'src/app/game/music-player/IMusicPlayer'
+import { UserMusicDto, UserNoteDto } from '../user-profile/user.dto'
 
-import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-import { ArrowDirection } from 'src/app/game/constants/arrow-direction.enum';
-import { Color } from 'src/app/game/constants/color';
-import { DanceType } from 'src/app/game/constants/dance-type.enum';
-import { CONFIG } from 'src/app/game/constants/game-config';
-import { NoteDifficulty } from 'src/app/game/constants/note-difficulty.enum';
-import { DancePadGamepad } from 'src/app/game/game-controller/dancepad-gamepad';
-import { DancePadKeyboard } from 'src/app/game/game-controller/dancepad-keyboard';
-import { IDancePad } from 'src/app/game/game-controller/dancepad.interface';
-import { MusicPlayerLocalComponent } from "src/app/game/music-player/music-player-local/music-player-local.component";
-import { MusicPlayerSoundcloudComponent } from "src/app/game/music-player/music-player-soundcloud/music-player-soundcloud.component";
-import { MusicPlayerYoutubeComponent } from "src/app/game/music-player/music-player-youtube/music-player-youtube.component";
-import { AnnouncerService } from 'src/app/services/gameplay/announcer.service';
-import { musicLocalService } from 'src/app/services/local-storage/local.music.service';
-import { UserCacheService } from 'src/app/services/local-storage/user.cache.service';
-import { UserConfigService } from 'src/app/services/userconfig.service';
-import { HeaderComponent } from "src/app/shared/component/header/header.component";
-import { RadarScoreComponent } from "src/app/shared/component/radar-score/radar-score.component";
-import { MusicCacheService } from '../../services/local-storage/music.cache.service';
-import { PresenceService } from '../../services/thirdpartyapp/presence.service';
-import { GradeComponent } from "../../shared/component/grade/grade.component";
-import { DifficultyCriteria } from '../upload/DifficultyCriteria';
-import { UserFirestoreService } from './../../services/firestore/user.firestore.service';
-import { SoundManager } from './../../services/gameplay/sound.service';
+import { FormsModule } from '@angular/forms'
+import { Router } from '@angular/router'
+import { ArrowDirection } from 'src/app/game/constants/arrow-direction.enum'
+import { Color } from 'src/app/game/constants/color'
+import { DanceType } from 'src/app/game/constants/dance-type.enum'
+import { CONFIG } from 'src/app/game/constants/game-config'
+import { NoteDifficulty } from 'src/app/game/constants/note-difficulty.enum'
+import { DancePadGamepad } from 'src/app/game/game-controller/dancepad-gamepad'
+import { DancePadKeyboard } from 'src/app/game/game-controller/dancepad-keyboard'
+import { IDancePad } from 'src/app/game/game-controller/dancepad.interface'
+import { MusicPlayerLocalComponent } from "src/app/game/music-player/music-player-local/music-player-local.component"
+import { MusicPlayerSoundcloudComponent } from "src/app/game/music-player/music-player-soundcloud/music-player-soundcloud.component"
+import { MusicPlayerYoutubeComponent } from "src/app/game/music-player/music-player-youtube/music-player-youtube.component"
+import { AnnouncerService } from 'src/app/services/gameplay/announcer.service'
+import { MusicLocalService } from 'src/app/services/local-storage/local.music.service'
+import { UserCacheService } from 'src/app/services/local-storage/user.cache.service'
+import { UserConfigService } from 'src/app/services/userconfig.service'
+import { HeaderComponent } from "src/app/shared/component/header/header.component"
+import { RadarScoreComponent } from "src/app/shared/component/radar-score/radar-score.component"
+import { MusicCacheService } from '../../services/local-storage/music.cache.service'
+import { PresenceService } from '../../services/thirdpartyapp/presence.service'
+import { productionConsole } from 'src/app/shared/console-output'
+import { GradeComponent } from "../../shared/component/grade/grade.component"
+import { DifficultyCriteria } from '../upload/DifficultyCriteria'
+import { UserFirestoreService } from './../../services/firestore/user.firestore.service'
+import { SoundService } from './../../services/gameplay/sound.service'
 
 @Component({
   selector: 'app-browse',
   templateUrl: './browse.page.html',
   styleUrls: ['./browse.page.scss'],
   standalone: true,
-  imports: [IonBadge, IonSplitPane, IonCardSubtitle, IonMenu, IonText, IonCardContent, IonCardTitle, IonInfiniteScrollContent, IonImg, IonInfiniteScroll, IonSearchbar, IonCard, IonCardHeader, IonContent, NgStyle, NgClass, FormsModule, HeaderComponent, GradeComponent, RadarScoreComponent, MusicPlayerYoutubeComponent, MusicPlayerLocalComponent, MusicPlayerSoundcloudComponent]
+  imports: [IonBadge, IonSplitPane, IonCardSubtitle, IonMenu, IonText, IonCardContent, IonCardTitle, IonInfiniteScrollContent, IonInfiniteScroll, IonSearchbar, IonCard, IonCardHeader, IonContent, NgStyle, NgClass, FormsModule, HeaderComponent, GradeComponent, RadarScoreComponent, MusicPlayerYoutubeComponent, MusicPlayerLocalComponent, MusicPlayerSoundcloudComponent]
 })
-export class BrowsePage implements OnInit {
-  private router = inject(Router);
-  private cd = inject(ChangeDetectorRef);
-  private localMusicService = inject(musicLocalService);
-  private musicCacheService = inject(MusicCacheService);
-  private userFirestoreService = inject(UserFirestoreService);
-  private userConfigService = inject(UserConfigService);
-  private userCacheService = inject(UserCacheService);
-  private announcerService = inject(AnnouncerService);
-  private discordRpcService = inject(PresenceService);
-  private soundManager = inject(SoundManager);
+export class BrowsePage implements OnInit, OnDestroy {
+  //#region Constants
+  readonly SOUND_ARROW_UP = new Audio('assets/Sounds/menuFx/arrow_up.ogg')
+  readonly SOUND_ARROW_DOWN = new Audio('assets/Sounds/menuFx/arrow_down.ogg')
 
-  readonly SOUND_ARROW_UP = new Audio('assets/Sounds/menuFx/arrow_up.ogg');
-  readonly SOUND_ARROW_DOWN = new Audio('assets/Sounds/menuFx/arrow_down.ogg');
+  readonly MusicOrigin = MusicOrigin
+  readonly DanceType = DanceType
+  pickMusicPlayer = MusicPlayerCommon.PickMusicPlayer
+  //#endregion
 
-  readonly MusicOrigin = MusicOrigin;
-  readonly DanceType = DanceType;
-  pickMusicPlayer = MusicPlayerCommon.pickMusicPlayer;
+  private router = inject(Router)
+  private cd = inject(ChangeDetectorRef)
+  private localMusicService = inject(MusicLocalService)
+  private musicCacheService = inject(MusicCacheService)
+  private userFirestoreService = inject(UserFirestoreService)
+  private userConfigService = inject(UserConfigService)
+  private userCacheService = inject(UserCacheService)
+  private announcerService = inject(AnnouncerService)
+  private discordRpcService = inject(PresenceService)
+  private soundService = inject(SoundService)
 
-  dbMusics = signal<MusicDto[]>([]);
-  storedMusics = signal<MusicDto[]>([]);
+  dbMusics = signal<MusicDto[]>([])
+  storedMusics = signal<MusicDto[]>([])
 
-  musicNotes = signal<NoteDataDto[]>([]);
-  musicUserScore = signal<UserMusicDto | null>(null);
+  musicNotes = signal<NoteDataDto[]>([])
+  musicUserScore = signal<UserMusicDto | null>(null)
 
-  userScores: Record<string, number> = {};
+  userScores: Record<string, number> = {}
 
-  searchQuery: string = '';
+  searchQuery: string = ''
 
-  selectedMusicIndex = signal<number>(0);
-  selectedNotesIndex = signal<number[]>([]);
+  selectedMusicIndex = signal<number>(0)
+  selectedNotesIndex = signal<number[]>([])
 
   dancepad: IDancePad[] = []
 
-  lastDifficultyPlayed: NoteDifficulty[] = [];
+  lastDifficultyPlayed: NoteDifficulty[] = []
 
-  private sampleLoopActive = false;
+  private sampleLoopActive = false
 
-  @ViewChildren('musicCard', { read: ElementRef }) musicCards!: QueryList<ElementRef>;
+  @ViewChildren('musicCard', { read: ElementRef }) musicCards!: QueryList<ElementRef>
 
   ngOnInit() {
-    this.searchQuery = localStorage.getItem('browseSearchQuery') ?? '';
-    this.selectedNotesIndex.set(new Array(this.userConfigService.players.length).fill(0));
+    this.searchQuery = localStorage.getItem('browseSearchQuery') ?? ''
+    this.selectedNotesIndex.set(new Array(this.userConfigService.players.length).fill(0))
 
-    this.initIonInfinite();
+    this.InitIonInfinite()
 
-    this.initPlayerInput();
-    this.discordRpcService.update("Browsing");
+    this.InitPlayerInput()
+    this.discordRpcService.Update("Browsing")
   }
-
-
 
   //#region Input handling
   ionViewWillEnter() {
-    window.addEventListener('keydown', this.keyHandler);
-    this.isListeningInput = true;
-    this.listenInput();
-  }
-  ionViewWillLeave() {
-    window.removeEventListener('keydown', this.keyHandler);
-    this.isListeningInput = false;
-    this.sampleLoopActive = false;
+    window.addEventListener('keydown', this.KeyHandler)
+    this.isListeningInput = true
+    this.ListenInput()
   }
 
-  initPlayerInput() {
-    const players = this.userConfigService.players;
+  ionViewWillLeave() {
+    window.removeEventListener('keydown', this.KeyHandler)
+    this.isListeningInput = false
+    this.sampleLoopActive = false
+  }
+
+  ngOnDestroy() {
+    this.dancepad.forEach(pad => pad.Destroy())
+  }
+
+  InitPlayerInput() {
+    const players = this.userConfigService.players
     for (const player of players) {
       if (player.gamepad!.index === -1)
-        this.dancepad.push(new DancePadKeyboard(player.keyBindingKeyboard));
+        this.dancepad.push(new DancePadKeyboard(player.keyBindingKeyboard))
       else
-        this.dancepad.push(new DancePadGamepad(player.gamepad!.index!, player.keyBindingGamepad));
+        this.dancepad.push(new DancePadGamepad(player.gamepad!.index!, player.keyBindingGamepad))
     }
   }
 
-  readonly blockedKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'Spacebar', 'Enter'];
-  private keyHandler = (event: KeyboardEvent) => {
-    if (this.isFocusOnSearchInput) return;
+  readonly blockedKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'Spacebar', 'Enter']
+  private KeyHandler = (event: KeyboardEvent) => {
+    if (this.isFocusOnSearchInput) return
     if (this.blockedKeys.includes(event.key)) {
-      event.preventDefault();
+      event.preventDefault()
     }
     if (event.key === 'Enter') {
-      this.runGame();
+      this.RunGame()
     }
-  };
+  }
 
-  isFocusOnSearchInput = false;
-  isListeningInput = false;
-  listenInput() {
+  isFocusOnSearchInput = false
+  isListeningInput = false
+  ListenInput() {
     if (!this.isFocusOnSearchInput) {
       for (let index = 0; index < this.dancepad.length; index++) {
-        const padstate = this.dancepad[index].getRefreshedState();
+        const padstate = this.dancepad[index].GetRefreshedState()
         if (padstate[ArrowDirection.Left]) {
-          this.onSelectMusic(Math.max(0, this.selectedMusicIndex() - 1));
+          this.OnSelectMusic(Math.max(0, this.selectedMusicIndex() - 1))
         }
         if (padstate[ArrowDirection.Right]) {
-          this.onSelectMusic(Math.min(this.storedMusics().length + this.dbMusics().length - 1, this.selectedMusicIndex() + 1));
+          this.OnSelectMusic(Math.min(this.storedMusics().length + this.dbMusics().length - 1, this.selectedMusicIndex() + 1))
         }
         if (padstate[ArrowDirection.Down]) {
-          const notesLength = this.musicNotes().length;
-          this.onSelectNote(Math.min(notesLength - 1, (this.selectedNotesIndex()[index] ?? 0) + 1), index);
+          const notesLength = this.musicNotes().length
+          this.OnSelectNote(Math.min(notesLength - 1, (this.selectedNotesIndex()[index] ?? 0) + 1), index)
         }
         if (padstate[ArrowDirection.Up]) {
-          this.onSelectNote(Math.max(0, (this.selectedNotesIndex()[index] ?? 0) - 1), index);
+          this.OnSelectNote(Math.max(0, (this.selectedNotesIndex()[index] ?? 0) - 1), index)
         }
       }
     }
     if (this.isListeningInput)
-      setTimeout(() => this.listenInput(), 100);
+      setTimeout(() => this.ListenInput(), 100)
   }
   //#endregion
 
-  getSelectedMusic(index: number): MusicDto | null {
+  GetSelectedMusic(index: number): MusicDto | null {
     if (index >= 0) {
       if (index < this.storedMusics().length)
-        return this.storedMusics()[index];
+        return this.storedMusics()[index]
       else
-        return this.dbMusics()[index - this.storedMusics().length];
+        return this.dbMusics()[index - this.storedMusics().length]
     }
-    return null;
+    return null
   }
 
-  trySetSelectedMusicById(musicId: string) {
-    let index = this.storedMusics().findIndex((m: { id: string; }) => m.id === musicId);
+  TrySetSelectedMusicById(musicId: string) {
+    let index = this.storedMusics().findIndex((m: { id: string }) => m.id === musicId)
 
     if (index === -1) {
-      index = this.dbMusics().findIndex((m: { id: string; }) => m.id === musicId) + this.storedMusics().length;
+      index = this.dbMusics().findIndex((m: { id: string }) => m.id === musicId) + this.storedMusics().length
     }
 
     if (index === -1) {
-      this.onSelectMusic(0);
+      this.OnSelectMusic(0)
     }
     else {
-      this.onSelectMusic(index);
+      this.OnSelectMusic(index)
     }
   }
 
-
-  onSelectMusic(listIndex: number) {
-    const music = this.getSelectedMusic(listIndex);
+  OnSelectMusic(listIndex: number) {
+    const music = this.GetSelectedMusic(listIndex)
     if (!music) {
-      this.musicNotes.set([]);
-      return;
+      this.musicNotes.set([])
+      return
     }
 
-    const isSinglePlayer = this.userConfigService.players.length === 1;
-    const filteredNotes = music.noteData.filter(note => !isSinglePlayer || note.stepsType === DanceType.DanceSingle).sort((a, b) => a.meter - b.meter) ?? [];
+    const isSinglePlayer = this.userConfigService.players.length === 1
+    const filteredNotes = music.noteData.filter(note => !isSinglePlayer || note.stepsType === DanceType.DanceSingle).sort((a, b) => a.meter - b.meter)
 
-    this.musicNotes.set(filteredNotes);
+    this.musicNotes.set(filteredNotes)
 
-    this.selectedMusicIndex.set(listIndex);
-    localStorage.setItem('lastMusicSelectedId', music.id);
+    this.selectedMusicIndex.set(listIndex)
+    localStorage.setItem('lastMusicSelectedId', music.id)
 
-    this.musicUserScore.set(this.userCacheService.getMusicStats(music.id));
+    this.musicUserScore.set(this.userCacheService.GetMusicStats(music.id))
 
-    this.soundManager.playSfx(this.SOUND_ARROW_UP);
+    this.soundService.PlaySfx(this.SOUND_ARROW_UP)
 
     setTimeout(() => {
-      const el = this.musicCards.toArray()[listIndex]?.nativeElement;
+      const el = this.musicCards.toArray()[listIndex]?.nativeElement
       if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' })
       }
-    });
-  }
-  onSelectNote(noteIdx: number, playerIndex: number = 0) {
-    this.selectedNotesIndex()[playerIndex] = noteIdx;
-    this.soundManager.playSfx(this.SOUND_ARROW_DOWN);
-    this.cd.markForCheck();
+    })
   }
 
-  onSearch(event: SearchbarCustomEvent) {
-    this.searchQuery = (event.target.value || '').toLowerCase();
-    localStorage.setItem('browseSearchQuery', this.searchQuery);
-
-    this.initIonInfinite();
+  OnSelectNote(noteIdx: number, playerIndex: number = 0) {
+    this.selectedNotesIndex()[playerIndex] = noteIdx
+    this.soundService.PlaySfx(this.SOUND_ARROW_DOWN)
+    this.cd.markForCheck()
   }
 
-  initIonInfinite() {
-    const q = this.searchQuery.toLowerCase();
+  OnSearch(event: SearchbarCustomEvent) {
+    this.searchQuery = (event.target.value || '').toLowerCase()
+    localStorage.setItem('browseSearchQuery', this.searchQuery)
 
-    let updateDbMusics = this.musicCacheService.allRemoteMusics;
-    let updateLocalMusics = this.localMusicService.allLocalMusics;
+    this.InitIonInfinite()
+  }
+
+  InitIonInfinite() {
+    const q = this.searchQuery.toLowerCase()
+
+    let updateDbMusics = this.musicCacheService.allRemoteMusics
+    let updateLocalMusics = this.localMusicService.allLocalMusics
 
     if (q) {
       updateLocalMusics =
@@ -233,99 +239,103 @@ export class BrowsePage implements OnInit {
         )
     }
 
-    this.storedMusics.set(updateLocalMusics);
-    this.dbMusics.set(updateDbMusics);
+    this.storedMusics.set(updateLocalMusics)
+    this.dbMusics.set(updateDbMusics)
 
-    const lastId = localStorage.getItem('lastMusicSelectedId');
-    const localIndex = lastId ? updateLocalMusics.findIndex(m => m.id === lastId) : -1;
-    const remoteIndex = lastId ? updateDbMusics.findIndex(m => m.id === lastId) : -1;
+    const lastId = localStorage.getItem('lastMusicSelectedId')
+    const localIndex = lastId ? updateLocalMusics.findIndex(m => m.id === lastId) : -1
+    const remoteIndex = lastId ? updateDbMusics.findIndex(m => m.id === lastId) : -1
 
-    const newIndex = localIndex !== -1 ? localIndex : (remoteIndex !== -1 ? remoteIndex + updateLocalMusics.length : 0);
-    this.onSelectMusic(newIndex);
+    const newIndex = localIndex !== -1 ? localIndex : (remoteIndex !== -1 ? remoteIndex + updateLocalMusics.length : 0)
+    this.OnSelectMusic(newIndex)
   }
 
-  onIonInfinite(event: InfiniteScrollCustomEvent) {
-    console.info("Congratz, you found the infinite scroll ! But there is no more music to load :)");
-    event.target.complete();
+  OnIonInfinite(event: InfiniteScrollCustomEvent) {
+    productionConsole.info("Congratz, you found the infinite scroll ! But there is no more music to load :)")
+    event.target.complete()
   }
-  onPlayerReady(mPlayer: IMusicPlayer) {
-    const music = this.getSelectedMusic(this.selectedMusicIndex());
-    if (!music) return;
 
-    const start = music.sampleStart ?? 0;
-    const length = music.sampleLength ?? 5;
+  OnPlayerReady(mPlayer: IMusicPlayer) {
+    const music = this.GetSelectedMusic(this.selectedMusicIndex())
+    if (!music) return
 
-    this.sampleLoopActive = true;
-    this.startSampleLoop(mPlayer, start, length);
+    const start = music.sampleStart ?? 0
+    const length = music.sampleLength ?? 5
+
+    this.sampleLoopActive = true
+    this.StartSampleLoop(mPlayer, start, length)
   }
-  private async startSampleLoop(player: IMusicPlayer, start: number, length: number, delay: number = 2) {
-    function sleep(ms: number) {
-      return new Promise(res => setTimeout(res, ms));
+
+  private async StartSampleLoop(player: IMusicPlayer, start: number, length: number, delay: number = 2) {
+    function Sleep(ms: number) {
+      return new Promise(res => setTimeout(res, ms))
     }
     while (this.sampleLoopActive) {
-      player.setToTime(start);
-      player.play();
+      player.SetToTime(start)
+      player.Play()
 
-      const endTime = start + length;
+      const endTime = start + length
 
-      while (this.sampleLoopActive && player.getCurrentTime() < endTime) {
-        await sleep(100);
+      while (this.sampleLoopActive && player.GetCurrentTime() < endTime) {
+        await Sleep(100)
       }
-      player.stop();
+      player.Stop()
 
-      let waited = 0;
+      let waited = 0
       while (this.sampleLoopActive && waited < delay * 1000) {
-        await sleep(100);
-        waited += 100;
+        await Sleep(100)
+        waited += 100
       }
     }
   }
 
-
-
-
-  async runGame(): Promise<void> {
-    const selectedMusic = this.getSelectedMusic(this.selectedMusicIndex());
-    if (!selectedMusic) return;
-    console.log("Selected music for game:", selectedMusic, "with notes:", this.musicNotes());
-    await this.musicCacheService.updateCacheMusic(selectedMusic.id);
+  async RunGame(): Promise<void> {
+    const selectedMusic = this.GetSelectedMusic(this.selectedMusicIndex())
+    if (!selectedMusic) return
+    // Charts are sent by name: selectedNotesIndex indexes the filtered and sorted musicNotes, not music.noteData
+    const chartNames = this.selectedNotesIndex().map(index => this.musicNotes()[index]?.chartName)
+    if (chartNames.some(name => !name)) return
+    await this.musicCacheService.UpdateCacheMusic(selectedMusic.id)
 
     for (let i = 0; i < this.selectedNotesIndex().length; i++) {
-      const newDifficulty: NoteDifficulty = this.musicNotes()[this.selectedNotesIndex()[i]]?.difficulty;
-      const lastDifficulty = this.lastDifficultyPlayed[i];
+      const newDifficulty: NoteDifficulty = this.musicNotes()[this.selectedNotesIndex()[i]]?.difficulty
+      const lastDifficulty = this.lastDifficultyPlayed[i]
       if (newDifficulty && newDifficulty !== lastDifficulty) {
-        this.lastDifficultyPlayed[i] = newDifficulty;
-        this.announcerService.playAnnouncerLine("difficulty", newDifficulty.toLowerCase());
+        this.lastDifficultyPlayed[i] = newDifficulty
+        this.announcerService.PlayAnnouncerLine("difficulty", newDifficulty.toLowerCase())
       }
     }
 
     this.router.navigate(['/play/game', selectedMusic.id], {
       queryParams: {
-        notes: this.selectedNotesIndex(),
+        notes: chartNames,
       }
-    });
+    })
   }
 
   //#region Utils
 
-  getSelectedNotesDifficulty(): DifficultyCriteria[] {
-    const notes = this.musicNotes().filter((note, index) => this.selectedNotesIndex().includes(index));
-    return notes.map(note => note.difficultyCriterias).filter((d): d is DifficultyCriteria => d !== undefined);
-  }
-  getPlayersForNote(noteIndex: number): number[] {
-    return this.selectedNotesIndex()
-      .map((selectedIdx, player) => selectedIdx === noteIndex ? player : null)
-      .filter((v): v is number => v !== null);
+  GetSelectedNotesDifficulty(): DifficultyCriteria[] {
+    const notes = this.musicNotes().filter((note, index) => this.selectedNotesIndex().includes(index))
+    return notes.map(note => note.difficultyCriterias).filter((d): d is DifficultyCriteria => d !== undefined)
   }
 
-  getPlayerColor(playerIndex: number): string {
-    return CONFIG.PLAYER_COLORS[playerIndex % CONFIG.PLAYER_COLORS.length].stroke;
+  GetPlayersForNote(noteIndex: number): number[] {
+    return this.selectedNotesIndex()
+      .map((selectedIdx, player) => selectedIdx === noteIndex ? player : null)
+      .filter((v): v is number => v !== null)
   }
-  getNoteColor(difficulty: NoteDifficulty): string {
-    return Color.noteDifficultyColor(difficulty)
+
+  GetPlayerColor(playerIndex: number): string {
+    return CONFIG.PLAYER_COLORS[playerIndex % CONFIG.PLAYER_COLORS.length].stroke
   }
-  getUserNote(chartname: string): UserNoteDto | null {
-    return this.musicUserScore()?.notes.find(n => n.id === chartname) ?? null;
+
+  GetNoteColor(difficulty: NoteDifficulty): string {
+    return Color.NoteDifficultyColor(difficulty)
+  }
+
+  GetUserNote(chartname: string): UserNoteDto | null {
+    return this.musicUserScore()?.notes.find(n => n.id === chartname) ?? null
   }
   //#endregion
 }

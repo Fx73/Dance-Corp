@@ -1,6 +1,6 @@
-import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
-import { YOUTUBE_PLAYER_CONFIG, YouTubePlayer } from '@angular/youtube-player';
-import { IMusicPlayer, MusicPlayerCommon } from '../IMusicPlayer';
+import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core'
+import { YOUTUBE_PLAYER_CONFIG, YouTubePlayer } from '@angular/youtube-player'
+import { IMusicPlayer, MusicPlayerCommon } from '../IMusicPlayer'
 
 @Component({
   selector: 'app-music-player-youtube',
@@ -18,55 +18,52 @@ export class MusicPlayerYoutubeComponent extends MusicPlayerCommon implements IM
     controls: 0,
     mute: 0,
     autoplay: 1,
-  };
+  }
 
   @Input()
-  musicUrl!: string;
+  musicUrl!: string
   @Input()
-  startOffset?: number = 0;
+  startOffset?: number = 0
 
   @Output()
-  ready: EventEmitter<IMusicPlayer> = new EventEmitter<IMusicPlayer>();
+  ready: EventEmitter<IMusicPlayer> = new EventEmitter<IMusicPlayer>()
 
-  @ViewChild('musicPlayer') player!: YouTubePlayer;
+  @ViewChild('musicPlayer') player!: YouTubePlayer
 
   constructor() {
-    super();
+    super()
   }
 
   // This method is called when the YouTube player is ready. 
   // It can use : event: YT.PlayerEvent
-  onReadyInternal(): void {
-    this.player.stopVideo();
-    this.player.setVolume(this.getVolume() * 100);
+  OnReadyInternal(): void {
+    this.player.stopVideo()
+    this.player.setVolume(this.GetVolume() * 100)
 
-    this.ready.emit(this);
+    this.ready.emit(this)
   }
 
-
-
-  play(): void {
-    this.player.playVideo();
+  Play(): void {
+    this.player.playVideo()
   }
 
-  stop(): void {
-    this.player.stopVideo();
+  Stop(): void {
+    this.player.stopVideo()
   }
 
-  getCurrentTime(): number {
-    return this.player.getCurrentTime() - (this.startOffset ?? 0);
+  GetCurrentTime(): number {
+    return this.player.getCurrentTime() - (this.startOffset ?? 0)
   }
 
-  setToTime(time: number): void {
-    this.player.seekTo(time + (this.startOffset ?? 0), true);
+  SetToTime(time: number): void {
+    this.player.seekTo(time + (this.startOffset ?? 0), true)
   }
 
-  public extractVideoId(url: string): string {
+  public ExtractVideoId(url: string): string {
     const match = url.match(
       /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:embed\/|watch\?v=)|youtu\.be\/)([0-9A-Za-z_-]{11})/
-    );
-    return match ? match[1] : '';
+    )
+    return match ? match[1] : ''
   }
-
 
 }

@@ -1,0 +1,118 @@
+rules_version = '2';
+
+// Source of truth for the Firestore rules of every project: edit here, never in the console.
+// Deployed by the Deploy workflow (dev -> dance-corp-dev, master -> dance-corp).
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function musicPath(musicId) {
+      return /databases/$(database)/documents/musics/$(musicId);
+    }
+
+    function notePath(musicId, chartName) {
+      return /databases/$(database)/documents/musics/$(musicId)/notes/$(chartName);
+    }
+
+    // Chart index of a music: { [chartName]: creatorId }, one entry per musics/{musicId}/notes document
+    function chartsOf(data) {
+      return data.get('charts', {});
+    }
+
+    // Keep in sync with protectedFields / notesProtectedFields in music.firestore.service.ts
+    function protectedFields() {
+      return chartsOf(resource.data).size() > 0
+        ? ['title', 'artist', 'offset', 'music', 'stops', 'bpms']
+        : ['title', 'artist', 'offset', 'music', 'stops'];
+    }
+
+    // A chart index change touches the single chart named in lastChartChange,
+    // and is written in the same batch as that chart: added with it, or removed with it.
+    function isChartIndexChangeValid(musicId) {
+      let chartName = request.resource.data.get('lastChartChange', '');
+      let charts = chartsOf(request.resource.data);
+      return charts.diff(chartsOf(resource.data)).affectedKeys().hasOnly([chartName])
+        && (chartName in charts
+          ? existsAfter(notePath(musicId, chartName)) && getAfter(notePath(musicId, chartName)).data.creatorId == charts[chartName]
+          : !existsAfter(notePath(musicId, chartName)));
+    }
+
+    match /musics/{musicId} {
+      allow read: if true;
+      allow create: if isSignedIn()
+        && !request.resource.data.keys().hasAny(['noteData', 'charts', 'lastChartChange']);
+      // Anyone signed in can edit a music, except its protected fields (bpms is protected once it has charts).
+      // noteData is the legacy embedded storage: read-only until it is removed.
+      allow update: if isSignedIn()
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(protectedFields().concat(['noteData']))
+        && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['charts']) || isChartIndexChangeValid(musicId));
+      // A music can only be deleted once all its charts are gone
+      allow delete: if isSignedIn()
+        && chartsOf(resource.data).size() == 0
+        && resource.data.get('noteData', []).size() == 0;
+    }
+
+    // Charts: only their creator edits or deletes them. Creating or deleting one also updates the chart index.
+    match /musics/{musicId}/notes/{chartName} {
+      allow create: if isSignedIn()
+        && request.resource.data.creatorId == request.auth.uid
+        && request.resource.data.chartName == chartName
+        && chartsOf(getAfter(musicPath(musicId)).data).get(chartName, '') == request.auth.uid;
+      allow update: if isSignedIn()
+        && resource.data.creatorId == request.auth.uid
+        && request.resource.data.creatorId == request.auth.uid
+        && request.resource.data.chartName == chartName;
+      allow delete: if isSignedIn()
+        && resource.data.creatorId == request.auth.uid
+        && !(chartName in chartsOf(getAfter(musicPath(musicId)).data));
+    }
+
+    // Reads, including the collectionGroup('notes') query that loads every chart at once.
+    // Only musics have a notes subcollection.
+    match /{path=**}/notes/{chartName} {
+      allow read: if true;
+    }
+
+    match /users/{userId}/{subCollection=**} {
+      allow read, write: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    match /metadata/{docId} {
+      allow read: if true;
+    }
+
+    // { genres: string[] }
+    match /metadata/musicdata {
+      allow create, update: if isSignedIn()
+        && request.resource.data.keys().hasOnly(['genres'])
+        && request.resource.data.genres is list;
+    }
+
+    // { ids: string[], updatedAt: number }
+    // An update adds or removes at most one id, so the index cannot be wiped in one write
+    match /metadata/music_index {
+      allow create: if isSignedIn() && isValidMusicIndex();
+      allow update: if isSignedIn() && isValidMusicIndex()
+        && request.resource.data.ids.size() >= resource.data.ids.size() - 1
+        && request.resource.data.ids.size() <= resource.data.ids.size() + 1;
+
+      function isValidMusicIndex() {
+        return request.resource.data.keys().hasOnly(['ids', 'updatedAt'])
+          && request.resource.data.ids is list
+          && request.resource.data.updatedAt is number;
+      }
+    }
+
+    // { [musicId]: timestamp } — one music is touched per write
+    match /metadata/music_updates {
+      allow create: if isSignedIn() && request.resource.data.size() <= 1;
+      allow update: if isSignedIn()
+        && request.resource.data.diff(resource.data).affectedKeys().size() <= 1
+        && request.resource.data.diff(resource.data).removedKeys().size() == 0;
+    }
+  }
+}

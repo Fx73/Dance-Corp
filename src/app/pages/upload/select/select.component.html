@@ -1,7 +1,7 @@
 <ion-item [class.changed]="isChanged" [title]="valueDb">
 
   @if (isEditing) {
-  <ion-select [label]="label" [value]="value" (ionChange)="onSelectChange($event)">
+  <ion-select [label]="label" [value]="value" (ionChange)="OnSelectChange($event)">
     @for (opt of options; track $index) {
     <ion-select-option [value]="opt">
       {{ opt }}

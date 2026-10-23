@@ -1,0 +1,67 @@
+name: CI
+on:
+  pull_request:
+    branches:
+      - "dev"
+      - "master"
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Npm setup
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+
+      - name: Lint
+        run: npx ng lint
+
+      - name: Build (dev Firebase)
+        run: npx ng build --configuration=dev
+
+      - name: Deploy preview channel
+        # Secrets are not available to PRs opened from forks
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_DANCE_CORP_DEV }}
+          projectId: dance-corp-dev
+          entryPoint: website
+          expires: 7d
+
+  desktop:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Npm setup
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Build with Tauri (dev Firebase)
+        run: npx tauri build --config src-tauri/tauri.dev.conf.json

@@ -178,3 +178,217 @@ Link: https://github.com/Fx73/Dance-Corp/commit/9540ad00c393c2b7c5df0696aa55dc26
 → To verify:
   - Start a game from browse: `/play/game/:musicId` opens (guard returns true)
   - Log in: the user profile (name, avatar, level, stats) loads from Firestore
+
+## Commit: Replace deprecated ion-img with native img
+Link: https://github.com/Fx73/Dance-Corp/commit/734e63312300ae8be977662c74dac822c5626f0c
+
+- browse, browse-upload, upload, user-profile pages and header: `<ion-img>` replaced by `<img>`, with `display: block` / `object-fit: contain` to keep the `ion-img` rendering; jackets use `loading="lazy"`
+
+→ To verify:
+  - Browse and browse-upload: jackets are not stretched and keep their black background; single/double icon on the chart cards
+  - Upload: background and jacket previews take the card width
+  - User profile: the avatar stays round
+  - Header: logo size, clicking it goes to home
+  - The `ion-img` deprecation warning is gone from the console
+
+## Commit: Fix user music converter key so notes become UserNoteDto
+Link: https://github.com/Fx73/Dance-Corp/commit/9858943905c305871b6b089d1fb253fa41d6cdb4
+
+- src/app/services/firestore/user.firestore.service.ts: **bug fix**, subtype key `"notes:"` renamed to `notes`
+
+→ To verify:
+  - Log in: the user stats per chart (passed, times played, high score) load as before in browse and the profile
+
+## Commit: Read every player's chart index from the game URL
+Link: https://github.com/Fx73/Dance-Corp/commit/557c6dcbe9c7bab2cc1234ed972cc53979e6e60b
+
+- src/app/game/game.page.ts: **bug fix**, `queryParamMap.getAll('notes')` instead of `get('notes')?.split(',')`
+
+→ To verify:
+  - 1 player: a game starts with the selected chart
+  - 2 players with different charts: each player gets their own chart
+
+## Commit: Save each player's stats against the chart they played
+Link: https://github.com/Fx73/Dance-Corp/commit/aecd1f1dcaee60e6d4f782d9fe83790be461f896
+
+- src/app/game/game.manager.ts: **bug fix**, `GameOver()` saves each round under its selected chart instead of `noteData[0]`
+- src/app/game/game.page.ts: **bug fix**, the Discord presence shows the level of the selected chart
+
+→ To verify:
+  - Play a chart that is not the first one of the music: the score and "passed" are shown on that chart in browse
+  - Tauri: the Discord presence shows the played level
+
+## Commit: Replace re-uploaded notes in the music cache instead of duplicating
+Link: https://github.com/Fx73/Dance-Corp/commit/410da919b78436478a601e3a1facf51220db21a8
+
+- src/app/services/local-storage/music.cache.service.ts: **bug fix**, `UploadNotesInBase()` replaces notes with the same `chartName` instead of appending them
+
+→ To verify:
+  - Upload: re-upload an existing note, then open browse without a full refresh: the chart is listed once, with the new content
+  - Upload a new note: it is added to the list
+
+## Commit: Start the crowd sound fade-out once its duration is known
+Link: https://github.com/Fx73/Dance-Corp/commit/a08a8da908cb49eee344a5fe127ac317b1f3ed3d
+
+- src/app/services/gameplay/announcer.service.ts: **bug fix**, the crowd fade-out is scheduled on `loadedmetadata`, as `audio.duration` is `NaN` right after `play()`
+
+→ To verify:
+  - End of a game: applause or boos now play until 4 s before their end, then fade out (they were cut almost at once before)
+
+## Commit: Make UserGuard wait for the session and the user document
+Link: https://github.com/Fx73/Dance-Corp/commit/703b1b1f9744906d4650054aefbe3c794efd2e42
+
+- src/app/shared/guard/user.guard.ts: **bug fix**, waits for `authStateReady()` instead of a 500 ms timeout, then for `userData` to be set (5 s timeout, it was never awaited); redirects with a `UrlTree`
+
+→ To verify:
+  - Logged out: `/upload`, `/browse-upload` and `/user-profile` redirect to home
+  - Logged in: navigating to these pages from the menu opens them
+  - Logged in: reloading these pages (F5) opens them with the user loaded (profile shows name and stats, upload works with no "User not authenticated")
+
+## Commit: Redirect browse and game to player selection when players are not ready
+Link: https://github.com/Fx73/Dance-Corp/commit/40d60f76012fedc3f50e51431978a308af35b3ae
+
+- src/app/shared/guard/players.guard.ts: **bug fix**, `gameGuard` replaced by `playersGuard` on `/play/browse` and `/play/game/:musicId`, redirects to `/play/player-selection` when a player has no gamepad or an undetected one
+- src/app/services/userconfig.service.ts: `ArePlayersReady()` shared with the player selection page; `isReady` removed (always true)
+
+→ To verify:
+  - Fresh profile (localStorage cleared): open `/play/browse` directly, it redirects to player selection with no console error
+  - Keyboard player: reload `/play/browse`, it stays on browse
+  - Gamepad player: reload `/play/browse`, it redirects to player selection; press a button, Start goes back to browse
+  - Normal flow: player selection → browse → game → back to browse
+
+## Commit: Remove DancePadKeyboard window listeners when the pad is destroyed
+Link: https://github.com/Fx73/Dance-Corp/commit/09555de9bbe67b939110580e0b20b5d2e4362627
+
+- src/app/game/game-controller/*: **bug fix**, `IDancePad.Destroy()` added; `DancePadKeyboard` removes its `keydown` / `keyup` listeners, `DancePadGamepad` has nothing to release
+- src/app/game/game.manager.ts: `DestroyGame()` destroys each round's pad
+- src/app/pages/browse/browse.page.ts: `ngOnDestroy()` destroys the browse pads
+
+→ To verify:
+  - Keyboard player: browse navigation with the arrows, play a game, back to browse, play again: inputs work every time
+  - Upload: the note test works with the keyboard, close it and reopen it
+  - Gamepad player: same flow, inputs still work
+
+## Commit: Stop the upload page loading forever when the music is not found
+Link: https://github.com/Fx73/Dance-Corp/commit/9faed688d302786b1c89fd359001ceee56dcd330
+
+- src/app/pages/upload/upload.page.ts: **bug fix**, `StartLoad()` stops loading and shows the "Music not found" toast when the music is neither local nor in the database; dead `DeepClone()` fallback removed
+
+→ To verify:
+  - `/upload?music=<unknown id>`: error toast, then the file picker is shown
+  - Database-only music: shown read only, "Edit Music" makes it editable
+  - Local music (with or without a database version): opens in edit mode as before
+
+## Commit: Send the selected charts to the game by chartName
+Link: https://github.com/Fx73/Dance-Corp/commit/560619692a1d338379dab7c23d6924fb5a5e4b62
+
+- src/app/pages/browse/browse.page.ts: **bug fix**, `RunGame()` sends the selected `chartName`s in the `notes` query param instead of indexes into the filtered list
+- src/app/game/game.page.ts: **bug fix**, chart names resolved in `music.noteData`; unknown chart name redirects to home
+
+→ To verify:
+  - 1 player, music with single and double charts: each selected chart is the one played (level, notes), for several charts of the list
+  - 2 players with different charts: each player gets their own chart
+  - After the game: score and "passed" are shown on the played chart in browse
+  - Chart name with spaces or special characters: the game starts
+
+## Commit: Move scoring, judgment and announcer values to CONFIG
+Link: https://github.com/Fx73/Dance-Corp/commit/00ded672f5b371cda855cf60ba988da1b0479f07
+
+- src/app/game/constants/game-config.ts: `JUDGMENT`, `SCORE`, `PERFORMANCE` and `ANNOUNCER` sections, same values as before
+- src/app/game/game-model/gameRound.ts, src/app/services/gameplay/announcer.service.ts, src/app/game/game.manager.ts: inline values replaced by `CONFIG`; `SatisfactionType` enum instead of `0` / `1` / `2`; `GameRound.MAX_SCORE` moved to `CONFIG.SCORE.MAX`
+
+→ To verify:
+  - A game plays as before: judgments, score, performance bar, fail
+  - Announcer combo lines and end of game applause still trigger
+
+## Commit: Remove debug logs and silence the console in production
+Link: https://github.com/Fx73/Dance-Corp/commit/21354a2e0ac4aaaa6d0cec79fbff19dcd3cf3df5
+
+- 14 files: debug `console.log` removed (object dumps, per-arrow judgments, satisfaction, protected field check, chart name parsing, token maps, email on register error)
+- src/app/shared/console-output.ts: `SilenceConsole()` and `productionConsole`
+- src/main.ts: `SilenceConsole()` called in production
+- src/app/app.component.ts: toasts log through `productionConsole`
+- browse and browse-upload pages: infinite scroll easter egg logs through `productionConsole`
+
+→ To verify:
+  - `ionic serve` (development): the remaining logs show (loading, cache sync, game start and game over)
+  - Production build (`npm run build`, then serve `website/www`): only toasts, errors and the infinite scroll message show in the console
+  - Tauri build: same as production
+
+## Commit: Add a dev Firebase project and split CI from deployment
+Link: https://github.com/Fx73/Dance-Corp/commit/74bdcf4bcc92c2329414404b33c319684c1a4e55
+
+Tested: `ng build --configuration=dev` only contains `dance-corp-dev`, `ng build --configuration=production` only contains `dance-corp`.
+
+- src/environments/environment.ts, environment.prod.ts: Firebase config moved here from src/app.config.ts, dev project by default
+- src/main.ts: Analytics only starts when a `measurementId` is set
+- angular.json: new `dev` build configuration
+- src-tauri/tauri.dev.conf.json: separate "DanceCorp Dev" desktop app for dev builds
+- .github/workflows/ci.yml, deploy.yml: replace build_deploy_web.yml and build_desktop.yml
+
+→ To verify:
+  - The CI workflow passes on a PR: lint, build, preview URL comment, desktop build
+  - A push to `dev` deploys to dance-corp-dev, a push to `master` to dance-corp
+  - The desktop artifact contains the `.msi` and `.exe` installers
+  - The "DanceCorp Dev" app installs next to the release app and keeps its own AppData
+  - Production still records Analytics
+
+## Commit: Deploy the Firestore rules from the repo and tighten them
+Link: https://github.com/Fx73/Dance-Corp/commit/9106f353e00a06c5580a637dc4ac780ec91d544f
+
+Tested: 32 allow/deny cases in the Firestore emulator (protected fields, bpms with and without notes, delete, metadata shape and index guard, fresh DB). Rules deployed to dance-corp-dev.
+
+- website/firestore.rules: delete blocked while notes remain, bpms protected once notes exist, metadata writes restricted and checked
+- src/app/services/firestore/music.firestore.service.ts: `GetProtectedFields()` adds `bpms` when the music has notes; `AddGenres` creates `musicdata` if missing
+- src/app/pages/upload/upload.page.ts: uses `GetProtectedFields()`
+- .github/workflows/deploy.yml: deploys the rules and indexes
+
+→ To verify:
+  - Upload a music, add notes, edit it, delete its notes then the music, on the dev site
+  - Changing the bpms of a music without notes works; with notes, the client refuses it with a clear message
+  - The Deploy workflow deploys the rules (the service account may need the Firebase Rules Admin role)
+
+## Commit: Update Tauri crates to match the npm packages
+Link: https://github.com/Fx73/Dance-Corp/commit/5e545eb43484fab8b1c9b2182db9573161d122ed
+
+Tested: `cargo check` and `npx tauri build` (MSI and NSIS bundles) pass locally.
+
+- src-tauri/Cargo.toml, Cargo.lock: tauri 2.12.5, tauri-build 2.7.4, tauri-plugin-fs 2.7.1, tauri-plugin-log 2.10.1
+- package.json: `@tauri-apps/cli` 2.12.4
+
+→ To verify:
+  - Desktop app: upload a music (folder created, file written), it shows in the local list, plays, and can be deleted
+  - Discord presence shows "Let's dance !"
+  - Steam presence, when launched through Steam
+
+## Commit: Store charts in a notes subcollection so only their creator can change them
+Link: https://github.com/Fx73/Dance-Corp/commit/71e589939151b69b7fd92c4f3a2475040202d89d
+
+Tested: 29 allow/deny cases in the Firestore emulator (chart creation, edit and deletion by creator and others, index tampering, music deletion, bpms lock, legacy noteData). Dev migrated and read anonymously with the client SDK: 65 musics, 276 charts, no orphan, every index matches its subcollection.
+
+- website/firestore.rules: notes subcollection rules, chart index consistency, collectionGroup read
+- src/app/services/firestore/music.firestore.service.ts: charts read from and written to the subcollection, `MusicDto.noteData` rebuilt on read
+- src/app/pages/upload/upload.page.ts: `GetProtectedFields` takes the chart count
+- tools/migrate-notes-to-subcollection.mjs, copy-prod-to-dev.mjs: migration, and the copy follows the subcollections
+
+→ To verify (on the PR preview, against dance-corp-dev):
+  - Clear the site data, reload: every music shows its charts
+  - Upload a chart, edit it, delete it; another account cannot edit or delete it
+  - Deleting a music is refused while it has charts, then works once they are gone
+  - Changing the bpms is refused once the music has a chart
+  - Another browser with a warm cache picks up an added and a deleted chart
+
+## Commit: Bump the version automatically: patch on dev, minor on release
+Link: https://github.com/Fx73/Dance-Corp/commit/a4ca8bc5c599db357ed91ec77c3037bce2647e44
+
+Tested: `commit-version.sh` on a throwaway branch creates a signed commit with package.json and package-lock.json. Workflow YAML is valid. The workflows themselves only run after the merge.
+
+- .github/workflows/deploy.yml: `version` job (patch bump on dev, tag on master), web and desktop build its commit
+- .github/workflows/release.yml: minor bump on dev when a dev -> master PR opens
+- .github/scripts/commit-version.sh: signed commit through the GitHub API
+
+→ To verify:
+  - Merging this PR bumps dev to 1.0.2, and the dev site and DanceCorp Dev installers show 1.0.2
+  - The bump commit does not start another Deploy run
+  - Opening the dev -> master PR bumps dev to 1.1.0, and the PR shows that commit
+  - The merged master deploy shows 1.1.0 and creates the v1.1.0 tag

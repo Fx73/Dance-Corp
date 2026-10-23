@@ -1,0 +1,12 @@
+{
+  "name": "dancecorp-tools",
+  "private": true,
+  "description": "Maintenance scripts, run by hand. Not part of the app build.",
+  "type": "module",
+  "scripts": {
+    "copy-prod-to-dev": "node copy-prod-to-dev.mjs"
+  },
+  "dependencies": {
+    "firebase-admin": "^14.5.0"
+  }
+}

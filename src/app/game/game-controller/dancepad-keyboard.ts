@@ -1,74 +1,79 @@
-import { ArrowState, DancePadInput, IDancePad } from "./dancepad.interface";
+import { ArrowState, DancePadInput, IDancePad } from "./dancepad.interface"
 
-import { ArrowDirection } from "src/app/game/constants/arrow-direction.enum";
+import { ArrowDirection } from "src/app/game/constants/arrow-direction.enum"
 
 export class DancePadKeyboard implements IDancePad {
-    private currentState: Set<number>;
-    private previousState: Set<number>;
-    private keyBinding: Map<string, ArrowDirection>;
+    private currentState: Set<number>
+    private previousState: Set<number>
+    private keyBinding: Map<string, ArrowDirection>
 
-    public lastExposedState: DancePadInput;
+    public lastExposedState: DancePadInput
 
     constructor(keyBinding: Map<string, ArrowDirection>) {
-        this.currentState = new Set();
-        this.previousState = new Set();
+        this.currentState = new Set()
+        this.previousState = new Set()
         this.keyBinding = keyBinding
         this.lastExposedState = [0, 0, 0, 0, 0]
 
         // Listen for keyboard events
-        window.addEventListener('keydown', (event) => this.handleKeyDown(event));
-        window.addEventListener('keyup', (event) => this.handleKeyUp(event));
+        window.addEventListener('keydown', this.HandleKeyDown)
+        window.addEventListener('keyup', this.HandleKeyUp)
     }
 
-    private handleKeyDown(event: KeyboardEvent): void {
+    public Destroy(): void {
+        window.removeEventListener('keydown', this.HandleKeyDown)
+        window.removeEventListener('keyup', this.HandleKeyUp)
+    }
+
+    private HandleKeyDown = (event: KeyboardEvent): void => {
         if (!event.repeat && this.keyBinding.has(event.key)) {
-            this.currentState.add(this.keyBinding.get(event.key)!);
+            this.currentState.add(this.keyBinding.get(event.key)!)
         }
     }
 
-    private handleKeyUp(event: KeyboardEvent): void {
+    private HandleKeyUp = (event: KeyboardEvent): void => {
         if (this.keyBinding.has(event.key)) {
-            this.currentState.delete(this.keyBinding.get(event.key)!);
+            this.currentState.delete(this.keyBinding.get(event.key)!)
         }
     }
 
     // Update keyboard state and return DancePadInput
-    public getRefreshedState(): DancePadInput {
+    public GetRefreshedState(): DancePadInput {
         this.lastExposedState = [
-            this.getArrowInput(ArrowDirection.Left),
-            this.getArrowInput(ArrowDirection.Down),
-            this.getArrowInput(ArrowDirection.Up),
-            this.getArrowInput(ArrowDirection.Right),
-            this.getArrowInput(ArrowDirection.Start)
-        ] as DancePadInput;
+            this.GetArrowInput(ArrowDirection.Left),
+            this.GetArrowInput(ArrowDirection.Down),
+            this.GetArrowInput(ArrowDirection.Up),
+            this.GetArrowInput(ArrowDirection.Right),
+            this.GetArrowInput(ArrowDirection.Start)
+        ] as DancePadInput
 
-        this.previousState = new Set(this.currentState);
+        this.previousState = new Set(this.currentState)
 
-        return this.lastExposedState;
+        return this.lastExposedState
     }
 
-    private getArrowInput(direction: ArrowDirection): ArrowState {
-        if (this.isButtonJustPressed(direction)) {
-            return ArrowState.Press;
-        } else if (this.isButtonDown(direction)) {
-            return ArrowState.Hold;
+    private GetArrowInput(direction: ArrowDirection): ArrowState {
+        if (this.IsButtonJustPressed(direction)) {
+            return ArrowState.Press
+        } else if (this.IsButtonDown(direction)) {
+            return ArrowState.Hold
         } else {
-            return ArrowState.Empty;
+            return ArrowState.Empty
         }
     }
 
     // Check if a button is currently pressed
-    private isButtonDown(buttonIndex: number): boolean {
-        return this.currentState.has(buttonIndex);
+    private IsButtonDown(buttonIndex: number): boolean {
+        return this.currentState.has(buttonIndex)
     }
 
     // Check if a button was just pressed
-    private isButtonJustPressed(buttonIndex: number): boolean {
-        return this.currentState.has(buttonIndex) && !this.previousState.has(buttonIndex);
+    private IsButtonJustPressed(buttonIndex: number): boolean {
+        return this.currentState.has(buttonIndex) && !this.previousState.has(buttonIndex)
     }
 
     // Check if a button was just released
-    private isButtonJustReleased(buttonIndex: number): boolean {
-        return !this.currentState.has(buttonIndex) && this.previousState.has(buttonIndex);
+    private IsButtonJustReleased(buttonIndex: number): boolean {
+        return !this.currentState.has(buttonIndex) && this.previousState.has(buttonIndex)
     }
 }

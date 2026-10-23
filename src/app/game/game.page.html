@@ -1,16 +1,16 @@
 <ion-header [translucent]="true">
 	<ion-toolbar>
-		<ion-button slot="start" (click)="goBack()">
+		<ion-button slot="start" (click)="GoBack()">
 			<ion-icon name="arrow-back"></ion-icon>
 		</ion-button>
 		<ion-title>{{ music?.title }} - {{ music?.artist }}</ion-title>
 	</ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" [style.--background]="'url(' + game?.getCurrentBackground() + ') center/cover no-repeat'">
+<ion-content [fullscreen]="true" [style.--background]="'url(' + game?.GetCurrentBackground() + ') center/cover no-repeat'">
 
 	@if(loadingMusic){
-	<app-waiting-screen [title]="music!.title" [artist]="music!.artist" [coverUrl]="music!.jacket" (countdownFinished)="handleCountdownFinished()"></app-waiting-screen>
+	<app-waiting-screen [title]="music!.title" [artist]="music!.artist" [coverUrl]="music!.jacket" (countdownFinished)="HandleCountdownFinished()"></app-waiting-screen>
 	}
 
 	@if(game){
@@ -22,20 +22,20 @@
 	}
 	}
 	@if(game.isGameOver){
-	<ion-card class="base-card start-card" style="height: 15vh;" (click)="goBack()"> Back to music list </ion-card>
+	<ion-card class="base-card start-card" style="height: 15vh;" (click)="GoBack()"> Back to music list </ion-card>
 	}
 	}
 
 	<!-- Music Player -->
 	@switch (musicOrigin) {
 	@case (MusicOrigin.Youtube){
-	<app-music-player-youtube [musicUrl]="music?.music!" (ready)="onPlayerReady($event)" [startOffset]="music?.musicoffset"></app-music-player-youtube>
+	<app-music-player-youtube [musicUrl]="music?.music!" (ready)="OnPlayerReady($event)" [startOffset]="music?.musicoffset"></app-music-player-youtube>
 	}
 	@case (MusicOrigin.Soundcloud){
-	<app-music-player-soundcloud [musicUrl]="music?.music!" (ready)="onPlayerReady($event)" [startOffset]="music?.musicoffset"></app-music-player-soundcloud>
+	<app-music-player-soundcloud [musicUrl]="music?.music!" (ready)="OnPlayerReady($event)" [startOffset]="music?.musicoffset"></app-music-player-soundcloud>
 	}
 	@case (MusicOrigin.Local){
-	<app-music-player-local [musicUrl]="music?.music!" (ready)="onPlayerReady($event)" [startOffset]="music?.musicoffset"></app-music-player-local>
+	<app-music-player-local [musicUrl]="music?.music!" (ready)="OnPlayerReady($event)" [startOffset]="music?.musicoffset"></app-music-player-local>
 	}
 	}
 

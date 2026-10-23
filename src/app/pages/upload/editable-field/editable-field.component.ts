@@ -1,8 +1,8 @@
-import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, inject } from "@angular/core";
-import { InputChangeEventDetail, InputCustomEvent, IonInput, IonItem, IonLabel } from "@ionic/angular";
-import { IMusicEditableField, MUSIC_EDITABLE_FIELD_TOKEN } from "../editable-field.interface";
+import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, inject } from "@angular/core"
+import { InputChangeEventDetail, InputCustomEvent, IonInput, IonItem, IonLabel } from "@ionic/angular"
+import { IMusicEditableField, MUSIC_EDITABLE_FIELD_TOKEN } from "../editable-field.interface"
 
-import { SanitizeSscInput } from "../reader.ssc";
+import { SanitizeSscInput } from "../reader.ssc"
 
 @Component({
   selector: 'app-music-editable-field',
@@ -15,44 +15,42 @@ import { SanitizeSscInput } from "../reader.ssc";
   imports: [IonItem, IonLabel, IonInput]
 })
 export class MusicEditableFieldComponent<T extends string | number | null | undefined = string | number | null | undefined> implements IMusicEditableField, OnChanges {
-  elementRef = inject(ElementRef);
+  elementRef = inject(ElementRef)
 
-  @Input() isEditing = false;
+  @Input() isEditing = false
 
-  @Input() label!: string;
-  @Input() type: 'string' | 'number' = 'string';
+  @Input() label!: string
+  @Input() type: 'string' | 'number' = 'string'
 
-  @Input() value!: T;
-  @Input() valueDb: T | null = null;
+  @Input() value!: T
+  @Input() valueDb: T | null = null
 
-  @Input() warningMessage: string | null = null;
+  @Input() warningMessage: string | null = null
 
-  @Output() valueChange: EventEmitter<T> = new EventEmitter();
+  @Output() valueChange: EventEmitter<T> = new EventEmitter()
 
-  public isDirty = false;
+  public isDirty = false
 
   ngOnChanges() {
-    this.isDirty = this.isEditing && this.normalize(this.value) !== this.normalize(this.valueDb);
+    this.isDirty = this.isEditing && this.Normalize(this.value) !== this.Normalize(this.valueDb)
   }
 
-  onInputChange(ev: InputCustomEvent<InputChangeEventDetail>) {
-    const rawValue = ev.detail.value;
-    const newValue = SanitizeSscInput(rawValue == null ? null : String(rawValue));
+  OnInputChange(ev: InputCustomEvent<InputChangeEventDetail>) {
+    const rawValue = ev.detail.value
+    const newValue = SanitizeSscInput(rawValue == null ? null : String(rawValue))
 
-    this.isDirty = this.isEditing && this.normalize(newValue) !== this.normalize(this.valueDb);
-    // SanitizeSscInput renvoie une string (ou null), émise telle quelle même si le champ lié est un number
-    this.valueChange.emit(newValue as T);
+    this.isDirty = this.isEditing && this.Normalize(newValue) !== this.Normalize(this.valueDb)
+    // SanitizeSscInput returns a string (or null), emitted as is even if the bound field is a number
+    this.valueChange.emit(newValue as T)
   }
-
 
   get isChanged(): boolean {
-    return this.isEditing && this.normalize(this.value) !== this.normalize(this.valueDb);
+    return this.isEditing && this.Normalize(this.value) !== this.Normalize(this.valueDb)
   }
 
-  private normalize(v: unknown): string {
-    if (v === undefined || v === null) return "";
-    return String(v).trim();
+  private Normalize(v: unknown): string {
+    if (v === undefined || v === null) return ""
+    return String(v).trim()
   }
-
 
 }

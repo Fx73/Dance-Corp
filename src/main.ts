@@ -1,29 +1,32 @@
-import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular';
-import { PreloadAllModules, RouteReuseStrategy, provideRouter, withPreloading } from '@angular/router';
-import { getFirestore, initializeFirestore } from 'firebase/firestore';
+import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular'
+import { PreloadAllModules, RouteReuseStrategy, provideRouter, withPreloading } from '@angular/router'
+import { getFirestore, initializeFirestore } from 'firebase/firestore'
 
-import { AppComponent } from './app/app.component';
-import { bootstrapApplication } from '@angular/platform-browser';
-import { enableProdMode } from '@angular/core';
-import { environment } from './environments/environment';
-import { firebaseConfig } from './app.config';
-import { getAnalytics } from 'firebase/analytics';
-import { initializeApp } from 'firebase/app';
-import localeFr from '@angular/common/locales/fr';
-import { registerLocaleData } from '@angular/common';
-import { routes } from './app/app.routes';
+import { AppComponent } from './app/app.component'
+import { SilenceConsole } from './app/shared/console-output'
+import { bootstrapApplication } from '@angular/platform-browser'
+import { enableProdMode } from '@angular/core'
+import { environment } from './environments/environment'
+import { getAnalytics } from 'firebase/analytics'
+import { initializeApp } from 'firebase/app'
+import localeFr from '@angular/common/locales/fr'
+import { registerLocaleData } from '@angular/common'
+import { routes } from './app/app.routes'
 
 if (environment.production) {
-  enableProdMode();
+  enableProdMode()
+  SilenceConsole()
 }
 
-const firebaseApp = initializeApp(firebaseConfig);
-getAnalytics(firebaseApp);
-initializeFirestore(firebaseApp, { ignoreUndefinedProperties: true });
-getFirestore(firebaseApp);
+const firebaseApp = initializeApp(environment.firebase)
+// Analytics is only enabled on the production project
+if (environment.firebase.measurementId) {
+  getAnalytics(firebaseApp)
+}
+initializeFirestore(firebaseApp, { ignoreUndefinedProperties: true })
+getFirestore(firebaseApp)
 
-
-registerLocaleData(localeFr);
+registerLocaleData(localeFr)
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -34,4 +37,4 @@ bootstrapApplication(AppComponent, {
       withPreloading(PreloadAllModules),
     ),
   ],
-});
+})

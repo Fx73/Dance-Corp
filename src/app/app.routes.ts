@@ -1,6 +1,6 @@
-import { Routes } from '@angular/router';
-import { UserGuard } from './shared/guard/user.guard';
-import { gameGuard } from './shared/guard/game.guard';
+import { Routes } from '@angular/router'
+import { UserGuard } from './shared/guard/user.guard'
+import { playersGuard } from './shared/guard/players.guard'
 
 export const routes: Routes = [
   {
@@ -15,7 +15,7 @@ export const routes: Routes = [
   {
     path: 'play/game/:musicId',
     loadComponent: () => import('./game/game.page').then(m => m.GamePage),
-    canActivate: [gameGuard]
+    canActivate: [playersGuard]
   },
   {
     path: 'browse-upload',
@@ -38,6 +38,7 @@ export const routes: Routes = [
   {
     path: 'play/browse',
     loadComponent: () => import('./pages/browse/browse.page').then(m => m.BrowsePage),
+    canActivate: [playersGuard]
   },
   {
     path: 'user-profile',
@@ -52,4 +53,4 @@ export const routes: Routes = [
     path: 'about',
     loadComponent: () => import('./pages/about/about.page').then(m => m.AboutPage)
   },
-];
+]

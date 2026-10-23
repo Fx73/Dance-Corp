@@ -17,8 +17,7 @@
 
       <ion-card-content>
         @if (userData.avatar) {
-          <ion-img [src]="userData.avatar" class="img-avatar">
-          </ion-img>
+          <img [src]="userData.avatar" alt="Avatar" class="img-avatar" />
         }
         <ion-item lines="none">
           <ion-label>Level</ion-label>

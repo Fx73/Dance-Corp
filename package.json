@@ -1,6 +1,6 @@
 {
   "name": "DanceCorp",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "author": "Ionic Framework",
   "homepage": "https://ionicframework.com/",
   "scripts": {
@@ -39,7 +39,8 @@
     "@angular/compiler-cli": "^22.2.3",
     "@angular/language-service": "^22.2.3",
     "@ionic/angular-toolkit": "^13.0.0",
-    "@tauri-apps/cli": "^2.12.3",
+    "@stylistic/eslint-plugin": "^5.10.0",
+    "@tauri-apps/cli": "^2.12.4",
     "@types/youtube": "^0.3.0",
     "angular-eslint": "^22.6.0",
     "eslint": "^10.13.0",

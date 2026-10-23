@@ -1,11 +1,12 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { IonApp, IonRouterOutlet } from '@ionic/angular';
+import { Component, OnInit, inject } from '@angular/core'
+import { IonApp, IonRouterOutlet } from '@ionic/angular'
 
-import { AnnouncerService } from './services/gameplay/announcer.service';
-import { MusicCacheService } from './services/local-storage/music.cache.service';
-import { PresenceService } from './services/thirdpartyapp/presence.service';
-import { SoundManager } from './services/gameplay/sound.service';
-import { ToastController } from '@ionic/angular';
+import { AnnouncerService } from './services/gameplay/announcer.service'
+import { MusicCacheService } from './services/local-storage/music.cache.service'
+import { PresenceService } from './services/thirdpartyapp/presence.service'
+import { SoundService } from './services/gameplay/sound.service'
+import { ToastController } from '@ionic/angular'
+import { productionConsole } from './shared/console-output'
 
 @Component({
   selector: 'app-root',
@@ -14,68 +15,70 @@ import { ToastController } from '@ionic/angular';
   imports: [IonApp, IonRouterOutlet],
 })
 export class AppComponent implements OnInit {
-  private toastController = inject(ToastController);
-  private presenceService = inject(PresenceService);
-  private musicCacheService = inject(MusicCacheService);
+  private toastController = inject(ToastController)
+  private presenceService = inject(PresenceService)
+  private musicCacheService = inject(MusicCacheService)
 
-  static appInstance: AppComponent;
+  static appInstance: AppComponent
 
   constructor() {
-    const announcerService = inject(AnnouncerService);
-    const soundManager = inject(SoundManager);
+    const announcerService = inject(AnnouncerService)
+    const soundService = inject(SoundService)
 
-    AppComponent.appInstance = this;
-    announcerService.init();
+    AppComponent.appInstance = this
+    announcerService.Init()
 
-    document.addEventListener('click', () => soundManager.InitBackgroundMusic(), { once: true });
+    document.addEventListener('click', () => soundService.InitBackgroundMusic(), { once: true })
   }
 
   ngOnInit() {
-    this.musicCacheService.updateCache()
-    this.presenceService.init()
+    this.musicCacheService.UpdateCache()
+    this.presenceService.Init()
   }
 
-
-
   //#region Toasts
-  async presentOkToast(message: string) {
+  async PresentOkToast(message: string) {
     const toast = await this.toastController.create({
       message: message,
       duration: 6000,
       color: 'success'
-    });
-    toast.present();
+    })
+    toast.present()
   }
 
-  async presentWarningToast(message: string) {
+  async PresentWarningToast(message: string) {
     const toast = await this.toastController.create({
       message: message,
       duration: 6000,
       color: 'warning'
-    });
-    toast.present();
+    })
+    toast.present()
   }
 
-  async presentErrorToast(message: string) {
+  async PresentErrorToast(message: string) {
     const toast = await this.toastController.create({
       message: message,
       duration: 6000,
       color: 'danger'
-    });
-    toast.present();
+    })
+    toast.present()
+  }
+  //#endregion
+
+  //#region Statics
+  static PresentOkToast(message: string) {
+    productionConsole.log(message)
+    AppComponent.appInstance.PresentOkToast(message)
   }
 
-  static presentOkToast(message: string) {
-    console.log(message)
-    AppComponent.appInstance.presentOkToast(message)
+  static PresentWarningToast(message: string) {
+    productionConsole.warn(message)
+    AppComponent.appInstance.PresentWarningToast(message)
   }
-  static presentWarningToast(message: string) {
-    console.warn(message)
-    AppComponent.appInstance.presentWarningToast(message)
-  }
-  static presentErrorToast(message: string) {
-    console.error(message)
-    AppComponent.appInstance.presentErrorToast(message)
+
+  static PresentErrorToast(message: string) {
+    productionConsole.error(message)
+    AppComponent.appInstance.PresentErrorToast(message)
   }
   //#endregion
 }

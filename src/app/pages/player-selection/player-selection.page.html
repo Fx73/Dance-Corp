@@ -15,7 +15,7 @@
             <ion-card-content>
               <ion-item lines="none">
               @if(index !== 0) {
-                <ion-select  label="Dancer" labelPlacement="stacked" placeholder="Select a user" [value]="player.userId" (ionChange)="updateUser(index, $event.detail.value)">
+                <ion-select  label="Dancer" labelPlacement="stacked" placeholder="Select a user" [value]="player.userId" (ionChange)="UpdateUser(index, $event.detail.value)">
                   @for (user of userList; track user) {
                     <ion-select-option [value]="user.id">
                       {{ user.name }}
@@ -28,8 +28,8 @@
               }
               </ion-item>
               <ion-item lines="none">
-                <ion-select label="Gamepad" labelPlacement="stacked" placeholder="Select a gamepad" [value]="player.gamepad?.id" (ionChange)="updateGamepad(index, $event.detail.value)">
-                  @for (gamepad of this.gamepadService.getGamepads(); track gamepad) {
+                <ion-select label="Gamepad" labelPlacement="stacked" placeholder="Select a gamepad" [value]="player.gamepad?.id" (ionChange)="UpdateGamepad(index, $event.detail.value)">
+                  @for (gamepad of this.gamepadService.GetGamepads(); track gamepad) {
                     <ion-select-option [value]="gamepad.id">
                       {{ gamepad.id }}
                     </ion-select-option>
@@ -37,7 +37,7 @@
                 </ion-select>
               </ion-item>
               @if(index !== 0) {
-              <ion-button  color="primary" expand="block" size="small" (click)="removePlayer(index)" style="margin-top: 10px;">
+              <ion-button  color="primary" expand="block" size="small" (click)="RemovePlayer(index)" style="margin-top: 10px;">
                 Remove
               </ion-button>
               }@else{
@@ -47,7 +47,7 @@
           </ion-card>
         }
         @if (this.userConfigService.players.length < 4) { 
-          <ion-card class="add-player-card" (click)="addPlayer()">
+          <ion-card class="add-player-card" (click)="AddPlayer()">
             <ion-card-header>
               <ion-card-subtitle>Add player</ion-card-subtitle>
             </ion-card-header>
@@ -64,7 +64,7 @@
       </ion-card>
     </ion-card-content>
   </ion-card>
-  <ion-card class="base-card start-card" style="height: 15vh;" [disabled]="!allPlayersReady" [routerLink]="['/play/browse']" (click)="onStartClick()">
+  <ion-card class="base-card start-card" style="height: 15vh;" [disabled]="!allPlayersReady" [routerLink]="['/play/browse']" (click)="OnStartClick()">
     Start
   </ion-card>
 
