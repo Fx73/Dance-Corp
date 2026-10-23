@@ -1,4 +1,4 @@
-import { Firestore, collection, deleteDoc, doc, documentId, getDoc, getDocs, getFirestore, orderBy, query, setDoc, updateDoc, where } from 'firebase/firestore'
+import { DocumentData, DocumentSnapshot, FieldPath, Firestore, QueryDocumentSnapshot, collection, collectionGroup, deleteDoc, deleteField, doc, documentId, getDoc, getDocs, getFirestore, orderBy, query, setDoc, updateDoc, where, writeBatch } from 'firebase/firestore'
 import { MusicDto, NoteDataDto } from '../../game/game-model/music.dto'
 
 import { Injectable, inject } from '@angular/core'
@@ -14,6 +14,7 @@ import { UserFirestoreService } from './user.firestore.service'
 export class MusicFirestoreService {
     //#region Constants
     readonly MUSIC_COLLECTION = "musics"
+    readonly NOTES_COLLECTION = "notes"
     readonly METADATA_COLLECTION = "metadata"
     readonly MUSIC_METADATA_DOC = "musicdata"
     readonly MUSIC_INDEX_DOC = "music_index"
@@ -62,9 +63,10 @@ export class MusicFirestoreService {
             const musicRef = doc(this.db, this.MUSIC_COLLECTION, dto.id).withConverter(this.firestoreConverterMusic)
 
             // check protected fields are not modified
-            const current = (await getDoc(musicRef)).data()
+            const snap = await getDoc(musicRef)
+            const current = snap.data()
             if (!current) throw new Error("Music not found")
-            for (const field of this.GetProtectedFields(current)) {
+            for (const field of this.GetProtectedFields(this.ChartCount(snap))) {
                 if (!DeepEqual(dto[field], current[field]))
                     throw new Error(`Field "${field}" cannot be modified after upload.`)
             }
@@ -82,9 +84,9 @@ export class MusicFirestoreService {
         }
     }
 
-    /** Fields that cannot change once uploaded; bpms are also locked as soon as the music has notes */
-    GetProtectedFields(music: MusicDto): (keyof MusicDto)[] {
-        return music.noteData?.length > 0
+    /** Fields that cannot change once uploaded; bpms are also locked as soon as the music has charts */
+    GetProtectedFields(chartCount: number): (keyof MusicDto)[] {
+        return chartCount > 0
             ? [...this.protectedFields, ...this.notesProtectedFields]
             : this.protectedFields
     }
@@ -95,14 +97,11 @@ export class MusicFirestoreService {
             if (!user) throw new Error("User not authenticated")
 
             const musicRef = doc(this.db, this.MUSIC_COLLECTION, musicId)
-                .withConverter(this.firestoreConverterMusic)
 
             const snap = await getDoc(musicRef)
             if (!snap.exists()) throw new Error("Music not found")
 
-            const music = snap.data()
-
-            const toUpdateNotes: NoteDataDto[] = music.noteData
+            const charts: Record<string, string> = snap.get('charts') ?? {}
 
             for (const note of notes) {
                 // Only allow updates if the user is the creator OR it's a new note
@@ -111,19 +110,27 @@ export class MusicFirestoreService {
                     note.credit = note.credit ?? user.name
                 }
 
-                if (note.creatorId !== user.id) {
+                const isExisting = note.chartName in charts
+                if (note.creatorId !== user.id || (isExisting && charts[note.chartName] !== user.id)) {
                     console.log(`Skipping update for note ${note.chartName} - Not the creator`)
                     continue
                 }
 
-                // 2. Add or update the note in the music's noteData array
-                const idx = toUpdateNotes.findIndex(n => n.chartName === note.chartName)
-                if (idx >= 0) toUpdateNotes[idx] = note
-                else toUpdateNotes.push(note)
-            }
+                const noteRef = doc(musicRef, this.NOTES_COLLECTION, note.chartName).withConverter(this.firestoreConverterNote)
 
-            // 3. Rewrite the complete document
-            await setDoc(musicRef, { noteData: toUpdateNotes }, { merge: true })
+                // Existing chart: only its document changes
+                if (isExisting) {
+                    await setDoc(noteRef, note)
+                    continue
+                }
+
+                // New chart: written in one batch with its chart index entry (checked by the rules)
+                const batch = writeBatch(this.db)
+                batch.set(noteRef, note)
+                batch.update(musicRef, new FieldPath('charts', note.chartName), user.id, 'lastChartChange', note.chartName)
+                await batch.commit()
+                charts[note.chartName] = user.id
+            }
 
             this.UpdateMusicIndex(musicId)
 
@@ -137,16 +144,23 @@ export class MusicFirestoreService {
         console.log("Querying complete database for music list. This should only happen once per session and will be cached for next calls.")
 
         const musicRef = collection(this.db, this.MUSIC_COLLECTION).withConverter(this.firestoreConverterMusic)
-        const q = query(musicRef, orderBy(documentId()),)
-        const querySnapshot = await getDocs(q)
+        const notesRef = collectionGroup(this.db, this.NOTES_COLLECTION).withConverter(this.firestoreConverterNote)
+        const [musicSnapshot, notesSnapshot] = await Promise.all([getDocs(query(musicRef, orderBy(documentId()))), getDocs(notesRef)])
 
-        if (querySnapshot.empty)
+        if (musicSnapshot.empty)
             throw new Error("No musics to fetch in database")
 
-        const musics: MusicDto[] = []
-        querySnapshot.forEach(doc => musics.push(doc.data()))
+        // Group the charts by music; charts whose music no longer exists are ignored
+        const notesByMusic: Map<string, NoteDataDto[]> = new Map()
+        notesSnapshot.forEach(noteDoc => {
+            const musicId = noteDoc.ref.parent.parent?.id
+            if (!musicId) return
+            notesByMusic.set(musicId, [...(notesByMusic.get(musicId) ?? []), noteDoc.data()])
+        })
 
-        console.log("Musics retrieved count:", musics.length)
+        const musics = musicSnapshot.docs.map(musicDoc => this.ToMusic(musicDoc, notesByMusic.get(musicDoc.id) ?? []))
+
+        console.log("Musics retrieved count:", musics.length, "charts:", notesSnapshot.size)
         return musics
     }
 
@@ -170,7 +184,8 @@ export class MusicFirestoreService {
             )
 
             const snap = await getDocs(q)
-            snap.forEach(doc => results.push(doc.data()))
+            const musics = await Promise.all(snap.docs.map(async musicDoc => this.ToMusic(musicDoc, await this.GetNotes(musicDoc.id))))
+            results.push(...musics)
         }
 
         return results
@@ -178,15 +193,13 @@ export class MusicFirestoreService {
 
     async DeleteMusic(musicId: string): Promise<void> {
         try {
-            const musicRef = doc(this.db, this.MUSIC_COLLECTION, musicId).withConverter(this.firestoreConverterMusic)
+            const musicRef = doc(this.db, this.MUSIC_COLLECTION, musicId)
 
             const snap = await getDoc(musicRef)
             if (!snap.exists()) throw new Error("Music not found")
 
-            const music = snap.data()
-
-            // Check whether embedded notes remain
-            if (music.noteData && music.noteData.length > 0) {
+            // Check whether charts remain
+            if (this.ChartCount(snap) > 0) {
                 console.warn("Cannot delete, notes are still present on music:", musicId)
                 throw new Error("Cannot delete music with existing notes")
             }
@@ -207,30 +220,49 @@ export class MusicFirestoreService {
             const userId = this.userFirestoreService.user?.id
             if (!userId) throw new Error("User not authenticated")
 
-            const musicRef = doc(this.db, this.MUSIC_COLLECTION, musicId).withConverter(this.firestoreConverterMusic)
+            const musicRef = doc(this.db, this.MUSIC_COLLECTION, musicId)
+            const noteRef = doc(musicRef, this.NOTES_COLLECTION, note.chartName).withConverter(this.firestoreConverterNote)
 
-            const snap = await getDoc(musicRef)
-            if (!snap.exists()) throw new Error("Music not found")
+            const snap = await getDoc(noteRef)
+            if (!snap.exists()) throw new Error("Note not found")
 
-            const notedata = snap.data().noteData
-            const idx = notedata.findIndex(n => n.chartName === note.chartName)
-            if (idx < 0) throw new Error("Note not found")
-
-            if (notedata[idx].creatorId !== userId)
+            if (snap.data().creatorId !== userId)
                 throw new Error("User is not the creator of this note")
 
-            // Remove the note
-            notedata.splice(idx, 1)
+            // The chart and its chart index entry are removed in one batch (checked by the rules)
+            const batch = writeBatch(this.db)
+            batch.delete(noteRef)
+            batch.update(musicRef, new FieldPath('charts', note.chartName), deleteField(), 'lastChartChange', note.chartName)
+            await batch.commit()
 
-            // Rewrite the whole document
-            await updateDoc(musicRef, { noteData: notedata })
-
-            this.UpdateMusicIndex(musicId, false)
+            // Flag the music as updated so that other clients drop the chart from their cache
+            this.UpdateMusicIndex(musicId)
 
         } catch (error) {
             AppComponent.PresentWarningToast("Error deleting note: " + error)
             throw error
         }
+    }
+
+    private async GetNotes(musicId: string): Promise<NoteDataDto[]> {
+        const notesRef = collection(this.db, this.MUSIC_COLLECTION, musicId, this.NOTES_COLLECTION).withConverter(this.firestoreConverterNote)
+        const snap = await getDocs(notesRef)
+        return snap.docs.map(noteDoc => noteDoc.data())
+    }
+
+    /** Builds a music from its document and its charts, read from the notes subcollection */
+    private ToMusic(musicDoc: QueryDocumentSnapshot<MusicDto>, notes: NoteDataDto[]): MusicDto {
+        const music = musicDoc.data()
+        // Firestore-only fields, and the legacy embedded notes until they are removed
+        Reflect.deleteProperty(music, 'charts')
+        Reflect.deleteProperty(music, 'lastChartChange')
+        music.noteData = notes.sort((a, b) => (a.meter || 0) - (b.meter || 0))
+        return music
+    }
+
+    /** Number of charts of a music, from its chart index */
+    private ChartCount<T, U extends DocumentData>(musicDoc: DocumentSnapshot<T, U>): number {
+        return Object.keys(musicDoc.get('charts') ?? {}).length
     }
 
     //#region Genres
