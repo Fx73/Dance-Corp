@@ -392,3 +392,22 @@ Tested: `commit-version.sh` on a throwaway branch creates a signed commit with p
   - The bump commit does not start another Deploy run
   - Opening the dev -> master PR bumps dev to 1.1.0, and the PR shows that commit
   - The merged master deploy shows 1.1.0 and creates the v1.1.0 tag
+
+## Commit: Await async calls or mark them as fire-and-forget
+Link: https://github.com/Fx73/Dance-Corp/commit/478f5a59871c7b883cd5ca8c6226eeaaf08ed593
+
+- src/app/services/firestore/music.firestore.service.ts: `AddGenres()`, `UpdateMusicIndex()` and `RemoveMusicFromIndex()` awaited, a failure now shows the error toast instead of the success one
+- src/app/services/local-storage/music.cache.service.ts: `UpdateCache()` no longer throws (error toast), awaited in the `catch` blocks; corrupted cache entries are logged and removed from the cache and the registry
+- src/app/pages/upload/upload.page.ts: `DeleteNote()`, `DeleteFile()` and `SwitchToDbPage()` are async and wait for each step before reloading and showing their toast
+- src/app/services/thirdpartyapp/presence.service.ts: `Update()` and `Clear()` catch their errors
+- src/app/services/firestore/user.firestore.service.ts, src/app/services/local-storage/user.cache.service.ts: toast when the profile, the scores or a new score fail to load or save
+- src/app/app.component.ts: toasts awaited, announcers loading errors logged
+
+→ To verify:
+  - Upload a new music with a genre, update it: one success toast, the music and the genre appear in another browser
+  - Delete a chart from the database: the page reloads without it, the success toast comes after the reload
+  - Discard a local edit of a database music: the database version is reloaded
+  - Load a `.sm` file of a music that already exists in the database: the page switches to the database music
+  - Corrupt a `MUSIC_<id>` entry in localStorage, reload: an error is logged, the app still starts
+  - Desktop: Discord and Steam presence still update when changing pages
+  - Finish a song logged in: the score is saved
