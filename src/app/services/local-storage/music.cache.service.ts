@@ -24,11 +24,8 @@ export class MusicCacheService {
         this.registry = new Set(JSON.parse(localStorage.getItem(this.MUSIC_REGISTRY_KEY) ?? '[]'))
 
         for (const id of this.registry) {
-            const raw = localStorage.getItem(this.MUSIC_STORAGE_KEY(id))
-            if (!raw) continue
-            try {
-                this.musics.push(MusicDto.FromJSON(JSON.parse(raw)))
-            } catch { }
+            const music = this.ReadCachedMusic(id)
+            if (music) this.musics.push(music)
         }
 
     }
@@ -37,7 +34,16 @@ export class MusicCacheService {
         return this.musics.filter(m => this.localMusicService.registry.has(m.id) === false)
     }
 
+    /** Never throws: a failed update is reported with a toast, and the cache keeps its previous state */
     async UpdateCache() {
+        try {
+            await this.FetchCacheUpdate()
+        } catch (error) {
+            AppComponent.PresentErrorToast("Failed to update the music list: " + error)
+        }
+    }
+
+    private async FetchCacheUpdate() {
         const ts = parseInt(localStorage.getItem(this.MUSIC_REGISTRY_TS_KEY) || '0')
         if (ts === 0) {
             this.musics = await this.musicFirestoreService.GetAllMusics()
@@ -113,14 +119,8 @@ export class MusicCacheService {
     }
 
     GetMusic(musicId: string): MusicDto | null {
-        const cacheKey = this.MUSIC_STORAGE_KEY(musicId)
-
-        const raw = localStorage.getItem(cacheKey)
-        if (raw) {
-            try {
-                return MusicDto.FromJSON(JSON.parse(raw))
-            } catch { }
-        }
+        const music = this.ReadCachedMusic(musicId)
+        if (music) return music
 
         console.error(`Music ${musicId} not found in cache`)
         return null
@@ -138,14 +138,8 @@ export class MusicCacheService {
     }
 
     async GetMusicWithDbNoUpdate(musicId: string): Promise<MusicDto | null> {
-        const cacheKey = this.MUSIC_STORAGE_KEY(musicId)
-
-        const raw = localStorage.getItem(cacheKey)
-        if (raw) {
-            try {
-                return MusicDto.FromJSON(JSON.parse(raw))
-            } catch { }
-        }
+        const cachedMusic = this.ReadCachedMusic(musicId)
+        if (cachedMusic) return cachedMusic
 
         console.error(`Music ${musicId} not found in cache, fetching from server...`)
 
@@ -158,6 +152,22 @@ export class MusicCacheService {
         localStorage.setItem(this.MUSIC_REGISTRY_KEY, JSON.stringify(Array.from(this.registry)))
 
         return music
+    }
+
+    /** A corrupted entry is removed from the cache and the registry, so that it is fetched again with the next catalog change */
+    private ReadCachedMusic(musicId: string): MusicDto | null {
+        const raw = localStorage.getItem(this.MUSIC_STORAGE_KEY(musicId))
+        if (!raw) return null
+
+        try {
+            return MusicDto.FromJSON(JSON.parse(raw))
+        } catch (error) {
+            console.error(`Music ${musicId} is corrupted in cache, removing it:`, error)
+            localStorage.removeItem(this.MUSIC_STORAGE_KEY(musicId))
+            this.registry.delete(musicId)
+            localStorage.setItem(this.MUSIC_REGISTRY_KEY, JSON.stringify(Array.from(this.registry)))
+            return null
+        }
     }
 
     ClearCache(): void {
@@ -173,7 +183,7 @@ export class MusicCacheService {
         try {
             await this.musicFirestoreService.UploadMusic(music)
         } catch (e) {
-            this.UpdateCache()
+            await this.UpdateCache()
             throw e
         }
         music.noteData = []
@@ -187,7 +197,7 @@ export class MusicCacheService {
         try {
             await this.musicFirestoreService.UpdateMusic(music)
         } catch (e) {
-            this.UpdateCache()
+            await this.UpdateCache()
             throw e
         }
         this.musics = this.musics.filter(m => m.id !== music.id)
@@ -201,7 +211,7 @@ export class MusicCacheService {
         try {
             await this.musicFirestoreService.DeleteMusic(musicId)
         } catch (e) {
-            this.UpdateCache()
+            await this.UpdateCache()
             throw e
         }
 
@@ -215,7 +225,7 @@ export class MusicCacheService {
         try {
             await this.musicFirestoreService.UploadNotes(musicId, notes)
         } catch (e) {
-            this.UpdateCache()
+            await this.UpdateCache()
             throw e
         }
         const music = this.musics.find(m => m.id === musicId)
@@ -232,7 +242,7 @@ export class MusicCacheService {
         try {
             await this.musicFirestoreService.DeleteNote(musicId, note)
         } catch (e) {
-            this.UpdateCache()
+            await this.UpdateCache()
             throw e
         }
         const music = this.musics.find(m => m.id === musicId)

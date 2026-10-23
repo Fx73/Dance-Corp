@@ -72,7 +72,7 @@ export class MusicPlayerLocalComponent extends MusicPlayerCommon implements IMus
   }
 
   Play(): void {
-    this.audio.play()
+    void this.audio.play()
     this.isPlaying = true
   }
 

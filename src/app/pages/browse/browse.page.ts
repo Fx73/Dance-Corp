@@ -88,7 +88,7 @@ export class BrowsePage implements OnInit, OnDestroy {
     this.InitIonInfinite()
 
     this.InitPlayerInput()
-    this.discordRpcService.Update("Browsing")
+    void this.discordRpcService.Update("Browsing")
   }
 
   //#region Input handling
@@ -125,7 +125,7 @@ export class BrowsePage implements OnInit, OnDestroy {
       event.preventDefault()
     }
     if (event.key === 'Enter') {
-      this.RunGame()
+      void this.RunGame()
     }
   }
 
@@ -252,7 +252,7 @@ export class BrowsePage implements OnInit, OnDestroy {
 
   OnIonInfinite(event: InfiniteScrollCustomEvent) {
     productionConsole.info("Congratz, you found the infinite scroll ! But there is no more music to load :)")
-    event.target.complete()
+    void event.target.complete()
   }
 
   OnPlayerReady(mPlayer: IMusicPlayer) {
@@ -263,7 +263,7 @@ export class BrowsePage implements OnInit, OnDestroy {
     const length = music.sampleLength ?? 5
 
     this.sampleLoopActive = true
-    this.StartSampleLoop(mPlayer, start, length)
+    void this.StartSampleLoop(mPlayer, start, length)
   }
 
   private async StartSampleLoop(player: IMusicPlayer, start: number, length: number, delay: number = 2) {
@@ -306,7 +306,7 @@ export class BrowsePage implements OnInit, OnDestroy {
       }
     }
 
-    this.router.navigate(['/play/game', selectedMusic.id], {
+    void this.router.navigate(['/play/game', selectedMusic.id], {
       queryParams: {
         notes: chartNames,
       }

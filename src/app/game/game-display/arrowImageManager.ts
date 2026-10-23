@@ -58,7 +58,7 @@ export class ArrowImageManager {
             ArrowImageManager.mineImage = this.CreateResizedImage(mineImage)
         }
 
-        Promise.all([
+        void Promise.all([
             new Promise<void>((resolve) => { holdCenterImage.onload = () => resolve() }),
             new Promise<void>((resolve) => { holdCapImage.onload = () => resolve() }),
         ]).then(() => {

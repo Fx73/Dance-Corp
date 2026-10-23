@@ -37,7 +37,7 @@ export class BrowseUploadPage implements OnInit {
   ngOnInit() {
     this.InitIonInfinite()
 
-    this.discordRpcService.Update("Editing")
+    void this.discordRpcService.Update("Editing")
   }
 
   InitIonInfinite() {
@@ -65,9 +65,9 @@ export class BrowseUploadPage implements OnInit {
 
   PickMusic(music: MusicDto | null = null) {
     if (music !== null)
-      this.router.navigate(['/upload'], { queryParams: { music: music.id } })
+      void this.router.navigate(['/upload'], { queryParams: { music: music.id } })
     else
-      this.router.navigate(['/upload'])
+      void this.router.navigate(['/upload'])
   }
 
   OnSearch(event: SearchbarCustomEvent) {
@@ -77,6 +77,6 @@ export class BrowseUploadPage implements OnInit {
 
   OnIonInfinite(event: InfiniteScrollCustomEvent) {
     productionConsole.info("Congratz, you found the infinite scroll ! But there is no more music to load :)")
-    event.target.complete()
+    void event.target.complete()
   }
 }

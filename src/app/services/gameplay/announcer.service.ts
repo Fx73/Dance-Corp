@@ -197,7 +197,7 @@ export class AnnouncerService {
             }
         }
 
-        this.announcerAudio.play()
+        void this.announcerAudio.play()
     }
 
     // -------------------------
@@ -239,7 +239,7 @@ export class AnnouncerService {
         const audio = new Audio(src)
         audio.volume = options.volume ?? 1
 
-        audio.play()
+        void audio.play()
 
         // No fade-out: stop here
         if (!options.fadeOutMs) return audio

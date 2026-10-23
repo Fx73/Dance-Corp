@@ -68,14 +68,14 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
 
     if (!musicId || chartNames.length === 0) {
       console.error("Music data is missing or incomplete.")
-      this.router.navigate(['/home'])
+      void this.router.navigate(['/home'])
       return
     }
 
     const music = this.musicCacheService.GetMusic(musicId)
     if (!music) {
       console.error(`Music with ID ${musicId} not found. Your cache might be corrupted.`)
-      this.router.navigate(['/home'])
+      void this.router.navigate(['/home'])
       return
     }
     this.music = music
@@ -83,7 +83,7 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
     const selectedNotes = chartNames.map(name => music.noteData.findIndex(n => n.chartName === name))
     if (selectedNotes.includes(-1)) {
       console.error(`Chart not found in music ${musicId}: ${chartNames.join(', ')}`)
-      this.router.navigate(['/home'])
+      void this.router.navigate(['/home'])
       return
     }
 
@@ -91,7 +91,7 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
     this.musicOrigin = MusicPlayerCommon.PickMusicPlayer(this.music.music!)
     if (this.musicOrigin == null) {
       AppComponent.PresentWarningToast("Error loading music in player !")
-      this.router.navigate(['/home'])
+      void this.router.navigate(['/home'])
       return
     }
 
@@ -100,7 +100,7 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
     this.game = new GameManager(this.music, players, selectedNotes, isTrainingMode, this.userCacheService, this.announcerService)
     this.announcerService.PickPreferredAnnouncer()
 
-    this.discordRpcService.Update("Dancing on lvl " + this.music.noteData[selectedNotes[0]].meter, this.music.title + " - " + this.music.artist)
+    void this.discordRpcService.Update("Dancing on lvl " + this.music.noteData[selectedNotes[0]].meter, this.music.title + " - " + this.music.artist)
   }
 
   @ViewChildren(PlayerDisplayComponent) playerDisplaysQuery!: QueryList<PlayerDisplayComponent>
@@ -126,14 +126,14 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
     this.game!.RegisterExternalComponents(this.musicPlayer, /*this.playerDisplays*/)
 
     this.waitingScreen.StartCountdown()
-    this.announcerService.PlayCountdownFromAnnouncer()
+    void this.announcerService.PlayCountdownFromAnnouncer()
 
     this.cdr.detectChanges()
   }
 
   HandleCountdownFinished() {
     this.loadingMusic = false
-    this.game?.StartGame()
+    void this.game?.StartGame()
   }
 
   ngOnDestroy(): void {

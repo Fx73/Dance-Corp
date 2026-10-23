@@ -2,6 +2,7 @@ import { DocumentData, Firestore, FirestoreDataConverter, QueryDocumentSnapshot,
 import { Injectable, signal, inject } from '@angular/core'
 import { UserDto, UserMusicDto, UserNoteDto } from 'src/app/pages/user-profile/user.dto'
 
+import { AppComponent } from 'src/app/app.component'
 import { FirestoreConverter } from './firestore.converter'
 import { GameRound } from 'src/app/game/game-model/gameRound'
 import { LoginFireauthService } from 'src/app/services/firestore/login.fireauth.service'
@@ -30,9 +31,9 @@ export class UserFirestoreService {
         this.db = getFirestore()
         loginFireauthService.ListenForUserChanges(firebaseUser => {
             if (firebaseUser) {
-                this.GetUserFromFirestore(firebaseUser).then(user => {
-                    this._userData.set(user)
-                })
+                this.GetUserFromFirestore(firebaseUser)
+                    .then(user => this._userData.set(user))
+                    .catch(error => AppComponent.PresentErrorToast("Failed to load your profile: " + error))
             } else {
                 this._userData.set(null)
             }

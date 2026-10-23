@@ -26,14 +26,14 @@ export class AppComponent implements OnInit {
     const soundService = inject(SoundService)
 
     AppComponent.appInstance = this
-    announcerService.Init()
+    announcerService.Init().catch(error => console.error("Failed to load the announcers:", error))
 
     document.addEventListener('click', () => soundService.InitBackgroundMusic(), { once: true })
   }
 
   ngOnInit() {
-    this.musicCacheService.UpdateCache()
-    this.presenceService.Init()
+    void this.musicCacheService.UpdateCache()
+    void this.presenceService.Init()
   }
 
   //#region Toasts
@@ -43,7 +43,7 @@ export class AppComponent implements OnInit {
       duration: 6000,
       color: 'success'
     })
-    toast.present()
+    await toast.present()
   }
 
   async PresentWarningToast(message: string) {
@@ -52,7 +52,7 @@ export class AppComponent implements OnInit {
       duration: 6000,
       color: 'warning'
     })
-    toast.present()
+    await toast.present()
   }
 
   async PresentErrorToast(message: string) {
@@ -61,24 +61,24 @@ export class AppComponent implements OnInit {
       duration: 6000,
       color: 'danger'
     })
-    toast.present()
+    await toast.present()
   }
   //#endregion
 
   //#region Statics
   static PresentOkToast(message: string) {
     productionConsole.log(message)
-    AppComponent.appInstance.PresentOkToast(message)
+    void AppComponent.appInstance.PresentOkToast(message)
   }
 
   static PresentWarningToast(message: string) {
     productionConsole.warn(message)
-    AppComponent.appInstance.PresentWarningToast(message)
+    void AppComponent.appInstance.PresentWarningToast(message)
   }
 
   static PresentErrorToast(message: string) {
     productionConsole.error(message)
-    AppComponent.appInstance.PresentErrorToast(message)
+    void AppComponent.appInstance.PresentErrorToast(message)
   }
   //#endregion
 }

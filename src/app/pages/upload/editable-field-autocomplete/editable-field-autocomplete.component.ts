@@ -85,7 +85,7 @@ export class MusicEditableFieldAutocompleteComponent<T extends string | null | u
     this.filteredGenres = []
 
     setTimeout(() => {
-      this.genreInput.setFocus()
+      void this.genreInput.setFocus()
     }, 0)
   }
 

@@ -73,7 +73,7 @@ export class OptionsPage {
       case 'sfxVolume':
         const SOUND_ARROW_UP = new Audio('assets/Sounds/menuFx/arrow_up.ogg')
         SOUND_ARROW_UP.volume = this.GetConfigValue('sfxVolume')
-        SOUND_ARROW_UP.play()
+        void SOUND_ARROW_UP.play()
         break
     }
 
@@ -123,8 +123,7 @@ export class OptionsPage {
     this.userCacheService.ClearCache()
   }
 
-  ClearMusicEditCache() {
-    this.localMusicService.ClearAllLocalMusics()
-
+  async ClearMusicEditCache() {
+    await this.localMusicService.ClearAllLocalMusics()
   }
 }

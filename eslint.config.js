@@ -12,6 +12,12 @@ module.exports = tseslint.config(
       ...angular.configs.tsRecommended,
     ],
     processor: angular.processInlineTemplates,
+    languageOptions: {
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: __dirname,
+      },
+    },
     plugins: {
       '@stylistic': stylistic,
     },
@@ -43,6 +49,8 @@ module.exports = tseslint.config(
       // Warning only: some unused code belongs to features in progress
       // ignoreRestSiblings: allows removing a property with destructuring, e.g. const { a, ...rest } = obj
       '@typescript-eslint/no-unused-vars': ['warn', { ignoreRestSiblings: true }],
+      // Async calls are awaited, or marked with void when they are fire-and-forget on purpose
+      '@typescript-eslint/no-floating-promises': 'error',
       '@angular-eslint/component-class-suffix': [
         'error',
         {

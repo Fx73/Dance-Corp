@@ -70,7 +70,7 @@ export class SoundService {
             clearInterval(this.fadeIntervals.get(audio))
         }
 
-        audio.play()
+        void audio.play()
 
         const step = 50
         const increment = step / duration
@@ -113,7 +113,7 @@ export class SoundService {
     PlaySfx(audio: HTMLAudioElement) {
         audio.volume = this.GetSfxVolume()
         audio.currentTime = 0
-        audio.play()
+        void audio.play()
     }
     
     // -------------------------

@@ -26,8 +26,8 @@ Bugs found but not fixed yet, and deprecations to migrate. Remove an entry once 
 - **Pass identifiers, not indexes, across pages and layers**
   Charts now travel by `chartName` from browse to the game, but music and player indexes still do (`selectedMusicIndex` over two concatenated lists, `noteSelected` in `GameManager`). Prefer `music.id` / `chartName`.
 
-- **Floating promises**
-  Async calls are often fired without `await` (`AddGenres()`, `UpdateMusicIndex()`, `UpdateCache()` in `catch` blocks, `DeleteNoteInBase()` followed by `LoadDbMusic()`). Await them, or mark intentional ones with `void`. The ESLint rule `@typescript-eslint/no-floating-promises` would list them all. Also review the 4 empty `catch { }` blocks that swallow errors.
+- **Rejected `audio.play()` ignored**
+  Sounds and the local music player call `audio.play()` without handling its rejection (marked `void`). When the browser blocks playback (autoplay policy before the first click, or a file that fails to load), the rejection is unhandled, `MusicPlayerLocalComponent` still sets `isPlaying`, and `GameManager.StartGame()` waits forever for the music time to move.
 
 - **Duplicated persistence block in `MusicCacheService`**
   "update `musics` + `localStorage.setItem` + `registry.add` + save registry" is repeated about 8 times. Extract a `PersistMusic(music)` / `RemoveMusic(id)` helper.

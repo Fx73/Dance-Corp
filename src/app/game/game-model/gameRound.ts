@@ -251,7 +251,7 @@ export class GameRound {
         this.precisionMessage.push(arrow)
 
         this.mineHitSound.currentTime = 0
-        this.mineHitSound.play()
+        void this.mineHitSound.play()
 
         this.announcerService.ChangeSatisfaction(SatisfactionType.Fail, CONFIG.ANNOUNCER.SATISFACTION.MINE_HIT)
     }

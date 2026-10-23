@@ -46,11 +46,11 @@ export class TestNoteComponent implements OnInit, OnDestroy {
     const player = this.userConfigService.players[0] || new Player()
     this.game = new GameManager(this.music, [player], [0], true, null!, null!)
     this.game.RegisterExternalComponents(musicPlayer)
-    this.game.StartGame()
+    void this.game.StartGame()
   }
 
   Dismiss() {
-    this.modalController.dismiss()
+    void this.modalController.dismiss()
   }
 
   ngOnDestroy(): void {
