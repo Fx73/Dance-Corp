@@ -411,3 +411,18 @@ Link: https://github.com/Fx73/Dance-Corp/commit/478f5a59871c7b883cd5ca8c6226eeaa
   - Corrupt a `MUSIC_<id>` entry in localStorage, reload: an error is logged, the app still starts
   - Desktop: Discord and Steam presence still update when changing pages
   - Finish a song logged in: the score is saved
+
+## Commit: Leave the game when the music does not start, log blocked sounds
+Link: https://github.com/Fx73/Dance-Corp/commit/17548287a100f9c411a4e3de4f018254e17a6645
+
+- src/app/game/game.manager.ts: `StartGame()` gives up after `MUSIC_START_TIMEOUT` (15 s) if the music time does not move, and stops waiting if the game is destroyed
+- src/app/game/game.page.ts, src/app/pages/upload/test-note/test-note.component.ts: error toast, then back to browse (game) or the modal closes (chart test)
+- src/app/game/music-player/music-player-local/music-player-local.component.ts: `isPlaying` only set once playback has started
+- src/app/services/gameplay/sound.service.ts: `SoundService.PlaySound()` logs a blocked or failed sound; used by the sounds, the announcers and the mine hit
+
+→ To verify:
+  - A normal game starts as before, on YouTube, SoundCloud and a local song (desktop)
+  - A YouTube music whose video is unavailable: after 15 s, error toast and back to browse
+  - Leave the game during the countdown or the wait: no toast and no navigation afterwards
+  - Open the app and play with a pad only, without any click: the music starts, or the game goes back to browse after 15 s
+  - Upload page, chart test with an unavailable music: error toast, the modal closes
