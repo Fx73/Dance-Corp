@@ -377,3 +377,18 @@ Tested: 29 allow/deny cases in the Firestore emulator (chart creation, edit and 
   - Deleting a music is refused while it has charts, then works once they are gone
   - Changing the bpms is refused once the music has a chart
   - Another browser with a warm cache picks up an added and a deleted chart
+
+## Commit: Bump the version automatically: patch on dev, minor on release
+Link: https://github.com/Fx73/Dance-Corp/commit/a4ca8bc5c599db357ed91ec77c3037bce2647e44
+
+Tested: `commit-version.sh` on a throwaway branch creates a signed commit with package.json and package-lock.json. Workflow YAML is valid. The workflows themselves only run after the merge.
+
+- .github/workflows/deploy.yml: `version` job (patch bump on dev, tag on master), web and desktop build its commit
+- .github/workflows/release.yml: minor bump on dev when a dev -> master PR opens
+- .github/scripts/commit-version.sh: signed commit through the GitHub API
+
+→ To verify:
+  - Merging this PR bumps dev to 1.0.2, and the dev site and DanceCorp Dev installers show 1.0.2
+  - The bump commit does not start another Deploy run
+  - Opening the dev -> master PR bumps dev to 1.1.0, and the PR shows that commit
+  - The merged master deploy shows 1.1.0 and creates the v1.1.0 tag
