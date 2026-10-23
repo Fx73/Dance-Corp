@@ -8,7 +8,8 @@ import { SoundService } from "./sound.service"
 interface ISoundBank {
     type: string
     name: string
-    lines: Record<string, string[]>
+    // An announcer has no lines for some categories
+    lines: Partial<Record<string, string[]>>
 }
 
 @Injectable({ providedIn: 'root' })
@@ -138,7 +139,9 @@ export class AnnouncerService {
         
         const announcer = this.Random(this.announcers)
         const category = this.Random(Object.keys(announcer.lines))
-        const line = this.Random(announcer.lines[category])
+        const lines = announcer.lines[category]
+        if (!lines) return
+        const line = this.Random(lines)
         
         this.PlayAnnouncerDirect(announcer, line, this.ProcessAnnouncerQueue.bind(this))
     }

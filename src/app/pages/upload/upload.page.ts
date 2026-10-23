@@ -271,7 +271,7 @@ export class UploadPage {
   }
 
   IsLocalMusic(): boolean {
-    return this.musicData?.music !== undefined && this.musicData.music.startsWith("local:")
+    return this.musicData.music !== undefined && this.musicData.music.startsWith("local:")
   }
 
   OnStartEdit() {
@@ -308,7 +308,7 @@ export class UploadPage {
 
   //#region Upload
   async UploadMusic(): Promise<void> {
-    if (this.musicData === null || this.isEditDB()) return
+    if (this.isEditDB()) return
 
     await this.musicCacheService.CreateMusicInBase(this.musicData)
     this.isEditDB.set(true)
@@ -317,7 +317,7 @@ export class UploadPage {
   }
 
   async UpdateMusic(): Promise<void> {
-    if (this.musicData === null || !this.isEditDB()) return
+    if (!this.isEditDB()) return
 
     await this.musicCacheService.UpdateMusicInBase(this.musicData)
     AppComponent.PresentOkToast("Music updated successfully!")
@@ -329,7 +329,7 @@ export class UploadPage {
   }
 
   async UploadAllNotes(): Promise<void> {
-    if (this.musicData === null || !this.isEditDB()) return
+    if (!this.isEditDB()) return
     await this.musicCacheService.UploadNotesInBase(this.musicData.id, this.musicData.noteData)
     AppComponent.PresentOkToast("All notes uploaded successfully!")
 
@@ -340,7 +340,7 @@ export class UploadPage {
   }
 
   async UploadNote(note: NoteDataDto): Promise<void> {
-    if (this.musicData === null || !this.isEditDB()) return
+    if (!this.isEditDB()) return
     await this.musicCacheService.UploadNotesInBase(this.musicData.id, [note])
     AppComponent.PresentOkToast("Note uploaded successfully!")
     await this.LoadDbMusic(this.musicData.id)
@@ -350,7 +350,6 @@ export class UploadPage {
 
   //#region Delete
   async DeleteFile(silent = false) {
-    if (this.musicData === null) return
     const musicId = this.musicData.id
     this.localMusicService.DeleteMusic(musicId)
     this.musicData = new MusicDto()
@@ -379,7 +378,6 @@ export class UploadPage {
   }
 
   async DeleteNote(note: NoteDataDto): Promise<void> {
-    if (!this.musicData) return
 
     if (this.musicDataDb && this.musicDataDb.noteData.some(n => n.chartName === note.chartName)) {
       await this.musicCacheService.DeleteNoteInBase(this.musicData.id, note)
@@ -399,7 +397,7 @@ export class UploadPage {
       const list = await readDir("music", {
         baseDir: BaseDirectory.AppData
       })
-      const toDelete = list.filter(f => f.name?.startsWith(musicId))
+      const toDelete = list.filter(f => f.name.startsWith(musicId))
 
       for (const file of toDelete) {
         await remove(`music/${file.name}`, {
@@ -466,7 +464,7 @@ export class UploadPage {
   }
 
   CheckUrl(): Promise<boolean> {
-    if (!this.musicData?.music) return Promise.resolve(false)
+    if (!this.musicData.music) return Promise.resolve(false)
 
     return new Promise((resolve, reject) => {
       fetch(this.musicData.music!, {

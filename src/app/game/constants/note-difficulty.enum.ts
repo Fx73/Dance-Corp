@@ -5,7 +5,7 @@ export enum NoteDifficulty {
     Expert = "Expert",
     Challenge = "Challenge"
 }
-export const difficultyMap: Record<string, NoteDifficulty> = {
+export const difficultyMap: Partial<Record<string, NoteDifficulty>> = {
     // Beginner
     "beginner": NoteDifficulty.Beginner,
     "novice": NoteDifficulty.Beginner,

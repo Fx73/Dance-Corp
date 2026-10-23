@@ -295,7 +295,7 @@ export class MusicFirestoreService {
             return []
         }
 
-        const genres = snap.data()?.['genres'] ?? []
+        const genres = snap.data()['genres'] ?? []
 
         return genres
             .filter((g: string) => g.length > 0)

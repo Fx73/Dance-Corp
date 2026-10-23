@@ -46,7 +46,8 @@ export class MusicDto {
   constructor(tokenMapWithNotes?: SscTokenMap) {
     if (tokenMapWithNotes === undefined) return
     // notedataN blocks (sub-maps) are read separately, below
-    const tokenMap = tokenMapWithNotes as Record<string, string>
+    // A tag missing from the file has no entry
+    const tokenMap = tokenMapWithNotes as Partial<Record<string, string>>
 
     this.title = tokenMap["title"]
     delete tokenMap["title"]
@@ -80,9 +81,9 @@ export class MusicDto {
     delete tokenMap["offset"]
     this.musicoffset = tokenMap["musicoffset"] ? parseFloat(tokenMap["musicoffset"]) : undefined
     delete tokenMap["musicoffset"]
-    this.sampleStart = parseFloat(tokenMap["samplestart"])
+    this.sampleStart = tokenMap["samplestart"] ? parseFloat(tokenMap["samplestart"]) : undefined
     delete tokenMap["samplestart"]
-    this.sampleLength = parseFloat(tokenMap["samplelength"])
+    this.sampleLength = tokenMap["samplelength"] ? parseFloat(tokenMap["samplelength"]) : undefined
     delete tokenMap["samplelength"]
     this.stops = this.ParseChanges<StopChange>(tokenMap["stops"], v => parseFloat(v)) ?? []
     delete tokenMap["stops"]
@@ -127,17 +128,16 @@ export class MusicDto {
 
     const toRemoveTokens = ['selectable', 'tickcounts']
     const leftTokens = Object.fromEntries(
-      Object.entries(tokenMap).filter(([key, value]) =>
-        !toRemoveTokens.includes(key) &&
-        value !== null &&
-        value !== undefined &&
-        !(typeof value === "string" && value.trim() === "")
+      Object.entries(tokenMap).filter((entry): entry is [string, string] =>
+        !toRemoveTokens.includes(entry[0]) &&
+        entry[1] !== undefined &&
+        !(typeof entry[1] === "string" && entry[1].trim() === "")
       )
     )
     this.additionalFields = { ...leftTokens }
   }
 
-  private ParseChanges<T extends ITimedChange>(token: string, parsefun: (value: string) => T['value']): T[] | undefined {
+  private ParseChanges<T extends ITimedChange>(token: string | undefined, parsefun: (value: string) => T['value']): T[] | undefined {
     if (!token) return undefined
     const changes = token.split(',')
     const array: T[] = []
@@ -180,23 +180,24 @@ export class NoteDataDto {
   creationDate: Date = new Date()
   stepChart: Measures[] = []
 
-  constructor(tokenMap?: Record<string, string>) {
+  // A tag missing from the chart has no entry
+  constructor(tokenMap?: Partial<Record<string, string>>) {
     if (tokenMap === undefined) return
 
     this.stepsType = tokenMap["stepstype"] as DanceType
     this.description = tokenMap["description"]
     this.chartStyle = tokenMap["chartstyle"]
-    const difficulty = tokenMap["difficulty"].toLowerCase().trim()
+    const difficulty = (tokenMap["difficulty"] ?? "").toLowerCase().trim()
     this.difficulty = difficultyMap[difficulty] || NoteDifficulty.Challenge
 
-    this.meter = parseInt(tokenMap["meter"])
+    this.meter = tokenMap["meter"] ? parseInt(tokenMap["meter"]) : 0
     this.credit = tokenMap["credit"]
     this.creatorId = tokenMap["creatorid"]
     const creationDateValue = tokenMap["creationdate"]
     this.creationDate = creationDateValue ? new Date(creationDateValue) : new Date()
     this.chartName = tokenMap["chartname"]?.trim() || `${this.difficulty}_${this.meter}_${this.stepsType === DanceType.DanceSingle ? 'S' : 'D'}_${this.creationDate.toISOString().split('T')[0]}`
 
-    this.stepChart = tokenMap["notes"].split(',').map(measure => {
+    this.stepChart = (tokenMap["notes"] ?? "").split(',').map(measure => {
       const measureInstance = new Measures()
       measureInstance.steps = measure.trim().split('\n').map(line => line.trim().split('').map(step => parseInt(step)))
       return measureInstance

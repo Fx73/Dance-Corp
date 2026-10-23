@@ -14,7 +14,8 @@ export class MusicPlayerLocalComponent extends MusicPlayerCommon implements IMus
   @Input() musicUrl!: string
   @Input() startOffset?: number
   @Output() ready: EventEmitter<IMusicPlayer> = new EventEmitter()
-  private audio!: HTMLAudioElement
+  // Created here so that it exists before ngOnInit has loaded the file
+  private audio = new Audio()
 
   isPlaying = false
   currentTime = signal(0)
@@ -27,7 +28,6 @@ export class MusicPlayerLocalComponent extends MusicPlayerCommon implements IMus
   async ngOnInit(): Promise<void> {
     const url = this.musicUrl.replace("local:", "")
     const localUri = await this.CreateMusicUri(url)
-    this.audio = new Audio()
     this.audio.src = localUri
     this.audio.volume = this.GetVolume()
     this.audio.preload = 'auto'
@@ -85,11 +85,11 @@ export class MusicPlayerLocalComponent extends MusicPlayerCommon implements IMus
   }
 
   GetCurrentTime(): number {
-    return (this.audio?.currentTime ?? 0) - (this.startOffset ?? 0)
+    return this.audio.currentTime - (this.startOffset ?? 0)
   }
 
   GetDuration(): number {
-    return (this.audio?.duration ?? 0) - (this.startOffset ?? 0)
+    return (this.audio.duration || 0) - (this.startOffset ?? 0) // NaN until the file is loaded
   }
 
   SetToTime(time: number): void {

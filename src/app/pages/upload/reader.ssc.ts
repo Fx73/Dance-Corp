@@ -161,7 +161,8 @@ export class SccReader {
     const result: { title?: string, artist?: string, jacket?: string, bpms?: BpmChange[] } = {}
 
     for (const token of tokens) {
-      const [rawKey, rawValue] = token.split(/:(.*)/s)
+      // A token without a colon has no value
+      const [rawKey, rawValue] = token.split(/:(.*)/s) as [string, string?]
       const key = rawKey.toLowerCase().trim()
       const value = rawValue?.trim()
 
@@ -169,7 +170,7 @@ export class SccReader {
         result[key] = value
       }
 
-      if (key === 'bpms') {
+      if (key === 'bpms' && value) {
         result.bpms = value.split(',').map((v: string) => {
           const [time, bpm] = v.split('=')
           return { time: parseFloat(time), value: parseFloat(bpm) }
