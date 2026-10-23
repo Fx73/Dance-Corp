@@ -92,6 +92,7 @@ Write new code the way the existing code is written. Known deviations to avoid a
 - Feature branches: commit and push freely, without asking.
 - `dev`: commit and push only when necessary, and only for bug fixes, one commit per fix. Never develop a feature directly on `dev`.
 - `master`: never commit or push.
+- Wiki: commit and push freely when updating it before a pull request to `dev` (see below).
 
 ### Versioning
 
@@ -102,6 +103,12 @@ Write new code the way the existing code is written. Known deviations to avoid a
 
 - Always run `npm install` then `ionic serve` right before a commit, and check that the build completes without errors. Do not commit a broken build.
 - Always run `ng lint` right before a commit, and fix every error. Do not commit with lint errors.
+
+### Before Opening a Pull Request to `dev`
+
+- Check that the [wiki](https://github.com/Fx73/Dance-Corp/wiki) matches the changes of the branch (gameplay rules, chart format, architecture, setup, CI/CD), and update it if it is not done yet. Also keep the feature status of [README.md](README.md) in sync.
+- The wiki is a separate repository: `https://github.com/Fx73/Dance-Corp.wiki.git`. Clone it outside the project. A push publishes it immediately, without a pull request.
+- In the wiki, link to repository files with absolute URLs on `master` (`https://github.com/Fx73/Dance-Corp/blob/master/...`), and to other wiki pages with `[[Page Name]]`. `_Sidebar.md` and `_Footer.md` are shown on every page.
 
 ### Commit Messages
 
