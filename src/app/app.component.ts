@@ -32,7 +32,12 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
-    void this.musicCacheService.UpdateCache()
+    this.musicCacheService.UpdateCache()
+      .then(changes => {
+        if (changes)
+          AppComponent.PresentOkToast(`Music list updated: ${changes.added} new, ${changes.updated} updated, ${changes.deleted} deleted.`)
+      })
+      .catch(error => AppComponent.PresentErrorToast("Failed to update the music list: " + error))
     void this.presenceService.Init()
   }
 

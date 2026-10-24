@@ -1,6 +1,5 @@
 import { Auth, FacebookAuthProvider, GoogleAuthProvider, User, createUserWithEmailAndPassword, getAuth, onAuthStateChanged, sendEmailVerification, sendPasswordResetEmail, signInWithEmailAndPassword, signInWithPopup, signOut, updateEmail, updatePassword, updateProfile } from 'firebase/auth'
 
-import { AppComponent } from '../../app.component'
 import { Injectable } from "@angular/core"
 
 @Injectable({
@@ -21,111 +20,46 @@ export class LoginFireauthService {
   }
 
   //#region Login
-  Register(email: string, password: string): void {
-    createUserWithEmailAndPassword(this.auth, email, password)
-      .catch((error) => {
-        const errorCode = error.code
-        const errorMessage = error.message
-        AppComponent.PresentWarningToast(errorMessage)
-        alert(errorCode)
-      })
+  async Register(email: string, password: string): Promise<void> {
+    await createUserWithEmailAndPassword(this.auth, email, password)
   }
 
-  Login(email: string, password: string): void {
-    signInWithEmailAndPassword(this.auth, email, password)
-      .catch((error) => {
-        const errorCode = error.code
-        const errorMessage = error.message
-        AppComponent.PresentWarningToast(errorMessage)
-        alert(errorCode)
-      })
+  async Login(email: string, password: string): Promise<void> {
+    await signInWithEmailAndPassword(this.auth, email, password)
   }
 
-  LoginWithGoogle() {
-    const provider = new GoogleAuthProvider()
-    signInWithPopup(this.auth, provider)
-      .catch((error) => {
-        const errorCode = error.code
-        const errorMessage = error.message
-        AppComponent.PresentWarningToast(errorMessage)
-        alert(errorCode)
-      })
+  async LoginWithGoogle(): Promise<void> {
+    await signInWithPopup(this.auth, new GoogleAuthProvider())
   }
 
-  LoginWithFacebook() {
-    const provider = new FacebookAuthProvider()
-    signInWithPopup(this.auth, provider)
-      .catch((error) => {
-        const errorCode = error.code
-        const errorMessage = error.message
-        AppComponent.PresentWarningToast(errorMessage)
-        alert(errorCode)
-      })
+  async LoginWithFacebook(): Promise<void> {
+    await signInWithPopup(this.auth, new FacebookAuthProvider())
   }
 
-  PasswordRecovery(email: string): void {
-    sendPasswordResetEmail(this.auth, email)
-      .catch((error) => {
-        const errorCode = error.code
-        const errorMessage = error.message
-        AppComponent.PresentWarningToast(errorMessage)
-        alert(errorCode)
-      })
+  async PasswordRecovery(email: string): Promise<void> {
+    await sendPasswordResetEmail(this.auth, email)
   }
   //#endregion
 
   //#region Account
-  ResendEmail(): void {
-    if (this.auth.currentUser)
-      sendEmailVerification(this.auth.currentUser)
-        .catch((error) => {
-          const errorCode = error.code
-          const errorMessage = error.message
-          AppComponent.PresentWarningToast(errorMessage)
-          alert(errorCode)
-        })
+  async ResendEmail(): Promise<void> {
+    if (!this.auth.currentUser) throw new Error("User not authenticated")
+    await sendEmailVerification(this.auth.currentUser)
   }
 
-  UpdatePassword(password: string) {
-    if (this.auth.currentUser)
-      updatePassword(this.auth.currentUser, password).then(() => {
-        alert('Password updated')
-      }).catch((error) => {
-        const errorCode = error.code
-        const errorMessage = error.message
-        AppComponent.PresentWarningToast(errorMessage)
-        alert(errorCode)
-      })
+  async UpdatePassword(password: string): Promise<void> {
+    if (!this.auth.currentUser) throw new Error("User not authenticated")
+    await updatePassword(this.auth.currentUser, password)
   }
 
-  UpdateProfile(email: string, name: string) {
-    if (this.auth.currentUser)
-      updateEmail(this.auth.currentUser, email).then(() => {
-        updateProfile(this.auth.currentUser!, { displayName: name }).then(() => {
-          alert('Profile updated')
-        }).catch((error) => {
-          const errorCode = error.code
-          const errorMessage = error.message
-          AppComponent.PresentWarningToast(errorMessage)
-          alert(errorCode)
-        })
-
-      }).catch((error) => {
-        const errorCode = error.code
-        const errorMessage = error.message
-        AppComponent.PresentWarningToast(errorMessage)
-        alert(errorCode)
-      })
+  async UpdateProfile(email: string, name: string): Promise<void> {
+    if (!this.auth.currentUser) throw new Error("User not authenticated")
+    await updateEmail(this.auth.currentUser, email)
+    await updateProfile(this.auth.currentUser, { displayName: name })
   }
   //#endregion
 
-  LogOut(): void {
-    signOut(this.auth)
-      .catch((error) => {
-        const errorCode = error.code
-        const errorMessage = error.message
-        AppComponent.PresentWarningToast(errorMessage)
-        alert(errorCode)
-      })
+  async LogOut(): Promise<void> {
+    await signOut(this.auth)
   }
 }

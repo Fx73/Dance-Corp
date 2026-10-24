@@ -149,7 +149,13 @@ export class UploadPage {
   }
 
   async LoadDbMusic(musicId: string) {
-    const data = await this.musicCacheService.GetMusicWithCheck(musicId)
+    let data: MusicDto | null
+    try {
+      data = await this.musicCacheService.GetMusicWithCheck(musicId)
+    } catch (error) {
+      AppComponent.PresentErrorToast("Failed to load the music: " + error)
+      return
+    }
     if (data) {
       this.musicDataDb = data
       this.isEditDB.set(true)
@@ -310,7 +316,12 @@ export class UploadPage {
   async UploadMusic(): Promise<void> {
     if (this.isEditDB()) return
 
-    await this.musicCacheService.CreateMusicInBase(this.musicData)
+    try {
+      await this.musicCacheService.CreateMusicInBase(this.musicData)
+    } catch (error) {
+      AppComponent.PresentErrorToast("Error uploading music: " + error)
+      return
+    }
     this.isEditDB.set(true)
     AppComponent.PresentOkToast("Music uploaded successfully!")
     await this.SwitchToDbPage()
@@ -319,7 +330,12 @@ export class UploadPage {
   async UpdateMusic(): Promise<void> {
     if (!this.isEditDB()) return
 
-    await this.musicCacheService.UpdateMusicInBase(this.musicData)
+    try {
+      await this.musicCacheService.UpdateMusicInBase(this.musicData)
+    } catch (error) {
+      AppComponent.PresentErrorToast("Error updating music: " + error)
+      return
+    }
     AppComponent.PresentOkToast("Music updated successfully!")
 
     await this.LoadDbMusic(this.musicData.id)
@@ -330,7 +346,12 @@ export class UploadPage {
 
   async UploadAllNotes(): Promise<void> {
     if (!this.isEditDB()) return
-    await this.musicCacheService.UploadNotesInBase(this.musicData.id, this.musicData.noteData)
+    try {
+      await this.musicCacheService.UploadNotesInBase(this.musicData.id, this.musicData.noteData)
+    } catch (error) {
+      AppComponent.PresentErrorToast("Error uploading the notes: " + error)
+      return
+    }
     AppComponent.PresentOkToast("All notes uploaded successfully!")
 
     await this.LoadDbMusic(this.musicData.id)
@@ -341,7 +362,12 @@ export class UploadPage {
 
   async UploadNote(note: NoteDataDto): Promise<void> {
     if (!this.isEditDB()) return
-    await this.musicCacheService.UploadNotesInBase(this.musicData.id, [note])
+    try {
+      await this.musicCacheService.UploadNotesInBase(this.musicData.id, [note])
+    } catch (error) {
+      AppComponent.PresentErrorToast("Error uploading the note: " + error)
+      return
+    }
     AppComponent.PresentOkToast("Note uploaded successfully!")
     await this.LoadDbMusic(this.musicData.id)
 
@@ -361,7 +387,11 @@ export class UploadPage {
       if (!silent) AppComponent.PresentOkToast("Music has been discarded")
 
     } else {
-      await this.musicCacheService.UpdateCache()
+      try {
+        await this.musicCacheService.UpdateCache()
+      } catch (error) {
+        AppComponent.PresentErrorToast("Failed to update the music list: " + error)
+      }
       await this.LoadDbMusic(musicId)
       if (!silent) AppComponent.PresentOkToast("Music changes have been removed")
     }
@@ -370,7 +400,12 @@ export class UploadPage {
 
   async DeleteMusic() {
     if (!this.musicDataDb) return
-    await this.musicCacheService.DeleteMusicInBase(this.musicDataDb.id)
+    try {
+      await this.musicCacheService.DeleteMusicInBase(this.musicDataDb.id)
+    } catch (error) {
+      AppComponent.PresentErrorToast("Error deleting music: " + error)
+      return
+    }
     this.musicDataDb = null
     this.isEditDB.set(false)
     this.cd.detectChanges()
@@ -380,7 +415,12 @@ export class UploadPage {
   async DeleteNote(note: NoteDataDto): Promise<void> {
 
     if (this.musicDataDb && this.musicDataDb.noteData.some(n => n.chartName === note.chartName)) {
-      await this.musicCacheService.DeleteNoteInBase(this.musicData.id, note)
+      try {
+        await this.musicCacheService.DeleteNoteInBase(this.musicData.id, note)
+      } catch (error) {
+        AppComponent.PresentErrorToast("Error deleting note: " + error)
+        return
+      }
       await this.LoadDbMusic(this.musicData.id)
       AppComponent.PresentOkToast("Note deleted successfully from database.")
 

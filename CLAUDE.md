@@ -68,10 +68,10 @@ Write new code the way the existing code is written. Known deviations to avoid a
 
 - DTOs are classes, not interfaces: default values on fields, an optional constructor that parses raw input, a `static FromJSON()` that rebuilds nested instances, and `DeepClone()` when copies are needed.
 - Keep the three layers: Firestore service (remote access) → cache service (localStorage + in-memory) → page. Pages never call Firestore directly when a cache service exists.
-- Firestore service methods check authentication first, wrap the call in `try/catch`, show a toast on success and on error, and rethrow.
+- Firestore service methods check authentication first, and let errors propagate.
 - Logging: `console.log` only for informative traces at strategic points (loading, sync, game lifecycle), with useful data. Never in per-frame or per-arrow paths: add those only temporarily to track a specific bug. In production (`environment.production`), `SilenceConsole()` mutes everything except `console.error` and `productionConsole` (used by the toasts, and for messages meant for the end user).
 - Types tell the truth. A value that can be missing is typed so (`Partial<Record<…>>`, `| undefined`, `.at()` instead of `[index]`), and only then checked with `?.` or `??`.
-- User feedback goes through the static helpers `AppComponent.PresentOkToast()` / `PresentWarningToast()` / `PresentErrorToast()`, usable from any layer. Avoid showing a second toast in the page for an action whose service already shows one.
+- User feedback goes through the static helpers `AppComponent.PresentOkToast()` / `PresentWarningToast()` / `PresentErrorToast()`, shown by the page or component that triggered the action. Services throw; they only show a toast for work they start themselves (listeners, background tasks).
 - State shared with templates uses Angular signals. Components are standalone; dependencies are injected with `inject()` (see member order above), not through the constructor.
 
 ### Formatting

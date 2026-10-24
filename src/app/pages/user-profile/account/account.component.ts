@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core'
 
 import { FormsModule } from '@angular/forms'
 import { IonButton, IonCard, IonInput, IonItem } from '@ionic/angular'
+import { AppComponent } from 'src/app/app.component'
 import { LoginFireauthService } from 'src/app/services/firestore/login.fireauth.service'
 
 @Component({
@@ -30,21 +31,40 @@ export class AccountComponent {
 
   }
 
-  SaveProfile() {
-    this.loginService.UpdateProfile(this.email, this.name)
+  async SaveProfile(): Promise<void> {
+    try {
+      await this.loginService.UpdateProfile(this.email, this.name)
+      AppComponent.PresentOkToast("Profile updated.")
+    } catch (error) {
+      AppComponent.PresentWarningToast("Profile update failed: " + error)
+    }
   }
 
-  SavePassword() {
-    if (this.password === this.password2)
-      this.loginService.UpdatePassword(this.password)
+  async SavePassword(): Promise<void> {
+    if (this.password !== this.password2) return
+    try {
+      await this.loginService.UpdatePassword(this.password)
+      AppComponent.PresentOkToast("Password updated.")
+    } catch (error) {
+      AppComponent.PresentWarningToast("Password update failed: " + error)
+    }
   }
 
-  ResendEmail() {
-    this.loginService.ResendEmail()
+  async ResendEmail(): Promise<void> {
+    try {
+      await this.loginService.ResendEmail()
+      AppComponent.PresentOkToast("A verification email has been sent.")
+    } catch (error) {
+      AppComponent.PresentWarningToast("Sending the verification email failed: " + error)
+    }
   }
 
-  LogOut() {
-    this.loginService.LogOut()
+  async LogOut(): Promise<void> {
+    try {
+      await this.loginService.LogOut()
+    } catch (error) {
+      AppComponent.PresentWarningToast("Logout failed: " + error)
+    }
   }
 
 }

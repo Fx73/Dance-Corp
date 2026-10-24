@@ -1,7 +1,6 @@
 import { MusicDto, NoteDataDto } from "src/app/game/game-model/music.dto"
 
 import { Injectable, inject } from "@angular/core"
-import { AppComponent } from "src/app/app.component"
 import { MusicLocalService } from 'src/app/services/local-storage/local.music.service'
 import { MusicFirestoreService } from "../firestore/music.firestore.service"
 
@@ -34,16 +33,8 @@ export class MusicCacheService {
         return this.musics.filter(m => this.localMusicService.registry.has(m.id) === false)
     }
 
-    /** Never throws: a failed update is reported with a toast, and the cache keeps its previous state */
-    async UpdateCache() {
-        try {
-            await this.FetchCacheUpdate()
-        } catch (error) {
-            AppComponent.PresentErrorToast("Failed to update the music list: " + error)
-        }
-    }
-
-    private async FetchCacheUpdate() {
+    /** Returns the number of musics added, updated and deleted, or null when the cache was already up to date */
+    async UpdateCache(): Promise<{ added: number, updated: number, deleted: number } | null> {
         const ts = parseInt(localStorage.getItem(this.MUSIC_REGISTRY_TS_KEY) || '0')
         if (ts === 0) {
             const allMusics = await this.musicFirestoreService.GetAllMusics()
@@ -53,18 +44,15 @@ export class MusicCacheService {
             }
             this.SaveRegistry()
             localStorage.setItem(this.MUSIC_REGISTRY_TS_KEY, Date.now().toString())
-            return
+            return { added: allMusics.length, updated: 0, deleted: 0 }
         }
 
         const updateInfo = await this.musicFirestoreService.GetUpdate(ts, this.registry)
-        if (!updateInfo) {
-            AppComponent.PresentErrorToast("Failed to fetch music updates from server.")
-            return
-        }
+        if (!updateInfo) throw new Error("The music index is missing on the server")
 
         if (updateInfo.newMusicIds.length === 0 && updateInfo.toUpdateMusicIds.length === 0 && updateInfo.toDeleteMusicIds.length === 0) {
             console.log("Music cache is already up to date.")
-            return
+            return null
         }
 
         for (const musicId of updateInfo.toDeleteMusicIds) {
@@ -90,7 +78,7 @@ export class MusicCacheService {
         this.SaveRegistry()
         localStorage.setItem(this.MUSIC_REGISTRY_TS_KEY, updateInfo.updatedAt.toString())
 
-        AppComponent.PresentOkToast(`Music list updated: ${updateInfo.newMusicIds.length} new, ${updateInfo.toUpdateMusicIds.length} updated, ${updateInfo.toDeleteMusicIds.length} deleted.`)
+        return { added: updateInfo.newMusicIds.length, updated: updateInfo.toUpdateMusicIds.length, deleted: updateInfo.toDeleteMusicIds.length }
     }
 
     async UpdateCacheMusic(musicId: string) {
@@ -155,7 +143,7 @@ export class MusicCacheService {
         try {
             await this.musicFirestoreService.UploadMusic(music)
         } catch (e) {
-            await this.UpdateCache()
+            await this.ResyncCache()
             throw e
         }
         music.noteData = []
@@ -167,7 +155,7 @@ export class MusicCacheService {
         try {
             await this.musicFirestoreService.UpdateMusic(music)
         } catch (e) {
-            await this.UpdateCache()
+            await this.ResyncCache()
             throw e
         }
         this.PersistMusic(music)
@@ -178,7 +166,7 @@ export class MusicCacheService {
         try {
             await this.musicFirestoreService.DeleteMusic(musicId)
         } catch (e) {
-            await this.UpdateCache()
+            await this.ResyncCache()
             throw e
         }
 
@@ -190,7 +178,7 @@ export class MusicCacheService {
         try {
             await this.musicFirestoreService.UploadNotes(musicId, notes)
         } catch (e) {
-            await this.UpdateCache()
+            await this.ResyncCache()
             throw e
         }
         const music = this.musics.find(m => m.id === musicId)
@@ -207,13 +195,22 @@ export class MusicCacheService {
         try {
             await this.musicFirestoreService.DeleteNote(musicId, note)
         } catch (e) {
-            await this.UpdateCache()
+            await this.ResyncCache()
             throw e
         }
         const music = this.musics.find(m => m.id === musicId)
         if (!music) return
         music.noteData = music.noteData.filter(n => n.chartName !== note.chartName)
         this.PersistMusic(music)
+    }
+
+    /** After a failed write: the original error matters, a failed resync is only logged */
+    private async ResyncCache() {
+        try {
+            await this.UpdateCache()
+        } catch (error) {
+            console.error("Failed to resync the music cache:", error)
+        }
     }
 
     //#region Persistence
