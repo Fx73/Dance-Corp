@@ -1,6 +1,7 @@
 # CLAUDE.md
 
 ## Repository convention
+
 The repository language is English.
 Always generate repository-facing content in English, regardless of the language used in the conversation.
 Always write commit messages in English.
@@ -12,43 +13,50 @@ If you identify a bug, error, code smell, or unexpected behavior that is not rel
 ## Missing Features
 
 If you identify a missing feature (an unsupported part of a file format, a game mechanic, some content), add an entry to [Documentation/MISSING_FEATURES.md](Documentation/MISSING_FEATURES.md):
+
 - **High priority** if its absence blocks part of the game (some songs or charts cannot be played correctly).
 - **Low priority** if it is optional content that blocks nothing.
 
 Do not implement it unless explicitly instructed to do so.
 
 ## Tracking Untested Changes
+
 For each commit, for every modification that may have runtime impact and that you were unable to verify yourself, add a verification entry to [Documentation/TO_VERIFY.md](Documentation/TO_VERIFY.md) using the following format:
 
->## Commit: <commit title>
->Link: <commit URL>
+> ## Commit: <commit title>
 >
->- <file 1>: <summary of the change>
->- <file 2>: <summary of the change>
->- <file N>: <summary of the change>
+> Link: <commit URL>
 >
->→ To verify:
->  - <verification point 1>
->  - <verification point 2>
->  - <verification point 3>
+> - <file 1>: <summary of the change>
+> - <file 2>: <summary of the change>
+> - <file N>: <summary of the change>
+>
+> → To verify:
+>
+> - <verification point 1>
+> - <verification point 2>
+> - <verification point 3>
 
 ## Coding Style
+
 Write new code the way the existing code is written. Known deviations to avoid are listed in [Documentation/KNOWN_ISSUES.md](Documentation/KNOWN_ISSUES.md) (Improvements, Code style to harmonize).
 
 ### Structure
+
 - Group class members with `//#region <Name>` / `//#endregion` (lowercase).
 - Class member order:
   1. `//#region Constants` block.
   2. Dependencies injected with `inject()` in private fields.
   3. Everything else (fields, constructor, lifecycle hooks, methods).
   4. Static methods last, in a `//#region Statics` block.
-- Constants are `readonly` and `UPPER_SNAKE_CASE`. Storage keys too; parameterized keys are lambdas: `readonly MUSIC_STORAGE_KEY = (musicId: string) => \`MUSIC_${musicId}\``.
+- Constants are `readonly` and `UPPER_SNAKE_CASE`. Storage keys too; parameterized keys are lambdas: `readonly MUSIC_STORAGE_KEY = (musicId: string) => \`MUSIC\_${musicId}\``.
 - Expose enums and static helpers to templates through class fields: `readonly DanceType = DanceType`.
 - Small, single-purpose methods named after the domain (`ArrowPerfect`, `MinePassed`, `GetCurrentBackground`).
 - Prefer guard clauses with early `return` over nested `if`/`else`.
 - A short helper used by a single method may be declared as a nested function inside it (`Sleep`, `Sanitize`, `Pick`).
 
 ### Naming
+
 - C# convention: PascalCase for methods and functions (instance, static, interface methods, nested functions), and for classes, enums and interfaces. camelCase for fields, properties, variables and parameters.
 - Exceptions, kept as the framework or the external API calls them: Angular and Ionic lifecycle hooks (`ngOnInit`, `ionViewWillEnter`…), `toJSON`, `toString`, Firestore converters (`toFirestore` / `fromFirestore`), router guards (`canActivate`), and interfaces describing an external API (wrapped in an `eslint-disable` block for `@typescript-eslint/naming-convention`).
 - Enforced by ESLint (`@typescript-eslint/naming-convention`).
@@ -57,16 +65,17 @@ Write new code the way the existing code is written. Known deviations to avoid a
 - Data objects are suffixed `Dto`.
 
 ### Data and layers
+
 - DTOs are classes, not interfaces: default values on fields, an optional constructor that parses raw input, a `static FromJSON()` that rebuilds nested instances, and `DeepClone()` when copies are needed.
 - Keep the three layers: Firestore service (remote access) → cache service (localStorage + in-memory) → page. Pages never call Firestore directly when a cache service exists.
 - Firestore service methods check authentication first, wrap the call in `try/catch`, show a toast on success and on error, and rethrow.
 - Logging: `console.log` only for informative traces at strategic points (loading, sync, game lifecycle), with useful data. Never in per-frame or per-arrow paths: add those only temporarily to track a specific bug. In production (`environment.production`), `SilenceConsole()` mutes everything except `console.error` and `productionConsole` (used by the toasts, and for messages meant for the end user).
-- Promises are awaited. A call fired on purpose without waiting (sound, navigation, dismissing an overlay) is marked with `void`; if it can fail in a way the user should know, end it with a `.catch()` that shows a toast. Enforced by ESLint (`@typescript-eslint/no-floating-promises`). Never leave an empty `catch { }`: log the error, or explain why it is ignored.
-- Types tell the truth. A value that can be missing is typed so (`Partial<Record<…>>`, `| undefined`, `.at()` instead of `[index]`), and only then checked with `?.` or `??`. A check on a value that cannot be missing is removed. Enforced by ESLint (`@typescript-eslint/no-unnecessary-condition`).
+- Types tell the truth. A value that can be missing is typed so (`Partial<Record<…>>`, `| undefined`, `.at()` instead of `[index]`), and only then checked with `?.` or `??`.
 - User feedback goes through the static helpers `AppComponent.PresentOkToast()` / `PresentWarningToast()` / `PresentErrorToast()`, usable from any layer. Avoid showing a second toast in the page for an action whose service already shows one.
 - State shared with templates uses Angular signals. Components are standalone; dependencies are injected with `inject()` (see member order above), not through the constructor.
 
 ### Formatting
+
 - Use a semicolon-free TypeScript style: no semicolon at the end of statements. A semicolon is still allowed as a separator to keep several statements on one line (`() => { Stop(); Play() }`). Never start a line with `(`, `[` or `` ` `` without a leading semicolon, as it would be joined to the previous line.
 - One blank line between methods.
 - A single-statement `if` / `else` may omit braces when the statement is on the next line. Always use braces for `for`, `while`, and other control structures.
@@ -120,4 +129,5 @@ Write new code the way the existing code is written. Known deviations to avoid a
 - On feature branches (any branch other than `master` and `dev`), do not hesitate to amend the latest commit when applying a small correction, omission, or adjustment directly related to that commit, followed by `git push --force-with-lease`. Amending changes the commit hash: update the matching `Link:` in [Documentation/TO_VERIFY.md](Documentation/TO_VERIFY.md) if the commit has an entry there.
 
 ## Context Verification
+
 Every response must end with the hamster emoji: 🐹
