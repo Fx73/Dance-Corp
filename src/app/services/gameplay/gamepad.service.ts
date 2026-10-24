@@ -27,8 +27,8 @@ export class GamepadService {
         this.gamepads.push(gamepad)
 
         const assignedIndex = this.userConfigService.players.findIndex(player => player.gamepad?.id === gamepad.id)
-        const assignedPlayer = this.userConfigService.players[assignedIndex]
-        if (assignedPlayer) {
+        const assignedPlayer = this.userConfigService.players.at(assignedIndex)
+        if (assignedIndex !== -1 && assignedPlayer) {
             this.userConfigService.UpdatePlayer('gamepad', assignedIndex, { index: gamepad.index, id: gamepad.id })
             AppComponent.PresentOkToast(`Reassigning to player ${assignedPlayer.name} gamepad ${gamepad.id} `)
         }

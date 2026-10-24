@@ -82,7 +82,7 @@ export class BeatManager {
         )
 
         // --- APPLY OFFSET ---
-        const offset = music.offset ?? 0
+        const offset = music.offset
 
         if (offset < 0) {
             const first = timeline[0]

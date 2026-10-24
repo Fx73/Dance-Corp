@@ -448,3 +448,52 @@ Link: https://github.com/Fx73/Dance-Corp/commit/712590e559db82f8493536bdaabef72f
   - First load with an empty cache (Options, clear the music cache, reload): the whole catalog appears in browse
   - Play a music: it stays at the same place in the browse list
   - Upload, update and delete a music, upload and delete a chart: the browse lists follow, also after a reload
+
+## Commit: Remove unnecessary optional chains, type missing values truthfully
+Link: https://github.com/Fx73/Dance-Corp/commit/820fecd7d29bd013082e80c61626a091e38c2e56
+
+- src/app/game/game-model/music.dto.ts: SSC token maps typed as partial; a missing `#SAMPLESTART` / `#SAMPLELENGTH` gives `undefined` instead of `NaN`; a chart without `#DIFFICULTY`, `#METER` or `#NOTES` no longer throws (Challenge, 0, empty chart)
+- src/app/pages/upload/reader.ssc.ts: an empty `#BPMS` tag no longer throws
+- src/app/game/music-player/music-player-local/music-player-local.component.ts: the audio element is created with the component, its source is set in `ngOnInit`
+- src/app/services/gameplay/announcer.service.ts: announcer lines typed as partial, a random line skips a category without lines
+- src/app/pages/upload/upload.page.ts, src/app/services/firestore/music.firestore.service.ts: optional chains and null checks on values always present removed
+
+→ To verify:
+  - Upload a `.sm` and a `.ssc` file, with and without `#SAMPLESTART`: the browse sample starts at the given time, or at 0
+  - Upload page: the genre suggestions load
+  - Desktop: a local song plays in browse and in game
+  - Announcers still speak during a game and in the menus
+
+## Commit: Remove unnecessary conditions and enable no-unnecessary-condition
+Link: https://github.com/Fx73/Dance-Corp/commit/2e9994fbfdfdac4f6c6cae028d996c6d6c2cc0c1
+
+- src/app/services/gameplay/sound.service.ts, announcer.service.ts, src/app/game/music-player/IMusicPlayer.ts, src/app/game/game.page.ts: `?? default` removed on `GetConfig()`, the `UserConfig` defaults apply
+- src/app/game/game.manager.ts: background change lookup bounded by the list length
+- src/app/game/game.page.ts: `musicPlayer` nullable, the game starts once both the player and the displays are ready
+- src/app/shared/component/radar-score/radar-score.component.ts: `radar` optional until the view exists, changes tested with `in`
+- src/app/services/gameplay/gamepad.service.ts: a reconnected gamepad is reassigned only when a player had it
+- Others: defaults on DTO fields that always have a value removed
+
+→ To verify:
+  - Fresh browser (no saved config): menu music, effects and announcers play at the default volumes
+  - A game starts and changes background on a music with background changes
+  - The difficulty radar draws on the browse page and on the upload page
+  - Disconnect and reconnect an assigned gamepad: it is reassigned to its player
+
+## Commit: Show toasts in the pages, services throw
+
+Link: https://github.com/Fx73/Dance-Corp/commit/e29d19f518c974b541f3d7d85ccc9261279a818b
+
+- src/app/services/firestore/music.firestore.service.ts: no more toasts, errors propagate
+- src/app/services/local-storage/music.cache.service.ts: `UpdateCache()` throws and returns the number of changes; a failed resync after a failed write is only logged
+- src/app/app.component.ts: shows the music list update toast at startup (now also on the first load of a device), or its error
+- src/app/pages/upload/upload.page.ts: each action shows its own error toast; one success toast per action instead of two
+- src/app/services/firestore/login.fireauth.service.ts, src/app/shared/user/login/login.component.ts, src/app/pages/user-profile/account/account.component.ts, src/app/shared/user/user.component.ts: toasts in the components, browser alerts replaced by toasts, password recovery fixed (it called itself)
+
+→ To verify:
+
+- Upload, update and delete a music, upload and delete a chart: one success toast each; offline, one error toast each
+- Startup with new musics on the server: the "Music list updated" toast
+- Login with a wrong password, register with a used email: a warning toast, no browser alert
+- Password recovery: the email is sent, with a success toast
+- Account page: update the profile and the password, resend the verification email, log out

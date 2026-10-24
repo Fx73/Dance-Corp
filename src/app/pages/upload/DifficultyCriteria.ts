@@ -260,9 +260,7 @@ export class NoteEvaluator {
         const hasNote = line.some(v => v === 1 || v === 2 || v === 4)
 
         if (hasNote) {
-          if (previousBeat !== null) {
-            intervals.push(previousBeat)
-          }
+          intervals.push(previousBeat)
           previousBeat = 0
         } else {
           previousBeat += 1 / beatDivision

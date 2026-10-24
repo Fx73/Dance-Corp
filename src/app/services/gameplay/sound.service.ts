@@ -125,11 +125,11 @@ export class SoundService {
       }
 
       private GetMusicVolume(): number {
-        return this.userConfigService.GetConfig()["menuMusicVolume"] ?? 0.2
+        return this.userConfigService.GetConfig()["menuMusicVolume"]
     }
 
     private GetSfxVolume(): number {
-        return this.userConfigService.GetConfig()["sfxVolume"] ?? 1
+        return this.userConfigService.GetConfig()["sfxVolume"]
     }
 
     //#region Statics

@@ -98,7 +98,7 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
     }
 
     const players = this.userConfigService.players
-    const isTrainingMode: boolean = this.userConfigService.GetConfig()["trainingMode"] ?? false
+    const isTrainingMode: boolean = this.userConfigService.GetConfig()["trainingMode"]
     this.game = new GameManager(this.music, players, selectedNotes, isTrainingMode, this.userCacheService, this.announcerService)
     this.announcerService.PickPreferredAnnouncer()
 
@@ -113,16 +113,16 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
       this.InitGame()
   }
 
-  private musicPlayer!: IMusicPlayer
+  private musicPlayer: IMusicPlayer | null = null
   OnPlayerReady(mPlayer: IMusicPlayer) {
     this.musicPlayer = mPlayer
-    if (this.musicPlayer && this.playerDisplays.length > 0)
+    if (this.playerDisplays.length > 0)
       this.InitGame()
   }
 
   private hasGameBeenInitialized = false
   InitGame() {
-    if (this.hasGameBeenInitialized) return
+    if (this.hasGameBeenInitialized || !this.musicPlayer) return
     this.hasGameBeenInitialized = true
 
     this.game!.RegisterExternalComponents(this.musicPlayer, /*this.playerDisplays*/)

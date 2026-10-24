@@ -4,6 +4,7 @@ import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, Ion
 import { NgClass } from '@angular/common'
 import { keyOutline, logInOutline, logoGoogle, personAddOutline, refreshCircleOutline } from 'ionicons/icons'
 
+import { AppComponent } from 'src/app/app.component'
 import { LoginFireauthService } from 'src/app/services/firestore/login.fireauth.service'
 import { addIcons } from 'ionicons'
 
@@ -41,24 +42,45 @@ export class LoginComponent {
     })
   }
 
-  Register(email: string, password: string): void {
-    this.loginService.Register(email, password)
+  async Register(email: string, password: string): Promise<void> {
+    try {
+      await this.loginService.Register(email, password)
+    } catch (error) {
+      AppComponent.PresentWarningToast("Registration failed: " + error)
+    }
   }
 
-  Login(email: string, password: string): void {
-    this.loginService.Login(email, password)
+  async Login(email: string, password: string): Promise<void> {
+    try {
+      await this.loginService.Login(email, password)
+    } catch (error) {
+      AppComponent.PresentWarningToast("Login failed: " + error)
+    }
   }
 
-  LoginWithGoogle() {
-    this.loginService.LoginWithGoogle()
+  async LoginWithGoogle(): Promise<void> {
+    try {
+      await this.loginService.LoginWithGoogle()
+    } catch (error) {
+      AppComponent.PresentWarningToast("Login failed: " + error)
+    }
   }
 
-  LoginWithFacebook() {
-    this.loginService.LoginWithFacebook()
+  async LoginWithFacebook(): Promise<void> {
+    try {
+      await this.loginService.LoginWithFacebook()
+    } catch (error) {
+      AppComponent.PresentWarningToast("Login failed: " + error)
+    }
   }
 
-  PasswordRecovery(email: string): void {
-    this.PasswordRecovery(email)
+  async PasswordRecovery(email: string): Promise<void> {
+    try {
+      await this.loginService.PasswordRecovery(email)
+      AppComponent.PresentOkToast("A password reset email has been sent.")
+    } catch (error) {
+      AppComponent.PresentWarningToast("Password recovery failed: " + error)
+    }
   }
 
 }

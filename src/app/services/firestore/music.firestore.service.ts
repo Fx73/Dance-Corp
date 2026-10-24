@@ -2,7 +2,6 @@ import { DocumentData, DocumentSnapshot, FieldPath, Firestore, QueryDocumentSnap
 import { MusicDto, NoteDataDto } from '../../game/game-model/music.dto'
 
 import { Injectable, inject } from '@angular/core'
-import { AppComponent } from 'src/app/app.component'
 import { DifficultyCriteria } from 'src/app/pages/upload/DifficultyCriteria'
 import { DeepEqual } from 'src/app/shared/utils/object-extend'
 import { FirestoreConverter } from './firestore.converter'
@@ -38,50 +37,38 @@ export class MusicFirestoreService {
     }
 
     async UploadMusic(dto: MusicDto): Promise<void> {
-        try {
-            if (!this.userFirestoreService.user) throw new Error("User not authenticated")
+        if (!this.userFirestoreService.user) throw new Error("User not authenticated")
 
-            const musicRef = doc(this.db, this.MUSIC_COLLECTION, dto.id).withConverter(this.firestoreConverterMusic)
+        const musicRef = doc(this.db, this.MUSIC_COLLECTION, dto.id).withConverter(this.firestoreConverterMusic)
 
-            const { noteData: notes, ...mainData } = dto
-            await setDoc(musicRef, mainData)
+        const { noteData: notes, ...mainData } = dto
+        await setDoc(musicRef, mainData)
 
-            await this.AddGenres(dto.genre ?? "")
+        await this.AddGenres(dto.genre ?? "")
 
-            await this.UpdateMusicIndex(dto.id, false)
-            AppComponent.PresentOkToast("Music successfully uploaded to firebase!")
-        } catch (error) {
-            AppComponent.PresentWarningToast("Error uploading music: " + error)
-            throw error
-        }
+        await this.UpdateMusicIndex(dto.id, false)
     }
 
     async UpdateMusic(dto: MusicDto): Promise<void> {
-        try {
-            if (!this.userFirestoreService.user) throw new Error("User not authenticated")
+        if (!this.userFirestoreService.user) throw new Error("User not authenticated")
 
-            const musicRef = doc(this.db, this.MUSIC_COLLECTION, dto.id).withConverter(this.firestoreConverterMusic)
+        const musicRef = doc(this.db, this.MUSIC_COLLECTION, dto.id).withConverter(this.firestoreConverterMusic)
 
-            // check protected fields are not modified
-            const snap = await getDoc(musicRef)
-            const current = snap.data()
-            if (!current) throw new Error("Music not found")
-            for (const field of this.GetProtectedFields(this.ChartCount(snap))) {
-                if (!DeepEqual(dto[field], current[field]))
-                    throw new Error(`Field "${field}" cannot be modified after upload.`)
-            }
-
-            const { noteData: notes, ...mainData } = dto
-            await updateDoc(musicRef, mainData)
-
-            await this.AddGenres(dto.genre ?? "")
-
-            await this.UpdateMusicIndex(dto.id)
-            AppComponent.PresentOkToast("Music successfully updated to firebase!")
-        } catch (error) {
-            AppComponent.PresentWarningToast("Error updating music: " + error)
-            throw error
+        // check protected fields are not modified
+        const snap = await getDoc(musicRef)
+        const current = snap.data()
+        if (!current) throw new Error("Music not found")
+        for (const field of this.GetProtectedFields(this.ChartCount(snap))) {
+            if (!DeepEqual(dto[field], current[field]))
+                throw new Error(`Field "${field}" cannot be modified after upload.`)
         }
+
+        const { noteData: notes, ...mainData } = dto
+        await updateDoc(musicRef, mainData)
+
+        await this.AddGenres(dto.genre ?? "")
+
+        await this.UpdateMusicIndex(dto.id)
     }
 
     /** Fields that cannot change once uploaded; bpms are also locked as soon as the music has charts */
@@ -92,52 +79,46 @@ export class MusicFirestoreService {
     }
 
     async UploadNotes(musicId: string, notes: NoteDataDto[]): Promise<void> {
-        try {
-            const user = this.userFirestoreService.user
-            if (!user) throw new Error("User not authenticated")
+        const user = this.userFirestoreService.user
+        if (!user) throw new Error("User not authenticated")
 
-            const musicRef = doc(this.db, this.MUSIC_COLLECTION, musicId)
+        const musicRef = doc(this.db, this.MUSIC_COLLECTION, musicId)
 
-            const snap = await getDoc(musicRef)
-            if (!snap.exists()) throw new Error("Music not found")
+        const snap = await getDoc(musicRef)
+        if (!snap.exists()) throw new Error("Music not found")
 
-            const charts: Record<string, string> = snap.get('charts') ?? {}
+        const charts: Record<string, string> = snap.get('charts') ?? {}
 
-            for (const note of notes) {
-                // Only allow updates if the user is the creator OR it's a new note
-                if (!note.creatorId) {
-                    note.creatorId = user.id
-                    note.credit = note.credit ?? user.name
-                }
-
-                const isExisting = note.chartName in charts
-                if (note.creatorId !== user.id || (isExisting && charts[note.chartName] !== user.id)) {
-                    console.log(`Skipping update for note ${note.chartName} - Not the creator`)
-                    continue
-                }
-
-                const noteRef = doc(musicRef, this.NOTES_COLLECTION, note.chartName).withConverter(this.firestoreConverterNote)
-
-                // Existing chart: only its document changes
-                if (isExisting) {
-                    await setDoc(noteRef, note)
-                    continue
-                }
-
-                // New chart: written in one batch with its chart index entry (checked by the rules)
-                const batch = writeBatch(this.db)
-                batch.set(noteRef, note)
-                batch.update(musicRef, new FieldPath('charts', note.chartName), user.id, 'lastChartChange', note.chartName)
-                await batch.commit()
-                charts[note.chartName] = user.id
+        for (const note of notes) {
+            // Only allow updates if the user is the creator OR it's a new note
+            if (!note.creatorId) {
+                note.creatorId = user.id
+                note.credit = note.credit ?? user.name
             }
 
-            await this.UpdateMusicIndex(musicId)
+            const isExisting = note.chartName in charts
+            if (note.creatorId !== user.id || (isExisting && charts[note.chartName] !== user.id)) {
+                console.log(`Skipping update for note ${note.chartName} - Not the creator`)
+                continue
+            }
 
-        } catch (error) {
-            AppComponent.PresentWarningToast("Error updating music: " + error)
-            throw error
+            const noteRef = doc(musicRef, this.NOTES_COLLECTION, note.chartName).withConverter(this.firestoreConverterNote)
+
+            // Existing chart: only its document changes
+            if (isExisting) {
+                await setDoc(noteRef, note)
+                continue
+            }
+
+            // New chart: written in one batch with its chart index entry (checked by the rules)
+            const batch = writeBatch(this.db)
+            batch.set(noteRef, note)
+            batch.update(musicRef, new FieldPath('charts', note.chartName), user.id, 'lastChartChange', note.chartName)
+            await batch.commit()
+            charts[note.chartName] = user.id
         }
+
+        await this.UpdateMusicIndex(musicId)
     }
 
     async GetAllMusics(): Promise<MusicDto[]> {
@@ -192,56 +173,43 @@ export class MusicFirestoreService {
     }
 
     async DeleteMusic(musicId: string): Promise<void> {
-        try {
-            const musicRef = doc(this.db, this.MUSIC_COLLECTION, musicId)
+        const musicRef = doc(this.db, this.MUSIC_COLLECTION, musicId)
 
-            const snap = await getDoc(musicRef)
-            if (!snap.exists()) throw new Error("Music not found")
+        const snap = await getDoc(musicRef)
+        if (!snap.exists()) throw new Error("Music not found")
 
-            // Check whether charts remain
-            if (this.ChartCount(snap) > 0) {
-                console.warn("Cannot delete, notes are still present on music:", musicId)
-                throw new Error("Cannot delete music with existing notes")
-            }
-
-            await deleteDoc(musicRef)
-
-            await this.RemoveMusicFromIndex(musicId)
-            AppComponent.PresentOkToast("Music successfully deleted from firebase !")
-
-        } catch (error) {
-            AppComponent.PresentErrorToast("Error deleting music: " + error)
-            throw error
+        // Check whether charts remain
+        if (this.ChartCount(snap) > 0) {
+            console.warn("Cannot delete, notes are still present on music:", musicId)
+            throw new Error("Cannot delete music with existing notes")
         }
+
+        await deleteDoc(musicRef)
+
+        await this.RemoveMusicFromIndex(musicId)
     }
 
     async DeleteNote(musicId: string, note: NoteDataDto): Promise<void> {
-        try {
-            const userId = this.userFirestoreService.user?.id
-            if (!userId) throw new Error("User not authenticated")
+        const userId = this.userFirestoreService.user?.id
+        if (!userId) throw new Error("User not authenticated")
 
-            const musicRef = doc(this.db, this.MUSIC_COLLECTION, musicId)
-            const noteRef = doc(musicRef, this.NOTES_COLLECTION, note.chartName).withConverter(this.firestoreConverterNote)
+        const musicRef = doc(this.db, this.MUSIC_COLLECTION, musicId)
+        const noteRef = doc(musicRef, this.NOTES_COLLECTION, note.chartName).withConverter(this.firestoreConverterNote)
 
-            const snap = await getDoc(noteRef)
-            if (!snap.exists()) throw new Error("Note not found")
+        const snap = await getDoc(noteRef)
+        if (!snap.exists()) throw new Error("Note not found")
 
-            if (snap.data().creatorId !== userId)
-                throw new Error("User is not the creator of this note")
+        if (snap.data().creatorId !== userId)
+            throw new Error("User is not the creator of this note")
 
-            // The chart and its chart index entry are removed in one batch (checked by the rules)
-            const batch = writeBatch(this.db)
-            batch.delete(noteRef)
-            batch.update(musicRef, new FieldPath('charts', note.chartName), deleteField(), 'lastChartChange', note.chartName)
-            await batch.commit()
+        // The chart and its chart index entry are removed in one batch (checked by the rules)
+        const batch = writeBatch(this.db)
+        batch.delete(noteRef)
+        batch.update(musicRef, new FieldPath('charts', note.chartName), deleteField(), 'lastChartChange', note.chartName)
+        await batch.commit()
 
-            // Flag the music as updated so that other clients drop the chart from their cache
-            await this.UpdateMusicIndex(musicId)
-
-        } catch (error) {
-            AppComponent.PresentWarningToast("Error deleting note: " + error)
-            throw error
-        }
+        // Flag the music as updated so that other clients drop the chart from their cache
+        await this.UpdateMusicIndex(musicId)
     }
 
     private async GetNotes(musicId: string): Promise<NoteDataDto[]> {
@@ -295,7 +263,7 @@ export class MusicFirestoreService {
             return []
         }
 
-        const genres = snap.data()?.['genres'] ?? []
+        const genres = snap.data()['genres'] ?? []
 
         return genres
             .filter((g: string) => g.length > 0)

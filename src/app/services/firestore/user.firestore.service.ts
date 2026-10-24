@@ -97,7 +97,7 @@ export class UserFirestoreService {
 
         const scores: Record<string, number> = {}
         for (const note of music.notes) {
-            scores[note.id] = note.highScore ?? 0
+            scores[note.id] = note.highScore
         }
 
         return scores

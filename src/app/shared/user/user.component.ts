@@ -2,6 +2,7 @@ import { Component, ViewChild, signal, inject } from '@angular/core'
 import { IonButton, IonContent, IonIcon, IonItem, IonLabel, IonPopover, PopoverController } from '@ionic/angular'
 import { logoGoogle, person } from 'ionicons/icons'
 
+import { AppComponent } from 'src/app/app.component'
 import { LoginComponent } from './login/login.component'
 import { LoginFireauthService } from 'src/app/services/firestore/login.fireauth.service'
 import { Router } from '@angular/router'
@@ -55,12 +56,15 @@ export class UserComponent {
     await popover.onDidDismiss()
   }
 
-  Logout() {
-    this.loginService.LogOut()
-    void this.popoverController.dismiss().then(() => {
-      void this.router.navigateByUrl('home')
+  async Logout(): Promise<void> {
+    try {
+      await this.loginService.LogOut()
+    } catch (error) {
+      AppComponent.PresentWarningToast("Logout failed: " + error)
+      return
     }
-    )
+    await this.popoverController.dismiss()
+    void this.router.navigateByUrl('home')
   }
 
 }

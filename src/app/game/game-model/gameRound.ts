@@ -53,7 +53,7 @@ export class GameRound {
         else
             this.dancepad = new DancePadGamepad(player.gamepad!.index!, player.keyBindingGamepad)
 
-        this.level = notes.meter ?? 1
+        this.level = notes.meter
         this.arrowManager = new ArrowManager(notes)
 
         this.CalculateScore()

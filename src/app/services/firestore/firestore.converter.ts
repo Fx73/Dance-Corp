@@ -7,7 +7,8 @@ export class FirestoreConverter<T extends object> {
     //#endregion
 
     readonly type
-    readonly subtypes: Record<string, new () => object> = {}
+    // Only some fields have a subtype
+    readonly subtypes: Partial<Record<string, new () => object>> = {}
 
     constructor(type: new() => T, subtypes: Record<string, new () => object> = {}) {
         this.type = type
@@ -95,7 +96,7 @@ export class SimpleFirestoreConverter<T extends object> {
         const data: DocumentData = {}
         Object.keys(dto).forEach((key) => {
             if (!this.IGNORED_FIELDS.has(key)) {
-                const value = Reflect.get(dto, key)
+                const value: unknown = Reflect.get(dto, key)
                 if (!this.IGNORE_UNDEFINED || value !== undefined) {
                     data[key] = value
                 }
