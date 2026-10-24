@@ -479,3 +479,21 @@ Link: https://github.com/Fx73/Dance-Corp/commit/2e9994fbfdfdac4f6c6cae028d996c6d
   - A game starts and changes background on a music with background changes
   - The difficulty radar draws on the browse page and on the upload page
   - Disconnect and reconnect an assigned gamepad: it is reassigned to its player
+
+## Commit: Show toasts in the pages, services throw
+
+Link: https://github.com/Fx73/Dance-Corp/commit/e29d19f518c974b541f3d7d85ccc9261279a818b
+
+- src/app/services/firestore/music.firestore.service.ts: no more toasts, errors propagate
+- src/app/services/local-storage/music.cache.service.ts: `UpdateCache()` throws and returns the number of changes; a failed resync after a failed write is only logged
+- src/app/app.component.ts: shows the music list update toast at startup (now also on the first load of a device), or its error
+- src/app/pages/upload/upload.page.ts: each action shows its own error toast; one success toast per action instead of two
+- src/app/services/firestore/login.fireauth.service.ts, src/app/shared/user/login/login.component.ts, src/app/pages/user-profile/account/account.component.ts, src/app/shared/user/user.component.ts: toasts in the components, browser alerts replaced by toasts, password recovery fixed (it called itself)
+
+→ To verify:
+
+- Upload, update and delete a music, upload and delete a chart: one success toast each; offline, one error toast each
+- Startup with new musics on the server: the "Music list updated" toast
+- Login with a wrong password, register with a used email: a warning toast, no browser alert
+- Password recovery: the email is sent, with a success toast
+- Account page: update the profile and the password, resend the verification email, log out
