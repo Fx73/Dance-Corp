@@ -14,7 +14,7 @@ import { Player } from "./player"
 import { SatisfactionType } from "../constants/satisfaction-type.enum"
 import { SoundService } from 'src/app/services/gameplay/sound.service'
 
-export interface IPrecisionMessage {
+export type PrecisionMessage = {
     direction: ArrowDirection
     precision: Precision
 }
@@ -48,7 +48,7 @@ export class GameRound {
     private scorePerHoldBeat: number = 0
 
     //Display consuming
-    precisionMessage: IPrecisionMessage[] = [] // Message to display on the screen
+    precisionMessage: PrecisionMessage[] = [] // Message to display on the screen
     currentBeat: number = 0 // Current beat in the game to display
 
     constructor(notes: NoteDataDto, player: Player, isTrainingMode = false, private announcerService: AnnouncerService) {

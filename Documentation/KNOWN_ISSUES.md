@@ -35,7 +35,3 @@ Bugs found but not fixed yet, and deprecations to migrate. Remove an entry once 
 ## Improvements
 
 Nothing for now.
-
-## Code style to harmonize
-
-Nothing for now.

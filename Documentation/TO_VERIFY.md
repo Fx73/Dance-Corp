@@ -516,7 +516,7 @@ Tested: lint and build only.
 - dancepad-keyboard.ts, dancepad-gamepad.ts: binding read once with `get()` instead of `has()` then `get()!`
 - browse.page.ts, browse-upload.page.ts: the search skips a music without title or artist instead of throwing
 - game.page.ts: `InitGame` returns early when no game was created
-- gameRound.ts, player-display.component.ts: precision messages carry their precision (`IPrecisionMessage`) instead of the arrow; mines push none, the display already ignored them
+- gameRound.ts, player-display.component.ts: precision messages carry their precision (`PrecisionMessage`) instead of the arrow; mines push none, the display already ignored them
 - user-profile.page.ts/.html, account.component.ts: profile typed nullable and shown under `@if`, unused `userAuth` removed
 - pad-test.page.ts, userconfig.service.ts, upload.page.ts, IMusicPlayer.ts, test-note.component.ts: values captured or guarded before use, no behavior change
 
