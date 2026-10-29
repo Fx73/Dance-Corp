@@ -544,12 +544,10 @@ Link: https://github.com/Fx73/Dance-Corp/commit/b006cabde6596df7a4817385b726d63b
 
 Tested: lint and build only.
 
-- arrowManager.ts: a hold (or roll) not closed by a tail before the next hold on its direction, or before the end of the chart, becomes a tap; a tail closes its hold
 - arrow.ts, gameRound.ts, player-display.component.ts: hold length read from `Arrow.holdLength` instead of `beatEnd!`
 
 → To verify:
   - A chart with holds and rolls plays as before: holds drawn to their tail, OK at the end, score reaches its max on a full combo
-  - A chart with a hold missing its tail: that arrow shows and plays as a tap
 
 ## Commit: Reject a music file without title, artist or BPMs
 Link: https://github.com/Fx73/Dance-Corp/commit/9f55b76516006a3d44fee6da950a755b4a9704ee
@@ -564,3 +562,13 @@ Tested: lint and build only.
   - Upload a valid .sm / .ssc: loaded as before
   - Upload a file without #TITLE, then without #BPMS: error toast naming the tag, nothing loaded
   - Upload a file with another extension: error toast
+
+## Commit: Give a hold without a tail the length of one row
+Link: https://github.com/Fx73/Dance-Corp/commit/3acf08ac34b47163a777f5195818d98689df9782
+
+Tested: partly played by hand, lint and build.
+
+- arrowManager.ts: a hold (or roll) ends on the next row until its tail is read, so a missing tail leaves the shortest hold instead of a tap; a tail closes its hold
+
+→ To verify:
+  - A chart with a hold missing its tail: that arrow shows and plays as a one-row hold

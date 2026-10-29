@@ -14,11 +14,6 @@ export class ArrowManager {
     private LoadArrows(notes: NoteDataDto): void {
         const activeHolds: (Arrow | null)[] = Array(Object.values(ArrowDirection).length).fill(null)
 
-        // A hold without a tail in the chart is played as a tap
-        function EndAsTap(hold: Arrow | null) {
-            if (hold) hold.type = ArrowType.Tap
-        }
-
         for (let measureIndex = 0; measureIndex < notes.stepChart.length; measureIndex++) {
             const measure = notes.stepChart[measureIndex]
             const beatPrecision = measure.steps.length / CONFIG.GAME.BEAT_PER_MEASURE
@@ -37,14 +32,14 @@ export class ArrowManager {
                             break
 
                         case 2: { // Hold start
-                            EndAsTap(activeHolds[direction])
-                            const newArrow = new Arrow(direction, beatPosition, ArrowType.Hold)
+                            // Ends on the next row until its tail is read: a missing tail leaves the shortest hold
+                            const newArrow = new Arrow(direction, beatPosition, ArrowType.Hold, beatPosition + 1 / beatPrecision)
                             activeHolds[direction] = newArrow
                             this.arrowMap.push(newArrow)
                             break
                         }
 
-                        case 3: { // Hold continue
+                        case 3: { // Hold or roll tail
                             const lastHold = activeHolds[direction]
                             if (lastHold) {
                                 lastHold.beatEnd = beatPosition
@@ -54,8 +49,7 @@ export class ArrowManager {
                         }
 
                         case 4: { // Roll (treated as hold)
-                            EndAsTap(activeHolds[direction])
-                            const newArrow = new Arrow(direction, beatPosition, ArrowType.Hold)
+                            const newArrow = new Arrow(direction, beatPosition, ArrowType.Hold, beatPosition + 1 / beatPrecision)
                             activeHolds[direction] = newArrow
                             this.arrowMap.push(newArrow)
                             break
@@ -68,8 +62,6 @@ export class ArrowManager {
                 }
             }
         }
-
-        activeHolds.forEach(EndAsTap)
     }
 
 }
