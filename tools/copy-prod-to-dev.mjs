@@ -36,11 +36,6 @@ for (const name of [...COLLECTIONS, NOTES_COLLECTION]) {
 console.log(`total: ~${(bytes / 1024 / 1024).toFixed(1)} MB`)
 
 const [musicSnap, , notesSnap] = snapshots
-if (musicSnap.docs.some(d => d.get('charts') === undefined)) {
-  console.error('Prod is not migrated to the notes subcollection yet: run migrate-notes-to-subcollection.mjs --project prod first.')
-  process.exit(1)
-}
-
 const prodNotePaths = new Set(notesSnap.docs.map(d => d.ref.path))
 const copiedMusicIds = new Set(musicSnap.docs.map(d => d.id))
 const devNotesSnap = await dev.collectionGroup(NOTES_COLLECTION).get()
