@@ -29,8 +29,9 @@ export class DancePadGamepad implements IDancePad {
             this.currentState.clear()
 
             gamepad.buttons.forEach((button, index) => {
-                if (button.pressed && this.keyBinding.has(index)) {
-                    this.currentState.add(this.keyBinding.get(index)!)
+                const direction = this.keyBinding.get(index)
+                if (button.pressed && direction !== undefined) {
+                    this.currentState.add(direction)
                 }
             })
         }

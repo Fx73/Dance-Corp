@@ -9,9 +9,15 @@ import { CONFIG } from './../constants/game-config'
 import { DancePadGamepad } from "../game-controller/dancepad-gamepad"
 import { DancePadKeyboard } from '../game-controller/dancepad-keyboard'
 import { NoteDataDto } from "./music.dto"
+import { Precision } from "../constants/precision.enum"
 import { Player } from "./player"
 import { SatisfactionType } from "../constants/satisfaction-type.enum"
 import { SoundService } from 'src/app/services/gameplay/sound.service'
+
+export interface IPrecisionMessage {
+    direction: ArrowDirection
+    precision: Precision
+}
 
 export class GameRound {
     //#region App Constants
@@ -42,7 +48,7 @@ export class GameRound {
     private scorePerHoldBeat: number = 0
 
     //Display consuming
-    precisionMessage: Arrow[] = [] // Message to display on the screen
+    precisionMessage: IPrecisionMessage[] = [] // Message to display on the screen
     currentBeat: number = 0 // Current beat in the game to display
 
     constructor(notes: NoteDataDto, player: Player, isTrainingMode = false, private announcerService: AnnouncerService) {
@@ -182,7 +188,7 @@ export class GameRound {
         this.UpdatePerformance(CONFIG.PERFORMANCE.PERFECT)
         this.score += this.scorePerArrow
         this.comboCount++
-        this.precisionMessage.push(arrow)
+        this.precisionMessage.push({ direction: arrow.direction, precision: Precision.Perfect })
 
         this.announcerService.ChangeSatisfaction(SatisfactionType.Perfect, CONFIG.ANNOUNCER.SATISFACTION.PERFECT)
     }
@@ -192,7 +198,7 @@ export class GameRound {
         this.UpdatePerformance(CONFIG.PERFORMANCE.GREAT)
         this.score += this.scorePerArrow * CONFIG.SCORE.GREAT_RATIO
         this.comboCount++
-        this.precisionMessage.push(arrow)
+        this.precisionMessage.push({ direction: arrow.direction, precision: Precision.Great })
 
         if (this.comboCount >= CONFIG.ANNOUNCER.GREAT_COMBO)
             this.announcerService.ChangeSatisfaction(SatisfactionType.Perfect, CONFIG.ANNOUNCER.SATISFACTION.GREAT_IN_COMBO)
@@ -205,7 +211,7 @@ export class GameRound {
         this.UpdatePerformance(CONFIG.PERFORMANCE.GOOD)
         this.score += this.scorePerArrow * CONFIG.SCORE.GOOD_RATIO
         this.comboCount++
-        this.precisionMessage.push(arrow)
+        this.precisionMessage.push({ direction: arrow.direction, precision: Precision.Good })
 
         if (this.comboCount >= CONFIG.ANNOUNCER.GOOD_COMBO)
             this.announcerService.ChangeSatisfaction(SatisfactionType.Perfect, CONFIG.ANNOUNCER.SATISFACTION.GOOD_IN_COMBO)
@@ -218,7 +224,7 @@ export class GameRound {
         this.UpdatePerformance(CONFIG.PERFORMANCE.ALMOST)
         this.score += this.scorePerArrow * CONFIG.SCORE.ALMOST_RATIO
         this.comboCount = 0
-        this.precisionMessage.push(arrow)
+        this.precisionMessage.push({ direction: arrow.direction, precision: Precision.Almost })
 
         this.announcerService.ChangeSatisfaction(SatisfactionType.Fail, CONFIG.ANNOUNCER.SATISFACTION.ALMOST)
     }
@@ -227,7 +233,7 @@ export class GameRound {
         arrow.Missed()
         this.UpdatePerformance(CONFIG.PERFORMANCE.MISS)
         this.comboCount = 0
-        this.precisionMessage.push(arrow)
+        this.precisionMessage.push({ direction: arrow.direction, precision: Precision.Missed })
 
         this.announcerService.ChangeSatisfaction(SatisfactionType.Fail, CONFIG.ANNOUNCER.SATISFACTION.MISS)
     }
@@ -237,7 +243,7 @@ export class GameRound {
         const arrowLength = arrow.beatEnd! - arrow.beatPosition
         this.performance = Math.min(CONFIG.PERFORMANCE.MAX, this.performance + arrowLength)
         this.score += arrowLength * this.scorePerHoldBeat
-        this.precisionMessage.push(arrow)
+        this.precisionMessage.push({ direction: arrow.direction, precision: Precision.Ok })
 
         if (this.comboCount >= CONFIG.ANNOUNCER.HOLD_COMBO)
             this.announcerService.ChangeSatisfaction(SatisfactionType.Perfect, CONFIG.ANNOUNCER.SATISFACTION.HOLD_IN_COMBO)
@@ -249,7 +255,6 @@ export class GameRound {
         arrow.Boom()
         this.UpdatePerformance(CONFIG.PERFORMANCE.MINE_HIT)
         this.comboCount = 0
-        this.precisionMessage.push(arrow)
 
         this.mineHitSound.currentTime = 0
         SoundService.PlaySound(this.mineHitSound)

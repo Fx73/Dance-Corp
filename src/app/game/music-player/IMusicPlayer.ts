@@ -27,7 +27,7 @@ export class MusicPlayerCommon {
     }
 
     //#region Statics
-    public static PickMusicPlayer(uri: string): MusicOrigin | null {
+    public static PickMusicPlayer(uri: string | undefined): MusicOrigin | null {
         if (!uri) return null
 
         if (uri.includes("youtube") || uri.includes("youtu.be"))

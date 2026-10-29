@@ -99,7 +99,7 @@ export class OptionsPage {
       dancepad: { lastExposedState: [0, 0, 0, 0] },
       arrowMap: arrowMap,
       currentBeat: 0,
-      precisionMessage: [] as Arrow[]
+      precisionMessage: []
     } as unknown as GameRound
   }
 

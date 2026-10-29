@@ -43,7 +43,7 @@ export class TestNoteComponent implements OnInit, OnDestroy {
   game: GameManager | null = null
 
   ngOnInit() {
-    this.musicOrigin = MusicPlayerCommon.PickMusicPlayer(this.music.music!)
+    this.musicOrigin = MusicPlayerCommon.PickMusicPlayer(this.music.music)
 
   }
 

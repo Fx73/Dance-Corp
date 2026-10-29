@@ -499,7 +499,7 @@ Link: https://github.com/Fx73/Dance-Corp/commit/e29d19f518c974b541f3d7d85ccc9261
 - Account page: update the profile and the password, resend the verification email, log out
 
 ## Commit: Drop the legacy noteData checks from the Firestore rules
-Link: https://github.com/Fx73/Dance-Corp/commit/d676e87ae7fd5572e6e2bec1d3334fae2ec7189a
+Link: https://github.com/Fx73/Dance-Corp/commit/9c523a4e28d702241156a36cb480ae3647948725
 
 - website/firestore.rules: `noteData` no longer forbidden on music create/update, nor checked before a music deletion
 
@@ -507,3 +507,23 @@ Link: https://github.com/Fx73/Dance-Corp/commit/d676e87ae7fd5572e6e2bec1d3334fae
   - The Deploy workflow publishes the rules without error
   - Editing a music still works, and its protected fields are still refused
   - Deleting a music is refused while it has charts, then works once they are gone
+
+## Commit: Remove the non-null assertions that a narrowing or a guard makes useless
+Link: https://github.com/Fx73/Dance-Corp/commit/e0138f118fe4de34a7aec4be79a7f2088106bfe3
+
+Tested: lint and build only.
+
+- dancepad-keyboard.ts, dancepad-gamepad.ts: binding read once with `get()` instead of `has()` then `get()!`
+- browse.page.ts, browse-upload.page.ts: the search skips a music without title or artist instead of throwing
+- game.page.ts: `InitGame` returns early when no game was created
+- gameRound.ts, player-display.component.ts: precision messages carry their precision (`IPrecisionMessage`) instead of the arrow; mines push none, the display already ignored them
+- user-profile.page.ts/.html, account.component.ts: profile typed nullable and shown under `@if`, unused `userAuth` removed
+- pad-test.page.ts, userconfig.service.ts, upload.page.ts, IMusicPlayer.ts, test-note.component.ts: values captured or guarded before use, no behavior change
+
+→ To verify:
+  - Play a song with the keyboard, then with a gamepad: every arrow and Start respond
+  - Precision texts: Perfect / Great / Good / Almost / Missed on taps, the press precision then OK on a completed hold, Missed on a released hold, nothing on a mine
+  - Search by title and by artist in Browse and in Browse upload
+  - Remap a keyboard and a gamepad in Options, the mapping is saved
+  - Profile page: account fields and profile card filled
+  - Upload: Edit Music and Export Essc on a database music

@@ -53,7 +53,8 @@ export class UserConfigService {
 
         // Reassociating the gamepad if it exists and is valid
         if (player.gamepad && player.gamepad.index != -1) {
-            const matchingGamepad = navigator.getGamepads().find(g => g?.id === player.gamepad!.id)
+            const gamepadId = player.gamepad.id
+            const matchingGamepad = navigator.getGamepads().find(g => g?.id === gamepadId)
             player.gamepad.index = matchingGamepad ? matchingGamepad.index : null
         }
         return player

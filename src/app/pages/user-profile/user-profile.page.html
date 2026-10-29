@@ -10,6 +10,7 @@
       </ion-card-content>
     </ion-card>
 
+    @if (userData) {
     <ion-card class="user-profile-card base-card">
       <ion-card-header>
         <ion-card-title>{{ userData.name }}</ion-card-title>
@@ -45,5 +46,6 @@
         </ion-item>
       </ion-card-content>
     </ion-card>
+    }
   </div>
 </ion-content>

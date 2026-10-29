@@ -26,14 +26,16 @@ export class DancePadKeyboard implements IDancePad {
     }
 
     private HandleKeyDown = (event: KeyboardEvent): void => {
-        if (!event.repeat && this.keyBinding.has(event.key)) {
-            this.currentState.add(this.keyBinding.get(event.key)!)
+        const direction = this.keyBinding.get(event.key)
+        if (!event.repeat && direction !== undefined) {
+            this.currentState.add(direction)
         }
     }
 
     private HandleKeyUp = (event: KeyboardEvent): void => {
-        if (this.keyBinding.has(event.key)) {
-            this.currentState.delete(this.keyBinding.get(event.key)!)
+        const direction = this.keyBinding.get(event.key)
+        if (direction !== undefined) {
+            this.currentState.delete(direction)
         }
     }
 

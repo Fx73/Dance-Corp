@@ -281,14 +281,17 @@ export class UploadPage {
   }
 
   OnStartEdit() {
-    this.musicData = this.musicDataDb!.DeepClone()
+    if (!this.musicDataDb) return
+    this.musicData = this.musicDataDb.DeepClone()
     this.isEditLocal.set(true)
     this.cd.detectChanges()
 
   }
 
   ExportEssc(): void {
-    const esscContent = SccWriter.WriteSscFile(this.isEditLocal() ? this.musicData : this.musicDataDb!)
+    const music = this.isEditLocal() ? this.musicData : this.musicDataDb
+    if (!music) return
+    const esscContent = SccWriter.WriteSscFile(music)
     function Pick(translit?: string | null, normal?: string | null): string {
       const t = translit?.trim()
       return t ? t : (normal?.trim() ?? "")
@@ -504,10 +507,11 @@ export class UploadPage {
   }
 
   CheckUrl(): Promise<boolean> {
-    if (!this.musicData.music) return Promise.resolve(false)
+    const url = this.musicData.music
+    if (!url) return Promise.resolve(false)
 
     return new Promise((resolve, reject) => {
-      fetch(this.musicData.music!, {
+      fetch(url, {
         method: "HEAD"
       }).then(response => {
         resolve(response.status.toString()[0] === "2")
