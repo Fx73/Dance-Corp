@@ -14,6 +14,11 @@ export class ArrowManager {
     private LoadArrows(notes: NoteDataDto): void {
         const activeHolds: (Arrow | null)[] = Array(Object.values(ArrowDirection).length).fill(null)
 
+        // A hold without a tail in the chart is played as a tap
+        function EndAsTap(hold: Arrow | null) {
+            if (hold) hold.type = ArrowType.Tap
+        }
+
         for (let measureIndex = 0; measureIndex < notes.stepChart.length; measureIndex++) {
             const measure = notes.stepChart[measureIndex]
             const beatPrecision = measure.steps.length / CONFIG.GAME.BEAT_PER_MEASURE
@@ -32,6 +37,7 @@ export class ArrowManager {
                             break
 
                         case 2: { // Hold start
+                            EndAsTap(activeHolds[direction])
                             const newArrow = new Arrow(direction, beatPosition, ArrowType.Hold)
                             activeHolds[direction] = newArrow
                             this.arrowMap.push(newArrow)
@@ -42,11 +48,13 @@ export class ArrowManager {
                             const lastHold = activeHolds[direction]
                             if (lastHold) {
                                 lastHold.beatEnd = beatPosition
+                                activeHolds[direction] = null
                             }
                             break
                         }
 
                         case 4: { // Roll (treated as hold)
+                            EndAsTap(activeHolds[direction])
                             const newArrow = new Arrow(direction, beatPosition, ArrowType.Hold)
                             activeHolds[direction] = newArrow
                             this.arrowMap.push(newArrow)
@@ -60,6 +68,8 @@ export class ArrowManager {
                 }
             }
         }
+
+        activeHolds.forEach(EndAsTap)
     }
 
 }

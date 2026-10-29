@@ -32,6 +32,11 @@ export class Arrow {
         return this.isValid || this.isMissed
     }
 
+    // Beats covered by a hold, 0 for the other arrows
+    public get holdLength(): number {
+        return this.beatEnd === null ? 0 : this.beatEnd - this.beatPosition
+    }
+
     public Perfect() {
         if (this.type === ArrowType.Hold)
             this.isPressed = true

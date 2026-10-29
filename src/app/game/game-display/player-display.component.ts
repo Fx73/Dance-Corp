@@ -193,7 +193,7 @@ export class PlayerDisplayComponent implements AfterViewInit {
       }
 
       if (arrow.type === ArrowType.Hold) {
-        const arrowEndY = this.targetY + (arrow.beatEnd! - currentBeat) * CONFIG.DISPLAY.BEAT_INTERVAL
+        const arrowEndY = this.targetY + (arrow.beatPosition + arrow.holdLength - currentBeat) * CONFIG.DISPLAY.BEAT_INTERVAL
         this.DrawHold(arrow, arrowX, arrowY, arrowEndY)
       }
 

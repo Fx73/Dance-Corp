@@ -76,7 +76,7 @@ export class GameRound {
         const tapArrows = arrowMap.filter(arrow => arrow.type === ArrowType.Tap)
 
         // Calculate total hold percentage for score
-        const totalHoldTime = holdArrows.reduce((total, arrow) => total + (arrow.beatEnd!) - arrow.beatPosition, 0)
+        const totalHoldTime = holdArrows.reduce((total, arrow) => total + arrow.holdLength, 0)
         const totalTaps = tapArrows.length
         const totalWeight = totalTaps + totalHoldTime
 
@@ -240,7 +240,7 @@ export class GameRound {
 
     ArrowOk(arrow: Arrow) {
         arrow.Ok()
-        const arrowLength = arrow.beatEnd! - arrow.beatPosition
+        const arrowLength = arrow.holdLength
         this.performance = Math.min(CONFIG.PERFORMANCE.MAX, this.performance + arrowLength)
         this.score += arrowLength * this.scorePerHoldBeat
         this.precisionMessage.push({ direction: arrow.direction, precision: Precision.Ok })

@@ -538,3 +538,15 @@ Tested: lint and build only.
 → To verify:
   - Upload page, edit a text list (labels, bgchanges): empty a value, the field stays empty and the music can be updated
   - Export Essc after emptying a value: the line is written `time=` instead of `time=null`
+
+## Commit: Play a hold without a tail as a tap
+Link: https://github.com/Fx73/Dance-Corp/commit/b006cabde6596df7a4817385b726d63b6147f779
+
+Tested: lint and build only.
+
+- arrowManager.ts: a hold (or roll) not closed by a tail before the next hold on its direction, or before the end of the chart, becomes a tap; a tail closes its hold
+- arrow.ts, gameRound.ts, player-display.component.ts: hold length read from `Arrow.holdLength` instead of `beatEnd!`
+
+→ To verify:
+  - A chart with holds and rolls plays as before: holds drawn to their tail, OK at the end, score reaches its max on a full combo
+  - A chart with a hold missing its tail: that arrow shows and plays as a tap

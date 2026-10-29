@@ -18,10 +18,6 @@ Bugs found but not fixed yet, and deprecations to migrate. Remove an entry once 
   `PlayerDisplayComponent` reads its texts with `document.getElementById('precision-text-*')!` and `'combo-text'`. With two displays, the ids are duplicated and both components get the first one's elements.
   Possible fix: `@ViewChild` / `@ViewChildren` template references in the component.
 
-- **Hold without an end in the chart: negative hold time**
-  `ArrowManager` only sets `beatEnd` when it reads the hold tail, so an unterminated hold keeps `beatEnd = null`. `GameRound.CalculateScore()` then adds `null - beatPosition` (negative) to the total hold time, and `PlayerDisplayComponent` draws the hold up to beat 0 (`beatEnd!` in both, and in `ArrowOk`).
-  Possible fix: turn an unterminated hold into a tap when parsing, and type `beatEnd` as `number` for holds.
-
 - **Music without artist, title or BPMs**
   `MusicDto` builds its id with `Sanitize(this.artist!)` / `Sanitize(this.title!)`, which throws when one is missing, and assigns `ParseChanges(bpms)!`, which leaves `bpms` `undefined` when the file has no `#BPMS`.
   Possible fix: reject the file at parsing with a clear error, or fall back to a default.
