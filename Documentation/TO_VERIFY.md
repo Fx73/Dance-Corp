@@ -497,3 +497,13 @@ Link: https://github.com/Fx73/Dance-Corp/commit/e29d19f518c974b541f3d7d85ccc9261
 - Login with a wrong password, register with a used email: a warning toast, no browser alert
 - Password recovery: the email is sent, with a success toast
 - Account page: update the profile and the password, resend the verification email, log out
+
+## Commit: Drop the legacy noteData checks from the Firestore rules
+Link: https://github.com/Fx73/Dance-Corp/commit/d676e87ae7fd5572e6e2bec1d3334fae2ec7189a
+
+- website/firestore.rules: `noteData` no longer forbidden on music create/update, nor checked before a music deletion
+
+→ To verify (after the dev deploy):
+  - The Deploy workflow publishes the rules without error
+  - Editing a music still works, and its protected fields are still refused
+  - Deleting a music is refused while it has charts, then works once they are gone
