@@ -550,3 +550,17 @@ Tested: lint and build only.
 → To verify:
   - A chart with holds and rolls plays as before: holds drawn to their tail, OK at the end, score reaches its max on a full combo
   - A chart with a hold missing its tail: that arrow shows and plays as a tap
+
+## Commit: Reject a music file without title, artist or BPMs
+Link: https://github.com/Fx73/Dance-Corp/commit/9f55b76516006a3d44fee6da950a755b4a9704ee
+
+Tested: lint and build only.
+
+- reader.ssc.ts: `ParseFile` throws when `#TITLE`, `#ARTIST` or `#BPMS` is missing or empty, naming the missing tags
+- upload.page.ts: a file that cannot be read shows an error toast instead of an unhandled error (also for an unsupported extension)
+- music.dto.ts: `bpms` defaults to `[]`, `id` throws a clear error without artist or title
+
+→ To verify:
+  - Upload a valid .sm / .ssc: loaded as before
+  - Upload a file without #TITLE, then without #BPMS: error toast naming the tag, nothing loaded
+  - Upload a file with another extension: error toast

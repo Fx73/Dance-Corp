@@ -203,7 +203,12 @@ export class UploadPage {
       const reader = new FileReader()
       reader.onload = async (e) => {
         const content = e.target?.result as string
-        this.musicData = SccReader.ParseFile(file.name, content)
+        try {
+          this.musicData = SccReader.ParseFile(file.name, content)
+        } catch (error) {
+          AppComponent.PresentErrorToast("This music cannot be loaded. " + (error instanceof Error ? error.message : String(error)))
+          return
+        }
         this.localMusicService.UpdateMusic(this.musicData)
         this.isEditLocal.set(true)
         AppComponent.PresentOkToast("Music loaded successfully : " + this.musicData.id)

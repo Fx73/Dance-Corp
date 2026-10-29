@@ -18,10 +18,6 @@ Bugs found but not fixed yet, and deprecations to migrate. Remove an entry once 
   `PlayerDisplayComponent` reads its texts with `document.getElementById('precision-text-*')!` and `'combo-text'`. With two displays, the ids are duplicated and both components get the first one's elements.
   Possible fix: `@ViewChild` / `@ViewChildren` template references in the component.
 
-- **Music without artist, title or BPMs**
-  `MusicDto` builds its id with `Sanitize(this.artist!)` / `Sanitize(this.title!)`, which throws when one is missing, and assigns `ParseChanges(bpms)!`, which leaves `bpms` `undefined` when the file has no `#BPMS`.
-  Possible fix: reject the file at parsing with a clear error, or fall back to a default.
-
 ## Maintenance
 
 - **`npm audit`**: 6 vulnerabilities (5 high, 1 moderate), accepted for now. Do not run `npm audit fix --force`: it downgrades `firebase` to 9.14.0 and `@angular/build` to 22.1.9.

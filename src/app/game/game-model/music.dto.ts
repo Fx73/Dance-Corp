@@ -40,7 +40,9 @@ export class MusicDto {
         .replace(/\s+/g, '_')  // replace spaces with underscores
     }
 
-    return `${Sanitize(this.artist!)}-${Sanitize(this.title!)}`
+    // Checked when a file is read (SccReader.ParseFile)
+    if (!this.artist || !this.title) throw new Error("A music needs an artist and a title")
+    return `${Sanitize(this.artist)}-${Sanitize(this.title)}`
   }
 
   constructor(tokenMapWithNotes?: SscTokenMap) {
@@ -93,7 +95,7 @@ export class MusicDto {
     delete tokenMap["speeds"]
     this.scrolls = this.ParseChanges<ScrollChange>(tokenMap["scrolls"], v => parseFloat(v)) ?? []
     delete tokenMap["scrolls"]
-    this.bpms = this.ParseChanges<BpmChange>(tokenMap["bpms"], v => parseFloat(v))!
+    this.bpms = this.ParseChanges<BpmChange>(tokenMap["bpms"], v => parseFloat(v)) ?? []
     delete tokenMap["bpms"]
     const bgChange0 = tokenMap["background"]
     this.bgChanges = this.ParseChanges<BackgroundChange>(tokenMap["bgchanges"], v => v) ?? []
