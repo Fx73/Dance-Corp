@@ -41,12 +41,11 @@ export class MusicEditableListComponent<T extends ITimedChange = ITimedChange> i
     this.isDirty = this.isChanged
     this.value = this.value.map(row => ({
       ...row,
+      // A timed change always has a value: an emptied field becomes ""
       value: this.valueType === 'string'
-        // The sanitized value written back below can be null, although value is typed as string | number
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        ? SanitizeSscInput(String(row.value ?? ""))
+        ? SanitizeSscInput(String(row.value)) ?? ""
         : row.value
-    })) // the sanitized value (string or null) replaces the field value
+    }))
 
     this.valueChange.emit(this.value)
   }

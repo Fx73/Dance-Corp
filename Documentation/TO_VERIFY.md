@@ -527,3 +527,14 @@ Tested: lint and build only.
   - Remap a keyboard and a gamepad in Options, the mapping is saved
   - Profile page: account fields and profile card filled
   - Upload: Edit Music and Export Essc on a database music
+
+## Commit: Keep timed change values non-null in the upload list editor
+Link: https://github.com/Fx73/Dance-Corp/commit/65a86e496010bc0f25ba381793f5ad6010bdb392
+
+Tested: lint and build only.
+
+- src/app/pages/upload/editable-list/editable-list.component.ts: an emptied text value becomes `""` instead of `null`, the `eslint-disable` is gone
+
+→ To verify:
+  - Upload page, edit a text list (labels, bgchanges): empty a value, the field stays empty and the music can be updated
+  - Export Essc after emptying a value: the line is written `time=` instead of `time=null`

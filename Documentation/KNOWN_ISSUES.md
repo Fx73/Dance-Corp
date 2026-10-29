@@ -38,4 +38,4 @@ Nothing for now.
 
 ## Code style to harmonize
 
-- **`ITimedChange.value` can be null**: `MusicEditableListComponent` writes the result of `SanitizeSscInput()` (`string | null`) back into values typed as `string | number`. Typing it `string | number | null` reaches every timed change: done with an `eslint-disable` for now.
+Nothing for now.
