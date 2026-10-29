@@ -24,6 +24,14 @@ export class SccReader {
     const musicData = new MusicDto(tokenMap)
     console.log("Parsed Music Data:", musicData)
 
+    const missingTags = [
+      musicData.title?.trim() ? null : '#TITLE',
+      musicData.artist?.trim() ? null : '#ARTIST',
+      musicData.bpms.length > 0 ? null : '#BPMS',
+    ].filter(tag => tag !== null)
+    if (missingTags.length > 0)
+      throw new Error(`This file has no ${missingTags.join(', ')}: add it to the file and load it again.`)
+
     const tsvLines: string[] = []
     for (const noteData of musicData.noteData) {
       if (!noteData.difficultyCriterias) {

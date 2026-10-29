@@ -49,13 +49,13 @@ export class BrowseUploadPage implements OnInit {
     if (q) {
       updateLocalMusics =
         this.localMusicService.allLocalMusics.filter(m =>
-          m.title!.toLowerCase().includes(q) ||
-          m.artist!.toLowerCase().includes(q)
+          m.title?.toLowerCase().includes(q) ||
+          m.artist?.toLowerCase().includes(q)
         )
       updateDbMusics =
         this.musicCacheService.allRemoteMusics.filter(m =>
-          m.title!.toLowerCase().includes(q) ||
-          m.artist!.toLowerCase().includes(q)
+          m.title?.toLowerCase().includes(q) ||
+          m.artist?.toLowerCase().includes(q)
         )
     }
 

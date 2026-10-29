@@ -60,7 +60,7 @@ Write new code the way the existing code is written. Known deviations to avoid a
 - C# convention: PascalCase for methods and functions (instance, static, interface methods, nested functions), and for classes, enums and interfaces. camelCase for fields, properties, variables and parameters.
 - Exceptions, kept as the framework or the external API calls them: Angular and Ionic lifecycle hooks (`ngOnInit`, `ionViewWillEnter`…), `toJSON`, `toString`, Firestore converters (`toFirestore` / `fromFirestore`), router guards (`canActivate`), and interfaces describing an external API (wrapped in an `eslint-disable` block for `@typescript-eslint/naming-convention`).
 - Enforced by ESLint (`@typescript-eslint/naming-convention`).
-- Interfaces are prefixed with `I` (`IMusicPlayer`, `IDancePad`).
+- Interfaces are contracts implemented by classes, prefixed with `I` (`IMusicPlayer`, `ITimedChange`). A data-only shape that no class implements is a `type`, without prefix (`PrecisionMessage`).
 - Non-Angular classes responsible for orchestrating a game subsystem are suffixed `Manager` (`GameManager`, `BeatManager`). Angular injectables are suffixed `Service`.
 - Data objects are suffixed `Dto`.
 

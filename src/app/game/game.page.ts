@@ -90,7 +90,7 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
     }
 
     // Prepare Music Player
-    this.musicOrigin = MusicPlayerCommon.PickMusicPlayer(this.music.music!)
+    this.musicOrigin = MusicPlayerCommon.PickMusicPlayer(this.music.music)
     if (this.musicOrigin == null) {
       AppComponent.PresentWarningToast("Error loading music in player !")
       void this.router.navigate(['/home'])
@@ -122,10 +122,10 @@ export class GamePage implements OnInit, OnDestroy, AfterViewInit {
 
   private hasGameBeenInitialized = false
   InitGame() {
-    if (this.hasGameBeenInitialized || !this.musicPlayer) return
+    if (this.hasGameBeenInitialized || !this.musicPlayer || !this.game) return
     this.hasGameBeenInitialized = true
 
-    this.game!.RegisterExternalComponents(this.musicPlayer, /*this.playerDisplays*/)
+    this.game.RegisterExternalComponents(this.musicPlayer, /*this.playerDisplays*/)
 
     this.waitingScreen.StartCountdown()
     void this.announcerService.PlayCountdownFromAnnouncer()

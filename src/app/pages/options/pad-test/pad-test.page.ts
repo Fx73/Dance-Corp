@@ -124,7 +124,7 @@ export class PadTestPage {
   }
 
   ValidateMapping(): void {
-    if (this.playerSelected?.gamepad == null)
+    if (this.playerSelected?.gamepad == null || this.playerIndexSelected === undefined)
       return
 
     if (this.playerSelected.gamepad.index === -1) {
@@ -132,7 +132,7 @@ export class PadTestPage {
       for (const [direction, key] of this.keyboardBindings.entries()) {
         keyboardBindingsObject.set(key, direction)
       }
-      this.userConfigService.UpdatePlayer("keyBindingKeyboard", this.playerIndexSelected!, keyboardBindingsObject)
+      this.userConfigService.UpdatePlayer("keyBindingKeyboard", this.playerIndexSelected, keyboardBindingsObject)
       AppComponent.PresentOkToast("Player keyboard mappings have been updated.")
 
     } else {
@@ -140,7 +140,7 @@ export class PadTestPage {
       for (const [direction, button] of this.gampadBindings.entries()) {
         gamepadBindingsObject.set(button, direction)
       }
-      this.userConfigService.UpdatePlayer('keyBindingGamepad', this.playerIndexSelected!, gamepadBindingsObject)
+      this.userConfigService.UpdatePlayer('keyBindingGamepad', this.playerIndexSelected, gamepadBindingsObject)
       AppComponent.PresentOkToast("Player gamepad mappings have been updated.")
     }
 

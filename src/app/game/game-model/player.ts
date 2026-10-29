@@ -1,7 +1,7 @@
 import { ArrowDirection } from "src/app/game/constants/arrow-direction.enum"
 
 /** Serialized form of a Player (localStorage) */
-export interface IPlayerJSON {
+export type PlayerJSON = {
     name: string | undefined
     userId: string | null
     gamepad: { index: number | null, id: string } | undefined
@@ -21,7 +21,7 @@ export class Player {
         this.keyBindingKeyboard = Player.DefaultKeyboardBinding()
     }
 
-    toJSON(): IPlayerJSON {
+    toJSON(): PlayerJSON {
         return {
             name: this.name,
             userId: this.userId,
@@ -32,7 +32,7 @@ export class Player {
     }
 
     //#region Statics
-    static FromJSON(json: IPlayerJSON): Player {
+    static FromJSON(json: PlayerJSON): Player {
         const player = new Player()
         player.userId = json.userId
         player.gamepad = json.gamepad

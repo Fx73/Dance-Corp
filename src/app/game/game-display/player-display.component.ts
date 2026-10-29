@@ -103,10 +103,7 @@ export class PlayerDisplayComponent implements AfterViewInit {
 
     if (this.gameRound.precisionMessage.length > 0) {
       for (const msg of this.gameRound.precisionMessage) {
-        if (msg.type === ArrowType.Tap)
-          this.ShowPrecisionMessage(msg.precision!, msg.direction)
-        else if (msg.type === ArrowType.Hold)
-          this.ShowPrecisionMessage(msg.isValid ? Precision.Ok : msg.precision!, msg.direction)
+        this.ShowPrecisionMessage(msg.precision, msg.direction)
       }
       this.gameRound.precisionMessage = []
     }
@@ -196,7 +193,7 @@ export class PlayerDisplayComponent implements AfterViewInit {
       }
 
       if (arrow.type === ArrowType.Hold) {
-        const arrowEndY = this.targetY + (arrow.beatEnd! - currentBeat) * CONFIG.DISPLAY.BEAT_INTERVAL
+        const arrowEndY = this.targetY + (arrow.beatPosition + arrow.holdLength - currentBeat) * CONFIG.DISPLAY.BEAT_INTERVAL
         this.DrawHold(arrow, arrowX, arrowY, arrowEndY)
       }
 

@@ -44,16 +44,14 @@ service cloud.firestore {
     match /musics/{musicId} {
       allow read: if true;
       allow create: if isSignedIn()
-        && !request.resource.data.keys().hasAny(['noteData', 'charts', 'lastChartChange']);
+        && !request.resource.data.keys().hasAny(['charts', 'lastChartChange']);
       // Anyone signed in can edit a music, except its protected fields (bpms is protected once it has charts).
-      // noteData is the legacy embedded storage: read-only until it is removed.
       allow update: if isSignedIn()
-        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(protectedFields().concat(['noteData']))
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(protectedFields())
         && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['charts']) || isChartIndexChangeValid(musicId));
       // A music can only be deleted once all its charts are gone
       allow delete: if isSignedIn()
-        && chartsOf(resource.data).size() == 0
-        && resource.data.get('noteData', []).size() == 0;
+        && chartsOf(resource.data).size() == 0;
     }
 
     // Charts: only their creator edits or deletes them. Creating or deleting one also updates the chart index.

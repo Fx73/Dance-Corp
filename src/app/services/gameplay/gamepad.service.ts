@@ -10,7 +10,7 @@ export class GamepadService {
     private userConfigService = inject(UserConfigService)
     private ngZone = inject(NgZone)
 
-    private gamepads: IGamepadReference[] = []
+    private gamepads: GamepadReference[] = []
 
     constructor() {
         this.gamepads = [{ index: -1, id: "Keyboard" }]
@@ -39,13 +39,13 @@ export class GamepadService {
         this.gamepads = this.gamepads.filter(g => g.id !== event.gamepad.id)
     }
 
-    GetGamepads(): IGamepadReference[] {
+    GetGamepads(): GamepadReference[] {
         return this.gamepads
     }
 
 }
 
-export interface IGamepadReference {
+export type GamepadReference = {
     index: number | null
     id: string
 }

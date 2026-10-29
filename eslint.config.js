@@ -31,6 +31,8 @@ module.exports = tseslint.config(
       // Interface and type members: no delimiter on multiple lines, commas on a single line
       '@stylistic/member-delimiter-style': ['error', { multiline: { delimiter: 'none' }, singleline: { delimiter: 'comma', requireLast: false } }],
       'no-unexpected-multiline': 'error',
+      // Interfaces are contracts implemented by classes, data-only shapes are types (CLAUDE.md)
+      '@typescript-eslint/consistent-type-definitions': 'off',
       // Naming from CLAUDE.md: methods and functions in PascalCase (C# convention),
       // except names called by the framework or an external API.
       // classMethod also matches properties holding an arrow function: UPPER_CASE is allowed for constant lambdas.

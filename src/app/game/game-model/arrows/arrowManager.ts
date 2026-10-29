@@ -32,22 +32,24 @@ export class ArrowManager {
                             break
 
                         case 2: { // Hold start
-                            const newArrow = new Arrow(direction, beatPosition, ArrowType.Hold)
+                            // Ends on the next row until its tail is read: a missing tail leaves the shortest hold
+                            const newArrow = new Arrow(direction, beatPosition, ArrowType.Hold, beatPosition + 1 / beatPrecision)
                             activeHolds[direction] = newArrow
                             this.arrowMap.push(newArrow)
                             break
                         }
 
-                        case 3: { // Hold continue
+                        case 3: { // Hold or roll tail
                             const lastHold = activeHolds[direction]
                             if (lastHold) {
                                 lastHold.beatEnd = beatPosition
+                                activeHolds[direction] = null
                             }
                             break
                         }
 
                         case 4: { // Roll (treated as hold)
-                            const newArrow = new Arrow(direction, beatPosition, ArrowType.Hold)
+                            const newArrow = new Arrow(direction, beatPosition, ArrowType.Hold, beatPosition + 1 / beatPrecision)
                             activeHolds[direction] = newArrow
                             this.arrowMap.push(newArrow)
                             break

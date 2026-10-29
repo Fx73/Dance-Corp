@@ -497,3 +497,78 @@ Link: https://github.com/Fx73/Dance-Corp/commit/e29d19f518c974b541f3d7d85ccc9261
 - Login with a wrong password, register with a used email: a warning toast, no browser alert
 - Password recovery: the email is sent, with a success toast
 - Account page: update the profile and the password, resend the verification email, log out
+
+## Commit: Drop the legacy noteData checks from the Firestore rules
+Link: https://github.com/Fx73/Dance-Corp/commit/9c523a4e28d702241156a36cb480ae3647948725
+
+- website/firestore.rules: `noteData` no longer forbidden on music create/update, nor checked before a music deletion
+
+→ To verify (after the dev deploy):
+  - The Deploy workflow publishes the rules without error
+  - Editing a music still works, and its protected fields are still refused
+  - Deleting a music is refused while it has charts, then works once they are gone
+
+## Commit: Remove the non-null assertions that a narrowing or a guard makes useless
+Link: https://github.com/Fx73/Dance-Corp/commit/e0138f118fe4de34a7aec4be79a7f2088106bfe3
+
+Tested: lint and build only.
+
+- dancepad-keyboard.ts, dancepad-gamepad.ts: binding read once with `get()` instead of `has()` then `get()!`
+- browse.page.ts, browse-upload.page.ts: the search skips a music without title or artist instead of throwing
+- game.page.ts: `InitGame` returns early when no game was created
+- gameRound.ts, player-display.component.ts: precision messages carry their precision (`PrecisionMessage`) instead of the arrow; mines push none, the display already ignored them
+- user-profile.page.ts/.html, account.component.ts: profile typed nullable and shown under `@if`, unused `userAuth` removed
+- pad-test.page.ts, userconfig.service.ts, upload.page.ts, IMusicPlayer.ts, test-note.component.ts: values captured or guarded before use, no behavior change
+
+→ To verify:
+  - Play a song with the keyboard, then with a gamepad: every arrow and Start respond
+  - Precision texts: Perfect / Great / Good / Almost / Missed on taps, the press precision then OK on a completed hold, Missed on a released hold, nothing on a mine
+  - Search by title and by artist in Browse and in Browse upload
+  - Remap a keyboard and a gamepad in Options, the mapping is saved
+  - Profile page: account fields and profile card filled
+  - Upload: Edit Music and Export Essc on a database music
+
+## Commit: Keep timed change values non-null in the upload list editor
+Link: https://github.com/Fx73/Dance-Corp/commit/65a86e496010bc0f25ba381793f5ad6010bdb392
+
+Tested: lint and build only.
+
+- src/app/pages/upload/editable-list/editable-list.component.ts: an emptied text value becomes `""` instead of `null`, the `eslint-disable` is gone
+
+→ To verify:
+  - Upload page, edit a text list (labels, bgchanges): empty a value, the field stays empty and the music can be updated
+  - Export Essc after emptying a value: the line is written `time=` instead of `time=null`
+
+## Commit: Play a hold without a tail as a tap
+Link: https://github.com/Fx73/Dance-Corp/commit/b006cabde6596df7a4817385b726d63b6147f779
+
+Tested: lint and build only.
+
+- arrow.ts, gameRound.ts, player-display.component.ts: hold length read from `Arrow.holdLength` instead of `beatEnd!`
+
+→ To verify:
+  - A chart with holds and rolls plays as before: holds drawn to their tail, OK at the end, score reaches its max on a full combo
+
+## Commit: Reject a music file without title, artist or BPMs
+Link: https://github.com/Fx73/Dance-Corp/commit/9f55b76516006a3d44fee6da950a755b4a9704ee
+
+Tested: lint and build only.
+
+- reader.ssc.ts: `ParseFile` throws when `#TITLE`, `#ARTIST` or `#BPMS` is missing or empty, naming the missing tags
+- upload.page.ts: a file that cannot be read shows an error toast instead of an unhandled error (also for an unsupported extension)
+- music.dto.ts: `bpms` defaults to `[]`, `id` throws a clear error without artist or title
+
+→ To verify:
+  - Upload a valid .sm / .ssc: loaded as before
+  - Upload a file without #TITLE, then without #BPMS: error toast naming the tag, nothing loaded
+  - Upload a file with another extension: error toast
+
+## Commit: Give a hold without a tail the length of one row
+Link: https://github.com/Fx73/Dance-Corp/commit/3acf08ac34b47163a777f5195818d98689df9782
+
+Tested: partly played by hand, lint and build.
+
+- arrowManager.ts: a hold (or roll) ends on the next row until its tail is read, so a missing tail leaves the shortest hold instead of a tap; a tail closes its hold
+
+→ To verify:
+  - A chart with a hold missing its tail: that arrow shows and plays as a one-row hold

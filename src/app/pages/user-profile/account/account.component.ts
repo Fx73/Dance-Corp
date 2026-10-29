@@ -25,10 +25,11 @@ export class AccountComponent {
     const loginService = this.loginService
 
     const user = loginService.GetAuthUser()
-    this.name = user!.displayName ?? ""
-    this.email = user!.email ?? ""
-    this.isEmailVerified = user!.emailVerified
+    if (!user) return
 
+    this.name = user.displayName ?? ""
+    this.email = user.email ?? ""
+    this.isEmailVerified = user.emailVerified
   }
 
   async SaveProfile(): Promise<void> {

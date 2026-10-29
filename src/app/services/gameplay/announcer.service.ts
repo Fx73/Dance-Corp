@@ -5,7 +5,7 @@ import { SatisfactionType } from "src/app/game/constants/satisfaction-type.enum"
 import { SoundService } from "./sound.service"
 
 /** Content of the assets/Sounds/announcers/*.json files */
-interface ISoundBank {
+type SoundBank = {
     type: string
     name: string
     // An announcer has no lines for some categories
@@ -16,9 +16,9 @@ interface ISoundBank {
 export class AnnouncerService {
     private userConfigService = inject(UserConfigService)
 
-    private announcers: ISoundBank[] = []
-    private crowd!: ISoundBank
-    private preferredAnnouncer?: ISoundBank
+    private announcers: SoundBank[] = []
+    private crowd!: SoundBank
+    private preferredAnnouncer?: SoundBank
     private lastAnnouncerLine: string | null = null
     private failSatisfaction = 0
     private goodSatisfaction = 0
@@ -26,7 +26,7 @@ export class AnnouncerService {
 
     // --- CHANNELS ---
     private announcerAudio: HTMLAudioElement | null = null
-    private announcerQueue: { announcer: ISoundBank, line: string }[] = []
+    private announcerQueue: { announcer: SoundBank, line: string }[] = []
     private isQueueBlocked: boolean = false
 
     private crowdAudio: HTMLAudioElement | null = null
@@ -146,7 +146,7 @@ export class AnnouncerService {
         this.PlayAnnouncerDirect(announcer, line, this.ProcessAnnouncerQueue.bind(this))
     }
 
-    private EnqueueAnnouncerLine(announcer: ISoundBank, line: string) {
+    private EnqueueAnnouncerLine(announcer: SoundBank, line: string) {
         this.lastAnnouncerLine = line
         this.announcerQueue.push({ announcer, line })
         this.ProcessAnnouncerQueue()
@@ -188,7 +188,7 @@ export class AnnouncerService {
         this.ProcessAnnouncerQueue()
     }
 
-    private PlayAnnouncerDirect(announcer: ISoundBank, line: string, onEndCallback?: () => void) {
+    private PlayAnnouncerDirect(announcer: SoundBank, line: string, onEndCallback?: () => void) {
         const src = `assets/Sounds/announcers/${announcer.name}/${line}.ogg`
 
         this.announcerAudio = new Audio(src)
