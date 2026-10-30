@@ -46,6 +46,31 @@ jobs:
           entryPoint: website
           expires: 7d
 
+  # Firestore rules, tested against the emulator
+  rules:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Npm setup
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+
+      # The Firestore emulator needs Java 21
+      - name: Java setup
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Firestore rules tests
+        run: npm run test:rules
+
   desktop:
     runs-on: windows-latest
     steps:
