@@ -120,7 +120,8 @@
             "buildTarget": "app:build:development,test",
             "tsConfig": "tests/tsconfig.json",
             "include": [
-              "../tests/unit/**/*.spec.ts"
+              "../tests/unit/**/*.spec.ts",
+              "../tests/simulation/**/*.spec.ts"
             ],
             "coverageInclude": [
               "src/app/**/*.ts"

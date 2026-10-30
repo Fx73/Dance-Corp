@@ -119,6 +119,7 @@ Write new code the way the existing code is written. Known deviations to avoid a
 ## Tests
 
 - Unit tests live in `tests/unit/`, mirroring `src/app/`, never next to the code. Chart files used by the tests go in `tests/unit/fixtures/charts/`.
+- Game simulation tests live in `tests/simulation/`: they play whole games with the real `GameManager` on a fake clock. Gameplay changes (timing, judgment, score) come with a simulation.
 - Firestore rules tests live in `tests/firestore/` and run against the emulator with `npm run test:rules` (needs Java 21). Any change to `firestore.rules` comes with its tests.
 - A bug found while writing a test is not fixed in the same work: it gets a `KNOWN_ISSUES.md` entry and an `it.fails` test, which turns red once the bug is fixed (then switch it to `it`).
 
