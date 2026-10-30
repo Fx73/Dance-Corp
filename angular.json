@@ -145,7 +145,8 @@
             "lintFilePatterns": [
               "src/**/*.ts",
               "src/**/*.html",
-              "tests/**/*.ts"
+              "tests/**/*.ts",
+              "tests/**/*.mts"
             ]
           }
         }

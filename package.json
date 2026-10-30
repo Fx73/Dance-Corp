@@ -11,7 +11,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:coverage": "ng test --coverage",
-    "test:rules": "firebase emulators:exec --config website/firebase.json --only firestore --project demo-dance-corp \"vitest run --config tests/firestore/vitest.config.ts\"",
+    "test:rules": "firebase emulators:exec --config website/firebase.json --only firestore --project demo-dance-corp \"vitest run --config tests/firestore/vitest.config.mts\"",
     "lint": "ng lint",
     "ionic-build-prod": "ionic build --prod",
     "clean": "node -e \"const fs=require('fs');['node_modules','package-lock.json'].forEach(p=>fs.rmSync(p,{recursive:true,force:true}))\"",
