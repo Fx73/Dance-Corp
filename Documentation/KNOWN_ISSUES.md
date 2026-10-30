@@ -18,6 +18,24 @@ Bugs found but not fixed yet, and deprecations to migrate. Remove an entry once 
   `PlayerDisplayComponent` reads its texts with `document.getElementById('precision-text-*')!` and `'combo-text'`. With two displays, the ids are duplicated and both components get the first one's elements.
   Possible fix: `@ViewChild` / `@ViewChildren` template references in the component.
 
+- **Upload: exporting an edited music writes `#DIFFICULTYCRITERIAS:[object Object]`**
+  `MusicDto.DeepClone()` (used by `OnStartEdit`) goes through `NoteDataDto.FromJSON()`, which rebuilds neither `difficultyCriterias` (left a plain object, without `toString()`) nor `creationDate` (left a string, although typed `Date`). `SccWriter.WriteSscFile()` then writes `[object Object]`.
+  Possible fix: rebuild both in `NoteDataDto.FromJSON()`.
+  Test: `it.fails` in `tests/unit/pages/upload/reader.ssc.spec.ts` and `tests/unit/game/game-model/music.dto.spec.ts`.
+
+- **Difficulty evaluation: `NaN` meter in two cases**
+  `SccReader.ParseFile()` replaces the meter of a chart without criterias by `NoteEvaluator.GetLevelFromCriterias()`, which is `NaN` when:
+  - the chart ends before the last BPM change: `EvaluateSpeed()` counts a negative duration after it, and `Math.pow` of a negative ratio is `NaN`;
+  - no empty row separates two steps in the whole chart: `EvaluateBurst()` divides by a mean gap of 0.
+  Test: `it.fails` in `tests/unit/pages/upload/DifficultyCriteria.spec.ts`.
+
+- **`.sm` files: the chart credit is lost**
+  `SccReader.TokenizeSM()` stores it under `credits`, `NoteDataDto` reads `credit`.
+  Test: `it.fails` in `tests/unit/pages/upload/reader.ssc.spec.ts`.
+
+- **`SccReader.ParseFile()`: charts not sorted by their final meter**
+  `MusicDto` sorts the charts by the meter of the file, then `ParseFile()` replaces the meters of the charts without criterias by their evaluated level, without sorting again.
+
 ## Maintenance
 
 - **`npm audit`**: 6 vulnerabilities (5 high, 1 moderate), accepted for now. Do not run `npm audit fix --force`: it downgrades `firebase` to 9.14.0 and `@angular/build` to 22.1.9.

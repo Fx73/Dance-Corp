@@ -29,6 +29,9 @@ jobs:
       - name: Lint
         run: npx ng lint
 
+      - name: Unit tests
+        run: npx ng test
+
       - name: Build (dev Firebase)
         run: npx ng build --configuration=dev
 
