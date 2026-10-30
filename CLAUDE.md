@@ -114,6 +114,14 @@ Write new code the way the existing code is written. Known deviations to avoid a
 
 - Always run `npm install` then `ionic serve` right before a commit, and check that the build completes without errors. Do not commit a broken build.
 - Always run `ng lint` right before a commit, and fix every error. Do not commit with lint errors.
+- Always run `ng test` right before a commit. Do not commit failing tests.
+
+## Tests
+
+- Unit tests live in `tests/unit/`, mirroring `src/app/`, never next to the code. Chart files used by the tests go in `tests/unit/fixtures/charts/`.
+- Game simulation tests live in `tests/simulation/`: they play whole games with the real `GameManager` on a fake clock. Gameplay changes (timing, judgment, score) come with a simulation.
+- Firestore rules tests live in `tests/firestore/` and run against the emulator with `npm run test:rules` (needs Java 21). Any change to `firestore.rules` comes with its tests.
+- A bug found while writing a test is not fixed in the same work: it gets a `KNOWN_ISSUES.md` entry and an `it.fails` test, which turns red once the bug is fixed (then switch it to `it`).
 
 ### Before Opening a Pull Request to `dev`
 

@@ -8,6 +8,7 @@ npm-debug.log
 /.ionic
 /out-tsc
 /dist
+/coverage
 /tmp
 /website/www
 /website/.firebase
