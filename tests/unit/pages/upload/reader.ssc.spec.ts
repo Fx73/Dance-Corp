@@ -116,6 +116,16 @@ describe("SccReader", () => {
     it("names the missing required tags", () => {
       expect(() => SccReader.ParseFile("no-title.ssc", ReadChart("no-title.ssc"))).toThrow("#TITLE")
     })
+
+    it("names a missing artist", () => {
+      expect(() => SccReader.ParseFile("song.ssc", "#TITLE:A;\n#BPMS:0=120;")).toThrow("This file has no #ARTIST")
+    })
+
+    it("names missing or empty bpms", () => {
+      expect(() => SccReader.ParseFile("song.ssc", "#TITLE:A;\n#ARTIST:B;")).toThrow("This file has no #BPMS")
+      expect(() => SccReader.ParseFile("song.ssc", "#TITLE:A;\n#ARTIST:B;\n#BPMS:;")).toThrow("This file has no #BPMS")
+      expect(() => SccReader.ParseFile("song.sm", "#TITLE:A;\n#ARTIST:B;\n#BPMS:;")).toThrow("This file has no #BPMS")
+    })
   })
 
   describe("TokenizeCommon", () => {

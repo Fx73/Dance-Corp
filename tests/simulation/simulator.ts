@@ -14,12 +14,15 @@ import { UserCacheService } from "src/app/services/local-storage/user.cache.serv
 /** A key press at a music time, in seconds, held for `duration` seconds */
 export type Input = { time: number, direction: ArrowDirection, duration?: number }
 
-export type SimulationResult = {
-  round: GameRound
+/** A game ready to start, with its fake music player and the mocked services */
+export type Game = {
   manager: GameManager
+  musicPlayer: FakeMusicPlayer
   announcer: { ChangeSatisfaction: ReturnType<typeof vi.fn>, PlayAnnouncer: ReturnType<typeof vi.fn>, PlayCrowdOneShot: ReturnType<typeof vi.fn> }
   userCache: { GetMusicStats: ReturnType<typeof vi.fn>, UpdateUserStatsFromRound: ReturnType<typeof vi.fn> }
 }
+
+export type SimulationResult = Game & { round: GameRound }
 
 // A tap is held long enough to be seen by the next frame
 const TAP_DURATION = 0.04
@@ -27,25 +30,26 @@ const TAP_DURATION = 0.04
 const MAX_DURATION = 120
 const KEYS = ["ArrowLeft", "ArrowDown", "ArrowUp", "ArrowRight"]
 
-/** Music player driven by the fake clock: its time starts when it is played */
-class FakeMusicPlayer {
+/** Music player driven by the fake clock: its time starts when it is played, unless it is stuck */
+export class FakeMusicPlayer {
   musicUrl = "fake"
   startedAt: number | null = null
+  isStuck = false
 
   Play() { this.startedAt = performance.now() }
 
   Stop() { this.startedAt = null }
 
   GetCurrentTime(): number {
-    return this.startedAt === null ? 0 : (performance.now() - this.startedAt) / 1000
+    return this.startedAt === null || this.isStuck ? 0 : (performance.now() - this.startedAt) / 1000
   }
 
   SetToTime() { /* Not used by the game loop */ }
 }
 
 /** Music with its timing tags, written like in a .ssc file */
-export function CreateMusic(tags: { bpms: string, stops?: string, offset?: number }): MusicDto {
-  return new MusicDto({ title: "Simulation", artist: "Test", bpms: tags.bpms, stops: tags.stops ?? "", offset: String(tags.offset ?? 0) })
+export function CreateMusic(tags: { bpms: string, stops?: string, offset?: number, bgchanges?: string }): MusicDto {
+  return new MusicDto({ title: "Simulation", artist: "Test", bpms: tags.bpms, stops: tags.stops ?? "", offset: String(tags.offset ?? 0), bgchanges: tags.bgchanges ?? "" })
 }
 
 /** Chart from its measures, each one written as rows of digits like in a .ssc file */
@@ -86,25 +90,32 @@ function KeyboardPlayer(): Player {
   return player
 }
 
-function CreateAnnouncer(): SimulationResult["announcer"] {
+function CreateAnnouncer(): Game["announcer"] {
   return { ChangeSatisfaction: vi.fn(), PlayAnnouncer: vi.fn(), PlayCrowdOneShot: vi.fn() }
 }
 
-/**
- * Plays a whole game with the real GameManager, on a fake clock: the frames, the music time
- * and the key events are all driven by the simulation, millisecond by millisecond.
- * Call it between vi.useFakeTimers() and vi.useRealTimers().
- */
-export async function Simulate(music: MusicDto, chart: NoteDataDto, inputs: Input[], isTrainingMode: boolean = false): Promise<SimulationResult> {
+/** Game with the real GameManager, one keyboard player per chart: every player gets the same key events */
+export function CreateGame(music: MusicDto, charts: NoteDataDto[], isTrainingMode: boolean = false): Game {
   const announcer = CreateAnnouncer()
   const userCache = { GetMusicStats: vi.fn(() => ({ notes: [] })), UpdateUserStatsFromRound: vi.fn() }
   const musicPlayer = new FakeMusicPlayer()
 
-  const manager = new GameManager(music, [KeyboardPlayer()], [chart], isTrainingMode, userCache as unknown as UserCacheService, announcer as unknown as AnnouncerService)
+  const manager = new GameManager(music, charts.map(() => KeyboardPlayer()), charts, isTrainingMode, userCache as unknown as UserCacheService, announcer as unknown as AnnouncerService)
   manager.RegisterExternalComponents(musicPlayer as unknown as IMusicPlayer)
-  const round = manager.gameRounds[0]
+  return { manager, musicPlayer, announcer, userCache }
+}
 
-  const started = manager.StartGame()
+/**
+ * Plays a whole game on a fake clock: the frames, the music time and the key events
+ * are all driven by the simulation, millisecond by millisecond. The game is destroyed at the end.
+ * Rejects like StartGame when the music does not start.
+ * Call it between vi.useFakeTimers() and vi.useRealTimers().
+ */
+export async function Play(game: Game, inputs: Input[]): Promise<void> {
+  const { manager, musicPlayer } = game
+
+  let startError: unknown = null
+  const started = manager.StartGame().catch((error: unknown) => { startError = error })
   const startedAt = musicPlayer.startedAt ?? 0
 
   // Key events on the clock, in milliseconds
@@ -114,7 +125,7 @@ export async function Simulate(music: MusicDto, chart: NoteDataDto, inputs: Inpu
   ]).sort((a, b) => a.at - b.at)
 
   try {
-    while (!manager.isGameOver && performance.now() - startedAt < MAX_DURATION * 1000) {
+    while (!manager.isGameOver && startError === null && performance.now() - startedAt < MAX_DURATION * 1000) {
       while (events.length > 0 && events[0].at <= performance.now()) {
         const event = events.shift()!
         window.dispatchEvent(new KeyboardEvent(event.type, { key: event.key }))
@@ -126,5 +137,14 @@ export async function Simulate(music: MusicDto, chart: NoteDataDto, inputs: Inpu
     manager.DestroyGame()
   }
 
-  return { round, manager, announcer, userCache }
+  if (startError !== null) throw startError
+}
+
+/** Plays a whole game of one player on one chart, see Play */
+export async function Simulate(music: MusicDto, chart: NoteDataDto, inputs: Input[], isTrainingMode: boolean = false): Promise<SimulationResult> {
+  const game = CreateGame(music, [chart], isTrainingMode)
+  // DestroyGame empties the rounds
+  const round = game.manager.gameRounds[0]
+  await Play(game, inputs)
+  return { ...game, round }
 }

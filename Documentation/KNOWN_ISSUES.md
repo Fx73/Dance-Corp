@@ -16,6 +16,11 @@ Bugs found but not fixed yet, and deprecations to migrate. Remove an entry once 
   Possible fix: count the hold heads in the taps, or score them as hold beats only.
   Test: `it.fails` in `tests/simulation/game.simulation.spec.ts`.
 
+- **A perfect game does not get the special crowd sound**
+  `GameRound` adds `scorePerArrow` once per arrow, and the floating point rounding ends just below `CONFIG.SCORE.MAX` (`999999.9999999998` on 15 taps). `GameManager.GameOver()` tests `score >= CONFIG.SCORE.MAX`, so a perfect game plays "applause_heavy" instead of "special".
+  Possible fix: round the score, or compare with a small tolerance.
+  Test: `it.fails` in `tests/simulation/game.simulation.spec.ts`.
+
 - **One press can take two arrows on the same direction**
   `GameRound.GameLoop()` judges every arrow inside the tolerance window with the same pad state: on fast streams on one arrow (closer than the tolerance, 150 ms), the press of an arrow also judges the next one, early (`Good`).
   Possible fix: stop at the first arrow judged per direction and frame.
@@ -47,6 +52,11 @@ Bugs found but not fixed yet, and deprecations to migrate. Remove an entry once 
 - **`.sm` files: the chart credit is lost**
   `SccReader.TokenizeSM()` stores it under `credits`, `NoteDataDto` reads `credit`.
   Test: `it.fails` in `tests/unit/pages/upload/reader.ssc.spec.ts`.
+
+- **Music cache: the localStorage quota (about 5 MB) may be reached**
+  `MusicCacheService` stores every music with its charts in localStorage (`MUSIC_<id>`). A chart weighs roughly 10 to 20 KB as JSON (more with 192-row measures): with about 280 charts, the cache is already near the quota, which is not measured yet. Nothing handles `QuotaExceededError`: once it is reached, `setItem` throws in the middle of a sync and the cache is left half written. The whole cache is also read and parsed synchronously at startup.
+  Possible fix: store the musics in IndexedDB (e.g. `idb-keyval`), only `PersistMusic()`, `RemoveMusic()`, `SaveRegistry()` and the startup read change. First measure the cache size (`JSON.stringify(localStorage).length` in the console).
+  Test: `tests/unit/services/local-storage/music.cache.service.spec.ts` covers the cache behavior, to keep through the migration.
 
 - **`SccReader.ParseFile()`: charts not sorted by their final meter**
   `MusicDto` sorts the charts by the meter of the file, then `ParseFile()` replaces the meters of the charts without criterias by their evaluated level, without sorting again.

@@ -1,8 +1,11 @@
-import { CreateChart, CreateMusic, Input, PerfectInputs, Simulate, TimeOfBeat } from "./simulator"
+import { CreateChart, CreateGame, CreateMusic, Input, PerfectInputs, Play, Simulate, TimeOfBeat } from "./simulator"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 import { ArrowDirection } from "src/app/game/constants/arrow-direction.enum"
+import { ArrowState } from "src/app/game/game-controller/dancepad.interface"
+import { ArrowType } from "src/app/game/constants/arrow-type.enum"
 import { CONFIG } from "src/app/game/constants/game-config"
+import { GameRound } from "src/app/game/game-model/gameRound"
 import { Precision } from "src/app/game/constants/precision.enum"
 
 // 4ths, 8ths and jumps on every direction
@@ -19,6 +22,11 @@ function TapChart(measureCount: number) {
 
 function Precisions(arrows: { precision: Precision | null }[]): (Precision | null)[] {
   return arrows.map(arrow => arrow.precision)
+}
+
+// Without a player display, the precision messages are never consumed: they hold the whole game
+function Messages(round: GameRound): Precision[] {
+  return round.precisionMessage.map(message => message.precision)
 }
 
 describe("Game simulation", () => {
@@ -43,8 +51,17 @@ describe("Game simulation", () => {
       expect(round.isFinished).toBe(true)
       expect(round.comboCount).toBe(round.arrowManager.arrowMap.length)
       expect(round.score).toBeCloseTo(CONFIG.SCORE.MAX, 3)
+      expect(Messages(round)).toEqual(Precisions(round.arrowManager.arrowMap))
       expect(announcer.PlayAnnouncer).toHaveBeenCalledWith("victory")
       expect(userCache.UpdateUserStatsFromRound).toHaveBeenCalledTimes(1)
+    })
+
+    // Known issue: the score adds up scorePerArrow, and the rounding leaves it just below CONFIG.SCORE.MAX
+    it.fails("plays the special crowd sound on a perfect game", async () => {
+      const music = CreateMusic({ bpms: "0=120" })
+      const { announcer } = await Simulate(music, MIXED_CHART, PerfectInputs(music, MIXED_CHART))
+
+      expect(announcer.PlayCrowdOneShot).toHaveBeenCalledWith("special")
     })
 
     it("stays Perfect through BPM changes, stops and an offset", async () => {
@@ -74,6 +91,21 @@ describe("Game simulation", () => {
       expect(hold.isValid).toBe(true)
       expect(hold.isMissed).toBe(false)
       expect(round.isFinished).toBe(true)
+      // The press precision, then OK at the end of the hold
+      expect(Messages(round)).toEqual([Precision.Perfect, Precision.Perfect, Precision.Ok, Precision.Perfect])
+    })
+
+    it("plays a hold without tail as a one-row hold", async () => {
+      const music = CreateMusic({ bpms: "0=120" })
+      const chart = CreateChart(["2000", "0000", "0100", "0000"], ["1000", "0000", "0000", "0000"])
+      const { round } = await Simulate(music, chart, PerfectInputs(music, chart))
+
+      const hold = round.arrowManager.arrowMap[0]
+      expect(hold.type).toBe(ArrowType.Hold)
+      expect(hold.holdLength).toBe(1)
+      expect(hold.isValid).toBe(true)
+      expect(Messages(round)).toEqual([Precision.Perfect, Precision.Ok, Precision.Perfect, Precision.Perfect])
+      expect(round.isFinished).toBe(true)
     })
 
     // Known issue: a hold head also scores like a tap, although the taps share the score without it
@@ -101,6 +133,7 @@ describe("Game simulation", () => {
       const { round } = await Simulate(music, chart, PerfectInputs(music, chart, delay))
 
       expect(new Set(Precisions(round.arrowManager.arrowMap))).toEqual(new Set([precision]))
+      expect(Messages(round)).toEqual([precision, precision])
     })
   })
 
@@ -132,7 +165,9 @@ describe("Game simulation", () => {
       expect(round.isFailed).toBe(true)
       expect(round.isFinished).toBe(false)
       expect(round.score).toBe(0)
+      expect(new Set(Messages(round))).toEqual(new Set([Precision.Missed]))
       expect(announcer.PlayAnnouncer).toHaveBeenCalledWith("game_over")
+      expect(announcer.PlayCrowdOneShot).toHaveBeenCalledWith("boo")
     })
 
     it("never fails in training mode, and does not save the stats", async () => {
@@ -151,6 +186,68 @@ describe("Game simulation", () => {
       const { round } = await Simulate(music, chart, inputs)
 
       expect(round.arrowManager.arrowMap[0].precision).toBe(Precision.Missed)
+      expect(Messages(round)).toEqual([Precision.Perfect, Precision.Missed, Precision.Perfect])
+    })
+  })
+
+  describe("several players", () => {
+    it("plays each player's chart, and saves each player's stats on it", async () => {
+      const music = CreateMusic({ bpms: "0=240" })
+      const charts = [TapChart(1), TapChart(2)]
+      charts[0].chartName = "first"
+      charts[1].chartName = "second"
+      const game = CreateGame(music, charts)
+      const rounds = [...game.manager.gameRounds]
+      await Play(game, [])
+
+      expect(rounds.map(round => round.arrowManager.arrowMap.length)).toEqual([4, 8])
+      expect(game.userCache.UpdateUserStatsFromRound).toHaveBeenCalledTimes(2)
+      expect(game.userCache.UpdateUserStatsFromRound).toHaveBeenCalledWith(music.id, "first", rounds[0])
+      expect(game.userCache.UpdateUserStatsFromRound).toHaveBeenCalledWith(music.id, "second", rounds[1])
+    })
+  })
+
+  describe("music start", () => {
+    it("gives up when the music does not start", async () => {
+      const music = CreateMusic({ bpms: "0=120" })
+      const game = CreateGame(music, [TapChart(1)])
+      game.musicPlayer.isStuck = true
+      const startedAt = performance.now()
+
+      await expect(Play(game, [])).rejects.toThrow("The music did not start")
+      expect(performance.now() - startedAt).toBeGreaterThanOrEqual(CONFIG.GAME.MUSIC_START_TIMEOUT * 1000)
+      expect(game.manager.isGameOver).toBe(false)
+    })
+
+    it("stops waiting for the music without error when the game is destroyed", async () => {
+      const music = CreateMusic({ bpms: "0=120" })
+      const game = CreateGame(music, [TapChart(1)])
+      game.musicPlayer.isStuck = true
+
+      const started = game.manager.StartGame()
+      await vi.advanceTimersByTimeAsync(1000)
+      game.manager.DestroyGame()
+      await vi.advanceTimersByTimeAsync(CONFIG.GAME.MUSIC_START_TIMEOUT * 1000)
+
+      await expect(started).resolves.toBeUndefined()
+      expect(game.manager.isGameOver).toBe(false)
+    })
+  })
+
+  describe("end of the game", () => {
+    it("follows the background changes, up to the last one", async () => {
+      const music = CreateMusic({ bpms: "0=120", bgchanges: "0=a.png,4=b.png,8=c.png" })
+      const { manager } = await Simulate(music, MIXED_CHART, PerfectInputs(music, MIXED_CHART))
+
+      expect(manager.GetCurrentBackground()).toBe("https://c.png")
+    })
+
+    it("releases the keyboard", async () => {
+      const music = CreateMusic({ bpms: "0=240" })
+      const { round } = await Simulate(music, TapChart(1), [])
+
+      window.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowLeft" }))
+      expect(round.dancepad.GetRefreshedState()[ArrowDirection.Left]).toBe(ArrowState.Empty)
     })
   })
 
