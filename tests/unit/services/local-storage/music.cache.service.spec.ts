@@ -11,8 +11,10 @@ type Update = { newMusicIds: string[], toUpdateMusicIds: string[], toDeleteMusic
 const NO_UPDATE: Update = { newMusicIds: [], toUpdateMusicIds: [], toDeleteMusicIds: [], updatedAt: 1 }
 
 // Node 25+ defines its own localStorage global, unusable without --localstorage-file, over the jsdom one
+// Storage API names: kept as declared by the DOM
+/* eslint-disable @typescript-eslint/naming-convention */
 class MemoryStorage implements Storage {
-  private items = new Map<string, string>()
+  private items: Map<string, string> = new Map()
 
   get length(): number { return this.items.size }
 
@@ -26,6 +28,7 @@ class MemoryStorage implements Storage {
 
   setItem(key: string, value: string) { this.items.set(key, String(value)) }
 }
+/* eslint-enable @typescript-eslint/naming-convention */
 
 function Chart(chartName: string, meter: number = 5): NoteDataDto {
   const chart = new NoteDataDto()
@@ -51,7 +54,7 @@ function Ids(musics: MusicDto[]): string[] {
 function CreateFirestore(server: MusicDto[]) {
   return {
     GetAllMusics: vi.fn(async () => server.map(music => music.DeepClone())),
-    GetUpdate: vi.fn(async (_timestamp: number, _ids: Set<string>): Promise<Update | null> => NO_UPDATE),
+    GetUpdate: vi.fn<(timestamp: number, ids: Set<string>) => Promise<Update | null>>(async () => NO_UPDATE),
     GetMusicListWithId: vi.fn(async (ids: string[]) => server.filter(music => ids.includes(music.id)).map(music => music.DeepClone())),
     UploadMusic: vi.fn(async () => undefined),
     UpdateMusic: vi.fn(async () => undefined),
