@@ -6,11 +6,6 @@ Bugs found but not fixed yet, and deprecations to migrate. Remove an entry once 
 
 ## Bugs
 
-- **Score above the max on a chart with holds**
-  `GameRound.CalculateScore()` shares the score between the taps and the hold beats, but a hold head judged `Perfect` / `Great` / `Good` also adds `scorePerArrow`. A perfect game on a chart with holds ends above `CONFIG.SCORE.MAX`.
-  Possible fix: count the hold heads in the taps, or score them as hold beats only.
-  Test: `it.fails` in `tests/simulation/game.simulation.spec.ts`.
-
 - **Genre autocomplete: suggestions unreachable with the keyboard**
   `OnBlur` clears the suggestion list when the input loses focus, so pressing Tab to reach a suggestion closes the list first.
   Possible fix: arrow up/down + Enter navigation from the input, with `aria-activedescendant`.

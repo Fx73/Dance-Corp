@@ -73,7 +73,8 @@ export class GameRound {
     private CalculateScore() {
         const arrowMap = this.arrowManager.arrowMap
         const holdArrows = arrowMap.filter(arrow => arrow.type === ArrowType.Hold)
-        const tapArrows = arrowMap.filter(arrow => arrow.type === ArrowType.Tap)
+        // A hold head is judged like a tap: it scores like one, then its hold beats
+        const tapArrows = arrowMap.filter(arrow => arrow.type === ArrowType.Tap || arrow.type === ArrowType.Hold)
 
         // Calculate total hold percentage for score
         const totalHoldTime = holdArrows.reduce((total, arrow) => total + arrow.holdLength, 0)

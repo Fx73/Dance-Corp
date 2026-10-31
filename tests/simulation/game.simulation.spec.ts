@@ -109,8 +109,8 @@ describe("Game simulation", () => {
       expect(round.isFinished).toBe(true)
     })
 
-    // Known issue: a hold head also scores like a tap, although the taps share the score without it
-    it.fails("gives the max score with holds", async () => {
+    // A hold head scores like a tap, then its hold beats
+    it("gives the max score with holds", async () => {
       const music = CreateMusic({ bpms: "0=120" })
       const chart = CreateChart(["2000", "0000", "0100", "0000"], ["3000", "0000", "0000", "0000"], ["1000", "0000", "0000", "0000"])
       const { round } = await Simulate(music, chart, PerfectInputs(music, chart))
