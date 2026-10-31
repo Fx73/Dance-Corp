@@ -1,3 +1,5 @@
+// Storage API names: kept as declared by the DOM
+/* eslint-disable @typescript-eslint/naming-convention */
 import { MusicDto, NoteDataDto } from "src/app/game/game-model/music.dto"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
@@ -11,8 +13,6 @@ type Update = { newMusicIds: string[], toUpdateMusicIds: string[], toDeleteMusic
 const NO_UPDATE: Update = { newMusicIds: [], toUpdateMusicIds: [], toDeleteMusicIds: [], updatedAt: 1 }
 
 // Node 25+ defines its own localStorage global, unusable without --localstorage-file, over the jsdom one
-// Storage API names: kept as declared by the DOM
-/* eslint-disable @typescript-eslint/naming-convention */
 class MemoryStorage implements Storage {
   private items: Map<string, string> = new Map()
 
@@ -28,7 +28,6 @@ class MemoryStorage implements Storage {
 
   setItem(key: string, value: string) { this.items.set(key, String(value)) }
 }
-/* eslint-enable @typescript-eslint/naming-convention */
 
 function Chart(chartName: string, meter: number = 5): NoteDataDto {
   const chart = new NoteDataDto()
