@@ -1,4 +1,4 @@
-import { ArrowState, IDancePad } from "../game-controller/dancepad.interface"
+import { ArrowState, DancePadInput, IDancePad } from "../game-controller/dancepad.interface"
 
 import { AnnouncerService } from 'src/app/services/gameplay/announcer.service'
 import { Arrow } from "./arrows/arrow"
@@ -93,8 +93,8 @@ export class GameRound {
         const arrowMap = this.arrowManager.arrowMap
         this.currentBeat = currentBeat
 
-        // Get DancePad state
-        const padstate = this.dancepad.GetRefreshedState()
+        // Get DancePad state, copied: a press is consumed below without changing the exposed state
+        const padstate: DancePadInput = [...this.dancepad.GetRefreshedState()]
 
         if (this.isFinished)
             return
@@ -104,7 +104,11 @@ export class GameRound {
         while (currentArrowCheck < arrowMap.length && arrowMap[currentArrowCheck].beatPosition < currentBeat + tolerance) {
             const arrow = arrowMap[currentArrowCheck]
             if (!arrow.isOut) {
+                const precision = arrow.precision
                 this.CheckArrowPress(arrow, currentBeat, padstate[arrow.direction], tolerance)
+                // One press judges one arrow: the next arrows of its direction see it held
+                if (precision === null && GameRound.IsPressJudgment(arrow.precision) && padstate[arrow.direction] === ArrowState.Press)
+                    padstate[arrow.direction] = ArrowState.Hold
             }
             currentArrowCheck++
         }
@@ -134,7 +138,7 @@ export class GameRound {
                     this.MinePassed(arrow)
                 }
             }
-
+            return
         }
 
         if (arrow.type === ArrowType.Hold && arrow.isPressed) {
@@ -288,4 +292,11 @@ export class GameRound {
         if (this.isFailed) return
         this.isFinished = true
     }
+
+    //#region Statics
+    // Judgments given by a press, as opposed to Missed (time out) and Boom (mine)
+    private static IsPressJudgment(precision: Precision | null): boolean {
+        return precision === Precision.Perfect || precision === Precision.Great || precision === Precision.Good || precision === Precision.Almost
+    }
+    //#endregion
 }

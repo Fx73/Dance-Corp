@@ -6,24 +6,9 @@ Bugs found but not fixed yet, and deprecations to migrate. Remove an entry once 
 
 ## Bugs
 
-- **Mines are judged like taps**
-  `GameRound.CheckArrowPress()` does not return after its mine checks, so a mine goes on through the tap judgment: an avoided mine is `Missed` once out of the miss window (combo broken, performance lost) before it passes, and a pressed mine explodes then is judged `Perfect` and scores.
-  Possible fix: `return` at the end of the mine block.
-  Test: `it.fails` in `tests/simulation/game.simulation.spec.ts`.
-
 - **Score above the max on a chart with holds**
   `GameRound.CalculateScore()` shares the score between the taps and the hold beats, but a hold head judged `Perfect` / `Great` / `Good` also adds `scorePerArrow`. A perfect game on a chart with holds ends above `CONFIG.SCORE.MAX`.
   Possible fix: count the hold heads in the taps, or score them as hold beats only.
-  Test: `it.fails` in `tests/simulation/game.simulation.spec.ts`.
-
-- **A perfect game does not get the special crowd sound**
-  `GameRound` adds `scorePerArrow` once per arrow, and the floating point rounding ends just below `CONFIG.SCORE.MAX` (`999999.9999999998` on 15 taps). `GameManager.GameOver()` tests `score >= CONFIG.SCORE.MAX`, so a perfect game plays "applause_heavy" instead of "special".
-  Possible fix: round the score, or compare with a small tolerance.
-  Test: `it.fails` in `tests/simulation/game.simulation.spec.ts`.
-
-- **One press can take two arrows on the same direction**
-  `GameRound.GameLoop()` judges every arrow inside the tolerance window with the same pad state: on fast streams on one arrow (closer than the tolerance, 150 ms), the press of an arrow also judges the next one, early (`Good`).
-  Possible fix: stop at the first arrow judged per direction and frame.
   Test: `it.fails` in `tests/simulation/game.simulation.spec.ts`.
 
 - **Genre autocomplete: suggestions unreachable with the keyboard**
