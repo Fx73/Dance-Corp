@@ -1,0 +1,59 @@
+#VERSION:0.83;
+#TITLE:Test Song;
+#SUBTITLE:;
+#ARTIST:Test Artist;
+#CREDIT:Fx;
+#BANNER:banner.png;
+#JACKET:jacket.png;
+#MUSIC:song.ogg;
+#OFFSET:-0.100;
+#SAMPLESTART:30.000;
+#SAMPLELENGTH:12.000;
+#SELECTABLE:YES;
+#BPMS:0.000=120.000,8.000=240.000;
+#STOPS:4.000=0.500;
+#DELAYS:6.000=0.250;
+#TICKCOUNTS:0.000=4;
+#BGCHANGES:;
+
+//---------------dance-single - Expert----------------
+#NOTEDATA:;
+#CHARTNAME:My Chart;
+#STEPSTYPE:dance-single;
+#DESCRIPTION:Test;
+#DIFFICULTY:Hard;
+#METER:9;
+#CREDIT:Fx;
+#NOTES:
+1000
+0000
+0110
+0001
+,
+2000
+0000
+3000
+M000
+;
+
+//---------------dance-single - Easy----------------
+#NOTEDATA:;
+#STEPSTYPE:dance-single;
+#DIFFICULTY:Easy;
+#METER:3;
+#NOTES:
+1000
+0000
+0001
+0000
+,
+0100
+0000
+0010
+0000
+,
+1000
+0000
+0000
+0000
+;

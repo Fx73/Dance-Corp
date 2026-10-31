@@ -1,3 +1,5 @@
+// External API names: kept as declared by SoundCloud
+/* eslint-disable @typescript-eslint/naming-convention */
 import {
   Component,
   EventEmitter,
@@ -11,8 +13,6 @@ import { IMusicPlayer, MusicPlayerCommon } from '../IMusicPlayer'
 //import { Soundcloud } from 'soundcloud.ts';
 
 /** Subset of the SoundCloud widget API in use (https://developers.soundcloud.com/docs/api/html5-widget) */
-// External API names: kept as declared by SoundCloud
-/* eslint-disable @typescript-eslint/naming-convention */
 interface ISoundCloudWidget {
   load(url: string): void
   bind(eventName: string, listener: () => void): void
@@ -22,7 +22,6 @@ interface ISoundCloudWidget {
   setVolume(volume: number): void
   getPosition(callback: (milliseconds: number) => void): void
 }
-/* eslint-enable @typescript-eslint/naming-convention */
 
 declare const SC: {
   Widget: ((iframe: HTMLIFrameElement) => ISoundCloudWidget) & { Events: { READY: string } }

@@ -1,0 +1,19 @@
+#TITLE:Old Song;
+#ARTIST:Old Artist;
+#BPMS:0.000=150.000;
+#STOPS:;
+#OFFSET:0.050;
+#BACKGROUND:bg.png;
+
+//---------------dance-single - ----------------
+#NOTES:
+     dance-single:
+     Fx:
+     Challenge:
+     10:
+     0.1,0.2,0.3,0.4,0.5:
+1000
+0M00
+0010
+000F
+;

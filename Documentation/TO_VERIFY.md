@@ -92,7 +92,7 @@ Link: https://github.com/Fx73/Dance-Corp/commit/a6b0e70bbc0eb333b340cf732b1a55e5
 → To verify:
   - Login and logout
   - Pages protected by the guard redirect when logged out and open when logged in
-  - Songs load from the cache and from Firestore
+  - Songs load from Firestore
 
 ## Commit: Migration vers inject() : composants et pages
 Link: https://github.com/Fx73/Dance-Corp/commit/2d66e12bd6d3600f359aeb837c43410ab8dcc163
@@ -156,9 +156,7 @@ Link: https://github.com/Fx73/Dance-Corp/commit/c2352e96bd68dec2812f1050c360f8e7
 
 → To verify:
   - Upload: load a song that already exists in the database, protected fields take the database values
-  - Upload: export to `.essc` and compare with a previous export
   - Upload a song, then reload it from the database
-  - Saved players and local songs reload correctly after a page refresh
 
 ## Commit: Typage des API externes : widget SoundCloud et flag zone.js (no-explicit-any)
 Link: https://github.com/Fx73/Dance-Corp/commit/ed6082e1be043df7db7742dd534063d229f13203
@@ -215,17 +213,7 @@ Link: https://github.com/Fx73/Dance-Corp/commit/aecd1f1dcaee60e6d4f782d9fe83790b
 - src/app/game/game.page.ts: **bug fix**, the Discord presence shows the level of the selected chart
 
 → To verify:
-  - Play a chart that is not the first one of the music: the score and "passed" are shown on that chart in browse
   - Tauri: the Discord presence shows the played level
-
-## Commit: Replace re-uploaded notes in the music cache instead of duplicating
-Link: https://github.com/Fx73/Dance-Corp/commit/410da919b78436478a601e3a1facf51220db21a8
-
-- src/app/services/local-storage/music.cache.service.ts: **bug fix**, `UploadNotesInBase()` replaces notes with the same `chartName` instead of appending them
-
-→ To verify:
-  - Upload: re-upload an existing note, then open browse without a full refresh: the chart is listed once, with the new content
-  - Upload a new note: it is added to the list
 
 ## Commit: Start the crowd sound fade-out once its duration is known
 Link: https://github.com/Fx73/Dance-Corp/commit/a08a8da908cb49eee344a5fe127ac317b1f3ed3d
@@ -298,7 +286,6 @@ Link: https://github.com/Fx73/Dance-Corp/commit/00ded672f5b371cda855cf60ba988da1
 - src/app/game/game-model/gameRound.ts, src/app/services/gameplay/announcer.service.ts, src/app/game/game.manager.ts: inline values replaced by `CONFIG`; `SatisfactionType` enum instead of `0` / `1` / `2`; `GameRound.MAX_SCORE` moved to `CONFIG.SCORE.MAX`
 
 → To verify:
-  - A game plays as before: judgments, score, performance bar, fail
   - Announcer combo lines and end of game applause still trigger
 
 ## Commit: Remove debug logs and silence the console in production
@@ -373,9 +360,7 @@ Tested: 29 allow/deny cases in the Firestore emulator (chart creation, edit and 
 
 → To verify (on the PR preview, against dance-corp-dev):
   - Clear the site data, reload: every music shows its charts
-  - Upload a chart, edit it, delete it; another account cannot edit or delete it
-  - Deleting a music is refused while it has charts, then works once they are gone
-  - Changing the bpms is refused once the music has a chart
+  - Upload a chart, edit it, delete it
   - Another browser with a warm cache picks up an added and a deleted chart
 
 ## Commit: Bump the version automatically: patch on dev, minor on release
@@ -408,7 +393,6 @@ Link: https://github.com/Fx73/Dance-Corp/commit/478f5a59871c7b883cd5ca8c6226eeaa
   - Delete a chart from the database: the page reloads without it, the success toast comes after the reload
   - Discard a local edit of a database music: the database version is reloaded
   - Load a `.sm` file of a music that already exists in the database: the page switches to the database music
-  - Corrupt a `MUSIC_<id>` entry in localStorage, reload: an error is logged, the app still starts
   - Desktop: Discord and Steam presence still update when changing pages
   - Finish a song logged in: the score is saved
 
@@ -423,7 +407,7 @@ Link: https://github.com/Fx73/Dance-Corp/commit/17548287a100f9c411a4e3de4f018254
 → To verify:
   - A normal game starts as before, on YouTube, SoundCloud and a local song (desktop)
   - A YouTube music whose video is unavailable: after 15 s, error toast and back to browse
-  - Leave the game during the countdown or the wait: no toast and no navigation afterwards
+  - Leave the game during the countdown: no toast and no navigation afterwards
   - Open the app and play with a pad only, without any click: the music starts, or the game goes back to browse after 15 s
   - Upload page, chart test with an unavailable music: error toast, the modal closes
 
@@ -438,16 +422,6 @@ Link: https://github.com/Fx73/Dance-Corp/commit/6654a7d8eb9ce4a23c6449dabcb85d66
   - A game in single and multiplayer plays the selected charts, and the score is saved on the right chart
   - Upload page: testing a chart other than the first plays that chart; the announcer may now react during the test
   - Browse: select the last chart of a music with many charts, move to a music with fewer: its last chart is selected, and Enter starts the game
-
-## Commit: Factor the music cache persistence into helpers
-Link: https://github.com/Fx73/Dance-Corp/commit/712590e559db82f8493536bdaabef72f66a42101
-
-- src/app/services/local-storage/music.cache.service.ts: `PersistMusic()`, `RemoveMusic()` and `SaveRegistry()` replace the repeated block; an updated music keeps its position in `musics` (it moved to the end before, also when played, as `RunGame` refreshes it); unused `GetMusicWithDbNoUpdate()` removed
-
-→ To verify:
-  - First load with an empty cache (Options, clear the music cache, reload): the whole catalog appears in browse
-  - Play a music: it stays at the same place in the browse list
-  - Upload, update and delete a music, upload and delete a chart: the browse lists follow, also after a reload
 
 ## Commit: Remove unnecessary optional chains, type missing values truthfully
 Link: https://github.com/Fx73/Dance-Corp/commit/820fecd7d29bd013082e80c61626a091e38c2e56
@@ -476,7 +450,6 @@ Link: https://github.com/Fx73/Dance-Corp/commit/2e9994fbfdfdac4f6c6cae028d996c6d
 
 → To verify:
   - Fresh browser (no saved config): menu music, effects and announcers play at the default volumes
-  - A game starts and changes background on a music with background changes
   - The difficulty radar draws on the browse page and on the upload page
   - Disconnect and reconnect an assigned gamepad: it is reassigned to its player
 
@@ -505,8 +478,6 @@ Link: https://github.com/Fx73/Dance-Corp/commit/9c523a4e28d702241156a36cb480ae36
 
 → To verify (after the dev deploy):
   - The Deploy workflow publishes the rules without error
-  - Editing a music still works, and its protected fields are still refused
-  - Deleting a music is refused while it has charts, then works once they are gone
 
 ## Commit: Remove the non-null assertions that a narrowing or a guard makes useless
 Link: https://github.com/Fx73/Dance-Corp/commit/e0138f118fe4de34a7aec4be79a7f2088106bfe3
@@ -521,8 +492,8 @@ Tested: lint and build only.
 - pad-test.page.ts, userconfig.service.ts, upload.page.ts, IMusicPlayer.ts, test-note.component.ts: values captured or guarded before use, no behavior change
 
 → To verify:
-  - Play a song with the keyboard, then with a gamepad: every arrow and Start respond
-  - Precision texts: Perfect / Great / Good / Almost / Missed on taps, the press precision then OK on a completed hold, Missed on a released hold, nothing on a mine
+  - Play a song with a gamepad: every arrow and Start respond
+  - Precision texts show on their arrow; nothing on a mine (blocked by the "Mines are judged like taps" known issue)
   - Search by title and by artist in Browse and in Browse upload
   - Remap a keyboard and a gamepad in Options, the mapping is saved
   - Profile page: account fields and profile card filled
@@ -547,7 +518,7 @@ Tested: lint and build only.
 - arrow.ts, gameRound.ts, player-display.component.ts: hold length read from `Arrow.holdLength` instead of `beatEnd!`
 
 → To verify:
-  - A chart with holds and rolls plays as before: holds drawn to their tail, OK at the end, score reaches its max on a full combo
+  - A chart with holds and rolls: holds drawn to their tail
 
 ## Commit: Reject a music file without title, artist or BPMs
 Link: https://github.com/Fx73/Dance-Corp/commit/9f55b76516006a3d44fee6da950a755b4a9704ee
@@ -559,8 +530,7 @@ Tested: lint and build only.
 - music.dto.ts: `bpms` defaults to `[]`, `id` throws a clear error without artist or title
 
 → To verify:
-  - Upload a valid .sm / .ssc: loaded as before
-  - Upload a file without #TITLE, then without #BPMS: error toast naming the tag, nothing loaded
+  - Upload a file without #TITLE: error toast naming the tag, nothing loaded
   - Upload a file with another extension: error toast
 
 ## Commit: Give a hold without a tail the length of one row
@@ -571,4 +541,4 @@ Tested: partly played by hand, lint and build.
 - arrowManager.ts: a hold (or roll) ends on the next row until its tail is read, so a missing tail leaves the shortest hold instead of a tap; a tail closes its hold
 
 → To verify:
-  - A chart with a hold missing its tail: that arrow shows and plays as a one-row hold
+  - A chart with a hold missing its tail: that arrow shows as a one-row hold
