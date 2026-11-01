@@ -6,8 +6,7 @@ import { ArrowDirection } from 'src/app/game/constants/arrow-direction.enum'
 import { ArrowManager } from './arrows/arrowManager'
 import { ArrowType } from "../constants/arrow-type.enum"
 import { CONFIG } from './../constants/game-config'
-import { DancePadGamepad } from "../game-controller/dancepad-gamepad"
-import { DancePadKeyboard } from '../game-controller/dancepad-keyboard'
+import { CreateDancePad } from "../game-controller/dancepad.factory"
 import { NoteDataDto } from "./music.dto"
 import { Precision } from "../constants/precision.enum"
 import { Player } from "./player"
@@ -54,10 +53,7 @@ export class GameRound {
     constructor(notes: NoteDataDto, player: Player, isTrainingMode = false, private announcerService: AnnouncerService) {
         this.player = player
 
-        if (player.gamepad!.index === -1)
-            this.dancepad = new DancePadKeyboard(player.keyBindingKeyboard)
-        else
-            this.dancepad = new DancePadGamepad(player.gamepad!.index!, player.keyBindingGamepad)
+        this.dancepad = CreateDancePad(player)
 
         this.level = notes.meter
         this.arrowManager = new ArrowManager(notes)

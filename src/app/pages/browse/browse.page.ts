@@ -12,8 +12,7 @@ import { Color } from 'src/app/game/constants/color'
 import { DanceType } from 'src/app/game/constants/dance-type.enum'
 import { CONFIG } from 'src/app/game/constants/game-config'
 import { NoteDifficulty } from 'src/app/game/constants/note-difficulty.enum'
-import { DancePadGamepad } from 'src/app/game/game-controller/dancepad-gamepad'
-import { DancePadKeyboard } from 'src/app/game/game-controller/dancepad-keyboard'
+import { CreateDancePad } from 'src/app/game/game-controller/dancepad.factory'
 import { IDancePad } from 'src/app/game/game-controller/dancepad.interface'
 import { MusicPlayerLocalComponent } from "src/app/game/music-player/music-player-local/music-player-local.component"
 import { MusicPlayerSoundcloudComponent } from "src/app/game/music-player/music-player-soundcloud/music-player-soundcloud.component"
@@ -111,10 +110,7 @@ export class BrowsePage implements OnInit, OnDestroy {
   InitPlayerInput() {
     const players = this.userConfigService.players
     for (const player of players) {
-      if (player.gamepad!.index === -1)
-        this.dancepad.push(new DancePadKeyboard(player.keyBindingKeyboard))
-      else
-        this.dancepad.push(new DancePadGamepad(player.gamepad!.index!, player.keyBindingGamepad))
+      this.dancepad.push(CreateDancePad(player))
     }
   }
 

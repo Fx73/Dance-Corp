@@ -2,6 +2,7 @@ import { Injectable, effect, inject } from '@angular/core'
 
 import { ArrowImageManager } from '../game/game-display/arrowImageManager'
 import { BehaviorSubject } from 'rxjs'
+import { DancePadGamepad } from '../game/game-controller/dancepad-gamepad'
 import { Player } from '../game/game-model/player'
 import { UserFirestoreService } from './firestore/user.firestore.service'
 
@@ -49,15 +50,7 @@ export class UserConfigService {
 
     InstanciatePlayer(index: number): Player {
         const storedPlayer = localStorage.getItem(this.PLAYERS_STORAGE_KEY(index))
-        const player: Player = storedPlayer ? Player.FromJSON(JSON.parse(storedPlayer)) : new Player()
-
-        // Reassociating the gamepad if it exists and is valid
-        if (player.gamepad && player.gamepad.index != -1) {
-            const gamepadId = player.gamepad.id
-            const matchingGamepad = navigator.getGamepads().find(g => g?.id === gamepadId)
-            player.gamepad.index = matchingGamepad ? matchingGamepad.index : null
-        }
-        return player
+        return storedPlayer ? Player.FromJSON(JSON.parse(storedPlayer)) : new Player()
     }
 
     GetConfig(): UserConfig {
@@ -96,7 +89,7 @@ export class UserConfigService {
     }
 
     ArePlayersReady(): boolean {
-        return this.players.every(player => !!player.gamepad?.id && player.gamepad.index !== null)
+        return this.players.every(player => UserConfigService.IsGamepadSeen(player))
     }
 
     UpdateConfig<K extends keyof UserConfig>(option: K, value: UserConfig[K]): void {
@@ -130,6 +123,13 @@ export class UserConfigService {
         }
     }
 
+    //#region Statics
+    // The browser lists a gamepad only once a button of it was pressed
+    static IsGamepadSeen(player: Player): boolean {
+        if (player.gamepadId === undefined) return false
+        return player.gamepadId === Player.KEYBOARD_ID || DancePadGamepad.FindGamepad(player.gamepadId) !== null
+    }
+    //#endregion
 }
 
 export class UserConfig {

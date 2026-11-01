@@ -10,10 +10,6 @@ Bugs found but not fixed yet, and deprecations to migrate. Remove an entry once 
   `OnBlur` clears the suggestion list when the input loses focus, so pressing Tab to reach a suggestion closes the list first.
   Possible fix: arrow up/down + Enter navigation from the input, with `aria-activedescendant`.
 
-- **Gamepad player whose gamepad is not connected: the pad never responds**
-  `UserConfigService` sets `gamepad.index` to `null` when the saved gamepad is not found, and `gamepad` itself is typed `| undefined`. `GameRound` and `BrowsePage` still build a `DancePadGamepad` with `player.gamepad!.index!`: it polls `getGamepads()[null]` and silently ignores every input.
-  Possible fix: one shared factory for the dance pad (keyboard when `index === -1`), and a fallback to the keyboard with a warning toast when the gamepad is missing.
-
 - **Two players: the precision and combo texts of player 2 are shown on player 1**
   `PlayerDisplayComponent` reads its texts with `document.getElementById('precision-text-*')!` and `'combo-text'`. With two displays, the ids are duplicated and both components get the first one's elements.
   Possible fix: `@ViewChild` / `@ViewChildren` template references in the component.

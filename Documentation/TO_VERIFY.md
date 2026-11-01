@@ -542,3 +542,21 @@ Tested: partly played by hand, lint and build.
 
 → To verify:
   - A chart with a hold missing its tail: that arrow shows as a one-row hold
+
+## Commit: Follow the gamepads by id, through disconnections and reconnections
+Link: not known yet (the commit holds its own entry)
+
+Tested: unit tests with a mocked `navigator.getGamepads()`, lint and build. Not played with a real gamepad.
+
+- dancepad-gamepad.ts: the pad finds its gamepad by id each frame (known index first); a missing gamepad gives no input and releases its arrows
+- dancepad.factory.ts, gameRound.ts, browse.page.ts: one factory builds the pad of a player
+- player.ts: `gamepadId` replaces `gamepad` (`{ index, id }`); a player saved before keeps its gamepad
+- gamepad.service.ts: toast when the gamepad of a player connects or disconnects
+- userconfig.service.ts, player-selection.page.ts, pad-test.page.ts: no index stored anymore, the gamepad is looked up by id
+
+→ To verify:
+  - A player saved before this version keeps their gamepad and their key mapping
+  - Play with a gamepad: every arrow responds
+  - Unplug the gamepad during a game: warning toast, no arrow stays held; plug it back: toast, and it plays again (after a button press if the browser asks for one)
+  - Same in Browse: unplug, plug back, the gamepad navigates again
+  - Options, pad test: bind a button of a gamepad; with the gamepad unplugged, a warning toast and the binding popup closes

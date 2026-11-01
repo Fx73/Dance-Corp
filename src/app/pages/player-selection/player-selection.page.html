@@ -28,7 +28,7 @@
               }
               </ion-item>
               <ion-item lines="none">
-                <ion-select label="Gamepad" labelPlacement="stacked" placeholder="Select a gamepad" [value]="player.gamepad?.id" (ionChange)="UpdateGamepad(index, $event.detail.value)">
+                <ion-select label="Gamepad" labelPlacement="stacked" placeholder="Select a gamepad" [value]="player.gamepadId" (ionChange)="UpdateGamepad(index, $event.detail.value)">
                   @for (gamepad of this.gamepadService.GetGamepads(); track gamepad) {
                     <ion-select-option [value]="gamepad.id">
                       {{ gamepad.id }}

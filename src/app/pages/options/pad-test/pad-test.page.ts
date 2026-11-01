@@ -2,6 +2,7 @@ import { AlertController, IonButton, IonCard, IonCardContent, IonCardHeader, Ion
 
 import { AppComponent } from 'src/app/app.component'
 import { ArrowDirection } from 'src/app/game/constants/arrow-direction.enum'
+import { DancePadGamepad } from 'src/app/game/game-controller/dancepad-gamepad'
 
 import { Component, inject } from '@angular/core'
 import { FormsModule } from '@angular/forms'
@@ -23,6 +24,7 @@ export class PadTestPage {
   private alertController = inject(AlertController)
 
   readonly ArrowDirection = ArrowDirection
+  readonly KEYBOARD_ID = Player.KEYBOARD_ID
   readonly arrowKeys = Object.values(ArrowDirection).filter(value => typeof value === 'number')
   playerIndexSelected: number | undefined
   playerSelected: Player | undefined
@@ -50,42 +52,33 @@ export class PadTestPage {
   }
 
   UpdateGamepad(playerIndex: number, gamepadId: string): void {
-    if (gamepadId === "Keyboard") {
-      this.userConfigService.UpdatePlayer('gamepad', playerIndex, { index: -1, id: "Keyboard" })
-
-    } else {
-      const gamepad = navigator.getGamepads().filter(g => g !== null).find(g => g.id === gamepadId)
-      if (gamepad)
-        this.userConfigService.UpdatePlayer("gamepad", playerIndex, { index: gamepad.index, id: gamepad.id })
-      else
-        AppComponent.PresentWarningToast(`Gamepad not found. Please ensure it is connected.`)
-    }
+    this.userConfigService.UpdatePlayer('gamepadId', playerIndex, gamepadId)
   }
 
   async OpenBindPopover(arrowDirection: ArrowDirection): Promise<void> {
-    const gamepad = this.playerSelected?.gamepad
-    if (gamepad === undefined || gamepad.index === null) return
+    const gamepadId = this.playerSelected?.gamepadId
+    if (gamepadId === undefined) return
 
     const alert = await this.alertController.create({
       header: 'Waiting for Input',
-      message: `Press a button on your ${gamepad.id} for ${ArrowDirection[arrowDirection].toUpperCase()}`,
+      message: `Press a button on your ${gamepadId} for ${ArrowDirection[arrowDirection].toUpperCase()}`,
       backdropDismiss: false,
     })
 
     await alert.present()
     this.waitingForInput = true
 
-    if (gamepad.index !== -1)
-      this.WaitForGamepadInput(gamepad.index, arrowDirection, alert)
+    if (gamepadId !== Player.KEYBOARD_ID)
+      this.WaitForGamepadInput(gamepadId, arrowDirection, alert)
     else
       this.WaitForKeyboardInput(arrowDirection, alert)
   }
 
-  WaitForGamepadInput(gamepadIndex: number, arrowDirection: ArrowDirection, alert: HTMLIonAlertElement): void {
+  WaitForGamepadInput(gamepadId: string, arrowDirection: ArrowDirection, alert: HTMLIonAlertElement): void {
     const checkInput = () => {
-      const gamepad = navigator.getGamepads()[gamepadIndex]
+      const gamepad = DancePadGamepad.FindGamepad(gamepadId)
       if (!gamepad) {
-        AppComponent.PresentWarningToast(`Gamepad disconnected. Please reconnect.`)
+        AppComponent.PresentWarningToast(`Gamepad not found: press one of its buttons, or reconnect it.`)
         this.waitingForInput = false
         void alert.dismiss()
         return
@@ -124,10 +117,10 @@ export class PadTestPage {
   }
 
   ValidateMapping(): void {
-    if (this.playerSelected?.gamepad == null || this.playerIndexSelected === undefined)
+    if (this.playerSelected?.gamepadId === undefined || this.playerIndexSelected === undefined)
       return
 
-    if (this.playerSelected.gamepad.index === -1) {
+    if (this.playerSelected.gamepadId === Player.KEYBOARD_ID) {
       const keyboardBindingsObject: Map<string, ArrowDirection> = new Map<string, ArrowDirection>()
       for (const [direction, key] of this.keyboardBindings.entries()) {
         keyboardBindingsObject.set(key, direction)

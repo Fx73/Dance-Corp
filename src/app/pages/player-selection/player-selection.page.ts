@@ -2,7 +2,6 @@ import { Component, inject } from '@angular/core'
 import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonIcon, IonInput, IonItem, IonSelect, IonSelectOption } from '@ionic/angular'
 
 import { AnnouncerService } from 'src/app/services/gameplay/announcer.service'
-import { AppComponent } from 'src/app/app.component'
 
 import { FormsModule } from '@angular/forms'
 import { GamepadService } from 'src/app/services/gameplay/gamepad.service'
@@ -46,16 +45,7 @@ export class PlayerSelectionPage {
   }
 
   UpdateGamepad(playerIndex: number, gamepadId: string): void {
-    if (gamepadId === "Keyboard") {
-      this.userConfigService.UpdatePlayer('gamepad', playerIndex, { index: -1, id: "Keyboard" })
-
-    } else {
-      const gamepad = navigator.getGamepads().filter(g => g !== null).find(g => g.id === gamepadId)
-      if (gamepad)
-        this.userConfigService.UpdatePlayer("gamepad", playerIndex, { index: gamepad.index, id: gamepad.id })
-      else
-        AppComponent.PresentWarningToast(`Gamepad not found. Please ensure it is connected.`)
-    }
+    this.userConfigService.UpdatePlayer('gamepadId', playerIndex, gamepadId)
   }
 
   UpdateUser(playerIndex: number, userId: string | null) {
@@ -73,8 +63,8 @@ export class PlayerSelectionPage {
       return "✅ All players are ready!"
     }
 
-    const missingGamepad = players.filter(player => !player.gamepad?.id).map((player, index) => player.name ?? `Player ${index + 1}`)
-    const unrecognizedGamepad = players.filter(player => player.gamepad?.id && player.gamepad.index === null).map((player, index) => player.name ?? `Player ${index + 1}`)
+    const missingGamepad = players.filter(player => player.gamepadId === undefined).map((player, index) => player.name ?? `Player ${index + 1}`)
+    const unrecognizedGamepad = players.filter(player => player.gamepadId !== undefined && !UserConfigService.IsGamepadSeen(player)).map((player, index) => player.name ?? `Player ${index + 1}`)
 
     let statusMessage = ""
 
