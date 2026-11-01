@@ -20,6 +20,7 @@ import { MusicPlayerYoutubeComponent } from "src/app/game/music-player/music-pla
 import { AnnouncerService } from 'src/app/services/gameplay/announcer.service'
 import { MusicLocalService } from 'src/app/services/local-storage/local.music.service'
 import { UserCacheService } from 'src/app/services/local-storage/user.cache.service'
+import { GamepadService, GamepadStatus } from 'src/app/services/gameplay/gamepad.service'
 import { UserConfigService } from 'src/app/services/userconfig.service'
 import { AppComponent } from 'src/app/app.component'
 import { HeaderComponent } from "src/app/shared/component/header/header.component"
@@ -55,6 +56,7 @@ export class BrowsePage implements OnInit, OnDestroy {
   private musicCacheService = inject(MusicCacheService)
   private userFirestoreService = inject(UserFirestoreService)
   private userConfigService = inject(UserConfigService)
+  private gamepadService = inject(GamepadService)
   private userCacheService = inject(UserCacheService)
   private announcerService = inject(AnnouncerService)
   private discordRpcService = inject(PresenceService)
@@ -112,8 +114,12 @@ export class BrowsePage implements OnInit, OnDestroy {
     const players = this.userConfigService.players
     players.forEach((player, index) => {
       this.dancepad.push(CreateDancePad(player))
-      if (!UserConfigService.IsGamepadSeen(player))
-        AppComponent.PresentOkToast(`${player.name ?? `Player ${index + 1}`}: press a button of ${player.gamepadId} to activate it`)
+      const name = player.name ?? `Player ${index + 1}`
+      const status = player.gamepadId === undefined ? GamepadStatus.Active : this.gamepadService.GetStatus(player.gamepadId)
+      if (status === GamepadStatus.Plugged || status === GamepadStatus.Unknown)
+        AppComponent.PresentOkToast(`${name}: press a button of ${player.gamepadId} to activate it`)
+      else if (status === GamepadStatus.Unplugged)
+        AppComponent.PresentWarningToast(`${name}: ${player.gamepadId} is not plugged in`)
     })
   }
 

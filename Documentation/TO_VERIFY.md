@@ -573,3 +573,20 @@ Tested: lint, build and unit tests. Not played with a real gamepad.
 → To verify:
   - Reload the app with a gamepad plugged, without touching it: Start is enabled, Browse shows the "press a button" toast
   - Press a button of the gamepad: the "connected" toast shows, and the gamepad navigates; judge whether these two toasts are smooth enough
+
+## Commit: Desktop: tell whether a gamepad is plugged in before the webview sees it
+Link: not known yet (the commit holds its own entry)
+
+Tested: `cargo check`, lint, build, unit tests with the Tauri IPC mocked. Not run in the desktop app, no real gamepad.
+
+- src-tauri/src/gamepad.rs, lib.rs: a thread watches the gamepads with `gilrs`, `list_gamepads` lists them, `native-gamepad-connected` / `native-gamepad-disconnected` are emitted
+- native-gamepad.service.ts: desktop only, keeps the list and matches a webview gamepad id by its vendor and product ids
+- gamepad.service.ts: `GetStatus()` (active, plugged, unplugged, unknown), toast when the gamepad of a player is plugged in before the webview sees it
+- player-selection.page.ts, browse.page.ts: an unplugged gamepad is told apart from one waiting for a button press
+
+→ To verify (desktop app):
+  - `npx tauri dev` starts, the console logs the gamepads plugged in
+  - A gamepad with "Vendor: … Product: …" in its id (most dance pads), plugged before the app starts: player selection says to press a button; unplugged: says it is not plugged in
+  - Plug it while the app runs: the "plugged in, press one of its buttons" toast shows, then "connected" after a press
+  - An XInput gamepad (Xbox): no vendor in its id, the status stays "press a button" as in the browser
+  - The inputs in game are not slowed down by the watch thread

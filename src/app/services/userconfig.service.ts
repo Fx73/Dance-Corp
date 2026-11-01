@@ -2,7 +2,6 @@ import { Injectable, effect, inject } from '@angular/core'
 
 import { ArrowImageManager } from '../game/game-display/arrowImageManager'
 import { BehaviorSubject } from 'rxjs'
-import { DancePadGamepad } from '../game/game-controller/dancepad-gamepad'
 import { Player } from '../game/game-model/player'
 import { UserFirestoreService } from './firestore/user.firestore.service'
 
@@ -123,14 +122,6 @@ export class UserConfigService {
             localStorage.removeItem(this.PLAYERS_STORAGE_KEY(index))
         }
     }
-
-    //#region Statics
-    // The browser lists a gamepad only once a button of it was pressed
-    static IsGamepadSeen(player: Player): boolean {
-        if (player.gamepadId === undefined) return false
-        return player.gamepadId === Player.KEYBOARD_ID || DancePadGamepad.FindGamepad(player.gamepadId) !== null
-    }
-    //#endregion
 }
 
 export class UserConfig {

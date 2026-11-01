@@ -4,7 +4,7 @@ import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, Ion
 import { AnnouncerService } from 'src/app/services/gameplay/announcer.service'
 
 import { FormsModule } from '@angular/forms'
-import { GamepadService } from 'src/app/services/gameplay/gamepad.service'
+import { GamepadService, GamepadStatus } from 'src/app/services/gameplay/gamepad.service'
 import { HeaderComponent } from "src/app/shared/component/header/header.component"
 import { Player } from 'src/app/game/game-model/player'
 import { RouterModule } from '@angular/router'
@@ -59,9 +59,11 @@ export class PlayerSelectionPage {
   GetPlayerStatus(): string {
     const players = this.userConfigService.players
     const names = players.map((player, index) => player.name ?? `Player ${index + 1}`)
-    const missingGamepad = names.filter((_, index) => players[index].gamepadId === undefined)
-    // Not blocking: the gamepad plays as soon as the browser sees it
-    const unseenGamepad = names.filter((_, index) => players[index].gamepadId !== undefined && !UserConfigService.IsGamepadSeen(players[index]))
+    const statuses = players.map(player => player.gamepadId === undefined ? null : this.gamepadService.GetStatus(player.gamepadId))
+    const missingGamepad = names.filter((_, index) => statuses[index] === null)
+    // Not blocking: the gamepad plays as soon as the webview sees it
+    const unseenGamepad = names.filter((_, index) => statuses[index] === GamepadStatus.Plugged || statuses[index] === GamepadStatus.Unknown)
+    const unpluggedGamepad = names.filter((_, index) => statuses[index] === GamepadStatus.Unplugged)
 
     let statusMessage = this.allPlayersReady ? "✅ All players are ready!\n" : ""
 
@@ -71,6 +73,10 @@ export class PlayerSelectionPage {
 
     if (unseenGamepad.length > 0) {
       statusMessage += `🔄 ${unseenGamepad.join(", ")}: press a button to activate your gamepad.\n`
+    }
+
+    if (unpluggedGamepad.length > 0) {
+      statusMessage += `🔌 ${unpluggedGamepad.join(", ")}: your gamepad is not plugged in.\n`
     }
 
     return statusMessage
