@@ -560,3 +560,16 @@ Tested: unit tests with a mocked `navigator.getGamepads()`, lint and build. Not 
   - Unplug the gamepad during a game: warning toast, no arrow stays held; plug it back: toast, and it plays again (after a button press if the browser asks for one)
   - Same in Browse: unplug, plug back, the gamepad navigates again
   - Options, pad test: bind a button of a gamepad; with the gamepad unplugged, a warning toast and the binding popup closes
+
+## Commit: Let a game start before the browser has seen the gamepads
+Link: not known yet (the commit holds its own entry)
+
+Tested: lint, build and unit tests. Not played with a real gamepad.
+
+- userconfig.service.ts: players are ready once each one has a gamepad chosen, seen by the browser or not
+- player-selection.page.ts: the "press a button" line no longer blocks the start
+- browse.page.ts: a toast asks each player whose gamepad is not seen yet to press one of its buttons
+
+→ To verify:
+  - Reload the app with a gamepad plugged, without touching it: Start is enabled, Browse shows the "press a button" toast
+  - Press a button of the gamepad: the "connected" toast shows, and the gamepad navigates; judge whether these two toasts are smooth enough

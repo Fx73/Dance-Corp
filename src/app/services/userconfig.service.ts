@@ -88,8 +88,9 @@ export class UserConfigService {
         this.UpdateConfig("playerNumber", this.players.length)
     }
 
+    // A gamepad not seen yet does not block: it plays from its first button press
     ArePlayersReady(): boolean {
-        return this.players.every(player => UserConfigService.IsGamepadSeen(player))
+        return this.players.every(player => player.gamepadId !== undefined)
     }
 
     UpdateConfig<K extends keyof UserConfig>(option: K, value: UserConfig[K]): void {

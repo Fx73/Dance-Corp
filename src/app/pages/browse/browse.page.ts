@@ -21,6 +21,7 @@ import { AnnouncerService } from 'src/app/services/gameplay/announcer.service'
 import { MusicLocalService } from 'src/app/services/local-storage/local.music.service'
 import { UserCacheService } from 'src/app/services/local-storage/user.cache.service'
 import { UserConfigService } from 'src/app/services/userconfig.service'
+import { AppComponent } from 'src/app/app.component'
 import { HeaderComponent } from "src/app/shared/component/header/header.component"
 import { RadarScoreComponent } from "src/app/shared/component/radar-score/radar-score.component"
 import { MusicCacheService } from '../../services/local-storage/music.cache.service'
@@ -109,9 +110,11 @@ export class BrowsePage implements OnInit, OnDestroy {
 
   InitPlayerInput() {
     const players = this.userConfigService.players
-    for (const player of players) {
+    players.forEach((player, index) => {
       this.dancepad.push(CreateDancePad(player))
-    }
+      if (!UserConfigService.IsGamepadSeen(player))
+        AppComponent.PresentOkToast(`${player.name ?? `Player ${index + 1}`}: press a button of ${player.gamepadId} to activate it`)
+    })
   }
 
   readonly blockedKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'Spacebar', 'Enter']

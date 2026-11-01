@@ -58,25 +58,22 @@ export class PlayerSelectionPage {
 
   GetPlayerStatus(): string {
     const players = this.userConfigService.players
+    const names = players.map((player, index) => player.name ?? `Player ${index + 1}`)
+    const missingGamepad = names.filter((_, index) => players[index].gamepadId === undefined)
+    // Not blocking: the gamepad plays as soon as the browser sees it
+    const unseenGamepad = names.filter((_, index) => players[index].gamepadId !== undefined && !UserConfigService.IsGamepadSeen(players[index]))
 
-    if (this.allPlayersReady) {
-      return "✅ All players are ready!"
-    }
-
-    const missingGamepad = players.filter(player => player.gamepadId === undefined).map((player, index) => player.name ?? `Player ${index + 1}`)
-    const unrecognizedGamepad = players.filter(player => player.gamepadId !== undefined && !UserConfigService.IsGamepadSeen(player)).map((player, index) => player.name ?? `Player ${index + 1}`)
-
-    let statusMessage = ""
+    let statusMessage = this.allPlayersReady ? "✅ All players are ready!\n" : ""
 
     if (missingGamepad.length > 0) {
       statusMessage += `⚠ ${missingGamepad.join(", ")} must have a gamepad.\n`
     }
 
-    if (unrecognizedGamepad.length > 0) {
-      statusMessage += `🔄 ${unrecognizedGamepad.join(", ")} must press a button to activate their gamepad.\n`
+    if (unseenGamepad.length > 0) {
+      statusMessage += `🔄 ${unseenGamepad.join(", ")}: press a button to activate your gamepad.\n`
     }
 
-    return statusMessage || "🔍 Waiting for configuration..."
+    return statusMessage
   }
 
   OnStartClick() {
